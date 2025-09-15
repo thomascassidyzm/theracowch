@@ -109,40 +109,42 @@ class TheracowchVueCompiler {
     <!-- Theracowch App Template -->
     <div class="theracowch-app min-h-screen">
       <!-- Fun Navigation Bar -->
-      <nav class="bg-white/80 backdrop-blur-lg shadow-lg" style="background: rgba(255, 255, 255, 0.9);">
+      <nav class="fixed top-0 left-0 right-0 z-50" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);">
         <div class="max-w-lg mx-auto px-6 py-6">
           <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold" style="color: var(--text-dark)">
-              <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-10 h-10 inline-block rounded-full mr-3"> Theracowch
+            <h1 class="text-2xl font-bold flex items-center" style="color: var(--text-glass)">
+              <div class="w-10 h-10 bg-gradient-to-br from-neon-blue to-neon-purple rounded-full mr-3 flex items-center justify-center text-white font-bold shadow-lg">🐄</div> 
+              Theracowch
             </h1>
-            <div class="text-sm font-medium" style="color: var(--text-light)">
-              ✨ Daily Wellness
+            <div class="text-sm font-medium flex items-center gap-2" style="color: var(--text-glass-soft)">
+              <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
+              Online
             </div>
           </div>
         </div>
       </nav>
 
       <!-- Dashboard Content -->
-      <main class="max-w-lg mx-auto p-4" v-if="currentView === 'dashboard'">
+      <main class="max-w-lg mx-auto p-4 pt-24" v-if="currentView === 'dashboard'">
         <!-- AI Mandy Greeting -->
         <div class="wysa-card mb-6">
           <div class="flex items-center mb-3">
             <div class="cow-character-illustration mr-4 floating">
-              <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="cow-image" />
+              <div class="w-16 h-16 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full flex items-center justify-center text-2xl">🐄</div>
             </div>
             <div>
-              <h2 class="font-semibold text-lg" style="color: var(--text-dark)">AI Mandy</h2>
-              <p class="text-sm" style="color: var(--text-medium)">Your therapeutic coaching companion</p>
+              <h2 class="font-bold text-xl" style="color: var(--text-glass)">AI Mandy</h2>
+              <p class="text-sm font-medium" style="color: var(--text-glass-soft)">Your therapeutic coaching companion</p>
             </div>
           </div>
-          <p style="color: var(--text-dark)">{{ aiMandyGreeting }}</p>
+          <p class="text-base leading-relaxed" style="color: var(--text-glass-soft)">{{ aiMandyGreeting }}</p>
         </div>
 
         <!-- Daily Quote -->
         <div class="wysa-card mb-6">
-          <h3 class="font-semibold mb-3" style="color: var(--text-dark)"><img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-5 h-5 inline-block rounded-full"> Daily Inspiration</h3>
-          <blockquote class="italic mb-3" style="color: var(--text-medium)">{{ dailyQuote.text }}</blockquote>
-          <p class="text-sm mb-3" style="color: var(--text-medium)">- {{ dailyQuote.author }}</p>
+          <h3 class="font-semibold mb-3 flex items-center" style="color: var(--text-glass)"><div class="w-6 h-6 bg-gradient-to-br from-neon-orange to-neon-red rounded-full mr-2 flex items-center justify-center text-sm">✨</div> Daily Inspiration</h3>
+          <blockquote class="italic mb-4 text-lg leading-relaxed" style="color: var(--text-glass-soft)">{{ dailyQuote.text }}</blockquote>
+          <p class="text-sm font-medium" style="color: var(--text-glass-muted)">- {{ dailyQuote.author }}</p>
           <button @click="getNewQuote" class="wysa-button-secondary text-sm">
             🔄 Get new quote
           </button>
@@ -158,7 +160,7 @@ class TheracowchVueCompiler {
                :style="{ animationDelay: (index * 0.1) + 's' }">
             <div class="flex items-center p-4">
               <div class="mr-4 pulsing">
-                <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-12 h-12 rounded-full">
+                <div class="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-blue rounded-full flex items-center justify-center text-xl">🐄</div>
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-lg text-white text-shadow">{{ section.title }}</h3>
@@ -174,10 +176,10 @@ class TheracowchVueCompiler {
         <!-- Quick Actions -->
         <div class="grid grid-cols-2 gap-4">
           <button @click="quickMoodCheck" class="wysa-button text-center py-4">
-            <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-4 h-4 inline-block rounded-full"> Quick Mood Check
+            <div class="w-5 h-5 bg-gradient-to-br from-neon-green to-neon-cyan rounded-full mr-2 flex items-center justify-center text-xs">📊</div> Quick Mood Check
           </button>
           <button @click="chatWithMandy" class="wysa-button-secondary text-center py-4">
-            <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-4 h-4 inline-block rounded-full"> Chat with Mandy
+            <div class="w-5 h-5 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full mr-2 flex items-center justify-center text-xs">💬</div> Chat with Mandy
           </button>
         </div>
       </main>
@@ -203,7 +205,7 @@ class TheracowchVueCompiler {
         <!-- AI Mandy Guidance -->
         <div class="wysa-card mb-6">
           <div class="flex items-center mb-3">
-            <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="cow-image mr-3" style="width: 60px; height: 60px;" />
+            <img class="hidden" alt="AI Mandy" class="cow-image mr-3" style="width: 60px; height: 60px;" />
             <div>
               <h3 class="font-semibold" style="color: var(--text-dark)">AI Mandy's Guidance</h3>
             </div>
@@ -236,7 +238,7 @@ class TheracowchVueCompiler {
         <div class="flex items-center p-4 bg-white border-b">
           <button @click="goToDashboard" class="mr-3 text-gray-600">←</button>
           <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center mr-3">
-            <img src="assets/theracowch_main_image.jpg" alt="Mandy" class="w-8 h-8 rounded-full">
+            <img class="hidden" alt="Mandy" class="w-8 h-8 rounded-full">
           </div>
           <div class="flex-1">
             <h2 class="font-semibold">Mandy</h2>
@@ -604,49 +606,49 @@ class TheracowchVueCompiler {
             key: 'self_care',
             title: 'I - Me, Myself & I',
             subtitle: 'Self-care and personal wellness',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-self-care'
           },
           {
             key: 'mindfulness',
             title: 'M - Mindfulness',
             subtitle: 'Present moment awareness',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-mindfulness'
           },
           {
             key: 'acceptance',
             title: 'A - Acceptance',
             subtitle: 'Embracing your current state',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-acceptance'
           },
           {
             key: 'gratitude',
             title: 'G - Gratitude',
             subtitle: 'Focusing on positive aspects',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-gratitude'
           },
           {
             key: 'interactions',
             title: 'I - Interactions',
             subtitle: 'Connecting with others',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-interactions'
           },
           {
             key: 'nurturing',
             title: 'N - Nurturing',
             subtitle: 'Fun, playfulness, and joy',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-nurturing'
           },
           {
             key: 'exploring',
             title: 'E - Exploring',
             subtitle: 'Understanding thoughts & behaviors',
-            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            icon: '<img class="hidden" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
             gradientClass: 'gradient-exploring'
           }
         ]);
@@ -1013,37 +1015,64 @@ class TheracowchVueCompiler {
     }
     
     .theracowch-app {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
-      background: linear-gradient(135deg, #2C3E50 0%, #34495E 50%, #2C3E50 100%);
+      background: var(--bg-dark);
+      position: relative;
+    }
+    
+    .theracowch-app::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
     
     :root {
-      --teal-primary: #4ECDC4;
-      --coral-accent: #FF8A80;
-      --blue-soft: #81C7D4;
-      --pink-soft: #FFB3B3;
-      --purple-soft: #C8A2C8;
-      --yellow-soft: #FFF176;
-      --green-soft: #A5D6A7;
-      --white: #FFFFFF;
-      --text-dark: #2C3E50;
-      --text-medium: #5A6C7D;
-      --text-light: #8FA7B3;
-      --shadow: rgba(0, 0, 0, 0.08);
-      --shadow-medium: rgba(0, 0, 0, 0.12);
-      --border-radius: 20px;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+      --neon-blue: #00D4FF;
+      --neon-purple: #8B5CF6;
+      --neon-pink: #EC4899;
+      --neon-green: #10B981;
+      --neon-orange: #F59E0B;
+      --neon-red: #EF4444;
+      --neon-cyan: #06B6D4;
+      --text-glass: rgba(255, 255, 255, 0.9);
+      --text-glass-soft: rgba(255, 255, 255, 0.7);
+      --text-glass-muted: rgba(255, 255, 255, 0.5);
+      --bg-dark: linear-gradient(135deg, #0F0C29 0%, #24243e 50%, #2b5876 100%);
+      --shadow-glow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --border-radius-modern: 24px;
     }
     
     /* Rootd-style fun cards */
     .wysa-card {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 24px;
-      box-shadow: 0 8px 32px var(--shadow);
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: var(--glass-bg);
+      border-radius: var(--border-radius-modern);
+      padding: 28px;
+      box-shadow: var(--shadow-glow);
+      margin-bottom: 24px;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .wysa-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.3);
     }
     
     /* Therapeutic cow character styling */
@@ -1078,37 +1107,60 @@ class TheracowchVueCompiler {
     
     /* Simplified consistent buttons */
     .wysa-button {
-      background: linear-gradient(135deg, var(--teal-primary) 0%, var(--blue-soft) 100%);
+      background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 100%);
       color: white;
       border: none;
-      border-radius: 15px;
-      padding: 16px 24px;
+      border-radius: var(--border-radius-modern);
+      padding: 18px 28px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-      transition: all 0.2s ease;
+      box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .wysa-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .wysa-button:hover::before {
+      left: 100%;
     }
     
     .wysa-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px rgba(0, 212, 255, 0.4);
+      border-color: rgba(0, 212, 255, 0.4);
     }
     
     .wysa-button-secondary {
-      background: var(--white);
-      color: var(--text-medium);
-      border: 1px solid rgba(78, 205, 196, 0.2);
-      border-radius: 15px;
-      padding: 12px 20px;
+      background: var(--glass-bg);
+      color: var(--text-glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius-modern);
+      padding: 16px 24px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
     }
     
     .wysa-button-secondary:hover {
-      border-color: var(--teal-primary);
-      color: var(--teal-primary);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
+      transform: translateY(-2px);
     }
     
     /* Progress indicators */
@@ -1155,32 +1207,46 @@ class TheracowchVueCompiler {
     
     /* Slight variations for distinction */
     .gradient-self-care { 
-      background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); 
+      background: linear-gradient(135deg, var(--neon-red) 0%, var(--neon-pink) 100%); 
       color: white; 
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 0 8px 32px rgba(239, 68, 68, 0.2);
     }
     .gradient-mindfulness { 
-      background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%); 
+      background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 100%); 
       color: white; 
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2);
     }
     .gradient-acceptance { 
-      background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); 
+      background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%); 
       color: white; 
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
     }
     .gradient-gratitude { 
-      background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%); 
+      background: linear-gradient(135deg, var(--neon-orange) 0%, var(--neon-red) 100%); 
       color: white; 
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      box-shadow: 0 8px 32px rgba(245, 158, 11, 0.2);
     }
     .gradient-interactions { 
-      background: linear-gradient(135deg, #E91E63 0%, #AD1457 100%); 
+      background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-purple) 100%); 
       color: white; 
+      border: 1px solid rgba(236, 72, 153, 0.3);
+      box-shadow: 0 8px 32px rgba(236, 72, 153, 0.2);
     }
     .gradient-nurturing { 
-      background: linear-gradient(135deg, #FF5722 0%, #D84315 100%); 
+      background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-cyan) 100%); 
       color: white; 
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
     }
     .gradient-exploring { 
-      background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); 
+      background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%); 
       color: white; 
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
     }
     
     /* Navigation styling */
