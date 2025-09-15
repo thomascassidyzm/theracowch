@@ -18,7 +18,7 @@
     .theracowch-app {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
       min-height: 100vh;
-      background: linear-gradient(135deg, #FFE0E6 0%, #E1F5FE 100%);
+      background: linear-gradient(135deg, #2C3E50 0%, #34495E 50%, #2C3E50 100%);
     }
     
     :root {
@@ -158,31 +158,31 @@
     
     /* Slight variations for distinction */
     .gradient-self-care { 
-      background: linear-gradient(135deg, var(--coral-accent) 0%, var(--pink-soft) 100%); 
+      background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); 
       color: white; 
     }
     .gradient-mindfulness { 
-      background: linear-gradient(135deg, var(--blue-soft) 0%, var(--teal-primary) 100%); 
+      background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%); 
       color: white; 
     }
     .gradient-acceptance { 
-      background: linear-gradient(135deg, var(--purple-soft) 0%, var(--pink-soft) 100%); 
+      background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); 
       color: white; 
     }
     .gradient-gratitude { 
-      background: linear-gradient(135deg, var(--yellow-soft) 0%, var(--coral-accent) 100%); 
-      color: var(--text-dark); 
+      background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%); 
+      color: white; 
     }
     .gradient-interactions { 
-      background: linear-gradient(135deg, var(--purple-soft) 0%, var(--blue-soft) 100%); 
+      background: linear-gradient(135deg, #E91E63 0%, #AD1457 100%); 
       color: white; 
     }
     .gradient-nurturing { 
-      background: linear-gradient(135deg, var(--pink-soft) 0%, var(--coral-accent) 100%); 
+      background: linear-gradient(135deg, #FF5722 0%, #D84315 100%); 
       color: white; 
     }
     .gradient-exploring { 
-      background: linear-gradient(135deg, var(--green-soft) 0%, var(--teal-primary) 100%); 
+      background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); 
       color: white; 
     }
     
@@ -318,6 +318,283 @@
       backdrop-filter: blur(5px);
     }
     
+    /* Photo Upload Styling */
+    .photo-upload-area {
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px dashed rgba(78, 205, 196, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .photo-upload-placeholder {
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(129, 199, 212, 0.1) 100%);
+    }
+    
+    .photo-upload-placeholder:hover {
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(129, 199, 212, 0.2) 100%);
+      border-color: rgba(78, 205, 196, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.8;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .upload-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    
+    .upload-hint {
+      font-size: 14px;
+      color: var(--text-medium);
+      opacity: 0.8;
+    }
+    
+    .photo-preview-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    
+    .photo-preview {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .photo-actions {
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.05) 0%, rgba(129, 199, 212, 0.05) 100%);
+    }
+    
+    .change-photo-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, var(--teal-primary) 0%, var(--blue-soft) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+    }
+    
+    .change-photo-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
+    }
+    
+    .remove-photo-btn {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+    }
+    
+    .remove-photo-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+    }
+    
+    /* Enhanced animations for photo upload */
+    @keyframes photoUpload {
+      0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+      50% { transform: scale(1.05) rotate(2deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    
+    .photo-preview-container {
+      animation: photoUpload 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    /* Hidden file input */
+    .hidden {
+      display: none;
+    }
+
+    /* Enhanced Chat Interface Styling */
+    .chat-message-enter-active {
+      transition: all 0.3s ease-out;
+    }
+    
+    .chat-message-enter-from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    
+    .chat-message-enter-to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Therapeutic Typing Indicator */
+    @keyframes typing-bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    .animate-bounce {
+      animation: typing-bounce 1.4s infinite;
+    }
+    
+    /* Enhanced Message Bubbles */
+    .chat-bubble {
+      position: relative;
+      animation: fadeInUp 0.3s ease-out;
+    }
+    
+    .chat-bubble::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+    
+    /* User message tail */
+    .chat-bubble.user::before {
+      right: -8px;
+      top: 12px;
+      border-left: 8px solid #8B5CF6;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+    
+    /* AI message tail */
+    .chat-bubble.ai::before {
+      left: -8px;
+      top: 12px;
+      border-right: 8px solid white;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+    
+    /* Therapeutic Status Indicators */
+    .therapy-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    
+    .therapy-indicator.listening {
+      background-color: #10B981;
+    }
+    
+    .therapy-indicator.exploring {
+      background-color: #F59E0B;
+    }
+    
+    .therapy-indicator.deepening {
+      background-color: #8B5CF6;
+    }
+    
+    .therapy-indicator.integrating {
+      background-color: #EF4444;
+    }
+    
+    /* Coping Strategy Cards */
+    .coping-strategy-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 4px 0;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .coping-strategy-card:hover {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    /* IMAGINE Section Quick Access */
+    .imagine-quick-access {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+    }
+    
+    .imagine-quick-access:hover {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%);
+      border-color: rgba(147, 51, 234, 0.3);
+    }
+    
+    /* Enhanced animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Therapeutic Session Progress */
+    .session-progress {
+      background: linear-gradient(90deg, #10B981 0%, #F59E0B 25%, #8B5CF6 50%, #EF4444 75%, #10B981 100%);
+      height: 2px;
+      border-radius: 1px;
+      opacity: 0.3;
+    }
+    
+    /* Message Pattern Indicators */
+    .pattern-indicator {
+      font-size: 0.625rem;
+      color: rgba(107, 114, 128, 0.7);
+      font-style: italic;
+    }
+    
+    .pattern-indicator.anxiety {
+      color: rgba(239, 68, 68, 0.7);
+    }
+    
+    .pattern-indicator.depression {
+      color: rgba(59, 130, 246, 0.7);
+    }
+    
+    .pattern-indicator.perfectionism {
+      color: rgba(139, 92, 246, 0.7);
+    }
+    
+    .pattern-indicator.general {
+      color: rgba(16, 185, 129, 0.7);
+    }
+
     /* Mobile-first responsive design */
     @media (max-width: 640px) {
       .max-w-lg {
@@ -328,6 +605,29 @@
       .wysa-card {
         margin: 8px;
         border-radius: 12px;
+      }
+      
+      .photo-preview {
+        height: 160px;
+      }
+      
+      .photo-actions {
+        padding: 12px;
+        gap: 8px;
+      }
+      
+      .change-photo-btn,
+      .remove-photo-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+      
+      .upload-icon {
+        font-size: 40px;
+      }
+      
+      .upload-text {
+        font-size: 16px;
       }
     }
   </style>
@@ -386,7 +686,9 @@
                :class="section.gradientClass"
                :style="{ animationDelay: (index * 0.1) + 's' }">
             <div class="flex items-center p-4">
-              <div class="text-3xl mr-4 pulsing" v-html="section.icon"></div>
+              <div class="mr-4 pulsing">
+                <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-12 h-12 rounded-full">
+              </div>
               <div class="flex-1">
                 <h3 class="font-bold text-lg text-white text-shadow">{{ section.title }}</h3>
                 <p class="text-sm text-white opacity-90">{{ section.subtitle }}</p>
@@ -457,41 +759,101 @@
         </div>
       </main>
 
-      <!-- Chat Interface -->
+      <!-- Enhanced Chat Interface with Therapeutic Features -->
       <main class="max-w-lg mx-auto" v-if="currentView === 'chat'">
+        <!-- Chat Header with Therapeutic Context -->
         <div class="flex items-center p-4 bg-white border-b">
           <button @click="goToDashboard" class="mr-3 text-gray-600">←</button>
           <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center mr-3">
-            <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="w-8 h-8 rounded-full">
+            <img src="assets/theracowch_main_image.jpg" alt="Mandy" class="w-8 h-8 rounded-full">
           </div>
-          <div>
-            <h2 class="font-semibold">AI Mandy</h2>
-            <p class="text-sm text-green-600">● Online</p>
+          <div class="flex-1">
+            <h2 class="font-semibold">Mandy</h2>
+            <p class="text-sm text-green-600">● Available for therapeutic coaching</p>
+            <p class="text-xs text-gray-500" v-if="conversationContext.currentPattern">
+              Current focus: {{ conversationContext.currentPattern }}
+            </p>
+          </div>
+          <div class="text-xs text-gray-400">
+            Phase: {{ conversationContext.sessionPhase }}
           </div>
         </div>
         
+        <!-- Chat Messages with Enhanced Display -->
         <div class="h-96 overflow-y-auto p-4 bg-gray-50">
           <div v-for="message in chatHistory" :key="message.id" class="mb-4">
             <div :class="message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
-              <div :class="message.sender === 'user' ? 
-                           'bg-purple-500 text-white rounded-l-lg rounded-tr-lg p-3 max-w-xs' : 
-                           'bg-white text-gray-800 rounded-r-lg rounded-tl-lg p-3 max-w-xs shadow-sm'">
-                {{ message.text }}
+              <div class="max-w-xs">
+                <!-- Message Content -->
+                <div :class="message.sender === 'user' ? 
+                             'bg-purple-500 text-white rounded-l-lg rounded-tr-lg p-3 shadow-sm' : 
+                             'bg-white text-gray-800 rounded-r-lg rounded-tl-lg p-3 shadow-sm border border-gray-200'">
+                  {{ message.text }}
+                </div>
+                
+                <!-- Message Metadata (for Mandy's messages) -->
+                <div v-if="message.sender === 'ai_mandy' && message.framework" 
+                     class="text-xs text-gray-400 mt-1 px-2">
+                  <span v-if="message.pattern">{{ message.pattern }} · </span>
+                  {{ message.framework }}
+                </div>
+                
+                <!-- Timestamp -->
+                <div class="text-xs text-gray-400 mt-1 px-2">
+                  {{ new Date(message.timestamp).toLocaleTimeString() }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Typing Indicator -->
+          <div v-if="isTyping" class="flex justify-start mb-4">
+            <div class="bg-white text-gray-800 rounded-r-lg rounded-tl-lg p-3 shadow-sm border border-gray-200 max-w-xs">
+              <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
               </div>
             </div>
           </div>
         </div>
         
+        <!-- IMAGINE Quick Access -->
+        <div class="p-2 bg-gray-100 border-t" v-if="conversationContext.userPreferredSection">
+          <div class="text-xs text-gray-600 mb-2">Your preferred IMAGINE section:</div>
+          <button @click="goToSection(conversationContext.userPreferredSection)" 
+                  class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">
+            {{ imagineSections.find(s => s.key === conversationContext.userPreferredSection)?.title }}
+          </button>
+        </div>
+        
+        <!-- Enhanced Input Area -->
         <div class="p-4 bg-white border-t">
+          <!-- Coping Strategy Suggestions -->
+          <div v-if="conversationContext.copingStrategiesOffered.length > 0" 
+               class="mb-3 p-2 bg-blue-50 rounded text-sm">
+            <div class="text-blue-700 font-medium mb-1">Recent coping strategies:</div>
+            <div class="text-blue-600 text-xs">
+              {{ conversationContext.copingStrategiesOffered[conversationContext.copingStrategiesOffered.length - 1] }}
+            </div>
+          </div>
+          
+          <!-- Message Input -->
           <div class="flex">
             <input v-model="newMessage" 
                    @keyup.enter="sendMessage"
-                   placeholder="Type your message..."
+                   placeholder="Share what's on your mind..."
                    class="flex-1 border rounded-l-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
             <button @click="sendMessage" 
-                    class="bg-purple-500 text-white px-4 py-2 rounded-r-lg hover:bg-purple-600">
+                    :disabled="!newMessage.trim()"
+                    class="bg-purple-500 text-white px-4 py-2 rounded-r-lg hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
               Send
             </button>
+          </div>
+          
+          <!-- Session Info -->
+          <div class="text-xs text-gray-500 mt-2 text-center">
+            Safe space · Confidential · No judgment
           </div>
         </div>
       </main>
@@ -528,6 +890,50 @@
             <textarea v-model="moodEntry.notes" 
                       placeholder="Any thoughts or observations..."
                       class="w-full border rounded-lg px-3 py-2 h-20 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+          </div>
+          
+          <!-- Photo Upload Section -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-3" style="color: var(--text-dark)">
+              📸 Add a Photo (optional)
+            </label>
+            <div class="photo-upload-area">
+              <!-- File Input -->
+              <input 
+                type="file" 
+                ref="photoInput"
+                @change="handlePhotoSelection"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                class="hidden"
+                id="moodPhotoInput"
+              />
+              
+              <!-- Upload Button or Preview -->
+              <div v-if="!moodEntry.photoPreview" 
+                   @click="triggerPhotoUpload"
+                   class="photo-upload-placeholder">
+                <div class="upload-icon">📷</div>
+                <p class="upload-text">Tap to add a photo</p>
+                <p class="upload-hint">Share a moment from your day</p>
+              </div>
+              
+              <!-- Photo Preview -->
+              <div v-if="moodEntry.photoPreview" class="photo-preview-container">
+                <img :src="moodEntry.photoPreview" 
+                     alt="Mood photo preview" 
+                     class="photo-preview" />
+                <div class="photo-actions">
+                  <button @click="triggerPhotoUpload" 
+                          class="change-photo-btn">
+                    🔄 Change Photo
+                  </button>
+                  <button @click="removePhoto" 
+                          class="remove-photo-btn">
+                    ❌ Remove
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           
           <button @click="saveMoodEntry" 
@@ -589,13 +995,137 @@
           }
         });
 
-        // AI Mandy state
+        // AI Mandy Coaching System
         const aiMandyGreeting = ref("Good morning! 🌅 I'm here to support you on your anxiety reduction journey. How are you feeling today?");
         
         const dailyQuote = ref({
           text: "The only way out is through. Take it one moment at a time.",
           author: "Mandy Kloppers"
         });
+
+        // Mandy's CBT Coaching Methodology
+        const mandyCoachingSystem = {
+          // Universal Process: Listen → Gateway Question → Script Recognition → Redirect Energy → Sausage Machine
+          universalProcess: {
+            listen: (userMessage) => {
+              // Active listening - acknowledge and reflect
+              return {
+                acknowledgment: "I hear you",
+                reflection: userMessage.toLowerCase().includes('anxious') ? 
+                  "That sounds like anxiety is showing up for you" :
+                  userMessage.toLowerCase().includes('stuck') ?
+                  "Feeling stuck can be really challenging" :
+                  "Thank you for sharing that with me"
+              };
+            },
+            gatewayQuestion: (context) => {
+              // Core gateway questions that change everything
+              const questions = [
+                "What would you choose if this feeling wasn't here?",
+                "What are you putting into your emotional sausage machine right now?",
+                "Is this thought serving you, or is it just familiar?",
+                "What would courage look like in this moment?",
+                "If anxiety wasn't the boss, what would you do?"
+              ];
+              return questions[Math.floor(Math.random() * questions.length)];
+            },
+            scriptRecognition: (patterns) => {
+              // Help identify automatic patterns vs conscious choices
+              return {
+                scriptIndicators: ["automatic", "always", "never", "should", "must", "have to"],
+                reframe: "This sounds like a familiar pattern. When did you first learn to respond this way?"
+              };
+            },
+            redirectEnergy: (fromPattern, toChoice) => {
+              // Redirect from script patterns to conscious choices
+              return "Let's redirect that energy toward what you actually want to create.";
+            },
+            sausageMachine: (input, desiredOutput) => {
+              // You get out what you put in - change the input, change the output
+              return "What you're putting in is creating what you're getting out. What would you rather put in?";
+            }
+          },
+
+          // Mandy's Signature Language Patterns
+          signaturePhrases: [
+            "That sounds like a familiar pattern - how does this usually show up for you?",
+            "What would you choose if anxiety wasn't making the decision?",
+            "This feels like an old script. When did you first learn this response?",
+            "Let's look at what you're feeding your mind. What's going into your sausage machine?",
+            "I'm hearing the voice of should. What does your authentic voice say?",
+            "This pattern is trying to keep you safe, but is it serving you now?",
+            "What would self-compassion sound like here?",
+            "Small steps count. What's one tiny thing you could do right now?",
+            "You're already doing the work by noticing this pattern.",
+            "What story would you rather be writing?"
+          ],
+
+          // CBT-Based Response Framework
+          cbtFramework: {
+            identifyPatterns: (userMessage) => {
+              const anxietyPatterns = ['what if', 'worried about', 'scared that', 'anxious about'];
+              const depressionPatterns = ['always', 'never', 'hopeless', 'pointless'];
+              const perfectiomPatterns = ['should', 'must', 'have to', 'not good enough'];
+              
+              if (anxietyPatterns.some(pattern => userMessage.toLowerCase().includes(pattern))) {
+                return 'anxiety';
+              } else if (depressionPatterns.some(pattern => userMessage.toLowerCase().includes(pattern))) {
+                return 'depression';
+              } else if (perfectiomPatterns.some(pattern => userMessage.toLowerCase().includes(pattern))) {
+                return 'perfectionism';
+              }
+              return 'general';
+            },
+
+            challengeThoughts: (pattern) => {
+              const challenges = {
+                anxiety: "Let's examine this worry. Is this thought based on facts or fears?",
+                depression: "I notice some absolute thinking here. What evidence challenges this 'always' or 'never'?",
+                perfectionism: "These sound like inherited rules. What would 'good enough' look like if you were choosing?",
+                general: "What would you tell a good friend facing this same situation?"
+              };
+              return challenges[pattern] || challenges.general;
+            },
+
+            developCopingStrategies: (situation) => {
+              return [
+                "Let's practice the 3-breath reset: breathe in for 4, hold for 4, out for 6",
+                "Try the 5-4-3-2-1 grounding: 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste",
+                "Use the 'noted' technique: when anxiety speaks, just say 'noted' and continue with your choice",
+                "Practice the gateway question: 'What would I choose if this feeling wasn't here?'",
+                "Remember your sausage machine: change what you're putting in to change what comes out"
+              ];
+            }
+          },
+
+          // IMAGINE Framework Integration
+          imagineGuidance: {
+            self_care: "Your relationship with yourself sets the tone for everything else. What would loving yourself look like today?",
+            mindfulness: "This moment is the only one where change can happen. What do you notice right now?",
+            acceptance: "Fighting what is only creates more suffering. What would accepting this situation allow?",
+            gratitude: "Gratitude shifts perspective from lack to abundance. What's working in your life right now?",
+            interactions: "Relationships are mirrors. What pattern is this showing you about yourself?",
+            nurturing: "Joy is medicine for anxiety. What brings lightness to your heart?",
+            exploring: "Curiosity dissolves fear. What if this challenge is here to teach you something?"
+          },
+
+          // Natural Conversation Guidelines
+          conversationStyle: {
+            tone: "warm, encouraging, professional but personal",
+            approach: "therapeutic but conversational, not clinical",
+            language: "use their words, avoid jargon unless explaining concepts",
+            structure: "listen, reflect, explore, guide gently toward insight"
+          },
+
+          // Fallback Responses
+          fallbacks: [
+            "Tell me more about that.",
+            "What's that like for you?",
+            "How does this usually affect you?",
+            "What would be helpful right now?",
+            "That sounds really difficult."
+          ]
+        };
 
         // IMAGINE sections (spells I-M-A-G-I-N-E vertically)
         const imagineSections = ref([
@@ -650,22 +1180,35 @@
           }
         ]);
 
-        // Chat system
+        // Enhanced Chat System with Conversation History Management
         const chatHistory = ref([
           {
             id: 1,
             sender: 'ai_mandy',
-            text: "Hello! I'm AI Mandy, your therapy cow companion. How can I support you today?",
-            timestamp: new Date()
+            text: "Hello! I'm Mandy, your therapeutic coaching companion. I'm here to support you through whatever you're experiencing. What's on your mind today?",
+            timestamp: new Date(),
+            pattern: null,
+            framework: 'greeting'
           }
         ]);
         const newMessage = ref('');
+        const conversationContext = reactive({
+          currentPattern: null,
+          dominantTheme: null,
+          sessionPhase: 'opening', // opening, exploring, deepening, integrating
+          userPreferredSection: null,
+          previousTopics: [],
+          copingStrategiesOffered: [],
+          lastMandyResponse: null
+        });
 
         // Mood tracking
         const moodEntry = reactive({
           level: 5,
           activity: '',
-          notes: ''
+          notes: '',
+          photoData: null,
+          photoPreview: null
         });
 
         // Methods
@@ -679,16 +1222,8 @@
         };
 
         const getSectionGuidance = (sectionKey) => {
-          const guidance = {
-            self_care: "Let's focus on you today. Self-care isn't selfish - it's essential. What would feel nurturing for you right now?",
-            mindfulness: "Take a moment to breathe and be present. Mindfulness helps us step out of anxiety and into awareness. How are you feeling in this moment?",
-            acceptance: "Sometimes the most powerful thing we can do is accept where we are right now. What are you finding difficult to accept today?",
-            gratitude: "Gratitude can shift our perspective from what's missing to what's here. What's one small thing you can appreciate today?",
-            interactions: "Connections with others can be healing. How are your relationships supporting or challenging you right now?",
-            nurturing: "Play and joy are medicine for anxiety. What brings lightness to your day? Let's explore some fun together.",
-            exploring: "Understanding our thoughts and patterns helps us respond rather than react. What thoughts have been on repeat lately?"
-          };
-          return guidance[sectionKey] || "Welcome to this section of your journey.";
+          // Use Mandy's IMAGINE framework guidance
+          return mandyCoachingSystem.imagineGuidance[sectionKey] || "Welcome to this section of your journey. What would you like to explore today?";
         };
 
         const getSectionTools = (sectionKey) => {
@@ -758,34 +1293,172 @@
           currentView.value = 'chat';
         };
 
+        // Advanced AI Mandy Coaching Response System
+        const generateMandyResponse = (userMessage) => {
+          // Step 1: Listen - Use Universal Process
+          const listening = mandyCoachingSystem.universalProcess.listen(userMessage);
+          
+          // Step 2: Identify patterns using CBT framework
+          const identifiedPattern = mandyCoachingSystem.cbtFramework.identifyPatterns(userMessage);
+          
+          // Step 3: Update conversation context
+          conversationContext.currentPattern = identifiedPattern;
+          if (!conversationContext.previousTopics.includes(identifiedPattern)) {
+            conversationContext.previousTopics.push(identifiedPattern);
+          }
+          
+          // Step 4: Determine appropriate response based on Universal Process
+          let response = "";
+          
+          // Check if this is a continuation of a theme
+          const isNewPattern = conversationContext.lastMandyResponse?.pattern !== identifiedPattern;
+          
+          if (conversationContext.sessionPhase === 'opening' || isNewPattern) {
+            // Use signature phrase for pattern recognition
+            const signaturePhrase = mandyCoachingSystem.signaturePhrases[
+              Math.floor(Math.random() * mandyCoachingSystem.signaturePhrases.length)
+            ];
+            response = listening.reflection + ". " + signaturePhrase;
+            conversationContext.sessionPhase = 'exploring';
+            
+          } else if (conversationContext.sessionPhase === 'exploring') {
+            // Use gateway question
+            const gatewayQuestion = mandyCoachingSystem.universalProcess.gatewayQuestion(conversationContext);
+            response = gatewayQuestion;
+            conversationContext.sessionPhase = 'deepening';
+            
+          } else if (conversationContext.sessionPhase === 'deepening') {
+            // Offer CBT thought challenging
+            const challenge = mandyCoachingSystem.cbtFramework.challengeThoughts(identifiedPattern);
+            response = challenge;
+            conversationContext.sessionPhase = 'integrating';
+            
+          } else {
+            // Integration phase - offer coping strategies
+            const strategies = mandyCoachingSystem.cbtFramework.developCopingStrategies();
+            const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
+            response = "Let's try something practical. " + randomStrategy;
+            conversationContext.copingStrategiesOffered.push(randomStrategy);
+            conversationContext.sessionPhase = 'exploring'; // Cycle back for continued support
+          }
+          
+          // Context-aware additions
+          if (userMessage.toLowerCase().includes('imagine') || userMessage.toLowerCase().includes('section')) {
+            // User is referencing IMAGINE framework
+            const sections = ['self_care', 'mindfulness', 'acceptance', 'gratitude', 'interactions', 'nurturing', 'exploring'];
+            const mentionedSection = sections.find(section => 
+              userMessage.toLowerCase().includes(section) || 
+              userMessage.toLowerCase().includes(section.replace('_', ' '))
+            );
+            
+            if (mentionedSection) {
+              response += " " + mandyCoachingSystem.imagineGuidance[mentionedSection];
+              conversationContext.userPreferredSection = mentionedSection;
+            }
+          }
+          
+          // Add encouraging close for longer responses
+          if (response.length > 100) {
+            response += " You're doing important work by exploring this.";
+          }
+          
+          return {
+            text: response,
+            pattern: identifiedPattern,
+            framework: conversationContext.sessionPhase,
+            timestamp: new Date()
+          };
+        };
+
+        // Typing indicator state
+        const isTyping = ref(false);
+
         const sendMessage = () => {
           if (!newMessage.value.trim()) return;
           
+          const userMessageText = newMessage.value;
+          
+          // Add user message to history
           chatHistory.value.push({
             id: Date.now(),
             sender: 'user',
-            text: newMessage.value,
+            text: userMessageText,
             timestamp: new Date()
           });
 
-          // Simulate AI Mandy response
-          setTimeout(() => {
-            const responses = [
-              "I hear you. That sounds like a valuable insight. How does that make you feel?",
-              "Thank you for sharing that with me. What would you like to explore about this?",
-              "That's a great observation. What IMAGINE section do you think might help with this?",
-              "I appreciate your openness. Remember, small steps forward are still progress."
-            ];
-            
-            chatHistory.value.push({
-              id: Date.now() + 1,
-              sender: 'ai_mandy', 
-              text: responses[Math.floor(Math.random() * responses.length)],
-              timestamp: new Date()
-            });
-          }, 1000);
-
+          // Clear input and show typing indicator
           newMessage.value = '';
+          isTyping.value = true;
+
+          // Generate sophisticated Mandy response
+          setTimeout(() => {
+            const mandyResponse = generateMandyResponse(userMessageText);
+            
+            const aiMessage = {
+              id: Date.now() + 1,
+              sender: 'ai_mandy',
+              text: mandyResponse.text,
+              timestamp: mandyResponse.timestamp,
+              pattern: mandyResponse.pattern,
+              framework: mandyResponse.framework
+            };
+            
+            chatHistory.value.push(aiMessage);
+            conversationContext.lastMandyResponse = aiMessage;
+            isTyping.value = false;
+            
+            // Scroll to bottom of chat
+            setTimeout(() => {
+              const chatContainer = document.querySelector('.h-96');
+              if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+              }
+            }, 100);
+            
+          }, 1200); // Slightly longer delay for more natural feel
+        };
+
+        // Photo handling functions
+        const triggerPhotoUpload = () => {
+          const input = document.getElementById('moodPhotoInput');
+          if (input) {
+            input.click();
+          }
+        };
+
+        const handlePhotoSelection = (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          // Validate file type
+          const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+          if (!validTypes.includes(file.type)) {
+            alert('Please select a valid image file (JPG, PNG, GIF, or WebP)');
+            return;
+          }
+
+          // Validate file size (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('Photo size should be less than 5MB');
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            moodEntry.photoData = e.target.result;
+            moodEntry.photoPreview = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
+
+        const removePhoto = () => {
+          moodEntry.photoData = null;
+          moodEntry.photoPreview = null;
+          // Clear the file input
+          const input = document.getElementById('moodPhotoInput');
+          if (input) {
+            input.value = '';
+          }
         };
 
         const saveMoodEntry = () => {
@@ -799,6 +1472,14 @@
           moodEntry.level = 5;
           moodEntry.activity = '';
           moodEntry.notes = '';
+          moodEntry.photoData = null;
+          moodEntry.photoPreview = null;
+          
+          // Clear the file input
+          const input = document.getElementById('moodPhotoInput');
+          if (input) {
+            input.value = '';
+          }
           
           // Show success and return to dashboard
           alert('Mood entry saved! 🌟');
@@ -830,6 +1511,9 @@
           chatHistory,
           newMessage,
           moodEntry,
+          mandyCoachingSystem,
+          conversationContext,
+          isTyping,
           goToDashboard,
           goToSection,
           getSectionGuidance,
@@ -838,7 +1522,11 @@
           quickMoodCheck,
           chatWithMandy,
           sendMessage,
-          saveMoodEntry
+          generateMandyResponse,
+          saveMoodEntry,
+          triggerPhotoUpload,
+          handlePhotoSelection,
+          removePhoto
         };
       }
     }).mount('#app');
