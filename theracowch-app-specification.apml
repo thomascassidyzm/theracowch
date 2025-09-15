@@ -1,0 +1,378 @@
+app TheracowchApp:
+  title: "Theracowch - Daily Anxiety Reduction Through Playful Coaching"
+  description: "Interactive daily habit-building app using Mandy's IMAGINE framework for practical anxiety management"
+  version: "1.0.0"
+  apml_specification_version: "1.0.0"
+  last_updated: "2025-09-15"
+  
+  pss_compliance:
+    structure_standard: "APML-PSS v1.0.0"
+    self_documentation: enabled
+    universal_navigation: optimized
+  
+  deterministic_compilation:
+    target_platform: "Vue3 + TypeScript + Tailwind"
+    alternative_targets: ["PWA", "React + TypeScript"]
+    compilation_guarantee: identical_input_produces_identical_output
+    
+  brand_identity:
+    domain: "theracowch.com"
+    personality: playful_therapeutic_coaching
+    mascot: ai_mandy_cow_character
+    tone: warm_encouraging_gently_humorous
+    
+  triadic_compliance:
+    trinity_messaging: complete_user_interaction_coverage
+    implementation_triad: coaching_habits_progress_tracking
+    collaborative_intelligence: ai_mandy_human_user_therapeutic_ecosystem
+
+data User:
+  user_id: unique_id required
+  username: text required
+  email: email required
+  created_at: timestamp required
+  preferences: UserPreferences required
+  conversation_history: list of ConversationEntry required
+  mood_tracking: list of MoodEntry required
+  imagine_progress: ImagineProgress required
+
+data UserPreferences:
+  notification_settings: NotificationSettings required
+  privacy_settings: PrivacySettings required
+  ai_mandy_personality: text default "encouraging"
+  daily_goal_reminders: boolean default true
+  quote_categories: list of text default ["motivation", "anxiety", "self_care"]
+
+data ConversationEntry:
+  entry_id: unique_id required
+  timestamp: timestamp required
+  user_message: text required
+  ai_mandy_response: text required
+  imagine_section: text optional
+  mood_before: number optional
+  mood_after: number optional
+  context_photo: text optional
+
+data MoodEntry:
+  entry_id: unique_id required
+  timestamp: timestamp required
+  mood_level: number required
+  mood_description: text optional
+  activity: text optional
+  location_photo: text optional
+  notes: text optional
+  imagine_sections_used: list of text optional
+
+data ImagineProgress:
+  self_care_streak: number default 0
+  mindfulness_streak: number default 0
+  acceptance_streak: number default 0
+  gratitude_streak: number default 0
+  interactions_streak: number default 0
+  nurturing_streak: number default 0
+  exploring_streak: number default 0
+  total_sessions: number default 0
+  favorite_sections: list of text default []
+
+data DailyQuote:
+  quote_id: unique_id required
+  quote_text: text required
+  author: text default "Mandy Kloppers"
+  source_url: text optional
+  category: text required
+  last_shown: timestamp optional
+
+interface welcome_dashboard:
+  show dashboard_header:
+    title: "Welcome to Theracowch"
+    subtitle: "Your daily companion for reducing anxiety"
+    ai_mandy_greeting: personalized_based_on_time_and_history
+    
+  display daily_inspiration:
+    daily_quote: random_from_mandy_blog_content
+    quote_source: "thoughtsonlifeandlove.com"
+    refresh_button: allow_user_to_get_new_quote
+    
+  show imagine_navigation_grid:
+    section_tiles: 7_interactive_tiles
+    
+    tile self_care:
+      title: "I - Me, Myself & I"
+      subtitle: "Self-care and personal wellness"
+      icon: cow_self_care_illustration
+      color_scheme: warm_earth_tones
+      completion_indicator: daily_streak_badge
+      
+    tile mindfulness:
+      title: "M - Mindfulness" 
+      subtitle: "Present moment awareness"
+      icon: cow_meditation_illustration
+      color_scheme: calm_blues_greens
+      completion_indicator: daily_streak_badge
+      
+    tile acceptance:
+      title: "A - Acceptance"
+      subtitle: "Embracing your current state"
+      icon: cow_peaceful_illustration
+      color_scheme: soft_pastels
+      completion_indicator: daily_streak_badge
+      
+    tile gratitude:
+      title: "G - Gratitude"
+      subtitle: "Focusing on positive aspects"
+      icon: cow_grateful_illustration  
+      color_scheme: warm_yellows_oranges
+      completion_indicator: daily_streak_badge
+      
+    tile interactions:
+      title: "I - Interactions"
+      subtitle: "Connecting with others"
+      icon: cow_social_illustration
+      color_scheme: friendly_purples_pinks
+      completion_indicator: daily_streak_badge
+      
+    tile nurturing:
+      title: "N - Nurturing" 
+      subtitle: "Fun, playfulness, and joy"
+      icon: cow_playful_illustration
+      color_scheme: bright_cheerful_colors
+      completion_indicator: daily_streak_badge
+      
+    tile exploring:
+      title: "E - Exploring"
+      subtitle: "Understanding thoughts & behaviors"
+      icon: cow_curious_illustration
+      color_scheme: discovery_greens_blues
+      completion_indicator: daily_streak_badge
+      
+  show quick_actions:
+    mood_check_in: quick_mood_rating_with_camera
+    chat_with_ai_mandy: direct_access_to_conversation
+    view_progress: weekly_monthly_insights
+    
+  display bottom_navigation:
+    home_tab: current_dashboard
+    progress_tab: mood_tracking_and_insights
+    chat_tab: ai_mandy_conversations
+    settings_tab: preferences_and_account
+
+interface ai_mandy_conversation:
+  show chat_interface:
+    ai_mandy_avatar: animated_cow_character
+    conversation_history: scrollable_message_thread
+    input_field: text_message_composition
+    voice_input: optional_voice_to_text
+    
+  display ai_mandy_personality:
+    speaking_style: warm_encouraging_gently_humorous
+    coaching_approach: practical_implementation_focused
+    memory_system: remembers_previous_conversations
+    personalization: adapts_to_user_patterns_and_preferences
+    
+  show conversation_features:
+    imagine_section_suggestions: based_on_current_mood_context
+    progress_celebration: acknowledges_streaks_and_improvements
+    gentle_accountability: reminds_of_daily_goals_without_pressure
+    crisis_support: recognizes_distress_and_provides_appropriate_resources
+    
+  handle ai_integration:
+    api_service: claude_4_sonnet
+    prompt_system: mandy_coaching_methodology_prompts
+    response_generation: contextual_therapeutic_guidance
+    conversation_memory: stored_locally_for_privacy
+
+interface imagine_section_interactions:
+  show section_landing:
+    section_title: current_imagine_section_name
+    section_description: practical_explanation_of_purpose
+    ai_mandy_introduction: personalized_guidance_for_this_section
+    activity_options: list_of_available_exercises_tools
+    
+  display self_care_tools:
+    self_assessment: quick_wellness_check
+    self_care_planning: personalized_activity_suggestions
+    boundary_setting: practical_exercises
+    energy_management: tips_and_tracking
+    
+  display mindfulness_tools:
+    breathing_exercises: guided_audio_visual
+    present_moment_anchoring: quick_grounding_techniques
+    mindful_observation: photography_awareness_exercises
+    body_scan: guided_relaxation_sessions
+    
+  display acceptance_tools:
+    emotion_acknowledgment: naming_and_accepting_feelings
+    situation_acceptance: reframing_exercises
+    self_compassion: gentle_self_talk_prompts
+    letting_go: release_visualization_techniques
+    
+  display gratitude_tools:
+    gratitude_journaling: daily_appreciation_prompts
+    photo_gratitude: capture_moments_of_appreciation
+    gratitude_sharing: social_appreciation_features
+    perspective_shifting: finding_positives_in_challenges
+    
+  display interactions_tools:
+    social_energy_check: assessing_social_needs
+    connection_planning: scheduling_meaningful_interactions
+    boundary_communication: scripts_for_difficult_conversations
+    empathy_exercises: understanding_others_perspectives
+    
+  display nurturing_tools:
+    playfulness_prompts: silly_fun_activity_suggestions
+    humor_therapy: joke_sharing_and_laughter_exercises
+    creative_expression: art_music_writing_prompts
+    joy_cultivation: identifying_and_pursuing_happiness
+    
+  display exploring_tools:
+    thought_pattern_identification: cbt_thought_tracking
+    behavior_analysis: safety_behavior_recognition
+    confidence_building: challenging_avoidance_patterns
+    anxiety_cycle_breaking: interrupting_negative_spirals
+
+interface mood_progress_tracking:
+  show mood_entry_interface:
+    mood_scale: 1_to_10_emotional_rating
+    mood_descriptors: emotion_word_selection
+    context_capture: camera_for_location_activity_photo
+    activity_logging: quick_activity_category_selection
+    notes_field: optional_text_reflection
+    
+  display progress_insights:
+    mood_trends: weekly_monthly_charts
+    pattern_recognition: ai_identified_triggers_and_boosters
+    imagine_section_correlation: which_sections_help_most
+    streak_tracking: consecutive_days_using_app
+    
+  show weekly_summary:
+    mood_average: calculated_wellbeing_score
+    most_used_sections: imagine_section_usage_statistics
+    progress_highlights: positive_changes_and_improvements
+    ai_mandy_observations: personalized_insights_and_encouragement
+
+interface user_settings:
+  show account_management:
+    profile_information: username_email_preferences
+    password_security: authentication_settings
+    data_export: download_personal_conversation_mood_data
+    account_deletion: complete_data_removal_option
+    
+  display notification_preferences:
+    daily_reminders: gentle_nudges_for_app_usage
+    quote_notifications: morning_inspiration_delivery
+    streak_celebrations: achievement_acknowledgments
+    crisis_check_ins: optional_welfare_monitoring
+    
+  show privacy_controls:
+    data_storage: local_device_vs_cloud_backup_options
+    conversation_retention: auto_delete_old_conversations
+    photo_storage: local_only_vs_cloud_backup
+    analytics_sharing: anonymous_usage_statistics_opt_in
+    
+  display ai_mandy_customization:
+    personality_settings: adjust_humor_level_directness
+    coaching_style: more_gentle_vs_more_challenging
+    conversation_length: quick_check_ins_vs_deeper_sessions
+    topic_preferences: focus_areas_for_coaching
+
+interface authentication_system:
+  show registration_flow:
+    welcome_introduction: app_purpose_and_benefits
+    basic_information: email_username_password_collection
+    privacy_explanation: data_handling_transparency
+    initial_preferences: basic_customization_setup
+    
+  show login_interface:
+    email_password_entry: standard_authentication
+    remember_device: secure_token_storage
+    forgot_password: email_reset_functionality
+    guest_mode: limited_functionality_without_account
+    
+  handle security_features:
+    password_requirements: strong_password_enforcement
+    session_management: automatic_logout_after_inactivity
+    data_encryption: local_storage_security
+    privacy_compliance: gdpr_ccpa_compliance
+
+logic daily_engagement_flow:
+  process app_opening:
+    when user_opens_app:
+      display_personalized_greeting
+      show_daily_quote_from_mandy_blog
+      check_daily_imagine_progress
+      suggest_relevant_section_based_on_patterns
+      
+  process imagine_section_completion:
+    when user_completes_imagine_activity:
+      update_section_streak
+      show_encouraging_feedback
+      suggest_mood_check_in
+      offer_ai_mandy_conversation
+      
+  process mood_tracking:
+    when user_logs_mood:
+      store_mood_data_locally
+      analyze_patterns_for_insights
+      suggest_helpful_imagine_sections
+      celebrate_progress_if_improvement
+
+logic ai_mandy_coaching_system:
+  process conversation_initiation:
+    when user_starts_chat:
+      load_conversation_history
+      assess_current_context_mood_time
+      generate_appropriate_greeting
+      offer_relevant_coaching_topics
+      
+  process therapeutic_guidance:
+    when providing_coaching:
+      reference_mandy_kloppers_methodology
+      use_imagine_framework_principles
+      maintain_encouraging_playful_tone
+      focus_on_practical_implementation
+      avoid_clinical_therapy_language
+      
+  process crisis_recognition:
+    when detecting_distress:
+      acknowledge_user_feelings
+      provide_immediate_coping_strategies
+      suggest_professional_resources
+      maintain_supportive_presence
+
+logic privacy_first_architecture:
+  process data_storage:
+    when storing_user_data:
+      prioritize_local_device_storage
+      encrypt_sensitive_conversation_data
+      provide_cloud_backup_as_option
+      respect_user_privacy_preferences
+      
+  process ai_integration:
+    when communicating_with_claude_api:
+      send_conversation_context_without_personal_identifiers
+      maintain_conversation_continuity_through_local_storage
+      respect_user_data_retention_preferences
+
+validate theracowch_completeness:
+  check core_functionality:
+    verify daily_imagine_framework_implementation
+    verify ai_mandy_conversation_system
+    verify mood_tracking_and_progress_insights
+    verify privacy_first_data_architecture
+    
+  check user_experience:
+    verify playful_yet_therapeutic_tone
+    verify gentle_daily_engagement_without_pressure
+    verify practical_anxiety_reduction_tools
+    verify progressive_habit_building_support
+    
+  check technical_requirements:
+    verify pwa_offline_functionality
+    verify local_storage_conversation_memory
+    verify claude_4_sonnet_api_integration
+    verify responsive_mobile_first_design
+    
+  when all_validations_pass:
+    enable deterministic_compilation_to_vue3
+    generate_pss_compliant_project_structure
+    activate_theracowch_anxiety_reduction_ecosystem

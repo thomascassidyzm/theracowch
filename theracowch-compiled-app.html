@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>current_imagine_section_name</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding-bottom: 80px;
+      background: var(--gradient-simple);
+      margin: 0;
+    }
+    
+    .theracowch-app {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FFE0E6 0%, #E1F5FE 100%);
+    }
+    
+    :root {
+      --teal-primary: #4ECDC4;
+      --coral-accent: #FF8A80;
+      --blue-soft: #81C7D4;
+      --pink-soft: #FFB3B3;
+      --purple-soft: #C8A2C8;
+      --yellow-soft: #FFF176;
+      --green-soft: #A5D6A7;
+      --white: #FFFFFF;
+      --text-dark: #2C3E50;
+      --text-medium: #5A6C7D;
+      --text-light: #8FA7B3;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow-medium: rgba(0, 0, 0, 0.12);
+      --border-radius: 20px;
+    }
+    
+    /* Rootd-style fun cards */
+    .wysa-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      box-shadow: 0 8px 32px var(--shadow);
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Therapeutic cow character styling */
+    .cow-character-illustration {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+    
+    .cow-placeholder {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #FFE4B5 0%, #DEB887 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    .cow-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      object-fit: cover;
+    }
+    
+    /* Simplified consistent buttons */
+    .wysa-button {
+      background: linear-gradient(135deg, var(--teal-primary) 0%, var(--blue-soft) 100%);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      padding: 16px 24px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+      transition: all 0.2s ease;
+    }
+    
+    .wysa-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+    }
+    
+    .wysa-button-secondary {
+      background: var(--white);
+      color: var(--text-medium);
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      border-radius: 15px;
+      padding: 12px 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .wysa-button-secondary:hover {
+      border-color: var(--teal-primary);
+      color: var(--teal-primary);
+    }
+    
+    /* Progress indicators */
+    .progress-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: conic-gradient(var(--teal-character) 0deg, var(--light-purple) 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+    
+    /* IMAGINE horizontal cards */
+    .imagine-horizontal-card {
+      border-radius: 20px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .imagine-horizontal-card:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    
+    /* Consistent dark gradients for IMAGINE sections */
+    .gradient-self-care,
+    .gradient-mindfulness,
+    .gradient-acceptance,
+    .gradient-gratitude,
+    .gradient-interactions,
+    .gradient-nurturing,
+    .gradient-exploring {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+    }
+    
+    /* Slight variations for distinction */
+    .gradient-self-care { 
+      background: linear-gradient(135deg, var(--coral-accent) 0%, var(--pink-soft) 100%); 
+      color: white; 
+    }
+    .gradient-mindfulness { 
+      background: linear-gradient(135deg, var(--blue-soft) 0%, var(--teal-primary) 100%); 
+      color: white; 
+    }
+    .gradient-acceptance { 
+      background: linear-gradient(135deg, var(--purple-soft) 0%, var(--pink-soft) 100%); 
+      color: white; 
+    }
+    .gradient-gratitude { 
+      background: linear-gradient(135deg, var(--yellow-soft) 0%, var(--coral-accent) 100%); 
+      color: var(--text-dark); 
+    }
+    .gradient-interactions { 
+      background: linear-gradient(135deg, var(--purple-soft) 0%, var(--blue-soft) 100%); 
+      color: white; 
+    }
+    .gradient-nurturing { 
+      background: linear-gradient(135deg, var(--pink-soft) 0%, var(--coral-accent) 100%); 
+      color: white; 
+    }
+    .gradient-exploring { 
+      background: linear-gradient(135deg, var(--green-soft) 0%, var(--teal-primary) 100%); 
+      color: white; 
+    }
+    
+    /* Navigation styling */
+    .bottom-nav {
+      background: var(--card-white);
+      border-top: 1px solid rgba(184, 169, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 4px;
+    }
+    
+    /* Chat interface */
+    .chat-bubble-user {
+      background: var(--teal-character);
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+      padding: 12px 16px;
+      max-width: 80%;
+      margin-left: auto;
+      margin-bottom: 12px;
+    }
+    
+    .chat-bubble-ai {
+      background: var(--card-white);
+      color: var(--text-dark);
+      border-radius: 18px 18px 18px 4px;
+      padding: 12px 16px;
+      max-width: 80%;
+      margin-right: auto;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px var(--shadow-soft);
+    }
+    
+    /* Mood tracking */
+    .mood-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--coral-accent), var(--warm-yellow), var(--teal-character));
+      appearance: none;
+      outline: none;
+    }
+    
+    .mood-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--card-white);
+      border: 3px solid var(--teal-character);
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow-soft);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(184, 169, 255, 0.1);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--teal-character);
+      border-radius: 2px;
+    }
+    
+    /* Fun Rootd-style animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-8px) rotate(2deg); }
+      66% { transform: translateY(-12px) rotate(-2deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes rainbow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    @keyframes bounce-in {
+      0% { transform: scale(0.3) rotate(-45deg); opacity: 0; }
+      50% { transform: scale(1.1) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    
+    .floating {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .pulsing {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .rainbow-glow {
+      animation: rainbow 3s linear infinite;
+    }
+    
+    .bounce-in {
+      animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .text-shadow {
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    /* Fun emojis and icons */
+    .emoji-bounce {
+      display: inline-block;
+      animation: bounce-in 0.8s ease-out;
+    }
+    
+    .progress-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Mobile-first responsive design */
+    @media (max-width: 640px) {
+      .max-w-lg {
+        max-width: 100%;
+        margin: 0;
+      }
+      
+      .wysa-card {
+        margin: 8px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+    
+    <!-- Theracowch App Template -->
+    <div class="theracowch-app min-h-screen">
+      <!-- Fun Navigation Bar -->
+      <nav class="bg-white/80 backdrop-blur-lg shadow-lg" style="background: rgba(255, 255, 255, 0.9);">
+        <div class="max-w-lg mx-auto px-6 py-6">
+          <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold" style="color: var(--text-dark)">
+              <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-10 h-10 inline-block rounded-full mr-3"> Theracowch
+            </h1>
+            <div class="text-sm font-medium" style="color: var(--text-light)">
+              ✨ Daily Wellness
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Dashboard Content -->
+      <main class="max-w-lg mx-auto p-4" v-if="currentView === 'dashboard'">
+        <!-- AI Mandy Greeting -->
+        <div class="wysa-card mb-6">
+          <div class="flex items-center mb-3">
+            <div class="cow-character-illustration mr-4 floating">
+              <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="cow-image" />
+            </div>
+            <div>
+              <h2 class="font-semibold text-lg" style="color: var(--text-dark)">AI Mandy</h2>
+              <p class="text-sm" style="color: var(--text-medium)">Your therapeutic coaching companion</p>
+            </div>
+          </div>
+          <p style="color: var(--text-dark)">{{ aiMandyGreeting }}</p>
+        </div>
+
+        <!-- Daily Quote -->
+        <div class="wysa-card mb-6">
+          <h3 class="font-semibold mb-3" style="color: var(--text-dark)"><img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-5 h-5 inline-block rounded-full"> Daily Inspiration</h3>
+          <blockquote class="italic mb-3" style="color: var(--text-medium)">{{ dailyQuote.text }}</blockquote>
+          <p class="text-sm mb-3" style="color: var(--text-medium)">- {{ dailyQuote.author }}</p>
+          <button @click="getNewQuote" class="wysa-button-secondary text-sm">
+            🔄 Get new quote
+          </button>
+        </div>
+
+        <!-- IMAGINE Vertical Layout (spells I-M-A-G-I-N-E) -->
+        <div class="space-y-3 mb-6">
+          <div v-for="(section, index) in imagineSections" 
+               :key="section.key"
+               @click="goToSection(section.key)"
+               class="imagine-horizontal-card bounce-in"
+               :class="section.gradientClass"
+               :style="{ animationDelay: (index * 0.1) + 's' }">
+            <div class="flex items-center p-4">
+              <div class="text-3xl mr-4 pulsing" v-html="section.icon"></div>
+              <div class="flex-1">
+                <h3 class="font-bold text-lg text-white text-shadow">{{ section.title }}</h3>
+                <p class="text-sm text-white opacity-90">{{ section.subtitle }}</p>
+              </div>
+              <div class="text-white opacity-75">
+                ▶
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-4">
+          <button @click="quickMoodCheck" class="wysa-button text-center py-4">
+            <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-4 h-4 inline-block rounded-full"> Quick Mood Check
+          </button>
+          <button @click="chatWithMandy" class="wysa-button-secondary text-center py-4">
+            <img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-4 h-4 inline-block rounded-full"> Chat with Mandy
+          </button>
+        </div>
+      </main>
+
+      <!-- IMAGINE Section Landing Page -->
+      <main class="max-w-lg mx-auto p-4" v-if="currentView === 'section' && currentSection">
+        <div class="flex items-center mb-6">
+          <button @click="goToDashboard" class="mr-3 text-gray-600 text-2xl">←</button>
+          <h2 class="text-xl font-semibold" style="color: var(--text-dark)">{{ currentSection.title }}</h2>
+        </div>
+        
+        <!-- Section Description -->
+        <div class="wysa-card mb-6" :class="currentSection.gradientClass">
+          <div class="flex items-center mb-4">
+            <div class="text-4xl mr-4">{{ currentSection.icon }}</div>
+            <div>
+              <h3 class="font-bold text-lg text-white text-shadow">{{ currentSection.title }}</h3>
+              <p class="text-white opacity-90">{{ currentSection.subtitle }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Mandy Guidance -->
+        <div class="wysa-card mb-6">
+          <div class="flex items-center mb-3">
+            <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="cow-image mr-3" style="width: 60px; height: 60px;" />
+            <div>
+              <h3 class="font-semibold" style="color: var(--text-dark)">AI Mandy's Guidance</h3>
+            </div>
+          </div>
+          <p style="color: var(--text-dark)">{{ getSectionGuidance(currentSection.key) }}</p>
+        </div>
+
+        <!-- Available Tools -->
+        <div class="wysa-card">
+          <h3 class="font-semibold mb-4" style="color: var(--text-dark)">Available Tools & Exercises</h3>
+          <div class="space-y-3">
+            <div v-for="tool in getSectionTools(currentSection.key)" 
+                 :key="tool.id"
+                 class="p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+              <div class="flex items-center">
+                <div class="text-2xl mr-3">{{ tool.icon }}</div>
+                <div>
+                  <h4 class="font-semibold text-sm" style="color: var(--text-dark)">{{ tool.name }}</h4>
+                  <p class="text-xs" style="color: var(--text-medium)">{{ tool.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Chat Interface -->
+      <main class="max-w-lg mx-auto" v-if="currentView === 'chat'">
+        <div class="flex items-center p-4 bg-white border-b">
+          <button @click="goToDashboard" class="mr-3 text-gray-600">←</button>
+          <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center mr-3">
+            <img src="assets/theracowch_main_image.jpg" alt="AI Mandy" class="w-8 h-8 rounded-full">
+          </div>
+          <div>
+            <h2 class="font-semibold">AI Mandy</h2>
+            <p class="text-sm text-green-600">● Online</p>
+          </div>
+        </div>
+        
+        <div class="h-96 overflow-y-auto p-4 bg-gray-50">
+          <div v-for="message in chatHistory" :key="message.id" class="mb-4">
+            <div :class="message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
+              <div :class="message.sender === 'user' ? 
+                           'bg-purple-500 text-white rounded-l-lg rounded-tr-lg p-3 max-w-xs' : 
+                           'bg-white text-gray-800 rounded-r-lg rounded-tl-lg p-3 max-w-xs shadow-sm'">
+                {{ message.text }}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-4 bg-white border-t">
+          <div class="flex">
+            <input v-model="newMessage" 
+                   @keyup.enter="sendMessage"
+                   placeholder="Type your message..."
+                   class="flex-1 border rounded-l-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <button @click="sendMessage" 
+                    class="bg-purple-500 text-white px-4 py-2 rounded-r-lg hover:bg-purple-600">
+              Send
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Mood Check Interface -->
+      <main class="max-w-lg mx-auto p-4" v-if="currentView === 'mood'">
+        <div class="flex items-center mb-6">
+          <button @click="goToDashboard" class="mr-3 text-gray-600">←</button>
+          <h2 class="text-xl font-semibold">Mood Check-In</h2>
+        </div>
+        
+        <div class="wysa-card">
+          <h3 class="font-semibold mb-4" style="color: var(--text-dark)">How are you feeling right now?</h3>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-3" style="color: var(--text-dark)">Mood Level (1-10)</label>
+            <input type="range" v-model="moodEntry.level" min="1" max="10" class="mood-slider">
+            <div class="flex justify-between text-sm mt-2" style="color: var(--text-medium)">
+              <span>1 (Low)</span>
+              <span class="font-semibold" style="color: var(--teal-character)">{{ moodEntry.level }}</span>
+              <span>10 (High)</span>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">What are you doing?</label>
+            <input v-model="moodEntry.activity" 
+                   placeholder="e.g., working, relaxing, exercising..."
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Notes (optional)</label>
+            <textarea v-model="moodEntry.notes" 
+                      placeholder="Any thoughts or observations..."
+                      class="w-full border rounded-lg px-3 py-2 h-20 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+          </div>
+          
+          <button @click="saveMoodEntry" 
+                  class="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
+            Save Mood Entry
+          </button>
+        </div>
+      </main>
+
+      <!-- Bottom Navigation -->
+      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t">
+        <div class="max-w-lg mx-auto flex">
+          <button @click="currentView = 'dashboard'" 
+                  :class="currentView === 'dashboard' ? 'text-purple-600' : 'text-gray-400'"
+                  class="flex-1 py-3 text-center">
+            <div class="text-lg">🏠</div>
+            <div class="text-xs">Home</div>
+          </button>
+          <button @click="currentView = 'progress'" 
+                  :class="currentView === 'progress' ? 'text-purple-600' : 'text-gray-400'"
+                  class="flex-1 py-3 text-center">
+            <div class="text-lg">📊</div>
+            <div class="text-xs">Progress</div>
+          </button>
+          <button @click="currentView = 'chat'" 
+                  :class="currentView === 'chat' ? 'text-purple-600' : 'text-gray-400'"
+                  class="flex-1 py-3 text-center">
+            <div class="text-lg">💬</div>
+            <div class="text-xs">Chat</div>
+          </button>
+          <button @click="currentView = 'settings'" 
+                  :class="currentView === 'settings' ? 'text-purple-600' : 'text-gray-400'"
+                  class="flex-1 py-3 text-center">
+            <div class="text-lg">⚙️</div>
+            <div class="text-xs">Settings</div>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    
+    const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        // App state
+        const currentView = ref('dashboard');
+        const currentSection = ref(null);
+        const user = reactive({
+          username: 'User',
+          preferences: {},
+          moodHistory: [],
+          imagineProgress: {
+            // No streaks - just mindful presence tracking
+            last_activity: null,
+            favorite_sections: []
+          }
+        });
+
+        // AI Mandy state
+        const aiMandyGreeting = ref("Good morning! 🌅 I'm here to support you on your anxiety reduction journey. How are you feeling today?");
+        
+        const dailyQuote = ref({
+          text: "The only way out is through. Take it one moment at a time.",
+          author: "Mandy Kloppers"
+        });
+
+        // IMAGINE sections (spells I-M-A-G-I-N-E vertically)
+        const imagineSections = ref([
+          {
+            key: 'self_care',
+            title: 'I - Me, Myself & I',
+            subtitle: 'Self-care and personal wellness',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-self-care'
+          },
+          {
+            key: 'mindfulness',
+            title: 'M - Mindfulness',
+            subtitle: 'Present moment awareness',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-mindfulness'
+          },
+          {
+            key: 'acceptance',
+            title: 'A - Acceptance',
+            subtitle: 'Embracing your current state',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-acceptance'
+          },
+          {
+            key: 'gratitude',
+            title: 'G - Gratitude',
+            subtitle: 'Focusing on positive aspects',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-gratitude'
+          },
+          {
+            key: 'interactions',
+            title: 'I - Interactions',
+            subtitle: 'Connecting with others',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-interactions'
+          },
+          {
+            key: 'nurturing',
+            title: 'N - Nurturing',
+            subtitle: 'Fun, playfulness, and joy',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-nurturing'
+          },
+          {
+            key: 'exploring',
+            title: 'E - Exploring',
+            subtitle: 'Understanding thoughts & behaviors',
+            icon: '<img src="assets/theracowch_main_image.jpg" alt="Mandy Cow" class="w-6 h-6 rounded-full">',
+            gradientClass: 'gradient-exploring'
+          }
+        ]);
+
+        // Chat system
+        const chatHistory = ref([
+          {
+            id: 1,
+            sender: 'ai_mandy',
+            text: "Hello! I'm AI Mandy, your therapy cow companion. How can I support you today?",
+            timestamp: new Date()
+          }
+        ]);
+        const newMessage = ref('');
+
+        // Mood tracking
+        const moodEntry = reactive({
+          level: 5,
+          activity: '',
+          notes: ''
+        });
+
+        // Methods
+        const goToDashboard = () => currentView.value = 'dashboard';
+        const goToSection = (sectionKey) => {
+          const section = imagineSections.value.find(s => s.key === sectionKey);
+          if (section) {
+            currentSection.value = section;
+            currentView.value = 'section';
+          }
+        };
+
+        const getSectionGuidance = (sectionKey) => {
+          const guidance = {
+            self_care: "Let's focus on you today. Self-care isn't selfish - it's essential. What would feel nurturing for you right now?",
+            mindfulness: "Take a moment to breathe and be present. Mindfulness helps us step out of anxiety and into awareness. How are you feeling in this moment?",
+            acceptance: "Sometimes the most powerful thing we can do is accept where we are right now. What are you finding difficult to accept today?",
+            gratitude: "Gratitude can shift our perspective from what's missing to what's here. What's one small thing you can appreciate today?",
+            interactions: "Connections with others can be healing. How are your relationships supporting or challenging you right now?",
+            nurturing: "Play and joy are medicine for anxiety. What brings lightness to your day? Let's explore some fun together.",
+            exploring: "Understanding our thoughts and patterns helps us respond rather than react. What thoughts have been on repeat lately?"
+          };
+          return guidance[sectionKey] || "Welcome to this section of your journey.";
+        };
+
+        const getSectionTools = (sectionKey) => {
+          const tools = {
+            self_care: [
+              { id: 1, name: "Quick Wellness Check", description: "A gentle assessment of your current needs", icon: "🌟" },
+              { id: 2, name: "Self-Care Planning", description: "Personalized suggestions for nurturing yourself", icon: "📝" },
+              { id: 3, name: "Boundary Setting", description: "Practice saying no and protecting your energy", icon: "🛡️" },
+              { id: 4, name: "Energy Management", description: "Track and optimize your daily energy", icon: "⚡" }
+            ],
+            mindfulness: [
+              { id: 1, name: "Breathing Exercises", description: "Guided techniques to calm your nervous system", icon: "🫁" },
+              { id: 2, name: "Present Moment Anchoring", description: "Quick grounding techniques for anxiety", icon: "⚓" },
+              { id: 3, name: "Mindful Observation", description: "Photography and awareness exercises", icon: "📸" },
+              { id: 4, name: "Body Scan", description: "Guided relaxation and awareness sessions", icon: "🧘" }
+            ],
+            acceptance: [
+              { id: 1, name: "Emotion Acknowledgment", description: "Name and accept your feelings without judgment", icon: "❤️" },
+              { id: 2, name: "Situation Acceptance", description: "Reframe challenges with compassion", icon: "🤲" },
+              { id: 3, name: "Self-Compassion", description: "Gentle self-talk and kindness prompts", icon: "💝" },
+              { id: 4, name: "Letting Go", description: "Release techniques and visualizations", icon: "🕊️" }
+            ],
+            gratitude: [
+              { id: 1, name: "Gratitude Journaling", description: "Daily appreciation prompts and reflection", icon: "📔" },
+              { id: 2, name: "Photo Gratitude", description: "Capture moments of beauty and appreciation", icon: "📷" },
+              { id: 3, name: "Gratitude Sharing", description: "Connect with others through appreciation", icon: "💌" },
+              { id: 4, name: "Perspective Shifting", description: "Find positives in challenges", icon: "🔄" }
+            ],
+            interactions: [
+              { id: 1, name: "Social Energy Check", description: "Assess your social needs and capacity", icon: "🎭" },
+              { id: 2, name: "Connection Planning", description: "Schedule meaningful interactions", icon: "📅" },
+              { id: 3, name: "Boundary Communication", description: "Scripts for difficult conversations", icon: "💬" },
+              { id: 4, name: "Empathy Exercises", description: "Understand others' perspectives", icon: "🤝" }
+            ],
+            nurturing: [
+              { id: 1, name: "Playfulness Prompts", description: "Silly, fun activity suggestions", icon: "🎪" },
+              { id: 2, name: "Humor Therapy", description: "Jokes, laughter, and lightness", icon: "😄" },
+              { id: 3, name: "Creative Expression", description: "Art, music, and writing prompts", icon: "🎨" },
+              { id: 4, name: "Joy Cultivation", description: "Identify and pursue happiness", icon: "✨" }
+            ],
+            exploring: [
+              { id: 1, name: "Thought Pattern Recognition", description: "CBT-based thought tracking", icon: "🧠" },
+              { id: 2, name: "Behavior Analysis", description: "Understand your responses and patterns", icon: "🔍" },
+              { id: 3, name: "Confidence Building", description: "Challenge avoidance patterns", icon: "💪" },
+              { id: 4, name: "Anxiety Cycle Breaking", description: "Interrupt negative spirals", icon: "🔄" }
+            ]
+          };
+          return tools[sectionKey] || [];
+        };
+
+        const getNewQuote = () => {
+          const quotes = [
+            { text: "Anxiety is not your enemy. It's information about what matters to you.", author: "Mandy Kloppers" },
+            { text: "Small steps in the right direction can turn out to be the biggest steps of your life.", author: "Mandy Kloppers" },
+            { text: "You are stronger than you think and more resilient than you know.", author: "Mandy Kloppers" },
+            { text: "Progress, not perfection, is the goal.", author: "Mandy Kloppers" }
+          ];
+          const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+          dailyQuote.value = randomQuote;
+        };
+
+        const quickMoodCheck = () => {
+          currentView.value = 'mood';
+        };
+
+        const chatWithMandy = () => {
+          currentView.value = 'chat';
+        };
+
+        const sendMessage = () => {
+          if (!newMessage.value.trim()) return;
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'user',
+            text: newMessage.value,
+            timestamp: new Date()
+          });
+
+          // Simulate AI Mandy response
+          setTimeout(() => {
+            const responses = [
+              "I hear you. That sounds like a valuable insight. How does that make you feel?",
+              "Thank you for sharing that with me. What would you like to explore about this?",
+              "That's a great observation. What IMAGINE section do you think might help with this?",
+              "I appreciate your openness. Remember, small steps forward are still progress."
+            ];
+            
+            chatHistory.value.push({
+              id: Date.now() + 1,
+              sender: 'ai_mandy', 
+              text: responses[Math.floor(Math.random() * responses.length)],
+              timestamp: new Date()
+            });
+          }, 1000);
+
+          newMessage.value = '';
+        };
+
+        const saveMoodEntry = () => {
+          user.moodHistory.push({
+            ...moodEntry,
+            timestamp: new Date(),
+            id: Date.now()
+          });
+          
+          // Reset form
+          moodEntry.level = 5;
+          moodEntry.activity = '';
+          moodEntry.notes = '';
+          
+          // Show success and return to dashboard
+          alert('Mood entry saved! 🌟');
+          currentView.value = 'dashboard';
+        };
+
+        // Initialize
+        onMounted(() => {
+          console.log('Theracowch app initialized');
+          
+          // Update greeting based on time
+          const hour = new Date().getHours();
+          if (hour < 12) {
+            aiMandyGreeting.value = "Good morning! 🌅 Ready to start your day with some self-care?";
+          } else if (hour < 17) {
+            aiMandyGreeting.value = "Good afternoon! ☀️ How has your day been treating you?";
+          } else {
+            aiMandyGreeting.value = "Good evening! 🌙 Time to reflect and unwind. How are you feeling?";
+          }
+        });
+
+        return {
+          currentView,
+          currentSection,
+          user,
+          aiMandyGreeting,
+          dailyQuote,
+          imagineSections,
+          chatHistory,
+          newMessage,
+          moodEntry,
+          goToDashboard,
+          goToSection,
+          getSectionGuidance,
+          getSectionTools,
+          getNewQuote,
+          quickMoodCheck,
+          chatWithMandy,
+          sendMessage,
+          saveMoodEntry
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
