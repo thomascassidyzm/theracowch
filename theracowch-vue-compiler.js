@@ -185,11 +185,25 @@ class TheracowchVueCompiler {
       </main>
 
       <!-- IMAGINE Section Landing Page -->
-      <main class="max-w-lg mx-auto p-4" v-if="currentView === 'section' && currentSection">
-        <div class="flex items-center mb-6">
-          <button @click="goToDashboard" class="mr-3 text-gray-600 text-2xl">←</button>
-          <h2 class="text-xl font-semibold" style="color: var(--text-dark)">{{ currentSection.title }}</h2>
-        </div>
+      <main class="max-w-lg mx-auto pt-24 pb-4" v-if="currentView === 'section' && currentSection">
+        <!-- Fixed Navigation Header -->
+        <nav class="fixed top-0 left-0 right-0 z-50" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);">
+          <div class="max-w-lg mx-auto px-6 py-4">
+            <div class="flex items-center">
+              <button @click="goToDashboard" class="mr-4 p-2 rounded-full hover:bg-white/10 transition-colors" style="color: var(--text-glass)">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </button>
+              <div class="flex-1">
+                <h2 class="text-lg font-bold" style="color: var(--text-glass)">{{ currentSection.title }}</h2>
+                <p class="text-sm" style="color: var(--text-glass-soft)">{{ currentSection.subtitle }}</p>
+              </div>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="p-4">
         
         <!-- Section Description -->
         <div class="wysa-card mb-6" :class="currentSection.gradientClass">
@@ -233,20 +247,32 @@ class TheracowchVueCompiler {
       </main>
 
       <!-- Enhanced Chat Interface with Therapeutic Features -->
-      <main class="max-w-lg mx-auto" v-if="currentView === 'chat'">
-        <!-- Chat Header with Therapeutic Context -->
-        <div class="flex items-center p-4 bg-white border-b">
-          <button @click="goToDashboard" class="mr-3 text-gray-600">←</button>
-          <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center mr-3">
-            <img class="hidden" alt="Mandy" class="w-8 h-8 rounded-full">
+      <main class="max-w-lg mx-auto pt-20 pb-4" v-if="currentView === 'chat'">
+        <!-- Fixed Chat Header -->
+        <nav class="fixed top-0 left-0 right-0 z-50" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);">
+          <div class="max-w-lg mx-auto px-6 py-4">
+            <div class="flex items-center">
+              <button @click="goToDashboard" class="mr-4 p-2 rounded-full hover:bg-white/10 transition-colors" style="color: var(--text-glass)">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </button>
+              <div class="w-10 h-10 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full flex items-center justify-center mr-3">
+                🐄
+              </div>
+              <div class="flex-1">
+                <h2 class="font-bold" style="color: var(--text-glass)">AI Mandy</h2>
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
+                  <p class="text-sm" style="color: var(--text-glass-soft)">Available for coaching</p>
+                </div>
+                <p class="text-xs" style="color: var(--text-glass-muted)" v-if="conversationContext.currentPattern">
+                  Focus: {{ conversationContext.currentPattern }}
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="flex-1">
-            <h2 class="font-semibold">Mandy</h2>
-            <p class="text-sm text-green-600">● Available for therapeutic coaching</p>
-            <p class="text-xs text-gray-500" v-if="conversationContext.currentPattern">
-              Current focus: {{ conversationContext.currentPattern }}
-            </p>
-          </div>
+        </nav>
           <div class="text-xs text-gray-400">
             Phase: {{ conversationContext.sessionPhase }}
           </div>
@@ -417,31 +443,60 @@ class TheracowchVueCompiler {
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <!-- Modern Bottom Navigation -->
+      <nav class="fixed bottom-0 left-0 right-0 z-40" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border);">
         <div class="max-w-lg mx-auto flex">
           <button @click="currentView = 'dashboard'" 
-                  :class="currentView === 'dashboard' ? 'text-purple-600' : 'text-gray-400'"
-                  class="flex-1 py-3 text-center">
-            <div class="text-lg">🏠</div>
-            <div class="text-xs">Home</div>
+                  class="flex-1 py-4 text-center transition-colors hover:bg-white/5 relative">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all"
+                   :class="currentView === 'dashboard' ? 'bg-gradient-to-br from-neon-blue to-neon-cyan text-white scale-110' : 'text-white/60'">
+                🏠
+              </div>
+              <div class="text-xs font-medium" 
+                   :style="currentView === 'dashboard' ? 'color: var(--neon-blue)' : 'color: var(--text-glass-muted)'">
+                Home
+              </div>
+            </div>
           </button>
           <button @click="currentView = 'progress'" 
-                  :class="currentView === 'progress' ? 'text-purple-600' : 'text-gray-400'"
-                  class="flex-1 py-3 text-center">
-            <div class="text-lg">📊</div>
-            <div class="text-xs">Progress</div>
+                  class="flex-1 py-4 text-center transition-colors hover:bg-white/5">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all"
+                   :class="currentView === 'progress' ? 'bg-gradient-to-br from-neon-green to-neon-cyan text-white scale-110' : 'text-white/60'">
+                📊
+              </div>
+              <div class="text-xs font-medium" 
+                   :style="currentView === 'progress' ? 'color: var(--neon-green)' : 'color: var(--text-glass-muted)'">
+                Progress
+              </div>
+            </div>
           </button>
           <button @click="currentView = 'chat'" 
-                  :class="currentView === 'chat' ? 'text-purple-600' : 'text-gray-400'"
-                  class="flex-1 py-3 text-center">
-            <div class="text-lg">💬</div>
-            <div class="text-xs">Chat</div>
+                  class="flex-1 py-4 text-center transition-colors hover:bg-white/5">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all"
+                   :class="currentView === 'chat' ? 'bg-gradient-to-br from-neon-pink to-neon-purple text-white scale-110' : 'text-white/60'">
+                💬
+              </div>
+              <div class="text-xs font-medium" 
+                   :style="currentView === 'chat' ? 'color: var(--neon-pink)' : 'color: var(--text-glass-muted)'">
+                Chat
+              </div>
+            </div>
           </button>
           <button @click="currentView = 'settings'" 
-                  :class="currentView === 'settings' ? 'text-purple-600' : 'text-gray-400'"
-                  class="flex-1 py-3 text-center">
-            <div class="text-lg">⚙️</div>
-            <div class="text-xs">Settings</div>
+                  class="flex-1 py-4 text-center transition-colors hover:bg-white/5">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all"
+                   :class="currentView === 'settings' ? 'bg-gradient-to-br from-neon-purple to-neon-pink text-white scale-110' : 'text-white/60'">
+                ⚙️
+              </div>
+              <div class="text-xs font-medium" 
+                   :style="currentView === 'settings' ? 'color: var(--neon-purple)' : 'color: var(--text-glass-muted)'">
+                Settings
+              </div>
+            </div>
           </button>
         </div>
       </nav>
