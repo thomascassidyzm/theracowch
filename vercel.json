@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "theracowch-compiled-app.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/theracowch-compiled-app.html"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    }
+  ]
+}
