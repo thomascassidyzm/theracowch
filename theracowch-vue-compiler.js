@@ -151,23 +151,27 @@ class TheracowchVueCompiler {
         </div>
 
         <!-- IMAGINE Vertical Layout (spells I-M-A-G-I-N-E) -->
-        <div class="space-y-3 mb-6">
+        <div class="space-y-4 mb-8">
           <div v-for="(section, index) in imagineSections" 
                :key="section.key"
                @click="goToSection(section.key)"
-               class="imagine-horizontal-card bounce-in"
-               :class="section.gradientClass"
+               class="glassmorphism-card imagine-card"
                :style="{ animationDelay: (index * 0.1) + 's' }">
-            <div class="flex items-center p-4">
-              <div class="mr-4 pulsing">
-                <div class="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-blue rounded-full flex items-center justify-center text-xl">🐄</div>
+            <div class="flex items-center p-5">
+              <div class="mr-4">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
+                     :style="'background: ' + section.gradient + '; box-shadow: 0 8px 25px ' + section.shadowColor">
+                  {{ section.emoji }}
+                </div>
               </div>
               <div class="flex-1">
-                <h3 class="font-bold text-lg text-white text-shadow">{{ section.title }}</h3>
-                <p class="text-sm text-white opacity-90">{{ section.subtitle }}</p>
+                <h3 class="font-semibold text-lg text-white mb-1">{{ section.title }}</h3>
+                <p class="text-sm text-white text-opacity-75">{{ section.subtitle }}</p>
               </div>
-              <div class="text-white opacity-75">
-                ▶
+              <div class="text-white text-opacity-50">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                </svg>
               </div>
             </div>
           </div>
@@ -661,50 +665,57 @@ class TheracowchVueCompiler {
             key: 'self_care',
             title: 'I - Me, Myself & I',
             subtitle: 'Self-care and personal wellness',
-            icon: '🐄',
-            gradientClass: 'gradient-self-care'
+            emoji: '💎',
+            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            shadowColor: 'rgba(102, 126, 234, 0.4)'
           },
           {
             key: 'mindfulness',
             title: 'M - Mindfulness',
             subtitle: 'Present moment awareness',
-            icon: '🐄',
-            gradientClass: 'gradient-mindfulness'
+            emoji: '🧘',
+            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            shadowColor: 'rgba(240, 147, 251, 0.4)'
           },
           {
             key: 'acceptance',
             title: 'A - Acceptance',
             subtitle: 'Embracing your current state',
-            icon: '🐄',
-            gradientClass: 'gradient-acceptance'
+            emoji: '🤗',
+            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            shadowColor: 'rgba(79, 172, 254, 0.4)'
           },
           {
             key: 'gratitude',
             title: 'G - Gratitude',
             subtitle: 'Focusing on positive aspects',
-            icon: '🐄',
-            gradientClass: 'gradient-gratitude'
+            emoji: '🙏',
+            gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            shadowColor: 'rgba(67, 233, 123, 0.4)'
           },
           {
             key: 'interactions',
             title: 'I - Interactions',
             subtitle: 'Connecting with others',
-            icon: '🐄',
-            gradientClass: 'gradient-interactions'
+            emoji: '💬',
+            gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            shadowColor: 'rgba(250, 112, 154, 0.4)'
           },
           {
             key: 'nurturing',
             title: 'N - Nurturing',
             subtitle: 'Fun, playfulness, and joy',
-            icon: '🐄',
-            gradientClass: 'gradient-nurturing'
+            emoji: '🌱',
+            gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            shadowColor: 'rgba(168, 237, 234, 0.4)'
           },
           {
             key: 'exploring',
             title: 'E - Exploring',
             subtitle: 'Understanding thoughts & behaviors',
-            icon: '🐄',
-            gradientClass: 'gradient-exploring'
+            emoji: '🔍',
+            gradient: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
+            shadowColor: 'rgba(210, 153, 194, 0.4)'
           }
         ]);
 
@@ -1222,21 +1233,45 @@ class TheracowchVueCompiler {
       color: var(--text-dark);
     }
     
-    /* IMAGINE horizontal cards */
-    .imagine-horizontal-card {
+    /* Modern Glassmorphism Cards */
+    .glassmorphism-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.2);
     }
     
-    .imagine-horizontal-card:hover {
-      transform: translateY(-2px) scale(1.01);
-      box-shadow: 0 10px 35px rgba(0,0,0,0.2);
-      border-color: rgba(255, 255, 255, 0.4);
+    .glassmorphism-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .glassmorphism-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .glassmorphism-card:hover::before {
+      opacity: 1;
+    }
+    
+    .imagine-card {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
     }
     
     /* Consistent dark gradients for IMAGINE sections */
