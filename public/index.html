@@ -59,28 +59,31 @@
     }
 
     .btn-primary {
-      @apply inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300 relative overflow-hidden;
+      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-500 ease-out relative overflow-hidden;
+      border-radius: 2rem;
       background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
       background-size: 200% 200%;
       animation: gradientShift 4s ease infinite;
       box-shadow: 
-        0 10px 25px -5px rgba(99, 102, 241, 0.4), 
-        0 4px 10px -3px rgba(236, 72, 153, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+        0 12px 30px -5px rgba(99, 102, 241, 0.4), 
+        0 6px 15px -3px rgba(236, 72, 153, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.15);
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px) scale(1.05);
+      transform: translateY(-3px) scale(1.05);
       box-shadow: 
-        0 20px 40px -5px rgba(99, 102, 241, 0.5), 
-        0 8px 20px -3px rgba(236, 72, 153, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 25px 50px -5px rgba(99, 102, 241, 0.6), 
+        0 12px 25px -3px rgba(236, 72, 153, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
       animation-duration: 2s;
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     .btn-primary:active {
-      transform: translateY(0) scale(1.02);
+      transform: translateY(-1px) scale(1.02);
+      transition: all 0.1s ease-out;
     }
 
     @keyframes gradientShift {
@@ -89,22 +92,28 @@
     }
 
     .btn-glass {
-      @apply inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300 relative;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-500 ease-out relative;
+      border-radius: 2rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(15px);
       box-shadow: 
-        0 8px 20px -5px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 10px 25px -5px rgba(0, 0, 0, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.1);
     }
 
     .btn-glass:hover {
-      transform: translateY(-2px) scale(1.05);
+      transform: translateY(-3px) scale(1.05);
       background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.35);
       box-shadow: 
-        0 15px 30px -5px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 20px 40px -5px rgba(0, 0, 0, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-glass:active {
+      transform: translateY(-1px) scale(1.02);
+      transition: all 0.1s ease-out;
     }
 
     .imagine-card {
@@ -505,60 +514,60 @@
         
         const imagineSections = ref([
           {
-            key: 'introspection',
-            title: 'I - Introspection',
-            subtitle: 'Self-awareness & internal patterns',
-            emoji: '🪞',
-            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            shadowColor: 'rgba(102, 126, 234, 0.4)'
+            key: 'self_care',
+            title: 'I - Me, Myself & I',
+            subtitle: 'Self-care and personal wellness',
+            emoji: '💎',
+            gradient: 'linear-gradient(135deg, #d4a574 0%, #8b6914 100%)', // warm_earth_tones
+            shadowColor: 'rgba(212, 165, 116, 0.4)'
           },
           {
-            key: 'motivation',
-            title: 'M - Motivation',
-            subtitle: 'Drive patterns & authentic goals',
-            emoji: '🔥',
-            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            shadowColor: 'rgba(240, 147, 251, 0.4)'
-          },
-          {
-            key: 'anxiety',
-            title: 'A - Anxiety',
-            subtitle: 'Emotional regulation & coping',
-            emoji: '🌊',
-            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            key: 'mindfulness',
+            title: 'M - Mindfulness',
+            subtitle: 'Present moment awareness',
+            emoji: '🧘',
+            gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // calm_blues_greens
             shadowColor: 'rgba(79, 172, 254, 0.4)'
           },
           {
-            key: 'goals',
-            title: 'G - Goals',
-            subtitle: 'Purpose alignment & direction',
-            emoji: '🎯',
-            gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-            shadowColor: 'rgba(67, 233, 123, 0.4)'
+            key: 'acceptance',
+            title: 'A - Acceptance',
+            subtitle: 'Embracing your current state',
+            emoji: '🤗',
+            gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // soft_pastels
+            shadowColor: 'rgba(168, 237, 234, 0.4)'
           },
           {
-            key: 'identity',
-            title: 'I - Identity',
-            subtitle: 'Self-worth & belief patterns',
-            emoji: '💎',
-            gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            shadowColor: 'rgba(250, 112, 154, 0.4)'
+            key: 'gratitude',
+            title: 'G - Gratitude',
+            subtitle: 'Focusing on positive aspects',
+            emoji: '🙏',
+            gradient: 'linear-gradient(135deg, #fee140 0%, #fa709a 100%)', // warm_yellows_oranges
+            shadowColor: 'rgba(254, 225, 64, 0.4)'
+          },
+          {
+            key: 'interactions',
+            title: 'I - Interactions',
+            subtitle: 'Connecting with others',
+            emoji: '💬',
+            gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', // friendly_purples_pinks
+            shadowColor: 'rgba(168, 85, 247, 0.4)'
           },
           {
             key: 'nurturing',
             title: 'N - Nurturing',
-            subtitle: 'Relationships & boundaries',
-            emoji: '🤝',
-            gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-            shadowColor: 'rgba(168, 237, 234, 0.4)'
+            subtitle: 'Fun, playfulness, and joy',
+            emoji: '🌱',
+            gradient: 'linear-gradient(135deg, #34d399 0%, #fbbf24 100%)', // bright_cheerful_colors
+            shadowColor: 'rgba(52, 211, 153, 0.4)'
           },
           {
-            key: 'energy',
-            title: 'E - Energy',
-            subtitle: 'Vitality & life management',
-            emoji: '⚡',
-            gradient: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
-            shadowColor: 'rgba(210, 153, 194, 0.4)'
+            key: 'exploring',
+            title: 'E - Exploring',
+            subtitle: 'Understanding thoughts & behaviors',
+            emoji: '🔍',
+            gradient: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)', // discovery_greens_blues
+            shadowColor: 'rgba(16, 185, 129, 0.4)'
           }
         ]);
 
