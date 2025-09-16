@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Theracowch - AI Therapeutic Coaching</title>
+  <title>therapy COWch - AI Therapeutic Coaching</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script>
     // Tailwind CSS configuration for production
@@ -309,11 +309,16 @@
                      style="object-position: center 30%; transform: scale(1.5);">
               </div>
               <div>
-                <h1 class="text-xl font-bold gradient-text">Theracowch</h1>
+                <h1 class="text-xl font-bold gradient-text">therapy COWch</h1>
                 <p class="text-xs text-stone-400">Your therapeutic cowch</p>
               </div>
             </div>
-            <div class="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
+            <!-- Mobile badge -->
+            <div class="sm:hidden px-3 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-xs font-medium text-indigo-200">
+              ✨ AI Therapy
+            </div>
+            <!-- Desktop badge -->
+            <div class="hidden sm:block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
               ✨ AI Therapeutic Coaching
             </div>
           </div>
