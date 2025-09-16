@@ -20,7 +20,20 @@
     }
   </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐄</text></svg>">
+  
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="therapy COWch">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="msapplication-TileColor" content="#6366f1">
+  
+  <!-- Icons -->
+  <link rel="icon" href="/icons/icon-96x96.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.svg">
+  <link rel="mask-icon" href="/icons/icon-192x192.svg" color="#6366f1">
   
   <style>
     /* Modern Hexagon Maths-inspired Design System */
@@ -1828,6 +1841,78 @@
         };
       }
     }).mount('#app');
+
+    // Register Service Worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button after a delay
+      setTimeout(() => {
+        if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+          showInstallPrompt();
+        }
+      }, 3000);
+    });
+
+    function showInstallPrompt() {
+      if (!deferredPrompt) return;
+      
+      const installBanner = document.createElement('div');
+      installBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl shadow-lg text-white text-center';
+      installBanner.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🐄</span>
+            <div class="text-left">
+              <p class="font-semibold text-sm">Install therapy COWch</p>
+              <p class="text-xs opacity-80">Get the full app experience</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button id="install-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Later</button>
+            <button id="install-app" class="px-4 py-1 text-xs bg-white/20 rounded-full font-medium">Install</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(installBanner);
+      
+      document.getElementById('install-app').addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const result = await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          installBanner.remove();
+        }
+      });
+      
+      document.getElementById('install-dismiss').addEventListener('click', () => {
+        installBanner.remove();
+        deferredPrompt = null;
+      });
+      
+      // Auto-dismiss after 15 seconds
+      setTimeout(() => {
+        if (document.body.contains(installBanner)) {
+          installBanner.remove();
+        }
+      }, 15000);
+    }
   </script>
 </body>
 </html>

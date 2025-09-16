@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Cow Face Icons</title>
+</head>
+<body>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="sourceImage" src="public/assets/theracowch_main_image.jpg" style="display: none;" crossorigin="anonymous">
+    
+    <script>
+        const img = document.getElementById('sourceImage');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        
+        img.onload = function() {
+            iconSizes.forEach(size => {
+                canvas.width = size;
+                canvas.height = size;
+                
+                // Clear canvas with gradient background
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#6366f1');
+                gradient.addColorStop(0.5, '#8b5cf6');
+                gradient.addColorStop(1, '#ec4899');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // Draw the cow face (cropped from center, zoomed in)
+                const cropSize = Math.min(img.width, img.height) * 0.7; // Zoom in on face
+                const startX = (img.width - cropSize) / 2;
+                const startY = (img.height - cropSize) / 2.5; // Slightly higher to get face
+                
+                // Add rounded corners
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(size * 0.1, size * 0.1, size * 0.8, size * 0.8, size * 0.2);
+                ctx.clip();
+                
+                ctx.drawImage(img, startX, startY, cropSize, cropSize, size * 0.1, size * 0.1, size * 0.8, size * 0.8);
+                ctx.restore();
+                
+                // Download the icon
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `icon-${size}x${size}.png`;
+                    link.click();
+                }, 'image/png');
+            });
+        };
+        
+        // Fallback: create emoji-based icons if image fails
+        img.onerror = function() {
+            iconSizes.forEach(size => {
+                canvas.width = size;
+                canvas.height = size;
+                
+                // Gradient background
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#6366f1');
+                gradient.addColorStop(0.5, '#8b5cf6');
+                gradient.addColorStop(1, '#ec4899');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // Draw cow emoji
+                ctx.font = `${size * 0.6}px system-ui`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🐄', size / 2, size / 2);
+                
+                // Download
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `icon-${size}x${size}.png`;
+                    link.click();
+                }, 'image/png');
+            });
+        };
+    </script>
+</body>
+</html>
