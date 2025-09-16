@@ -59,43 +59,114 @@
     }
 
     .btn-primary {
-      @apply inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-white transition-all duration-300;
-      background: linear-gradient(to right, #6366f1, #5350e5);
-      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.25), 0 4px 10px -3px rgba(240, 197, 147, 0.1);
+      @apply inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300 relative overflow-hidden;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+      background-size: 200% 200%;
+      animation: gradientShift 4s ease infinite;
+      box-shadow: 
+        0 10px 25px -5px rgba(99, 102, 241, 0.4), 
+        0 4px 10px -3px rgba(236, 72, 153, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .btn-primary:hover {
-      transform: scale(1.05);
-      background: linear-gradient(to right, #5350e5, #4540ca);
-      box-shadow: 0 20px 35px -5px rgba(99, 102, 241, 0.3), 0 6px 15px -3px rgba(240, 197, 147, 0.15);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 
+        0 20px 40px -5px rgba(99, 102, 241, 0.5), 
+        0 8px 20px -3px rgba(236, 72, 153, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      animation-duration: 2s;
+    }
+
+    .btn-primary:active {
+      transform: translateY(0) scale(1.02);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
     }
 
     .btn-glass {
-      @apply inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-white transition-all duration-300;
+      @apply inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300 relative;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
+      box-shadow: 
+        0 8px 20px -5px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     .btn-glass:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 
+        0 15px 30px -5px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     .imagine-card {
-      @apply card cursor-pointer transform transition-all duration-300;
+      @apply card cursor-pointer transform transition-all duration-300 relative overflow-hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(249, 230, 211, 0.05));
     }
 
     .imagine-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(249, 230, 211, 0.1));
+      box-shadow: 
+        0 25px 50px -12px rgba(147, 93, 38, 0.15), 
+        0 15px 25px -5px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .imagine-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .imagine-card:hover::before {
+      left: 100%;
     }
 
     .gradient-text {
-      background: linear-gradient(135deg, #8590f8, #6366f1, #e8a968);
+      background: linear-gradient(135deg, #8590f8, #6366f1, #ec4899, #e8a968);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 40px rgba(236, 72, 153, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5), 0 0 60px rgba(236, 72, 153, 0.3);
+      }
+    }
+
+    .emoji-bounce {
+      animation: emojiFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes emojiFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
     }
 
     .hex-badge {
@@ -151,13 +222,13 @@
         <div class="max-w-4xl mx-auto px-6 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold">
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold emoji-bounce pulse-glow">
                 🐄
               </div>
               <h1 class="text-xl font-bold gradient-text">Theracowch</h1>
             </div>
-            <div class="hex-badge">
-              AI Therapeutic Coaching
+            <div class="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
+              ✨ AI Therapeutic Coaching
             </div>
           </div>
         </div>
@@ -176,11 +247,19 @@
               Chat with AI Mandy, your personal therapeutic coach specializing in CBT and mindful living
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <button @click="chatWithMandy" class="btn-primary">
-                💬 Start Coaching Session
+              <button @click="chatWithMandy" class="btn-primary group">
+                <span class="emoji-bounce mr-2">💬</span>
+                Start Coaching Session
+                <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13.293 7.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L14.586 12H3a1 1 0 110-2h11.586l-1.293-1.293a1 1 0 010-1.414z"/>
+                </svg>
               </button>
-              <button @click="exploreImagine" class="btn-glass">
-                ✨ Explore IMAGINE Framework
+              <button @click="exploreImagine" class="btn-glass group">
+                <span class="emoji-bounce mr-2">🧠</span>
+                Explore IMAGINE Framework
+                <svg class="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -199,19 +278,20 @@
                    class="imagine-card animate-fade-in-up"
                    :style="{ animationDelay: (index * 0.1) + 's' }">
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 relative z-10">
                   <div class="flex-shrink-0">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
-                         :style="'background: ' + section.gradient + '; box-shadow: 0 8px 25px ' + section.shadowColor">
+                    <div class="w-18 h-18 rounded-2xl flex items-center justify-center text-3xl shadow-lg emoji-bounce relative overflow-hidden"
+                         :style="'background: ' + section.gradient + '; box-shadow: 0 12px 30px ' + section.shadowColor">
                       {{ section.emoji }}
+                      <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl"></div>
                     </div>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-white mb-2">{{ section.title }}</h3>
-                    <p class="text-sm text-stone-300">{{ section.subtitle }}</p>
+                    <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-indigo-200 transition-colors">{{ section.title }}</h3>
+                    <p class="text-sm text-stone-300 group-hover:text-stone-200 transition-colors">{{ section.subtitle }}</p>
                   </div>
-                  <div class="text-stone-400">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <div class="text-stone-400 group-hover:text-indigo-300 transition-all duration-300 group-hover:scale-110">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="drop-shadow-sm">
                       <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
                     </svg>
                   </div>
@@ -351,39 +431,51 @@
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-white/10">
+      <nav class="fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-white/10 backdrop-blur-xl">
         <div class="max-w-4xl mx-auto px-4 py-3">
           <div class="flex justify-around items-center">
-            <button @click="goHome" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
-                    :class="currentView === 'home' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-              </svg>
-              <span class="text-xs font-medium">Home</span>
+            <button @click="goHome" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'home' ? 'text-indigo-400 bg-indigo-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <div v-if="currentView === 'home'" class="absolute -top-1 -right-1 w-2 h-2 bg-indigo-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">🏠 Home</span>
             </button>
             
-            <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
-                    :class="currentView === 'chat' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-              </svg>
-              <span class="text-xs font-medium">Chat</span>
+            <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'chat' ? 'text-purple-400 bg-purple-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <div v-if="currentView === 'chat'" class="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">💬 Chat</span>
             </button>
             
-            <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
-                    :class="currentView === 'imagine' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              <span class="text-xs font-medium">IMAGINE</span>
+            <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'imagine' ? 'text-pink-400 bg-pink-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <div v-if="currentView === 'imagine'" class="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">🧠 IMAGINE</span>
             </button>
             
-            <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
-                    :class="currentView === 'mood' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
-              </svg>
-              <span class="text-xs font-medium">Progress</span>
+            <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'mood' ? 'text-emerald-400 bg-emerald-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
+                </svg>
+                <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">📈 Progress</span>
             </button>
           </div>
         </div>
@@ -413,58 +505,58 @@
         
         const imagineSections = ref([
           {
-            key: 'self_care',
-            title: 'I - Me, Myself & I',
-            subtitle: 'Self-care and personal wellness',
-            emoji: '💎',
+            key: 'introspection',
+            title: 'I - Introspection',
+            subtitle: 'Self-awareness & internal patterns',
+            emoji: '🪞',
             gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             shadowColor: 'rgba(102, 126, 234, 0.4)'
           },
           {
-            key: 'mindfulness',
-            title: 'M - Mindfulness',
-            subtitle: 'Present moment awareness',
-            emoji: '🧘',
+            key: 'motivation',
+            title: 'M - Motivation',
+            subtitle: 'Drive patterns & authentic goals',
+            emoji: '🔥',
             gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
             shadowColor: 'rgba(240, 147, 251, 0.4)'
           },
           {
-            key: 'acceptance',
-            title: 'A - Acceptance',
-            subtitle: 'Embracing your current state',
-            emoji: '🤗',
+            key: 'anxiety',
+            title: 'A - Anxiety',
+            subtitle: 'Emotional regulation & coping',
+            emoji: '🌊',
             gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
             shadowColor: 'rgba(79, 172, 254, 0.4)'
           },
           {
-            key: 'gratitude',
-            title: 'G - Gratitude',
-            subtitle: 'Focusing on positive aspects',
-            emoji: '🙏',
+            key: 'goals',
+            title: 'G - Goals',
+            subtitle: 'Purpose alignment & direction',
+            emoji: '🎯',
             gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
             shadowColor: 'rgba(67, 233, 123, 0.4)'
           },
           {
-            key: 'interactions',
-            title: 'I - Interactions',
-            subtitle: 'Connecting with others',
-            emoji: '💬',
+            key: 'identity',
+            title: 'I - Identity',
+            subtitle: 'Self-worth & belief patterns',
+            emoji: '💎',
             gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
             shadowColor: 'rgba(250, 112, 154, 0.4)'
           },
           {
             key: 'nurturing',
             title: 'N - Nurturing',
-            subtitle: 'Fun, playfulness, and joy',
-            emoji: '🌱',
+            subtitle: 'Relationships & boundaries',
+            emoji: '🤝',
             gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
             shadowColor: 'rgba(168, 237, 234, 0.4)'
           },
           {
-            key: 'exploring',
-            title: 'E - Exploring',
-            subtitle: 'Understanding thoughts & behaviors',
-            emoji: '🔍',
+            key: 'energy',
+            title: 'E - Energy',
+            subtitle: 'Vitality & life management',
+            emoji: '⚡',
             gradient: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
             shadowColor: 'rgba(210, 153, 194, 0.4)'
           }
