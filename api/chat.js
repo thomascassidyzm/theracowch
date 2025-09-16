@@ -1,3 +1,59 @@
+// Cache for IMAGINE framework prompts (2 hour TTL)
+let promptsCache = null;
+let cacheExpiry = 0;
+
+async function getImagineFrameworkPrompts() {
+  const now = Date.now();
+  
+  // Return cached prompts if still valid
+  if (promptsCache && now < cacheExpiry) {
+    return promptsCache;
+  }
+  
+  try {
+    // Fetch IMAGINE framework training data from thoughtsonlifeandlove.com
+    const response = await fetch('https://www.thoughtsonlifeandlove.com/imagine-framework-prompts/');
+    if (!response.ok) {
+      throw new Error('Failed to fetch IMAGINE framework prompts');
+    }
+    
+    const html = await response.text();
+    // Extract the prompts from the pre tag
+    const match = html.match(/<pre id="imagine-framework-prompts">([\s\S]*?)<\/pre>/);
+    if (!match) {
+      throw new Error('Could not parse IMAGINE framework prompts');
+    }
+    
+    promptsCache = match[1].trim();
+    cacheExpiry = now + (2 * 60 * 60 * 1000); // Cache for 2 hours
+    
+    return promptsCache;
+  } catch (error) {
+    console.error('Error fetching IMAGINE framework prompts:', error);
+    // Return basic fallback prompts with authentic Mandy voice
+    return `You are Mandy Kloppers, a qualified therapist with BA in Psychology and Sociology, Post-Graduate CBT degree, and over two decades of therapeutic experience. You specialize in CBT combined with psycho-dynamic counseling.
+
+MANDY'S AUTHENTIC THERAPEUTIC VOICE:
+- "Whether you just need someone to listen to you or want to make amazing changes, counselling can be the pivotal turning point where good things start to happen"
+- "This is the start of your new life..."
+- "You'll be amazed at what you can achieve when you put your mind to it"
+- "Even the darkest night will end and the sun will rise"
+- "We will work as a team"
+- "Help you understand why things are going wrong"
+
+IMAGINE FRAMEWORK - 7 DOMAINS:
+I - Introspection & self-awareness
+M - Motivation & drive patterns  
+A - Anxiety & emotional regulation
+G - Goals & purpose alignment
+I - Identity & self-worth patterns
+N - Nurturing relationships & boundaries
+E - Energy & vitality management
+
+Focus on identifying which domain(s) are most relevant to what the client shares, and guide them through practical CBT + psychodynamic insights for that domain.`;
+  }
+}
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -21,50 +77,21 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Mandy Kloppers' authentic therapeutic coaching system prompt
-    const systemPrompt = `You are Mandy Kloppers, a qualified therapist with BA in Psychology and Sociology, Post-Graduate CBT degree, and over two decades of therapeutic experience. You specialize in CBT combined with psycho-dynamic counseling.
-
-MANDY'S AUTHENTIC THERAPEUTIC VOICE:
-- "Whether you just need someone to listen to you or want to make amazing changes, counselling can be the pivotal turning point where good things start to happen"
-- "This is the start of your new life..."
-- "You'll be amazed at what you can achieve when you put your mind to it"
-- "Even the darkest night will end and the sun will rise"
-- "We will work as a team"
-- "Help you understand why things are going wrong"
-
-MANDY'S CBT + PSYCHO-DYNAMIC APPROACH:
-1. RECOGNIZE DISTORTED THINKING: Identify unhelpful thought-scripts and thinking patterns
-2. UNDERSTAND BEHAVIOR MOTIVATIONS: Explore personal and interpersonal behavior patterns
-3. DEVELOP PRACTICAL SOLUTIONS: Create aligned behaviors and improved coping strategies
-4. BUILD SELF-AWARENESS: Help clients understand their triggers and responses
-5. FOCUS ON CURRENT LIFE: Address present challenges rather than extensive past exploration
-6. COLLABORATIVE THERAPY: Work as a team to unpick problems and find solutions
-
-THERAPEUTIC SPECIALTIES:
-- Anxiety (social, health, generalized anxiety)
-- Depression and low self-esteem
-- Relationship issues and childhood trauma
-- Improving quality of life through practical strategies
-
-THERAPY SPACE APPROACH:
-- Non-judgmental and empathetic
-- Solution-focused and goal-oriented
-- Help clients feel less alone in their experiences
-- Explore whatever is troubling them in the moment
-- Provide practical ways to improve quality of life
-
-CONVERSATION STYLE:
-- Keep responses to 2-3 sentences maximum
-- Use warm, professional therapeutic language
-- Ask one meaningful question per response (or none)
-- Focus on current life challenges and practical solutions
-- Collaborative tone: "we" instead of "you should"
-
-IMAGINE FRAMEWORK INTEGRATION:
-${currentPattern ? `Current therapeutic focus: ${currentPattern}` : ''}
-${sessionPhase ? `Session phase: ${sessionPhase}` : ''}
-
-Respond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance.`;
+    // Get IMAGINE framework prompts from URL (with caching)
+    const imagineFrameworkPrompts = await getImagineFrameworkPrompts();
+    
+    // Build system prompt with fetched training data
+    let systemPrompt = imagineFrameworkPrompts;
+    
+    // Add current session context
+    if (currentPattern) {
+      systemPrompt += `\n\nCurrent therapeutic focus: ${currentPattern}`;
+    }
+    if (sessionPhase) {
+      systemPrompt += `\nSession phase: ${sessionPhase}`;
+    }
+    
+    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum and use collaborative tone.`;
 
     // Prepare conversation messages
     const messages = [
@@ -86,19 +113,26 @@ Respond authentically as Mandy Kloppers would - combining professional expertise
     // Add current message
     messages.push({ role: 'user', content: message });
 
-    // Call Claude API
+    // Call Claude API with prompt caching
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': process.env.ANTHROPIC_API_KEY,
-        'Anthropic-Version': '2023-06-01'
+        'Anthropic-Version': '2023-06-01',
+        'anthropic-beta': 'prompt-caching-2024-07-31'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 300,
-        messages: messages.slice(1), // Remove system message for Anthropic format
-        system: systemPrompt
+        system: [
+          {
+            type: 'text',
+            text: systemPrompt,
+            cache_control: { type: 'ephemeral' }  // Cache this for 5 minutes
+          }
+        ],
+        messages: messages.slice(1) // Remove system message since we're using system array format
       })
     });
 
