@@ -95,7 +95,7 @@ Respond authentically as Mandy Kloppers would - combining professional expertise
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 300,
         messages: messages.slice(1), // Remove system message for Anthropic format
         system: systemPrompt
