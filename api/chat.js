@@ -91,7 +91,7 @@ Respond authentically as Mandy Kloppers would - combining professional expertise
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.CLAUDE_API_KEY,
+        'X-API-Key': process.env.ANTHROPIC_API_KEY,
         'Anthropic-Version': '2023-06-01'
       },
       body: JSON.stringify({
