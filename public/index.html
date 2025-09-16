@@ -623,6 +623,292 @@
                 </div>
               </div>
 
+              <!-- Thought Unhooking Exercise (Acceptance) -->
+              <div v-if="currentExercise.id === 'thought_unhooking' && currentSection.key === 'acceptance'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Thought Unhooking</h3>
+                  <p class="text-stone-300 mb-6">Learn to detach from anxious thoughts by treating them like scenes from a movie.</p>
+                  
+                  <div class="space-y-6">
+                    <div class="space-y-4">
+                      <h4 class="font-medium text-white">What thought is bothering you right now?</h4>
+                      <textarea v-model="currentBotherThought" 
+                                placeholder="Write the specific thought that's causing anxiety or distress..."
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                    </div>
+                    
+                    <div v-if="currentBotherThought.trim()" class="space-y-4">
+                      <h4 class="font-medium text-white">Now, let's unhook from this thought:</h4>
+                      
+                      <div class="space-y-3">
+                        <div class="p-4 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                          <h5 class="font-medium text-purple-300 mb-2">🎬 Movie Scene Technique</h5>
+                          <p class="text-sm text-stone-300 mb-3">Imagine this thought is just a scene playing in a movie. You're watching it, but you're not in it.</p>
+                          <p class="text-sm text-purple-200 italic">"I'm watching the thought: '{{ currentBotherThought }}' - but it's just a movie scene, not reality."</p>
+                        </div>
+                        
+                        <div class="p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                          <h5 class="font-medium text-blue-300 mb-2">🏷️ Label It Technique</h5>
+                          <p class="text-sm text-stone-300 mb-3">Give this thought a simple, non-judgmental label.</p>
+                          <div class="flex space-x-2">
+                            <button v-for="label in thoughtLabels" :key="label"
+                                    @click="selectedThoughtLabel = label"
+                                    class="px-3 py-1 rounded-full text-xs transition-all"
+                                    :class="selectedThoughtLabel === label ? 'bg-blue-500 text-white' : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/40'">
+                              {{ label }}
+                            </button>
+                          </div>
+                          <p v-if="selectedThoughtLabel" class="text-sm text-blue-200 mt-3 italic">
+                            "I notice I'm having a {{ selectedThoughtLabel.toLowerCase() }} thought. That's just what minds do."
+                          </p>
+                        </div>
+                        
+                        <div class="p-4 bg-green-500/10 border border-green-400/30 rounded-lg">
+                          <h5 class="font-medium text-green-300 mb-2">🔄 Reframe Question</h5>
+                          <p class="text-sm text-stone-300 mb-3">Ask yourself: "What can I actually do to improve this situation?"</p>
+                          <textarea v-model="actionableReframe" 
+                                    placeholder="Write one small, practical action you could take..."
+                                    class="input-field w-full h-16 resize-none text-sm bg-green-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeThoughtUnhooking" 
+                              :disabled="!actionableReframe.trim()"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !actionableReframe.trim() }">
+                        🎯 Complete Thought Unhooking
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Values Compass Exercise (Exploring) -->
+              <div v-if="currentExercise.id === 'values_compass' && currentSection.key === 'exploring'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Values Compass</h3>
+                  <p class="text-stone-300 mb-6">Identify your core values to guide decision-making and understand behavior patterns.</p>
+                  
+                  <div class="space-y-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div v-for="value in availableValues" :key="value"
+                           @click="toggleValue(value)"
+                           class="p-3 rounded-lg border cursor-pointer transition-all text-center text-sm"
+                           :class="selectedValues.includes(value) ? 
+                             'border-indigo-400 bg-indigo-500/20 text-indigo-200' : 
+                             'border-stone-600 bg-stone-700/50 text-stone-300 hover:border-stone-500'">
+                        {{ value }}
+                      </div>
+                    </div>
+                    
+                    <div v-if="selectedValues.length > 0" class="space-y-4">
+                      <h4 class="font-medium text-white">Your Top Values ({{ selectedValues.length }}/5 max)</h4>
+                      <div class="space-y-3">
+                        <div v-for="value in selectedValues" :key="value" class="p-3 bg-indigo-500/10 border border-indigo-400/30 rounded-lg">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium text-indigo-200">{{ value }}</span>
+                            <button @click="removeValue(value)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                          <textarea v-model="valueReflections[value]" 
+                                    :placeholder="`Why is ${value.toLowerCase()} important to you?`"
+                                    class="input-field w-full h-12 resize-none text-xs bg-indigo-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeValuesExploration" 
+                              :disabled="!canCompleteValues"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canCompleteValues }">
+                        🧭 Save My Values Compass
+                      </button>
+                    </div>
+                    
+                    <div v-if="selectedValues.length === 0" class="text-center py-4">
+                      <p class="text-stone-400">Select values that resonate most deeply with you (up to 5)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Connection Web Exercise (Interactions) -->
+              <div v-if="currentExercise.id === 'connection_web' && currentSection.key === 'interactions'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Connection Web</h3>
+                  <p class="text-stone-300 mb-6">Map your relationships and plan meaningful ways to strengthen connections.</p>
+                  
+                  <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <!-- Inner Circle -->
+                      <div class="space-y-4">
+                        <h4 class="font-medium text-white flex items-center space-x-2">
+                          <span>💝</span>
+                          <span>Inner Circle (Closest People)</span>
+                        </h4>
+                        <div class="space-y-2">
+                          <div v-for="(person, index) in innerCircle" :key="index"
+                               class="flex items-center justify-between p-2 bg-pink-500/10 border border-pink-400/30 rounded">
+                            <span class="text-pink-200 text-sm">{{ person }}</span>
+                            <button @click="removeFromCircle('inner', index)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                        </div>
+                        <div class="flex space-x-2">
+                          <input v-model="newInnerPerson" 
+                                 @keyup.enter="addToInnerCircle"
+                                 placeholder="Add someone close to you"
+                                 class="input-field flex-1 text-sm">
+                          <button @click="addToInnerCircle" class="btn-primary text-sm px-3 py-2">Add</button>
+                        </div>
+                      </div>
+                      
+                      <!-- Wider Network -->
+                      <div class="space-y-4">
+                        <h4 class="font-medium text-white flex items-center space-x-2">
+                          <span>🌐</span>
+                          <span>Wider Network</span>
+                        </h4>
+                        <div class="space-y-2">
+                          <div v-for="(person, index) in widerNetwork" :key="index"
+                               class="flex items-center justify-between p-2 bg-blue-500/10 border border-blue-400/30 rounded">
+                            <span class="text-blue-200 text-sm">{{ person }}</span>
+                            <button @click="removeFromCircle('wider', index)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                        </div>
+                        <div class="flex space-x-2">
+                          <input v-model="newWiderPerson" 
+                                 @keyup.enter="addToWiderNetwork"
+                                 placeholder="Add acquaintance or colleague"
+                                 class="input-field flex-1 text-sm">
+                          <button @click="addToWiderNetwork" class="btn-primary text-sm px-3 py-2">Add</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div v-if="innerCircle.length > 0 || widerNetwork.length > 0" class="space-y-4">
+                      <h4 class="font-medium text-white">Connection Action Plan</h4>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-green-500/10 border border-green-400/30 rounded-lg">
+                          <h5 class="font-medium text-green-300 mb-2">💌 This Week</h5>
+                          <textarea v-model="connectionPlan.thisWeek" 
+                                    placeholder="One person to reach out to this week..."
+                                    class="input-field w-full h-16 resize-none text-xs bg-green-500/5"></textarea>
+                        </div>
+                        <div class="p-4 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
+                          <h5 class="font-medium text-yellow-300 mb-2">📅 This Month</h5>
+                          <textarea v-model="connectionPlan.thisMonth" 
+                                    placeholder="Someone to make deeper plans with..."
+                                    class="input-field w-full h-16 resize-none text-xs bg-yellow-500/5"></textarea>
+                        </div>
+                        <div class="p-4 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                          <h5 class="font-medium text-purple-300 mb-2">🎯 New Connection</h5>
+                          <textarea v-model="connectionPlan.newConnection" 
+                                    placeholder="How could you meet someone new?"
+                                    class="input-field w-full h-16 resize-none text-xs bg-purple-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeConnectionWeb" 
+                              :disabled="!canCompleteConnection"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canCompleteConnection }">
+                        🕸️ Save My Connection Web
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Joy Jar Exercise (Nurturing) -->
+              <div v-if="currentExercise.id === 'joy_jar' && currentSection.key === 'nurturing'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Digital Joy Jar</h3>
+                  <p class="text-stone-300 mb-6">Collect moments of joy, fun, and playfulness to revisit when life feels too serious.</p>
+                  
+                  <div class="space-y-6">
+                    <div class="space-y-4">
+                      <h4 class="font-medium text-white">Add a Joy Moment</h4>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">Type of Joy</label>
+                          <select v-model="currentJoyEntry.type" class="input-field w-full text-sm">
+                            <option value="">Select type...</option>
+                            <option value="silly">🤪 Silly Moment</option>
+                            <option value="beautiful">😍 Something Beautiful</option>
+                            <option value="achievement">🏆 Small Win</option>
+                            <option value="connection">💕 Heart Connection</option>
+                            <option value="surprise">🎉 Pleasant Surprise</option>
+                            <option value="nature">🌱 Nature Joy</option>
+                            <option value="creativity">🎨 Creative Fun</option>
+                            <option value="kindness">🤗 Act of Kindness</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">When</label>
+                          <select v-model="currentJoyEntry.when" class="input-field w-full text-sm">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this-week">This Week</option>
+                            <option value="recently">Recently</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">Joy Level</label>
+                          <div class="flex space-x-1">
+                            <button v-for="level in 5" :key="level"
+                                    @click="currentJoyEntry.level = level"
+                                    class="w-8 h-8 rounded-full border-2 transition-all"
+                                    :class="currentJoyEntry.level >= level ? 
+                                      'border-yellow-400 bg-yellow-400/20 text-yellow-300' : 
+                                      'border-stone-600 text-stone-500 hover:border-stone-500'">
+                              ⭐
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <textarea v-model="currentJoyEntry.description" 
+                                placeholder="Describe this joyful moment... What made it special? How did it feel?"
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                      
+                      <button @click="addJoyMoment" 
+                              :disabled="!canAddJoy"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canAddJoy }">
+                        ✨ Add to Joy Jar
+                      </button>
+                    </div>
+                    
+                    <div v-if="joyJar.length > 0" class="space-y-4">
+                      <div class="flex items-center justify-between">
+                        <h4 class="font-medium text-white">Your Joy Collection ({{ joyJar.length }})</h4>
+                        <button @click="getRandomJoy" class="btn-glass text-sm px-4 py-2">
+                          🎲 Random Joy
+                        </button>
+                      </div>
+                      
+                      <div class="max-h-64 overflow-y-auto space-y-3">
+                        <div v-for="(joy, index) in joyJar" :key="index" 
+                             class="p-3 rounded-lg border transition-all"
+                             :class="randomJoyIndex === index ? 
+                               'border-yellow-400 bg-yellow-400/10 shadow-lg' : 
+                               'border-stone-600 bg-stone-700/30'">
+                          <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center space-x-2">
+                              <span class="text-lg">{{ getJoyEmoji(joy.type) }}</span>
+                              <span class="text-sm text-stone-400 capitalize">{{ joy.when }}</span>
+                              <div class="flex">
+                                <span v-for="n in joy.level" :key="n" class="text-yellow-400 text-xs">⭐</span>
+                              </div>
+                            </div>
+                            <button @click="removeJoy(index)" class="text-stone-500 hover:text-stone-300 text-sm">×</button>
+                          </div>
+                          <p class="text-stone-300 text-sm">{{ joy.description }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Default exercise placeholder for other exercises -->
               <div v-if="!isSpecialExercise(currentExercise.id)">
                 <div class="glass-dark p-6 rounded-xl">
@@ -729,6 +1015,39 @@
           { what: '', why: '' },
           { what: '', why: '' }
         ]);
+
+        // New exercise variables
+        // Thought Unhooking (Acceptance)
+        const currentBotherThought = ref('');
+        const selectedThoughtLabel = ref('');
+        const thoughtLabels = ref(['Worry', 'Fear', 'Judgment', 'Catastrophe', 'Rumination', 'Self-Doubt']);
+        const actionableReframe = ref('');
+
+        // Values Compass (Exploring)
+        const selectedValues = ref([]);
+        const valueReflections = ref({});
+        const availableValues = ref([
+          'Family', 'Freedom', 'Creativity', 'Adventure', 'Security', 'Growth',
+          'Connection', 'Achievement', 'Health', 'Authenticity', 'Fun', 'Peace',
+          'Learning', 'Service', 'Independence', 'Tradition', 'Beauty', 'Spirituality',
+          'Success', 'Nature', 'Justice', 'Compassion', 'Integrity', 'Innovation'
+        ]);
+
+        // Connection Web (Interactions)
+        const innerCircle = ref(['Best Friend', 'Family Member']);
+        const widerNetwork = ref(['Colleague', 'Neighbor']);
+        const newInnerPerson = ref('');
+        const newWiderPerson = ref('');
+        const connectionActions = ref([]);
+
+        // Joy Jar (Nurturing)
+        const joyEntries = ref([]);
+        const currentJoyEntry = ref({
+          type: '',
+          when: 'today',
+          level: 0,
+          description: ''
+        });
         
         const moodOptions = ref([
           { value: 1, emoji: '😢', label: 'Very Low' },
@@ -889,7 +1208,7 @@
               { id: "body_scan", name: "Body Scan", description: "Check in with physical sensations", icon: "🧘" }
             ],
             acceptance: [
-              { id: 1, name: "What I Can/Can't Control", description: "Clarify your sphere of influence", icon: "🎯" },
+              { id: "thought_unhooking", name: "Thought Unhooking", description: "Detach from anxious thoughts using CBT techniques", icon: "🎬" },
               { id: 2, name: "Self-Compassion Practice", description: "Treat yourself with kindness", icon: "💝" },
               { id: 3, name: "Radical Acceptance", description: "Practice accepting difficult emotions", icon: "🤲" }
             ],
@@ -899,19 +1218,19 @@
               { id: "small_wins", name: "Small Wins", description: "Celebrate minor victories", icon: "🏆" }
             ],
             interactions: [
-              { id: 1, name: "Connection Inventory", description: "Review your relationships", icon: "👥" },
+              { id: "connection_web", name: "Connection Web", description: "Map your relationships and plan connections", icon: "🕷️" },
               { id: 2, name: "Active Listening", description: "Practice deep listening skills", icon: "👂" },
               { id: 3, name: "Difficult Conversations", description: "Scripts for challenging talks", icon: "💬" }
             ],
             nurturing: [
-              { id: 1, name: "Play Break", description: "Do something just for fun", icon: "🎭" },
+              { id: "joy_jar", name: "Digital Joy Jar", description: "Collect and revisit happy moments", icon: "🏺" },
               { id: 2, name: "Creative Expression", description: "Art, music, or writing", icon: "🎨" },
               { id: 3, name: "Inner Child", description: "Connect with your playful side", icon: "🧸" }
             ],
             exploring: [
-              { id: 1, name: "Thought Record", description: "Track your thinking patterns", icon: "📝" },
+              { id: "values_compass", name: "Values Compass", description: "Navigate life decisions using your core values", icon: "🧭" },
               { id: 2, name: "Trigger Mapping", description: "Identify what sets off reactions", icon: "🗺️" },
-              { id: 3, name: "Values Clarification", description: "Understand what matters most", icon: "🧭" }
+              { id: 1, name: "Thought Record", description: "Track your thinking patterns", icon: "📝" }
             ]
           };
           return tools[sectionKey] || [];
@@ -1034,7 +1353,10 @@
         };
 
         const isSpecialExercise = (exerciseId) => {
-          const specialExercises = ['grounding_5432', 'breathing_4_7_8', 'energy_audit', 'three_good_things'];
+          const specialExercises = [
+            'grounding_5432', 'breathing_4_7_8', 'energy_audit', 'three_good_things',
+            'thought_unhooking', 'values_compass', 'connection_web', 'joy_jar'
+          ];
           return specialExercises.includes(exerciseId);
         };
 
@@ -1160,6 +1482,173 @@
           currentView.value = 'chat';
         };
 
+        // New exercise methods
+
+        // Thought Unhooking methods
+        const completeThoughtUnhooking = () => {
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Excellent work unhooking from that thought! You practiced seeing it as just mental content rather than absolute truth. The action step you identified: "${actionableReframe.value}" shows you're moving from worry to empowerment.`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          currentBotherThought.value = '';
+          selectedThoughtLabel.value = '';
+          actionableReframe.value = '';
+          
+          currentView.value = 'chat';
+        };
+
+        // Values Compass methods
+        const toggleValue = (value) => {
+          const index = selectedValues.value.indexOf(value);
+          if (index > -1) {
+            selectedValues.value.splice(index, 1);
+            delete valueReflections.value[value];
+          } else if (selectedValues.value.length < 5) {
+            selectedValues.value.push(value);
+            valueReflections.value[value] = '';
+          }
+        };
+
+        const removeValue = (value) => {
+          const index = selectedValues.value.indexOf(value);
+          if (index > -1) {
+            selectedValues.value.splice(index, 1);
+            delete valueReflections.value[value];
+          }
+        };
+
+        const canCompleteValues = computed(() => {
+          return selectedValues.value.length > 0 && 
+                 selectedValues.value.every(value => valueReflections.value[value]?.trim());
+        });
+
+        const completeValuesExploration = () => {
+          const valuesText = selectedValues.value.map(value => 
+            `${value}: ${valueReflections.value[value]}`
+          ).join('; ');
+
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Wonderful! You've identified your core values: ${selectedValues.value.join(', ')}. These can now serve as your compass for decision-making. When facing choices, ask: "Which option aligns best with my values?"`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          selectedValues.value = [];
+          valueReflections.value = {};
+          
+          currentView.value = 'chat';
+        };
+
+        // Connection Web methods
+        const addToInnerCircle = () => {
+          if (newInnerPerson.value.trim() && !innerCircle.value.includes(newInnerPerson.value.trim())) {
+            innerCircle.value.push(newInnerPerson.value.trim());
+            newInnerPerson.value = '';
+          }
+        };
+
+        const addToWiderNetwork = () => {
+          if (newWiderPerson.value.trim() && !widerNetwork.value.includes(newWiderPerson.value.trim())) {
+            widerNetwork.value.push(newWiderPerson.value.trim());
+            newWiderPerson.value = '';
+          }
+        };
+
+        const removeFromCircle = (type, index) => {
+          if (type === 'inner') {
+            innerCircle.value.splice(index, 1);
+          } else {
+            widerNetwork.value.splice(index, 1);
+          }
+        };
+
+        const addConnectionAction = () => {
+          const newAction = connectionActions.value.length + 1;
+          connectionActions.value.push({
+            id: newAction,
+            person: '',
+            action: '',
+            when: 'this-week'
+          });
+        };
+
+        const removeConnectionAction = (index) => {
+          connectionActions.value.splice(index, 1);
+        };
+
+        const canSaveConnectionWeb = computed(() => {
+          return (innerCircle.value.length > 0 || widerNetwork.value.length > 0) &&
+                 connectionActions.value.some(action => action.person.trim() && action.action.trim());
+        });
+
+        const saveConnectionWeb = () => {
+          const totalConnections = innerCircle.value.length + widerNetwork.value.length;
+          const plannedActions = connectionActions.value.filter(action => action.person.trim() && action.action.trim()).length;
+
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Fantastic! You've mapped ${totalConnections} meaningful connections and planned ${plannedActions} ways to strengthen relationships. Connection is the antidote to anxiety - you're building your support network beautifully.`,
+            timestamp: new Date()
+          });
+          
+          currentView.value = 'chat';
+        };
+
+        // Joy Jar methods
+        const canAddJoyEntry = computed(() => {
+          return currentJoyEntry.value.type && 
+                 currentJoyEntry.value.level > 0 && 
+                 currentJoyEntry.value.description.trim();
+        });
+
+        const addJoyEntry = () => {
+          if (canAddJoyEntry.value) {
+            joyEntries.value.push({
+              ...currentJoyEntry.value,
+              id: Date.now(),
+              dateAdded: new Date()
+            });
+            
+            // Reset form
+            currentJoyEntry.value = {
+              type: '',
+              when: 'today',
+              level: 0,
+              description: ''
+            };
+          }
+        };
+
+        const removeJoyEntry = (index) => {
+          joyEntries.value.splice(index, 1);
+        };
+
+        const getRandomJoyEntry = () => {
+          if (joyEntries.value.length === 0) return null;
+          const randomIndex = Math.floor(Math.random() * joyEntries.value.length);
+          return joyEntries.value[randomIndex];
+        };
+
+        const saveJoyJar = () => {
+          const joyCount = joyEntries.value.length;
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Beautiful! Your joy jar now contains ${joyCount} precious moments. Remember, joy and playfulness aren't luxuries - they're necessities for mental wellbeing. You can revisit these anytime you need a dose of happiness.`,
+            timestamp: new Date()
+          });
+          
+          currentView.value = 'chat';
+        };
+
         return {
           currentView,
           currentSection,
@@ -1206,7 +1695,39 @@
           addEnergyDrain,
           threeGoodThings,
           canSaveGratitude,
-          saveGratitudeEntry
+          saveGratitudeEntry,
+          // New exercise variables and methods
+          currentBotherThought,
+          selectedThoughtLabel,
+          thoughtLabels,
+          actionableReframe,
+          completeThoughtUnhooking,
+          selectedValues,
+          valueReflections,
+          availableValues,
+          toggleValue,
+          removeValue,
+          canCompleteValues,
+          completeValuesExploration,
+          innerCircle,
+          widerNetwork,
+          newInnerPerson,
+          newWiderPerson,
+          connectionActions,
+          addToInnerCircle,
+          addToWiderNetwork,
+          removeFromCircle,
+          addConnectionAction,
+          removeConnectionAction,
+          canSaveConnectionWeb,
+          saveConnectionWeb,
+          joyEntries,
+          currentJoyEntry,
+          canAddJoyEntry,
+          addJoyEntry,
+          removeJoyEntry,
+          getRandomJoyEntry,
+          saveJoyJar
         };
       }
     }).mount('#app');
