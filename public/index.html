@@ -419,13 +419,219 @@
 
               <div class="grid grid-cols-1 gap-4">
                 <div v-for="tool in getSectionTools(currentSection.key)" :key="tool.id"
-                     class="glass-dark p-4 rounded-xl cursor-pointer hover:bg-white/10 transition-all">
-                  <div class="flex items-center space-x-3">
-                    <span class="text-xl">{{ tool.icon }}</span>
-                    <div>
-                      <h4 class="font-medium text-white">{{ tool.name }}</h4>
-                      <p class="text-sm text-stone-400">{{ tool.description }}</p>
+                     @click="startExercise(tool)"
+                     class="glass-dark p-4 rounded-xl cursor-pointer hover:bg-white/10 transition-all group">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <span class="text-xl">{{ tool.icon }}</span>
+                      <div>
+                        <h4 class="font-medium text-white">{{ tool.name }}</h4>
+                        <p class="text-sm text-stone-400">{{ tool.description }}</p>
+                      </div>
                     </div>
+                    <div class="text-stone-400 group-hover:text-indigo-300 transition-colors">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="chatWithMandy" class="btn-primary w-full">
+                💬 Discuss This with AI Mandy
+              </button>
+            </div>
+          </div>
+
+          <!-- Exercise Interface -->
+          <div v-if="currentView === 'exercise' && currentExercise" class="card max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl"
+                     :style="'background: ' + currentSection.gradient">
+                  {{ currentExercise.icon }}
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold text-white">{{ currentExercise.name }}</h2>
+                  <p class="text-stone-300">{{ currentSection.title }}</p>
+                </div>
+              </div>
+              <button @click="goBackToSection" class="btn-glass text-sm px-4 py-2">
+                ← Back
+              </button>
+            </div>
+
+            <!-- Dynamic Exercise Content -->
+            <div class="space-y-6">
+              
+              <!-- 5-4-3-2-1 Grounding Exercise -->
+              <div v-if="currentExercise.id === 'grounding_5432' && currentSection.key === 'mindfulness'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">5-4-3-2-1 Grounding Exercise</h3>
+                  <p class="text-stone-300 mb-6">This exercise helps you connect with the present moment through your senses.</p>
+                  
+                  <div class="space-y-4">
+                    <div v-for="(step, index) in groundingSteps" :key="index" 
+                         class="p-4 rounded-lg transition-all duration-300"
+                         :class="currentGroundingStep === index ? 'bg-indigo-500/20 border border-indigo-400/50' : 'bg-white/5'">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                             :class="currentGroundingStep === index ? 'bg-indigo-500 text-white' : 'bg-stone-600 text-stone-300'">
+                          {{ step.number }}
+                        </div>
+                        <div>
+                          <h4 class="font-medium text-white">{{ step.title }}</h4>
+                          <p class="text-sm text-stone-400">{{ step.description }}</p>
+                        </div>
+                      </div>
+                      
+                      <div v-if="currentGroundingStep === index" class="mt-4 pl-11">
+                        <div class="space-y-2">
+                          <div v-for="(item, itemIndex) in step.items" :key="itemIndex" 
+                               class="flex items-center space-x-2">
+                            <input type="checkbox" :id="`item-${index}-${itemIndex}`" 
+                                   @change="checkGroundingItem(index, itemIndex)"
+                                   class="rounded border-stone-600 bg-stone-700 text-indigo-500 focus:ring-indigo-500">
+                            <label :for="`item-${index}-${itemIndex}`" class="text-sm text-stone-300">{{ item }}</label>
+                          </div>
+                        </div>
+                        
+                        <button v-if="canAdvanceGrounding(index)" 
+                                @click="nextGroundingStep" 
+                                class="btn-primary mt-4 text-sm px-4 py-2">
+                          {{ index === groundingSteps.length - 1 ? 'Complete Exercise' : 'Next Step' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Breathing Exercise -->
+              <div v-if="currentExercise.id === 'breathing_4_7_8' && currentSection.key === 'mindfulness'">
+                <div class="glass-dark p-6 rounded-xl text-center">
+                  <h3 class="font-semibold text-white mb-4">4-7-8 Breathing Exercise</h3>
+                  <p class="text-stone-300 mb-6">A calming breath pattern to reduce anxiety and promote relaxation.</p>
+                  
+                  <div class="mb-8">
+                    <div class="w-32 h-32 mx-auto rounded-full border-4 border-indigo-400/30 flex items-center justify-center relative overflow-hidden"
+                         :class="{ 'animate-pulse': breathingActive }">
+                      <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full"
+                           :class="breathingPhase === 'inhale' ? 'scale-110' : breathingPhase === 'hold' ? 'scale-105' : 'scale-95'"
+                           :style="{ transition: 'transform ' + breathingDuration + 'ms ease-in-out' }"></div>
+                      <div class="relative z-10">
+                        <div class="text-2xl font-bold text-white">{{ breathingCount }}</div>
+                        <div class="text-sm text-stone-300 capitalize">{{ breathingPhase }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <div class="text-stone-300">
+                      <p>Round {{ currentBreathRound }} of {{ totalBreathRounds }}</p>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4">
+                      <button v-if="!breathingActive" @click="startBreathing" class="btn-primary px-6 py-3">
+                        🫁 Start Breathing
+                      </button>
+                      <button v-if="breathingActive" @click="stopBreathing" class="btn-glass px-6 py-3">
+                        ⏸️ Pause
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Self-Care Energy Audit -->
+              <div v-if="currentExercise.id === 'energy_audit' && currentSection.key === 'self_care'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Energy Audit</h3>
+                  <p class="text-stone-300 mb-6">Identify what gives you energy vs. what drains it.</p>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                      <h4 class="font-medium text-white flex items-center space-x-2">
+                        <span>⚡</span>
+                        <span>Energy Givers</span>
+                      </h4>
+                      <div class="space-y-2">
+                        <div v-for="(giver, index) in energyGivers" :key="index"
+                             class="flex items-center space-x-2">
+                          <span class="text-green-400">+</span>
+                          <span class="text-stone-300 text-sm">{{ giver }}</span>
+                        </div>
+                      </div>
+                      <div class="flex space-x-2">
+                        <input v-model="newEnergyGiver" 
+                               @keyup.enter="addEnergyGiver"
+                               placeholder="What gives you energy?"
+                               class="input-field flex-1 text-sm">
+                        <button @click="addEnergyGiver" class="btn-primary text-sm px-3 py-2">Add</button>
+                      </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                      <h4 class="font-medium text-white flex items-center space-x-2">
+                        <span>🔋</span>
+                        <span>Energy Drains</span>
+                      </h4>
+                      <div class="space-y-2">
+                        <div v-for="(drain, index) in energyDrains" :key="index"
+                             class="flex items-center space-x-2">
+                          <span class="text-red-400">-</span>
+                          <span class="text-stone-300 text-sm">{{ drain }}</span>
+                        </div>
+                      </div>
+                      <div class="flex space-x-2">
+                        <input v-model="newEnergyDrain" 
+                               @keyup.enter="addEnergyDrain"
+                               placeholder="What drains your energy?"
+                               class="input-field flex-1 text-sm">
+                        <button @click="addEnergyDrain" class="btn-primary text-sm px-3 py-2">Add</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gratitude Practice -->
+              <div v-if="currentExercise.id === 'three_good_things' && currentSection.key === 'gratitude'">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">Three Good Things</h3>
+                  <p class="text-stone-300 mb-6">Write down three things that went well today and why they were meaningful.</p>
+                  
+                  <div class="space-y-6">
+                    <div v-for="(thing, index) in threeGoodThings" :key="index" class="space-y-3">
+                      <h4 class="font-medium text-white">Good Thing #{{ index + 1 }}</h4>
+                      <textarea v-model="thing.what" 
+                                :placeholder="`What was the ${index + 1}${index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'} good thing?`"
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                      <textarea v-model="thing.why" 
+                                placeholder="Why was this meaningful to you?"
+                                class="input-field w-full h-16 resize-none text-sm"></textarea>
+                    </div>
+                    
+                    <button @click="saveGratitudeEntry" 
+                            :disabled="!canSaveGratitude"
+                            class="btn-primary w-full"
+                            :class="{ 'opacity-50 cursor-not-allowed': !canSaveGratitude }">
+                      💝 Save Gratitude Entry
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Default exercise placeholder for other exercises -->
+              <div v-if="!isSpecialExercise(currentExercise.id)">
+                <div class="glass-dark p-6 rounded-xl">
+                  <h3 class="font-semibold text-white mb-4">{{ currentExercise.name }}</h3>
+                  <p class="text-stone-300 mb-6">{{ currentExercise.description }}</p>
+                  <div class="text-center py-8">
+                    <div class="text-6xl mb-4">🚧</div>
+                    <p class="text-stone-400">Interactive exercise coming soon!</p>
+                    <p class="text-sm text-stone-500 mt-2">This exercise will be fully interactive in a future update.</p>
                   </div>
                 </div>
               </div>
@@ -493,16 +699,36 @@
   </div>
 
   <script>
-    const { createApp, ref } = Vue;
+    const { createApp, ref, computed } = Vue;
     
     createApp({
       setup() {
         const currentView = ref('home');
         const currentSection = ref(null);
+        const currentExercise = ref(null);
         const newMessage = ref('');
         const isTyping = ref(false);
         const selectedMood = ref(null);
         const moodNote = ref('');
+
+        // Exercise-specific reactive variables
+        const currentGroundingStep = ref(0);
+        const groundingCheckedItems = ref({});
+        const breathingActive = ref(false);
+        const breathingPhase = ref('inhale');
+        const breathingCount = ref(4);
+        const breathingDuration = ref(4000);
+        const currentBreathRound = ref(1);
+        const totalBreathRounds = ref(4);
+        const energyGivers = ref(['Morning coffee', 'Time in nature', 'Good conversations']);
+        const energyDrains = ref(['Endless emails', 'Traffic jams', 'Negative news']);
+        const newEnergyGiver = ref('');
+        const newEnergyDrain = ref('');
+        const threeGoodThings = ref([
+          { what: '', why: '' },
+          { what: '', why: '' },
+          { what: '', why: '' }
+        ]);
         
         const moodOptions = ref([
           { value: 1, emoji: '😢', label: 'Very Low' },
@@ -571,6 +797,39 @@
           }
         ]);
 
+        const groundingSteps = ref([
+          {
+            number: 5,
+            title: "5 things you can see",
+            description: "Look around and name 5 things you can see",
+            items: ["Wall color", "A book", "Your hands", "Light source", "Something small"]
+          },
+          {
+            number: 4,
+            title: "4 things you can touch",
+            description: "Notice 4 things you can physically feel",
+            items: ["Fabric texture", "Temperature", "Surface texture", "Your feet on ground"]
+          },
+          {
+            number: 3,
+            title: "3 things you can hear",
+            description: "Listen carefully for 3 sounds around you",
+            items: ["Background noise", "Your breathing", "Distant sounds"]
+          },
+          {
+            number: 2,
+            title: "2 things you can smell",
+            description: "Take a moment to notice 2 scents",
+            items: ["Air freshener/perfume", "Natural scents"]
+          },
+          {
+            number: 1,
+            title: "1 thing you can taste",
+            description: "Notice any taste in your mouth",
+            items: ["Lingering taste"]
+          }
+        ]);
+
         const chatHistory = ref([
           {
             id: 1,
@@ -620,14 +879,14 @@
         const getSectionTools = (sectionKey) => {
           const tools = {
             self_care: [
-              { id: 1, name: "Wellness Check-In", description: "Assess your current needs", icon: "🌟" },
-              { id: 2, name: "Boundary Setting", description: "Practice saying no with kindness", icon: "🛡️" },
-              { id: 3, name: "Energy Audit", description: "Identify what drains and energizes you", icon: "⚡" }
+              { id: "wellness_checkin", name: "Wellness Check-In", description: "Assess your current needs", icon: "🌟" },
+              { id: "boundary_setting", name: "Boundary Setting", description: "Practice saying no with kindness", icon: "🛡️" },
+              { id: "energy_audit", name: "Energy Audit", description: "Identify what drains and energizes you", icon: "⚡" }
             ],
             mindfulness: [
-              { id: 1, name: "5-4-3-2-1 Grounding", description: "Connect with your senses", icon: "🌿" },
-              { id: 2, name: "Breath Awareness", description: "Simple breathing exercises", icon: "💨" },
-              { id: 3, name: "Body Scan", description: "Check in with physical sensations", icon: "🧘" }
+              { id: "grounding_5432", name: "5-4-3-2-1 Grounding", description: "Connect with your senses", icon: "🌿" },
+              { id: "breathing_4_7_8", name: "4-7-8 Breathing", description: "Calming breath pattern", icon: "🫁" },
+              { id: "body_scan", name: "Body Scan", description: "Check in with physical sensations", icon: "🧘" }
             ],
             acceptance: [
               { id: 1, name: "What I Can/Can't Control", description: "Clarify your sphere of influence", icon: "🎯" },
@@ -635,9 +894,9 @@
               { id: 3, name: "Radical Acceptance", description: "Practice accepting difficult emotions", icon: "🤲" }
             ],
             gratitude: [
-              { id: 1, name: "Three Good Things", description: "Daily appreciation practice", icon: "✨" },
-              { id: 2, name: "Gratitude Letter", description: "Write to someone who helped you", icon: "💌" },
-              { id: 3, name: "Small Wins", description: "Celebrate minor victories", icon: "🏆" }
+              { id: "three_good_things", name: "Three Good Things", description: "Daily appreciation practice", icon: "✨" },
+              { id: "gratitude_letter", name: "Gratitude Letter", description: "Write to someone who helped you", icon: "💌" },
+              { id: "small_wins", name: "Small Wins", description: "Celebrate minor victories", icon: "🏆" }
             ],
             interactions: [
               { id: 1, name: "Connection Inventory", description: "Review your relationships", icon: "👥" },
@@ -752,15 +1011,166 @@
           currentView.value = 'chat';
         };
 
+        // Exercise methods
+        const startExercise = (tool) => {
+          currentExercise.value = tool;
+          currentView.value = 'exercise';
+          
+          // Reset exercise states
+          if (tool.id === 'grounding_5432') {
+            currentGroundingStep.value = 0;
+            groundingCheckedItems.value = {};
+          } else if (tool.id === 'breathing_4_7_8') {
+            breathingActive.value = false;
+            currentBreathRound.value = 1;
+            breathingPhase.value = 'inhale';
+            breathingCount.value = 4;
+          }
+        };
+
+        const goBackToSection = () => {
+          currentView.value = 'section';
+          currentExercise.value = null;
+        };
+
+        const isSpecialExercise = (exerciseId) => {
+          const specialExercises = ['grounding_5432', 'breathing_4_7_8', 'energy_audit', 'three_good_things'];
+          return specialExercises.includes(exerciseId);
+        };
+
+        // Grounding exercise methods
+        const checkGroundingItem = (stepIndex, itemIndex) => {
+          if (!groundingCheckedItems.value[stepIndex]) {
+            groundingCheckedItems.value[stepIndex] = {};
+          }
+          groundingCheckedItems.value[stepIndex][itemIndex] = true;
+        };
+
+        const canAdvanceGrounding = (stepIndex) => {
+          const step = groundingSteps.value[stepIndex];
+          const checkedItems = groundingCheckedItems.value[stepIndex] || {};
+          const checkedCount = Object.keys(checkedItems).length;
+          return checkedCount >= Math.min(2, step.items.length); // Allow advancing after checking at least 2 items
+        };
+
+        const nextGroundingStep = () => {
+          if (currentGroundingStep.value < groundingSteps.value.length - 1) {
+            currentGroundingStep.value++;
+          } else {
+            // Exercise complete
+            chatHistory.value.push({
+              id: Date.now(),
+              sender: 'system',
+              text: 'Great work completing the 5-4-3-2-1 grounding exercise! How do you feel now?',
+              timestamp: new Date()
+            });
+            currentView.value = 'chat';
+          }
+        };
+
+        // Breathing exercise methods
+        const startBreathing = () => {
+          breathingActive.value = true;
+          runBreathingCycle();
+        };
+
+        const stopBreathing = () => {
+          breathingActive.value = false;
+        };
+
+        const runBreathingCycle = async () => {
+          if (!breathingActive.value) return;
+          
+          // Inhale for 4 seconds
+          breathingPhase.value = 'inhale';
+          breathingCount.value = 4;
+          breathingDuration.value = 4000;
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          
+          if (!breathingActive.value) return;
+          
+          // Hold for 7 seconds
+          breathingPhase.value = 'hold';
+          breathingCount.value = 7;
+          breathingDuration.value = 7000;
+          await new Promise(resolve => setTimeout(resolve, 7000));
+          
+          if (!breathingActive.value) return;
+          
+          // Exhale for 8 seconds
+          breathingPhase.value = 'exhale';
+          breathingCount.value = 8;
+          breathingDuration.value = 8000;
+          await new Promise(resolve => setTimeout(resolve, 8000));
+          
+          if (!breathingActive.value) return;
+          
+          // Next round or complete
+          if (currentBreathRound.value < totalBreathRounds.value) {
+            currentBreathRound.value++;
+            runBreathingCycle();
+          } else {
+            breathingActive.value = false;
+            chatHistory.value.push({
+              id: Date.now(),
+              sender: 'system',
+              text: 'Wonderful! You completed 4 rounds of 4-7-8 breathing. Notice how your body feels now.',
+              timestamp: new Date()
+            });
+          }
+        };
+
+        // Energy audit methods
+        const addEnergyGiver = () => {
+          if (newEnergyGiver.value.trim()) {
+            energyGivers.value.push(newEnergyGiver.value.trim());
+            newEnergyGiver.value = '';
+          }
+        };
+
+        const addEnergyDrain = () => {
+          if (newEnergyDrain.value.trim()) {
+            energyDrains.value.push(newEnergyDrain.value.trim());
+            newEnergyDrain.value = '';
+          }
+        };
+
+        // Gratitude methods
+        const canSaveGratitude = computed(() => {
+          return threeGoodThings.value.some(thing => thing.what.trim() && thing.why.trim());
+        });
+
+        const saveGratitudeEntry = () => {
+          const filledThings = threeGoodThings.value.filter(thing => thing.what.trim() && thing.why.trim());
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Beautiful! You recorded ${filledThings.length} meaningful things you're grateful for. This helps rewire your brain to notice more positive experiences.`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          threeGoodThings.value = [
+            { what: '', why: '' },
+            { what: '', why: '' },
+            { what: '', why: '' }
+          ];
+          
+          currentView.value = 'chat';
+        };
+
         return {
           currentView,
           currentSection,
+          currentExercise,
           newMessage,
           isTyping,
           selectedMood,
           moodNote,
           moodOptions,
           imagineSections,
+          groundingSteps,
           chatHistory,
           chatWithMandy,
           exploreImagine,
@@ -771,7 +1181,32 @@
           getSectionTools,
           sendMessage,
           selectMood,
-          saveMoodEntry
+          saveMoodEntry,
+          // Exercise methods and data
+          startExercise,
+          goBackToSection,
+          isSpecialExercise,
+          currentGroundingStep,
+          checkGroundingItem,
+          canAdvanceGrounding,
+          nextGroundingStep,
+          breathingActive,
+          breathingPhase,
+          breathingCount,
+          breathingDuration,
+          currentBreathRound,
+          totalBreathRounds,
+          startBreathing,
+          stopBreathing,
+          energyGivers,
+          energyDrains,
+          newEnergyGiver,
+          newEnergyDrain,
+          addEnergyGiver,
+          addEnergyDrain,
+          threeGoodThings,
+          canSaveGratitude,
+          saveGratitudeEntry
         };
       }
     }).mount('#app');
