@@ -200,6 +200,15 @@
     .animate-fade-in-up {
       animation: fadeInUp 0.6s ease-out forwards;
     }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
 
     .input-field {
       @apply w-full px-4 py-4 rounded-lg border text-stone-100 transition-all duration-200;
@@ -252,16 +261,35 @@
           
           <!-- Hero Section -->
           <div class="text-center mb-12" v-if="currentView === 'home'">
+            <!-- Featured AI Mandy Cow -->
+            <div class="flex justify-center mb-8">
+              <div class="relative">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-2xl animate-float">
+                  <div class="w-full h-full rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm">
+                    <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy - Your Therapeutic Cow Coach" 
+                         class="w-full h-full object-cover">
+                  </div>
+                </div>
+                <!-- Floating elements around the cow -->
+                <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  ✨
+                </div>
+                <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-pink-400 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  💝
+                </div>
+              </div>
+            </div>
+            
             <h1 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
-              Transform Your Mental Wellness
+              Meet AI Mandy 🐄
             </h1>
             <p class="text-xl text-stone-300 mb-8 max-w-2xl mx-auto">
-              Chat with AI Mandy, your personal therapeutic coach specializing in CBT and mindful living
+              Your friendly therapeutic cow coach, ready to guide you through anxiety reduction with warmth, wisdom, and evidence-based techniques
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
               <button @click="chatWithMandy" class="btn-primary group">
                 <span class="emoji-bounce mr-2">💬</span>
-                Start Coaching Session
+                Chat with AI Mandy
                 <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M13.293 7.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L14.586 12H3a1 1 0 110-2h11.586l-1.293-1.293a1 1 0 010-1.414z"/>
                 </svg>
@@ -1065,7 +1093,7 @@
             key: 'self_care',
             title: 'I - Me, Myself & I',
             subtitle: 'Self-care and wellness with AI Mandy',
-            emoji: '🐄💆‍♀️',
+            emoji: '💎',
             gradient: 'linear-gradient(135deg, #d4a574 0%, #8b6914 100%)', // warm_earth_tones
             shadowColor: 'rgba(212, 165, 116, 0.4)'
           },
@@ -1073,7 +1101,7 @@
             key: 'mindfulness',
             title: 'M - Mindfulness',
             subtitle: 'Present moment awareness',
-            emoji: '🐄🧘',
+            emoji: '🧘‍♀️',
             gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // calm_blues_greens
             shadowColor: 'rgba(79, 172, 254, 0.4)'
           },
@@ -1081,7 +1109,7 @@
             key: 'acceptance',
             title: 'A - Acceptance',
             subtitle: 'Embracing your current state',
-            emoji: '🐄🤗',
+            emoji: '🤲',
             gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // soft_pastels
             shadowColor: 'rgba(168, 237, 234, 0.4)'
           },
@@ -1089,7 +1117,7 @@
             key: 'gratitude',
             title: 'G - Gratitude',
             subtitle: 'Focusing on positive aspects',
-            emoji: '🐄🙏',
+            emoji: '✨',
             gradient: 'linear-gradient(135deg, #fee140 0%, #fa709a 100%)', // warm_yellows_oranges
             shadowColor: 'rgba(254, 225, 64, 0.4)'
           },
@@ -1097,7 +1125,7 @@
             key: 'interactions',
             title: 'I - Interactions',
             subtitle: 'Connecting with your herd & community',
-            emoji: '🐄🤝',
+            emoji: '🤝',
             gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', // friendly_purples_pinks
             shadowColor: 'rgba(168, 85, 247, 0.4)'
           },
@@ -1105,7 +1133,7 @@
             key: 'nurturing',
             title: 'N - Nurturing',
             subtitle: 'Fun, playfulness & joy like a happy cow',
-            emoji: '🐄🎉',
+            emoji: '🎭',
             gradient: 'linear-gradient(135deg, #34d399 0%, #fbbf24 100%)', // bright_cheerful_colors
             shadowColor: 'rgba(52, 211, 153, 0.4)'
           },
@@ -1113,7 +1141,7 @@
             key: 'exploring',
             title: 'E - Exploring',
             subtitle: 'Understanding thoughts with cow wisdom',
-            emoji: '🐄🔍',
+            emoji: '🧠',
             gradient: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)', // discovery_greens_blues
             shadowColor: 'rgba(16, 185, 129, 0.4)'
           }
