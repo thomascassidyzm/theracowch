@@ -33,6 +33,15 @@
   <!-- Icons -->
   <link rel="icon" href="/icons/icon-96x96.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-192x192.svg">
+  <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.svg">
+  <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.svg">
+  <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.svg">
+  <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.svg">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.svg">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.svg">
+  <link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.svg">
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.svg">
   <link rel="mask-icon" href="/icons/icon-192x192.svg" color="#6366f1">
   
   <style>
@@ -1857,16 +1866,32 @@
 
     // PWA Install Prompt
     let deferredPrompt;
+    let hasShownPrompt = localStorage.getItem('cowch-install-dismissed') === 'true';
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       
-      // Show install button after a delay
+      // Show install button after a delay if not dismissed
+      if (!hasShownPrompt) {
+        setTimeout(() => {
+          if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+            showInstallPrompt();
+          }
+        }, 3000);
+      }
+    });
+    
+    // Also show prompt on page load if available and not dismissed
+    window.addEventListener('load', () => {
       setTimeout(() => {
-        if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
-          showInstallPrompt();
+        if (!hasShownPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+          // Check if install is available (some browsers don't fire beforeinstallprompt)
+          if ('serviceWorker' in navigator && 'PushManager' in window) {
+            showGenericInstallPrompt();
+          }
         }
-      }, 3000);
+      }, 5000);
     });
 
     function showInstallPrompt() {
@@ -1903,7 +1928,8 @@
       
       document.getElementById('install-dismiss').addEventListener('click', () => {
         installBanner.remove();
-        deferredPrompt = null;
+        localStorage.setItem('cowch-install-dismissed', 'true');
+        hasShownPrompt = true;
       });
       
       // Auto-dismiss after 15 seconds
@@ -1912,6 +1938,40 @@
           installBanner.remove();
         }
       }, 15000);
+    }
+
+    function showGenericInstallPrompt() {
+      const installBanner = document.createElement('div');
+      installBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl shadow-lg text-white text-center';
+      installBanner.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🐄</span>
+            <div class="text-left">
+              <p class="font-semibold text-sm">Moo-ve COWch to your home screen!</p>
+              <p class="text-xs opacity-80">Use your browser's "Add to Home Screen" option 🛋️</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button id="generic-install-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Got it</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(installBanner);
+      
+      document.getElementById('generic-install-dismiss').addEventListener('click', () => {
+        installBanner.remove();
+        localStorage.setItem('cowch-install-dismissed', 'true');
+        hasShownPrompt = true;
+      });
+      
+      // Auto-dismiss after 8 seconds
+      setTimeout(() => {
+        if (document.body.contains(installBanner)) {
+          installBanner.remove();
+        }
+      }, 8000);
     }
   </script>
 </body>
