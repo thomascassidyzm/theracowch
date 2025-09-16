@@ -91,11 +91,11 @@ Respond authentically as Mandy Kloppers would - combining professional expertise
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'X-API-Key': process.env.CLAUDE_API_KEY,
+        'Anthropic-Version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 300,
         messages: messages.slice(1), // Remove system message for Anthropic format
         system: systemPrompt
