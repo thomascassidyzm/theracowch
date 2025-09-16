@@ -152,7 +152,7 @@
       </nav>
 
       <!-- Main Content -->
-      <main class="pt-24 pb-8">
+      <main class="pt-24 pb-24">
         <div class="max-w-4xl mx-auto px-6">
           
           <!-- Hero Section -->
@@ -259,6 +259,39 @@
             </div>
           </div>
 
+          <!-- Mood Tracker -->
+          <div v-if="currentView === 'mood'" class="card max-w-2xl mx-auto">
+            <div class="text-center mb-6">
+              <h2 class="text-2xl font-bold text-white mb-4">How are you feeling today?</h2>
+              <p class="text-stone-300">Track your mood to identify patterns and progress</p>
+            </div>
+            
+            <div class="grid grid-cols-5 gap-4 mb-8">
+              <button v-for="mood in moodOptions" :key="mood.value"
+                      @click="selectMood(mood.value)"
+                      class="flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:scale-105"
+                      :class="selectedMood === mood.value ? 'glass bg-indigo-500/20 border-indigo-400' : 'glass-dark hover:bg-white/10'">
+                <span class="text-3xl mb-2">{{ mood.emoji }}</span>
+                <span class="text-xs font-medium text-center">{{ mood.label }}</span>
+              </button>
+            </div>
+            
+            <div class="space-y-4">
+              <textarea v-model="moodNote" 
+                        placeholder="What's contributing to this feeling? (optional)"
+                        class="input-field min-h-[100px] resize-none"></textarea>
+              
+              <button @click="saveMoodEntry" class="btn-primary w-full"
+                      :disabled="!selectedMood">
+                Save Mood Entry
+              </button>
+              
+              <button @click="chatWithMandy" class="btn-glass w-full">
+                💬 Talk to AI Mandy about this
+              </button>
+            </div>
+          </div>
+
           <!-- Section Detail -->
           <div v-if="currentView === 'section' && currentSection" class="card max-w-2xl mx-auto">
             <div class="flex items-center justify-between mb-6">
@@ -304,6 +337,45 @@
 
         </div>
       </main>
+
+      <!-- Bottom Navigation -->
+      <nav class="fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-white/10">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+          <div class="flex justify-around items-center">
+            <button @click="goHome" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
+                    :class="currentView === 'home' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              </svg>
+              <span class="text-xs font-medium">Home</span>
+            </button>
+            
+            <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
+                    :class="currentView === 'chat' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+              </svg>
+              <span class="text-xs font-medium">Chat</span>
+            </button>
+            
+            <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
+                    :class="currentView === 'imagine' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span class="text-xs font-medium">IMAGINE</span>
+            </button>
+            
+            <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200"
+                    :class="currentView === 'mood' ? 'text-indigo-400' : 'text-stone-400 hover:text-white'">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
+              </svg>
+              <span class="text-xs font-medium">Progress</span>
+            </button>
+          </div>
+        </div>
+      </nav>
     </div>
   </div>
 
@@ -316,6 +388,16 @@
         const currentSection = ref(null);
         const newMessage = ref('');
         const isTyping = ref(false);
+        const selectedMood = ref(null);
+        const moodNote = ref('');
+        
+        const moodOptions = ref([
+          { value: 1, emoji: '😢', label: 'Very Low' },
+          { value: 2, emoji: '😔', label: 'Low' },
+          { value: 3, emoji: '😐', label: 'Neutral' },
+          { value: 4, emoji: '🙂', label: 'Good' },
+          { value: 5, emoji: '😊', label: 'Great' }
+        ]);
         
         const imagineSections = ref([
           {
@@ -391,6 +473,10 @@
 
         const exploreImagine = () => {
           currentView.value = 'imagine';
+        };
+
+        const showMoodTracker = () => {
+          currentView.value = 'mood';
         };
 
         const goHome = () => {
@@ -474,7 +560,7 @@
           newMessage.value = '';
           isTyping.value = true;
 
-          // Call the real API
+          // Call the real API with better error handling
           try {
             const response = await fetch('/api/chat', {
               method: 'POST',
@@ -489,18 +575,29 @@
               })
             });
 
-            if (response.ok) {
-              const data = await response.json();
+            const data = await response.json();
+            console.log('API Response:', response.status, data);
+
+            if (response.ok && data.response) {
               chatHistory.value.push({
                 id: Date.now() + 1,
                 sender: 'ai_mandy',
                 text: data.response,
                 timestamp: new Date()
               });
+            } else if (data.fallback) {
+              // Use the API's fallback response
+              chatHistory.value.push({
+                id: Date.now() + 1,
+                sender: 'ai_mandy',
+                text: data.fallback,
+                timestamp: new Date()
+              });
             } else {
-              throw new Error('API call failed');
+              throw new Error(`API error: ${response.status}`);
             }
           } catch (error) {
+            console.error('Chat API Error:', error);
             chatHistory.value.push({
               id: Date.now() + 1,
               sender: 'ai_mandy',
@@ -512,20 +609,56 @@
           isTyping.value = false;
         };
 
+        const selectMood = (value) => {
+          selectedMood.value = value;
+        };
+
+        const saveMoodEntry = () => {
+          if (!selectedMood.value) return;
+          
+          // Here you could save to localStorage or send to an API
+          console.log('Saving mood entry:', {
+            mood: selectedMood.value,
+            note: moodNote.value,
+            timestamp: new Date()
+          });
+          
+          // Reset and show success
+          selectedMood.value = null;
+          moodNote.value = '';
+          
+          // Show a simple success message
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: 'Mood entry saved! Tracking your emotional patterns helps identify what supports your wellbeing.',
+            timestamp: new Date()
+          });
+          
+          // Switch to chat view
+          currentView.value = 'chat';
+        };
+
         return {
           currentView,
           currentSection,
           newMessage,
           isTyping,
+          selectedMood,
+          moodNote,
+          moodOptions,
           imagineSections,
           chatHistory,
           chatWithMandy,
           exploreImagine,
+          showMoodTracker,
           goHome,
           goToSection,
           getSectionGuidance,
           getSectionTools,
-          sendMessage
+          sendMessage,
+          selectMood,
+          saveMoodEntry
         };
       }
     }).mount('#app');
