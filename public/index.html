@@ -291,14 +291,14 @@
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
               <button @click="chatWithMandy" class="btn-primary group">
                 <span class="emoji-bounce mr-2">💬</span>
-                Chat with Mandy
+                Chat with AI Mandy
                 <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M13.293 7.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L14.586 12H3a1 1 0 110-2h11.586l-1.293-1.293a1 1 0 010-1.414z"/>
                 </svg>
               </button>
               <button @click="exploreImagine" class="btn-glass group">
                 <span class="emoji-bounce mr-2">🧠</span>
-                Explore IMAGINE
+                Explore IMAGINE Framework
                 <svg class="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
                 </svg>
@@ -418,11 +418,11 @@
               
               <button @click="saveMoodEntry" class="btn-primary w-full"
                       :disabled="!selectedMood">
-                💝 Save Mood
+                Save Mood Entry
               </button>
               
               <button @click="chatWithMandy" class="btn-glass w-full">
-                💬 Chat with Mandy
+                💬 Talk to AI Mandy about this
               </button>
             </div>
           </div>
@@ -473,7 +473,7 @@
               </div>
 
               <button @click="chatWithMandy" class="btn-primary w-full">
-                💬 Chat with Mandy
+                💬 Discuss This with AI Mandy
               </button>
             </div>
           </div>
@@ -534,7 +534,7 @@
                         <button v-if="canAdvanceGrounding(index)" 
                                 @click="nextGroundingStep" 
                                 class="btn-primary mt-4 text-sm px-4 py-2">
-                          {{ index === groundingSteps.length - 1 ? 'Complete' : 'Next' }}
+                          {{ index === groundingSteps.length - 1 ? 'Complete Exercise' : 'Next Step' }}
                         </button>
                       </div>
                     </div>
@@ -568,7 +568,7 @@
                     
                     <div class="flex justify-center space-x-4">
                       <button v-if="!breathingActive" @click="startBreathing" class="btn-primary px-6 py-3">
-                        🫁 Start
+                        🫁 Start Breathing
                       </button>
                       <button v-if="breathingActive" @click="stopBreathing" class="btn-glass px-6 py-3">
                         ⏸️ Pause
@@ -602,7 +602,7 @@
                                @keyup.enter="addEnergyGiver"
                                placeholder="What gives you energy?"
                                class="input-field flex-1 text-sm">
-                        <button @click="addEnergyGiver" class="btn-primary text-sm px-4 py-2">✓</button>
+                        <button @click="addEnergyGiver" class="btn-primary text-sm px-3 py-2">Add</button>
                       </div>
                     </div>
                     
@@ -623,7 +623,7 @@
                                @keyup.enter="addEnergyDrain"
                                placeholder="What drains your energy?"
                                class="input-field flex-1 text-sm">
-                        <button @click="addEnergyDrain" class="btn-primary text-sm px-4 py-2">✓</button>
+                        <button @click="addEnergyDrain" class="btn-primary text-sm px-3 py-2">Add</button>
                       </div>
                     </div>
                   </div>
@@ -651,7 +651,7 @@
                             :disabled="!canSaveGratitude"
                             class="btn-primary w-full"
                             :class="{ 'opacity-50 cursor-not-allowed': !canSaveGratitude }">
-                      💝 Save Entry
+                      💝 Save Gratitude Entry
                     </button>
                   </div>
                 </div>
@@ -710,7 +710,7 @@
                               :disabled="!actionableReframe.trim()"
                               class="btn-primary w-full"
                               :class="{ 'opacity-50 cursor-not-allowed': !actionableReframe.trim() }">
-                        🎯 Complete
+                        🎯 Complete Thought Unhooking
                       </button>
                     </div>
                   </div>
@@ -753,7 +753,7 @@
                               :disabled="!canCompleteValues"
                               class="btn-primary w-full"
                               :class="{ 'opacity-50 cursor-not-allowed': !canCompleteValues }">
-                        🧭 Save Values
+                        🧭 Save My Values Compass
                       </button>
                     </div>
                     
@@ -790,7 +790,7 @@
                                  @keyup.enter="addToInnerCircle"
                                  placeholder="Add someone close to you"
                                  class="input-field flex-1 text-sm">
-                          <button @click="addToInnerCircle" class="btn-primary text-sm px-4 py-2">✓</button>
+                          <button @click="addToInnerCircle" class="btn-primary text-sm px-3 py-2">Add</button>
                         </div>
                       </div>
                       
@@ -812,7 +812,7 @@
                                  @keyup.enter="addToWiderNetwork"
                                  placeholder="Add acquaintance or colleague"
                                  class="input-field flex-1 text-sm">
-                          <button @click="addToWiderNetwork" class="btn-primary text-sm px-4 py-2">✓</button>
+                          <button @click="addToWiderNetwork" class="btn-primary text-sm px-3 py-2">Add</button>
                         </div>
                       </div>
                     </div>
@@ -841,10 +841,10 @@
                       </div>
                       
                       <button @click="completeConnectionWeb" 
-                              :disabled="!canSaveConnectionWeb"
+                              :disabled="!canCompleteConnection"
                               class="btn-primary w-full"
-                              :class="{ 'opacity-50 cursor-not-allowed': !canSaveConnectionWeb }">
-                        🕸️ Save Connections
+                              :class="{ 'opacity-50 cursor-not-allowed': !canCompleteConnection }">
+                        🕸️ Save My Connection Web
                       </button>
                     </div>
                   </div>
@@ -903,24 +903,24 @@
                                 placeholder="Describe this joyful moment... What made it special? How did it feel?"
                                 class="input-field w-full h-20 resize-none text-sm"></textarea>
                       
-                      <button @click="addJoyEntry" 
-                              :disabled="!canAddJoyEntry"
+                      <button @click="addJoyMoment" 
+                              :disabled="!canAddJoy"
                               class="btn-primary w-full"
-                              :class="{ 'opacity-50 cursor-not-allowed': !canAddJoyEntry }">
-                        ✨ Add Joy
+                              :class="{ 'opacity-50 cursor-not-allowed': !canAddJoy }">
+                        ✨ Add to Joy Jar
                       </button>
                     </div>
                     
-                    <div v-if="joyEntries.length > 0" class="space-y-4">
+                    <div v-if="joyJar.length > 0" class="space-y-4">
                       <div class="flex items-center justify-between">
-                        <h4 class="font-medium text-white">Your Joy Collection ({{ joyEntries.length }})</h4>
-                        <button @click="getRandomJoyEntry" class="btn-glass text-sm px-4 py-2">
-                          🎲 Random
+                        <h4 class="font-medium text-white">Your Joy Collection ({{ joyJar.length }})</h4>
+                        <button @click="getRandomJoy" class="btn-glass text-sm px-4 py-2">
+                          🎲 Random Joy
                         </button>
                       </div>
                       
                       <div class="max-h-64 overflow-y-auto space-y-3">
-                        <div v-for="(joy, index) in joyEntries" :key="index" 
+                        <div v-for="(joy, index) in joyJar" :key="index" 
                              class="p-3 rounded-lg border transition-all"
                              :class="randomJoyIndex === index ? 
                                'border-yellow-400 bg-yellow-400/10 shadow-lg' : 
@@ -933,7 +933,7 @@
                                 <span v-for="n in joy.level" :key="n" class="text-yellow-400 text-xs">⭐</span>
                               </div>
                             </div>
-                            <button @click="removeJoyEntry(index)" class="text-stone-500 hover:text-stone-300 text-sm">×</button>
+                            <button @click="removeJoy(index)" class="text-stone-500 hover:text-stone-300 text-sm">×</button>
                           </div>
                           <p class="text-stone-300 text-sm">{{ joy.description }}</p>
                         </div>
@@ -957,7 +957,7 @@
               </div>
 
               <button @click="chatWithMandy" class="btn-primary w-full">
-                💬 Chat with Mandy
+                💬 Discuss This with AI Mandy
               </button>
             </div>
           </div>
@@ -977,7 +977,7 @@
                 </svg>
                 <div v-if="currentView === 'home'" class="absolute -top-1 -right-1 w-2 h-2 bg-indigo-400 rounded-full pulse-glow"></div>
               </div>
-              <span class="text-xs font-medium">Home</span>
+              <span class="text-xs font-medium">🏠 Home</span>
             </button>
             
             <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
@@ -988,7 +988,7 @@
                 </svg>
                 <div v-if="currentView === 'chat'" class="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full pulse-glow"></div>
               </div>
-              <span class="text-xs font-medium">Chat</span>
+              <span class="text-xs font-medium">💬 Chat</span>
             </button>
             
             <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
@@ -999,7 +999,7 @@
                 </svg>
                 <div v-if="currentView === 'imagine'" class="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full pulse-glow"></div>
               </div>
-              <span class="text-xs font-medium">IMAGINE</span>
+              <span class="text-xs font-medium">🧠 IMAGINE</span>
             </button>
             
             <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
@@ -1010,7 +1010,7 @@
                 </svg>
                 <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full pulse-glow"></div>
               </div>
-              <span class="text-xs font-medium">Progress</span>
+              <span class="text-xs font-medium">📈 Progress</span>
             </button>
           </div>
         </div>
@@ -1683,62 +1683,6 @@
           currentView.value = 'chat';
         };
 
-        // Missing methods for Joy Jar
-        const getJoyEmoji = (type) => {
-          const emojis = {
-            silly: '🤪',
-            beautiful: '😍', 
-            achievement: '🏆',
-            connection: '💕',
-            surprise: '🎉',
-            nature: '🌱',
-            creativity: '🎨',
-            kindness: '🤗'
-          };
-          return emojis[type] || '✨';
-        };
-
-        const randomJoyIndex = ref(-1);
-
-        const getRandomJoyEntry = () => {
-          if (joyEntries.value.length === 0) return;
-          randomJoyIndex.value = Math.floor(Math.random() * joyEntries.value.length);
-        };
-
-        // Missing connection plan data
-        const connectionPlan = ref({
-          thisWeek: '',
-          thisMonth: '',
-          newConnection: ''
-        });
-
-        const canCompleteConnection = computed(() => {
-          return (innerCircle.value.length > 0 || widerNetwork.value.length > 0) &&
-                 (connectionPlan.value.thisWeek.trim() || 
-                  connectionPlan.value.thisMonth.trim() || 
-                  connectionPlan.value.newConnection.trim());
-        });
-
-        const completeConnectionWeb = () => {
-          const totalConnections = innerCircle.value.length + widerNetwork.value.length;
-
-          chatHistory.value.push({
-            id: Date.now(),
-            sender: 'system',
-            text: `Fantastic! You've mapped ${totalConnections} meaningful connections and created a plan to strengthen relationships. Connection is the antidote to anxiety - you're building your support network beautifully.`,
-            timestamp: new Date()
-          });
-          
-          // Reset for next time
-          connectionPlan.value = {
-            thisWeek: '',
-            thisMonth: '',
-            newConnection: ''
-          };
-          
-          currentView.value = 'chat';
-        };
-
         return {
           currentView,
           currentSection,
@@ -1817,12 +1761,7 @@
           addJoyEntry,
           removeJoyEntry,
           getRandomJoyEntry,
-          saveJoyJar,
-          getJoyEmoji,
-          randomJoyIndex,
-          connectionPlan,
-          canCompleteConnection,
-          completeConnectionWeb
+          saveJoyJar
         };
       }
     }).mount('#app');
