@@ -86,8 +86,8 @@ class TheracowchVueCompiler {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${this.appData.title || 'Theracowch'}</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐄</text></svg>">
   <style>
     ${styles}
   </style>
@@ -821,87 +821,64 @@ class TheracowchVueCompiler {
           currentView.value = 'chat';
         };
 
-        // Advanced AI Mandy Coaching Response System
-        const generateMandyResponse = (userMessage) => {
-          // Step 1: Listen - Use Universal Process
-          const listening = mandyCoachingSystem.universalProcess.listen(userMessage);
-          
-          // Step 2: Identify patterns using CBT framework
-          const identifiedPattern = mandyCoachingSystem.cbtFramework.identifyPatterns(userMessage);
-          
-          // Step 3: Update conversation context
-          conversationContext.currentPattern = identifiedPattern;
-          if (!conversationContext.previousTopics.includes(identifiedPattern)) {
-            conversationContext.previousTopics.push(identifiedPattern);
-          }
-          
-          // Step 4: Determine appropriate response based on Universal Process
-          let response = "";
-          
-          // Check if this is a continuation of a theme
-          const isNewPattern = conversationContext.lastMandyResponse?.pattern !== identifiedPattern;
-          
-          if (conversationContext.sessionPhase === 'opening' || isNewPattern) {
-            // Use signature phrase for pattern recognition
-            const signaturePhrase = mandyCoachingSystem.signaturePhrases[
-              Math.floor(Math.random() * mandyCoachingSystem.signaturePhrases.length)
-            ];
-            response = listening.reflection + ". " + signaturePhrase;
-            conversationContext.sessionPhase = 'exploring';
-            
-          } else if (conversationContext.sessionPhase === 'exploring') {
-            // Use gateway question
-            const gatewayQuestion = mandyCoachingSystem.universalProcess.gatewayQuestion(conversationContext);
-            response = gatewayQuestion;
-            conversationContext.sessionPhase = 'deepening';
-            
-          } else if (conversationContext.sessionPhase === 'deepening') {
-            // Offer CBT thought challenging
-            const challenge = mandyCoachingSystem.cbtFramework.challengeThoughts(identifiedPattern);
-            response = challenge;
-            conversationContext.sessionPhase = 'integrating';
-            
-          } else {
-            // Integration phase - offer coping strategies
-            const strategies = mandyCoachingSystem.cbtFramework.developCopingStrategies();
-            const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
-            response = "Let's try something practical. " + randomStrategy;
-            conversationContext.copingStrategiesOffered.push(randomStrategy);
-            conversationContext.sessionPhase = 'exploring'; // Cycle back for continued support
-          }
-          
-          // Context-aware additions
-          if (userMessage.toLowerCase().includes('imagine') || userMessage.toLowerCase().includes('section')) {
-            // User is referencing IMAGINE framework
-            const sections = ['self_care', 'mindfulness', 'acceptance', 'gratitude', 'interactions', 'nurturing', 'exploring'];
-            const mentionedSection = sections.find(section => 
-              userMessage.toLowerCase().includes(section) || 
-              userMessage.toLowerCase().includes(section.replace('_', ' '))
-            );
-            
-            if (mentionedSection) {
-              response += " " + mandyCoachingSystem.imagineGuidance[mentionedSection];
-              conversationContext.userPreferredSection = mentionedSection;
+        // Real AI Mandy Coaching Response System with Claude API
+        const generateMandyResponse = async (userMessage) => {
+          try {
+            // Prepare conversation history for API
+            const conversationHistory = chatHistory.value.map(msg => ({
+              sender: msg.sender,
+              text: msg.text,
+              timestamp: msg.timestamp
+            }));
+
+            // Call the Vercel API endpoint
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                message: userMessage,
+                conversationHistory: conversationHistory,
+                currentPattern: conversationContext.currentPattern,
+                sessionPhase: conversationContext.sessionPhase
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error('HTTP error! status: ' + response.status);
             }
+
+            const data = await response.json();
+            
+            // Update conversation context with API response
+            conversationContext.currentPattern = data.pattern;
+            conversationContext.sessionPhase = data.sessionPhase;
+            
+            return {
+              text: data.response,
+              pattern: data.pattern,
+              framework: data.sessionPhase,
+              timestamp: new Date(data.timestamp)
+            };
+
+          } catch (error) {
+            console.error('Error calling Mandy API:', error);
+            
+            // Fallback response for API failures
+            return {
+              text: "I'm experiencing a technical moment, but I'm still here with you. Sometimes technology needs a pause, just like we do. What's one thing you're feeling right now that we can explore together?",
+              pattern: 'general',
+              framework: conversationContext.sessionPhase || 'exploring',
+              timestamp: new Date()
+            };
           }
-          
-          // Add encouraging close for longer responses
-          if (response.length > 100) {
-            response += " You're doing important work by exploring this.";
-          }
-          
-          return {
-            text: response,
-            pattern: identifiedPattern,
-            framework: conversationContext.sessionPhase,
-            timestamp: new Date()
-          };
         };
 
         // Typing indicator state
         const isTyping = ref(false);
 
-        const sendMessage = () => {
+        const sendMessage = async () => {
           if (!newMessage.value.trim()) return;
           
           const userMessageText = newMessage.value;
@@ -918,9 +895,9 @@ class TheracowchVueCompiler {
           newMessage.value = '';
           isTyping.value = true;
 
-          // Generate sophisticated Mandy response
-          setTimeout(() => {
-            const mandyResponse = generateMandyResponse(userMessageText);
+          // Generate real Mandy response from Claude API
+          try {
+            const mandyResponse = await generateMandyResponse(userMessageText);
             
             const aiMessage = {
               id: Date.now() + 1,
@@ -943,7 +920,20 @@ class TheracowchVueCompiler {
               }
             }, 100);
             
-          }, 1200); // Slightly longer delay for more natural feel
+          } catch (error) {
+            console.error('Error in sendMessage:', error);
+            isTyping.value = false;
+            
+            // Add error message to chat
+            chatHistory.value.push({
+              id: Date.now() + 1,
+              sender: 'ai_mandy',
+              text: "I'm having trouble connecting right now, but I'm here with you. Sometimes our minds need a moment too. How are you feeling in this moment?",
+              timestamp: new Date(),
+              pattern: 'general',
+              framework: 'exploring'
+            });
+          }
         };
 
         // Photo handling functions
