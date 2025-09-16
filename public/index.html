@@ -22,6 +22,22 @@
   
   <style>
     /* Modern Hexagon Maths-inspired Design System */
+    :root {
+      /* Consistent spacing scale */
+      --spacing-xs: 0.5rem;    /* 8px */
+      --spacing-sm: 0.75rem;   /* 12px */
+      --spacing-md: 1rem;      /* 16px */
+      --spacing-lg: 1.5rem;    /* 24px */
+      --spacing-xl: 2rem;      /* 32px */
+      --spacing-2xl: 3rem;     /* 48px */
+      --spacing-3xl: 4rem;     /* 64px */
+      
+      /* Section spacing */
+      --section-gap: var(--spacing-2xl);
+      --card-padding: var(--spacing-lg);
+      --content-max-width: 64rem;
+    }
+
     body {
       min-height: 100vh;
       background: linear-gradient(to bottom right, #1a1918, #2a2827, #1a1918);
@@ -50,8 +66,9 @@
     }
 
     .card {
-      @apply glass rounded-2xl p-6 transition-all duration-300;
+      @apply glass rounded-2xl transition-all duration-300;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(249, 230, 211, 0.03));
+      padding: var(--card-padding);
     }
 
     .card:hover {
@@ -279,14 +296,14 @@
       <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-white/10">
         <div class="max-w-4xl mx-auto px-6 py-4">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center style="gap: var(--spacing-sm);"">
               <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center overflow-hidden shadow-lg">
                 <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy Cow" class="w-full h-full object-cover" 
                      style="object-position: center 30%; transform: scale(1.5);">
               </div>
               <div>
-                <h1 class="text-xl font-bold gradient-text">TheraCOWch</h1>
-                <p class="text-xs text-stone-400">with AI Mandy 🐄</p>
+                <h1 class="text-xl font-bold gradient-text">Theracowch</h1>
+                <p class="text-xs text-stone-400">Your therapeutic cowch</p>
               </div>
             </div>
             <div class="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
@@ -298,10 +315,10 @@
 
       <!-- Main Content -->
       <main class="pt-24 pb-24">
-        <div class="max-w-4xl mx-auto px-6">
+        <div class="mx-auto px-6" style="max-width: var(--content-max-width);">
           
           <!-- Hero Section -->
-          <div class="text-center mb-12" v-if="currentView === 'home'">
+          <div class="text-center" v-if="currentView === 'home'" style="margin-bottom: var(--section-gap);">
             <!-- Featured AI Mandy Cow -->
             <div class="flex justify-center mb-8">
               <div class="relative">
@@ -323,12 +340,12 @@
             </div>
             
             <h1 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
-              Meet AI Mandy 🐄
+              Welcome to your Cowch
             </h1>
             <p class="text-xl text-stone-300 mb-8 max-w-2xl mx-auto">
-              Your friendly therapeutic cow coach, ready to guide you through anxiety reduction with warmth, wisdom, and evidence-based techniques
+              Your therapeutic space with AI Mandy, ready to guide you through anxiety reduction with warmth, wisdom, and evidence-based techniques
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <div class="flex flex-col sm:flex-row style="gap: var(--spacing-md);" justify-center">
               <button @click="chatWithMandy" class="btn-primary group">
                 <span class="emoji-bounce mr-2">💬</span>
                 Chat with AI Mandy
@@ -348,19 +365,19 @@
 
           <!-- IMAGINE Framework -->
           <div v-if="currentView === 'home' || currentView === 'imagine'">
-            <div class="text-center mb-8">
-              <h2 class="text-2xl font-bold mb-4 text-white">The IMAGINE Framework</h2>
+            <div class="text-center" style="margin-bottom: var(--spacing-2xl);">
+              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">The IMAGINE Framework</h2>
               <p class="text-stone-300">Seven evidence-based domains for holistic mental wellness</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: var(--section-gap);">
               <div v-for="(section, index) in imagineSections" 
                    :key="section.key"
                    @click="goToSection(section.key)"
                    class="imagine-card animate-fade-in-up"
                    :style="{ animationDelay: (index * 0.1) + 's' }">
                 
-                <div class="flex items-center space-x-4 relative z-10">
+                <div class="flex items-center style="gap: var(--spacing-md);" relative z-10">
                   <div class="flex-shrink-0">
                     <div class="w-18 h-18 rounded-2xl flex items-center justify-center text-3xl shadow-lg emoji-bounce relative overflow-hidden"
                          :style="'background: ' + section.gradient + '; box-shadow: 0 12px 30px ' + section.shadowColor">
@@ -383,16 +400,16 @@
           </div>
 
           <!-- Chat Interface -->
-          <div v-if="currentView === 'chat'" class="card max-w-2xl mx-auto">
+          <div v-if="currentView === 'chat'" class="card max-w-2xl mx-auto" style="margin-bottom: var(--section-gap);">
             <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center style="gap: var(--spacing-sm);"">
                 <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/20">
                   <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy" class="w-full h-full object-cover"
                        style="object-position: center 30%; transform: scale(1.5);">
                 </div>
                 <div>
-                  <h3 class="font-semibold text-white">AI Mandy 🐄</h3>
-                  <p class="text-sm text-stone-400">Your Therapeutic Cow Coach</p>
+                  <h3 class="font-semibold text-white">AI Mandy</h3>
+                  <p class="text-sm text-stone-400">Your Therapeutic Coach</p>
                 </div>
               </div>
               <button @click="goHome" class="btn-small">
@@ -401,7 +418,7 @@
             </div>
 
             <!-- Chat Messages -->
-            <div class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+            <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);" mb-6 max-h-96 overflow-y-auto">
               <div v-for="message in chatHistory" :key="message.id" 
                    class="flex" :class="message.sender === 'user' ? 'justify-end' : 'justify-start'">
                 <div class="max-w-xs px-4 py-3 rounded-2xl"
@@ -414,7 +431,7 @@
               
               <div v-if="isTyping" class="flex justify-start">
                 <div class="glass-dark px-4 py-3 rounded-2xl">
-                  <div class="flex space-x-1">
+                  <div class="flex style="gap: var(--spacing-xs);"">
                     <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
                     <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
                     <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
@@ -424,7 +441,7 @@
             </div>
 
             <!-- Message Input -->
-            <div class="flex space-x-3">
+            <div class="flex style="gap: var(--spacing-sm);"">
               <input v-model="newMessage" @keyup.enter="sendMessage" 
                      placeholder="Share what's on your mind..." 
                      class="input-field flex-1">
@@ -436,12 +453,12 @@
 
           <!-- Mood Tracker -->
           <div v-if="currentView === 'mood'" class="card max-w-2xl mx-auto">
-            <div class="text-center mb-6">
-              <h2 class="text-2xl font-bold text-white mb-4">How are you feeling today?</h2>
+            <div class="text-center" style="margin-bottom: var(--spacing-xl);">
+              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">How are you feeling today?</h2>
               <p class="text-stone-300">Track your mood to identify patterns and progress</p>
             </div>
             
-            <div class="grid grid-cols-5 gap-4 mb-8">
+            <div class="grid grid-cols-5 style="gap: var(--spacing-md);" mb-8">
               <button v-for="mood in moodOptions" :key="mood.value"
                       @click="selectMood(mood.value)"
                       class="flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:scale-105"
@@ -451,7 +468,7 @@
               </button>
             </div>
             
-            <div class="space-y-4">
+            <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
               <textarea v-model="moodNote" 
                         placeholder="What's contributing to this feeling? (optional)"
                         class="input-field min-h-[100px] resize-none"></textarea>
@@ -470,7 +487,7 @@
           <!-- Section Detail -->
           <div v-if="currentView === 'section' && currentSection" class="card max-w-2xl mx-auto">
             <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center style="gap: var(--spacing-sm);"">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl"
                      :style="'background: ' + currentSection.gradient">
                   {{ currentSection.emoji }}
@@ -485,18 +502,18 @@
               </button>
             </div>
 
-            <div class="space-y-6">
+            <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
               <div class="glass-dark p-4 rounded-xl">
                 <h3 class="font-semibold text-white mb-2">Guidance</h3>
                 <p class="text-stone-300">{{ getSectionGuidance(currentSection.key) }}</p>
               </div>
 
-              <div class="grid grid-cols-1 gap-4">
+              <div class="grid grid-cols-1 style="gap: var(--spacing-md);"">
                 <div v-for="tool in getSectionTools(currentSection.key)" :key="tool.id"
                      @click="startExercise(tool)"
                      class="glass-dark p-4 rounded-xl cursor-pointer hover:bg-white/10 transition-all group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center style="gap: var(--spacing-sm);"">
                       <span class="text-xl">{{ tool.icon }}</span>
                       <div>
                         <h4 class="font-medium text-white">{{ tool.name }}</h4>
@@ -521,7 +538,7 @@
           <!-- Exercise Interface -->
           <div v-if="currentView === 'exercise' && currentExercise" class="card max-w-2xl mx-auto">
             <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center style="gap: var(--spacing-sm);"">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl"
                      :style="'background: ' + currentSection.gradient">
                   {{ currentExercise.icon }}
@@ -537,19 +554,19 @@
             </div>
 
             <!-- Dynamic Exercise Content -->
-            <div class="space-y-6">
+            <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
               
               <!-- 5-4-3-2-1 Grounding Exercise -->
               <div v-if="currentExercise.id === 'grounding_5432' && currentSection.key === 'mindfulness'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">5-4-3-2-1 Grounding Exercise</h3>
-                  <p class="text-stone-300 mb-6">This exercise helps you connect with the present moment through your senses.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">5-4-3-2-1 Grounding Exercise</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">This exercise helps you connect with the present moment through your senses.</p>
                   
-                  <div class="space-y-4">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                     <div v-for="(step, index) in groundingSteps" :key="index" 
                          class="p-4 rounded-lg transition-all duration-300"
                          :class="currentGroundingStep === index ? 'bg-indigo-500/20 border border-indigo-400/50' : 'bg-white/5'">
-                      <div class="flex items-center space-x-3">
+                      <div class="flex items-center style="gap: var(--spacing-sm);"">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
                              :class="currentGroundingStep === index ? 'bg-indigo-500 text-white' : 'bg-stone-600 text-stone-300'">
                           {{ step.number }}
@@ -563,7 +580,7 @@
                       <div v-if="currentGroundingStep === index" class="mt-4 pl-11">
                         <div class="space-y-2">
                           <div v-for="(item, itemIndex) in step.items" :key="itemIndex" 
-                               class="flex items-center space-x-2">
+                               class="flex items-center style="gap: var(--spacing-xs);"">
                             <input type="checkbox" :id="`item-${index}-${itemIndex}`" 
                                    @change="checkGroundingItem(index, itemIndex)"
                                    class="rounded border-stone-600 bg-stone-700 text-indigo-500 focus:ring-indigo-500">
@@ -584,9 +601,9 @@
 
               <!-- Breathing Exercise -->
               <div v-if="currentExercise.id === 'breathing_4_7_8' && currentSection.key === 'mindfulness'">
-                <div class="glass-dark p-6 rounded-xl text-center">
-                  <h3 class="font-semibold text-white mb-4">4-7-8 Breathing Exercise</h3>
-                  <p class="text-stone-300 mb-6">A calming breath pattern to reduce anxiety and promote relaxation.</p>
+                <div class="glass-dark rounded-xl text-center" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">4-7-8 Breathing Exercise</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">A calming breath pattern to reduce anxiety and promote relaxation.</p>
                   
                   <div class="mb-8">
                     <div class="w-32 h-32 mx-auto rounded-full border-4 border-indigo-400/30 flex items-center justify-center relative overflow-hidden"
@@ -601,12 +618,12 @@
                     </div>
                   </div>
                   
-                  <div class="space-y-4">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                     <div class="text-stone-300">
                       <p>Round {{ currentBreathRound }} of {{ totalBreathRounds }}</p>
                     </div>
                     
-                    <div class="flex justify-center space-x-4">
+                    <div class="flex justify-center style="gap: var(--spacing-md);"">
                       <button v-if="!breathingActive" @click="startBreathing" class="btn-primary px-6 py-3">
                         🫁 Start Breathing
                       </button>
@@ -620,24 +637,24 @@
 
               <!-- Self-Care Energy Audit -->
               <div v-if="currentExercise.id === 'energy_audit' && currentSection.key === 'self_care'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Energy Audit</h3>
-                  <p class="text-stone-300 mb-6">Identify what gives you energy vs. what drains it.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Energy Audit</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Identify what gives you energy vs. what drains it.</p>
                   
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                      <h4 class="font-medium text-white flex items-center space-x-2">
+                  <div class="grid grid-cols-1 md:grid-cols-2" style="gap: var(--spacing-xl);">
+                    <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
+                      <h4 class="font-medium text-white flex items-center style="gap: var(--spacing-xs);"">
                         <span>⚡</span>
                         <span>Energy Givers</span>
                       </h4>
                       <div class="space-y-2">
                         <div v-for="(giver, index) in energyGivers" :key="index"
-                             class="flex items-center space-x-2">
+                             class="flex items-center style="gap: var(--spacing-xs);"">
                           <span class="text-green-400">+</span>
                           <span class="text-stone-300 text-sm">{{ giver }}</span>
                         </div>
                       </div>
-                      <div class="flex space-x-2">
+                      <div class="flex style="gap: var(--spacing-xs);"">
                         <input v-model="newEnergyGiver" 
                                @keyup.enter="addEnergyGiver"
                                placeholder="What gives you energy?"
@@ -646,19 +663,19 @@
                       </div>
                     </div>
                     
-                    <div class="space-y-4">
-                      <h4 class="font-medium text-white flex items-center space-x-2">
+                    <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
+                      <h4 class="font-medium text-white flex items-center style="gap: var(--spacing-xs);"">
                         <span>🔋</span>
                         <span>Energy Drains</span>
                       </h4>
                       <div class="space-y-2">
                         <div v-for="(drain, index) in energyDrains" :key="index"
-                             class="flex items-center space-x-2">
+                             class="flex items-center style="gap: var(--spacing-xs);"">
                           <span class="text-red-400">-</span>
                           <span class="text-stone-300 text-sm">{{ drain }}</span>
                         </div>
                       </div>
-                      <div class="flex space-x-2">
+                      <div class="flex style="gap: var(--spacing-xs);"">
                         <input v-model="newEnergyDrain" 
                                @keyup.enter="addEnergyDrain"
                                placeholder="What drains your energy?"
@@ -672,11 +689,11 @@
 
               <!-- Gratitude Practice -->
               <div v-if="currentExercise.id === 'three_good_things' && currentSection.key === 'gratitude'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Three Good Things</h3>
-                  <p class="text-stone-300 mb-6">Write down three things that went well today and why they were meaningful.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Three Good Things</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Write down three things that went well today and why they were meaningful.</p>
                   
-                  <div class="space-y-6">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
                     <div v-for="(thing, index) in threeGoodThings" :key="index" class="space-y-3">
                       <h4 class="font-medium text-white">Good Thing #{{ index + 1 }}</h4>
                       <textarea v-model="thing.what" 
@@ -699,19 +716,19 @@
 
               <!-- Thought Unhooking Exercise (Acceptance) -->
               <div v-if="currentExercise.id === 'thought_unhooking' && currentSection.key === 'acceptance'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Thought Unhooking</h3>
-                  <p class="text-stone-300 mb-6">Learn to detach from anxious thoughts by treating them like scenes from a movie.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Thought Unhooking</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Learn to detach from anxious thoughts by treating them like scenes from a movie.</p>
                   
-                  <div class="space-y-6">
-                    <div class="space-y-4">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
+                    <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <h4 class="font-medium text-white">What thought is bothering you right now?</h4>
                       <textarea v-model="currentBotherThought" 
                                 placeholder="Write the specific thought that's causing anxiety or distress..."
                                 class="input-field w-full h-20 resize-none text-sm"></textarea>
                     </div>
                     
-                    <div v-if="currentBotherThought.trim()" class="space-y-4">
+                    <div v-if="currentBotherThought.trim()" class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <h4 class="font-medium text-white">Now, let's unhook from this thought:</h4>
                       
                       <div class="space-y-3">
@@ -724,7 +741,7 @@
                         <div class="p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg">
                           <h5 class="font-medium text-blue-300 mb-2">🏷️ Label It Technique</h5>
                           <p class="text-sm text-stone-300 mb-3">Give this thought a simple, non-judgmental label.</p>
-                          <div class="flex space-x-2">
+                          <div class="flex style="gap: var(--spacing-xs);"">
                             <button v-for="label in thoughtLabels" :key="label"
                                     @click="selectedThoughtLabel = label"
                                     class="px-3 py-1 rounded-full text-xs transition-all"
@@ -759,11 +776,11 @@
 
               <!-- Values Compass Exercise (Exploring) -->
               <div v-if="currentExercise.id === 'values_compass' && currentSection.key === 'exploring'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Values Compass</h3>
-                  <p class="text-stone-300 mb-6">Identify your core values to guide decision-making and understand behavior patterns.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Values Compass</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Identify your core values to guide decision-making and understand behavior patterns.</p>
                   
-                  <div class="space-y-6">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                       <div v-for="value in availableValues" :key="value"
                            @click="toggleValue(value)"
@@ -775,7 +792,7 @@
                       </div>
                     </div>
                     
-                    <div v-if="selectedValues.length > 0" class="space-y-4">
+                    <div v-if="selectedValues.length > 0" class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <h4 class="font-medium text-white">Your Top Values ({{ selectedValues.length }}/5 max)</h4>
                       <div class="space-y-3">
                         <div v-for="value in selectedValues" :key="value" class="p-3 bg-indigo-500/10 border border-indigo-400/30 rounded-lg">
@@ -806,15 +823,15 @@
 
               <!-- Connection Web Exercise (Interactions) -->
               <div v-if="currentExercise.id === 'connection_web' && currentSection.key === 'interactions'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Connection Web</h3>
-                  <p class="text-stone-300 mb-6">Map your relationships and plan meaningful ways to strengthen connections.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Connection Web</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Map your relationships and plan meaningful ways to strengthen connections.</p>
                   
-                  <div class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
+                    <div class="grid grid-cols-1 md:grid-cols-2" style="gap: var(--spacing-xl);">
                       <!-- Inner Circle -->
-                      <div class="space-y-4">
-                        <h4 class="font-medium text-white flex items-center space-x-2">
+                      <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
+                        <h4 class="font-medium text-white flex items-center style="gap: var(--spacing-xs);"">
                           <span>💝</span>
                           <span>Inner Circle (Closest People)</span>
                         </h4>
@@ -825,7 +842,7 @@
                             <button @click="removeFromCircle('inner', index)" class="text-stone-400 hover:text-stone-200">×</button>
                           </div>
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="flex style="gap: var(--spacing-xs);"">
                           <input v-model="newInnerPerson" 
                                  @keyup.enter="addToInnerCircle"
                                  placeholder="Add someone close to you"
@@ -835,8 +852,8 @@
                       </div>
                       
                       <!-- Wider Network -->
-                      <div class="space-y-4">
-                        <h4 class="font-medium text-white flex items-center space-x-2">
+                      <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
+                        <h4 class="font-medium text-white flex items-center style="gap: var(--spacing-xs);"">
                           <span>🌐</span>
                           <span>Wider Network</span>
                         </h4>
@@ -847,7 +864,7 @@
                             <button @click="removeFromCircle('wider', index)" class="text-stone-400 hover:text-stone-200">×</button>
                           </div>
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="flex style="gap: var(--spacing-xs);"">
                           <input v-model="newWiderPerson" 
                                  @keyup.enter="addToWiderNetwork"
                                  placeholder="Add acquaintance or colleague"
@@ -857,9 +874,9 @@
                       </div>
                     </div>
                     
-                    <div v-if="innerCircle.length > 0 || widerNetwork.length > 0" class="space-y-4">
+                    <div v-if="innerCircle.length > 0 || widerNetwork.length > 0" class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <h4 class="font-medium text-white">Connection Action Plan</h4>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div class="grid grid-cols-1 md:grid-cols-3 style="gap: var(--spacing-md);"">
                         <div class="p-4 bg-green-500/10 border border-green-400/30 rounded-lg">
                           <h5 class="font-medium text-green-300 mb-2">💌 This Week</h5>
                           <textarea v-model="connectionPlan.thisWeek" 
@@ -893,14 +910,14 @@
 
               <!-- Joy Jar Exercise (Nurturing) -->
               <div v-if="currentExercise.id === 'joy_jar' && currentSection.key === 'nurturing'">
-                <div class="glass-dark p-6 rounded-xl">
-                  <h3 class="font-semibold text-white mb-4">Digital Joy Jar</h3>
-                  <p class="text-stone-300 mb-6">Collect moments of joy, fun, and playfulness to revisit when life feels too serious.</p>
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Digital Joy Jar</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Collect moments of joy, fun, and playfulness to revisit when life feels too serious.</p>
                   
-                  <div class="space-y-6">
-                    <div class="space-y-4">
+                  <div class="style="display: flex; flex-direction: column; gap: var(--spacing-xl);"">
+                    <div class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <h4 class="font-medium text-white">Add a Joy Moment</h4>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div class="grid grid-cols-1 md:grid-cols-3 style="gap: var(--spacing-md);"">
                         <div>
                           <label class="block text-sm text-stone-400 mb-1">Type of Joy</label>
                           <select v-model="currentJoyEntry.type" class="input-field w-full text-sm">
@@ -926,7 +943,7 @@
                         </div>
                         <div>
                           <label class="block text-sm text-stone-400 mb-1">Joy Level</label>
-                          <div class="flex space-x-1">
+                          <div class="flex style="gap: var(--spacing-xs);"">
                             <button v-for="level in 5" :key="level"
                                     @click="currentJoyEntry.level = level"
                                     class="w-8 h-8 rounded-full border-2 transition-all"
@@ -951,7 +968,7 @@
                       </button>
                     </div>
                     
-                    <div v-if="joyJar.length > 0" class="space-y-4">
+                    <div v-if="joyJar.length > 0" class="style="display: flex; flex-direction: column; gap: var(--spacing-md);"">
                       <div class="flex items-center justify-between">
                         <h4 class="font-medium text-white">Your Joy Collection ({{ joyJar.length }})</h4>
                         <button @click="getRandomJoy" class="btn-small">
@@ -966,7 +983,7 @@
                                'border-yellow-400 bg-yellow-400/10 shadow-lg' : 
                                'border-stone-600 bg-stone-700/30'">
                           <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center style="gap: var(--spacing-xs);"">
                               <span class="text-lg">{{ getJoyEmoji(joy.type) }}</span>
                               <span class="text-sm text-stone-400 capitalize">{{ joy.when }}</span>
                               <div class="flex">
@@ -985,7 +1002,7 @@
 
               <!-- Default exercise placeholder for other exercises -->
               <div v-if="!isSpecialExercise(currentExercise.id)">
-                <div class="glass-dark p-6 rounded-xl">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
                   <h3 class="font-semibold text-white mb-4">{{ currentExercise.name }}</h3>
                   <p class="text-stone-300 mb-6">{{ currentExercise.description }}</p>
                   <div class="text-center py-8">
@@ -1135,7 +1152,7 @@
           {
             key: 'self_care',
             title: 'I - Me, Myself & I',
-            subtitle: 'Self-care and wellness with AI Mandy',
+            subtitle: 'Self-care and wellness on your cowch',
             emoji: '💎',
             gradient: 'linear-gradient(135deg, #d4a574 0%, #8b6914 100%)', // warm_earth_tones
             shadowColor: 'rgba(212, 165, 116, 0.4)'
@@ -1167,7 +1184,7 @@
           {
             key: 'interactions',
             title: 'I - Interactions',
-            subtitle: 'Connecting with your herd & community',
+            subtitle: 'Connecting with others beyond the cowch',
             emoji: '🤝',
             gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', // friendly_purples_pinks
             shadowColor: 'rgba(168, 85, 247, 0.4)'
@@ -1175,7 +1192,7 @@
           {
             key: 'nurturing',
             title: 'N - Nurturing',
-            subtitle: 'Fun, playfulness & joy like a happy cow',
+            subtitle: 'Fun, playfulness & joy on your cowch',
             emoji: '🎭',
             gradient: 'linear-gradient(135deg, #34d399 0%, #fbbf24 100%)', // bright_cheerful_colors
             shadowColor: 'rgba(52, 211, 153, 0.4)'
@@ -1183,7 +1200,7 @@
           {
             key: 'exploring',
             title: 'E - Exploring',
-            subtitle: 'Understanding thoughts with cow wisdom',
+            subtitle: 'Understanding thoughts & behaviors',
             emoji: '🧠',
             gradient: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)', // discovery_greens_blues
             shadowColor: 'rgba(16, 185, 129, 0.4)'
