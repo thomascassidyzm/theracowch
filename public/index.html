@@ -59,30 +59,31 @@
     }
 
     .btn-primary {
-      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-500 ease-out relative overflow-hidden;
+      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-300 ease-out relative overflow-hidden;
       border-radius: 2rem;
       background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
       background-size: 200% 200%;
       animation: gradientShift 4s ease infinite;
       box-shadow: 
-        0 12px 30px -5px rgba(99, 102, 241, 0.4), 
-        0 6px 15px -3px rgba(236, 72, 153, 0.2),
-        inset 0 2px 0 rgba(255, 255, 255, 0.2);
-      border: 2px solid rgba(255, 255, 255, 0.15);
+        0 8px 25px -5px rgba(99, 102, 241, 0.35), 
+        0 4px 12px -3px rgba(236, 72, 153, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      min-height: 3rem;
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.05);
+      transform: translateY(-2px) scale(1.02);
       box-shadow: 
-        0 25px 50px -5px rgba(99, 102, 241, 0.6), 
-        0 12px 25px -3px rgba(236, 72, 153, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.3);
-      animation-duration: 2s;
-      border-color: rgba(255, 255, 255, 0.25);
+        0 20px 40px -5px rgba(99, 102, 241, 0.5), 
+        0 8px 20px -3px rgba(236, 72, 153, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      animation-duration: 2.5s;
+      border-color: rgba(255, 255, 255, 0.3);
     }
 
     .btn-primary:active {
-      transform: translateY(-1px) scale(1.02);
+      transform: translateY(-1px) scale(1.01);
       transition: all 0.1s ease-out;
     }
 
@@ -92,27 +93,56 @@
     }
 
     .btn-glass {
-      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-500 ease-out relative;
+      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-300 ease-out relative;
       border-radius: 2rem;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(15px);
       box-shadow: 
-        0 10px 25px -5px rgba(0, 0, 0, 0.3),
-        inset 0 2px 0 rgba(255, 255, 255, 0.1);
+        0 6px 20px -5px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      min-height: 3rem;
     }
 
     .btn-glass:hover {
-      transform: translateY(-3px) scale(1.05);
+      transform: translateY(-2px) scale(1.02);
       background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.4);
       box-shadow: 
-        0 20px 40px -5px rgba(0, 0, 0, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        0 15px 35px -5px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
 
     .btn-glass:active {
-      transform: translateY(-1px) scale(1.02);
+      transform: translateY(-1px) scale(1.01);
+      transition: all 0.1s ease-out;
+    }
+
+    .btn-small {
+      @apply inline-flex items-center justify-center font-medium text-white transition-all duration-200 ease-out relative;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 
+        0 2px 8px -2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      min-height: 2.25rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 
+        0 4px 12px -2px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-small:active {
+      transform: translateY(0);
       transition: all 0.1s ease-out;
     }
 
@@ -355,7 +385,7 @@
                   <p class="text-sm text-stone-400">Your Therapeutic Cow Coach</p>
                 </div>
               </div>
-              <button @click="goHome" class="btn-glass text-sm px-4 py-2">
+              <button @click="goHome" class="btn-small">
                 ← Back
               </button>
             </div>
@@ -440,7 +470,7 @@
                   <p class="text-stone-300">{{ currentSection.subtitle }}</p>
                 </div>
               </div>
-              <button @click="goHome" class="btn-glass text-sm px-4 py-2">
+              <button @click="goHome" class="btn-small">
                 ← Back
               </button>
             </div>
@@ -491,7 +521,7 @@
                   <p class="text-stone-300">{{ currentSection.title }}</p>
                 </div>
               </div>
-              <button @click="goBackToSection" class="btn-glass text-sm px-4 py-2">
+              <button @click="goBackToSection" class="btn-small">
                 ← Back
               </button>
             </div>
@@ -533,7 +563,7 @@
                         
                         <button v-if="canAdvanceGrounding(index)" 
                                 @click="nextGroundingStep" 
-                                class="btn-primary mt-4 text-sm px-4 py-2">
+                                class="btn-small mt-4">
                           {{ index === groundingSteps.length - 1 ? 'Complete Exercise' : 'Next Step' }}
                         </button>
                       </div>
@@ -602,7 +632,7 @@
                                @keyup.enter="addEnergyGiver"
                                placeholder="What gives you energy?"
                                class="input-field flex-1 text-sm">
-                        <button @click="addEnergyGiver" class="btn-primary text-sm px-3 py-2">Add</button>
+                        <button @click="addEnergyGiver" class="btn-small">Add</button>
                       </div>
                     </div>
                     
@@ -623,7 +653,7 @@
                                @keyup.enter="addEnergyDrain"
                                placeholder="What drains your energy?"
                                class="input-field flex-1 text-sm">
-                        <button @click="addEnergyDrain" class="btn-primary text-sm px-3 py-2">Add</button>
+                        <button @click="addEnergyDrain" class="btn-small">Add</button>
                       </div>
                     </div>
                   </div>
@@ -790,7 +820,7 @@
                                  @keyup.enter="addToInnerCircle"
                                  placeholder="Add someone close to you"
                                  class="input-field flex-1 text-sm">
-                          <button @click="addToInnerCircle" class="btn-primary text-sm px-3 py-2">Add</button>
+                          <button @click="addToInnerCircle" class="btn-small">Add</button>
                         </div>
                       </div>
                       
@@ -812,7 +842,7 @@
                                  @keyup.enter="addToWiderNetwork"
                                  placeholder="Add acquaintance or colleague"
                                  class="input-field flex-1 text-sm">
-                          <button @click="addToWiderNetwork" class="btn-primary text-sm px-3 py-2">Add</button>
+                          <button @click="addToWiderNetwork" class="btn-small">Add</button>
                         </div>
                       </div>
                     </div>
@@ -914,7 +944,7 @@
                     <div v-if="joyJar.length > 0" class="space-y-4">
                       <div class="flex items-center justify-between">
                         <h4 class="font-medium text-white">Your Joy Collection ({{ joyJar.length }})</h4>
-                        <button @click="getRandomJoy" class="btn-glass text-sm px-4 py-2">
+                        <button @click="getRandomJoy" class="btn-small">
                           🎲 Random Joy
                         </button>
                       </div>
