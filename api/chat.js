@@ -11,20 +11,15 @@ async function getImagineFrameworkPrompts() {
   }
   
   try {
-    // Fetch IMAGINE framework training data from thoughtsonlifeandlove.com
-    const response = await fetch('https://www.thoughtsonlifeandlove.com/imagine-framework-prompts/');
+    // Fetch IMAGINE framework training data from theracowch.com hidden page
+    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://theracowch.com';
+    const response = await fetch(`${baseUrl}/imagine-framework-prompts.txt`);
     if (!response.ok) {
       throw new Error('Failed to fetch IMAGINE framework prompts');
     }
     
-    const html = await response.text();
-    // Extract the prompts from the pre tag
-    const match = html.match(/<pre id="imagine-framework-prompts">([\s\S]*?)<\/pre>/);
-    if (!match) {
-      throw new Error('Could not parse IMAGINE framework prompts');
-    }
-    
-    promptsCache = match[1].trim();
+    const trainingData = await response.text();
+    promptsCache = trainingData.trim();
     cacheExpiry = now + (2 * 60 * 60 * 1000); // Cache for 2 hours
     
     return promptsCache;
