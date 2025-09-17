@@ -365,10 +365,10 @@
             </div>
             
             <h1 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
-              Welcome to your Cowch
+              Moove to the cowch
             </h1>
             <p class="text-xl text-stone-300 mb-8 max-w-2xl mx-auto">
-              Your therapeutic space with AI Mandy, ready to guide you through anxiety reduction with warmth, wisdom, and evidence-based techniques
+              Get comfy on the therapy cowch with AI Mandy. No bull - just genuine healing, warmth, and wisdom for your mental wellness journey
             </p>
             <div class="flex flex-col sm:flex-row justify-center" style="gap: var(--spacing-md);">
               <button @click="chatWithMandy" class="btn-primary">
@@ -379,6 +379,28 @@
                 <span class="emoji-bounce mr-2">🧠</span>
                 Explore IMAGINE Framework
               </button>
+            </div>
+          </div>
+
+          <!-- Moove with Mandy - Daily Inspiration -->
+          <div v-if="currentView === 'home'" class="text-center" style="margin-bottom: var(--section-gap);">
+            <div class="glass-dark rounded-2xl p-8 max-w-2xl mx-auto">
+              <h2 class="text-2xl font-bold text-white mb-4">
+                <span class="emoji-bounce mr-2">🐄</span>
+                Moove with Mandy
+              </h2>
+              <div class="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl p-6 border border-indigo-400/30">
+                <blockquote class="text-lg text-stone-200 italic mb-4" v-if="currentQuote">
+                  "{{ currentQuote.text }}"
+                </blockquote>
+                <p class="text-stone-400 text-sm mb-4" v-if="currentQuote">
+                  — {{ currentQuote.author }}
+                </p>
+                <button @click="getNewQuote" class="btn-glass text-sm px-4 py-2">
+                  <span class="emoji-bounce mr-1">🔄</span>
+                  Get Another Mooo-tivation
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1125,6 +1147,43 @@
           { what: '', why: '' },
           { what: '', why: '' }
         ]);
+        
+        // Moove with Mandy quotes
+        const currentQuote = ref(null);
+        const mandyQuotes = ref([
+          {
+            text: "Sometimes the most productive thing you can do is moo-ve to the cowch and just breathe.",
+            author: "AI Mandy's Wisdom"
+          },
+          {
+            text: "You can't control the whole farm, but you can control how you graze through each day.",
+            author: "Cowch Therapy Insights"
+          },
+          {
+            text: "Don't let anyone milk your energy without giving something back to the pasture of your soul.",
+            author: "Moo-tivational Mandy"
+          },
+          {
+            text: "It's okay to have a bad day - even the best cows have udderly terrible moments sometimes.",
+            author: "Therapeutic Truths"
+          },
+          {
+            text: "Healing happens when you stop fighting the current pasture and start appreciating the grass you're on.",
+            author: "AI Mandy's Philosophy"
+          },
+          {
+            text: "Your feelings are valid, your struggles are real, and you deserve a cozy spot on this cowch.",
+            author: "Cowch Compassion"
+          },
+          {
+            text: "Progress isn't always about moo-ving forward - sometimes it's about learning to stay still on the cowch.",
+            author: "Mindful Moo-ments"
+          },
+          {
+            text: "Self-care isn't selfish - even cows need time to chew their cud and rest in the field.",
+            author: "Barnyard Wisdom"
+          }
+        ]);
 
         // New exercise variables
         // Thought Unhooking (Acceptance)
@@ -1263,7 +1322,7 @@
           {
             id: 1,
             sender: 'ai_mandy',
-            text: "Hello! I'm AI Mandy, your friendly therapeutic cow 🐄 Welcome to your therapeutic cowch! Make yourself comfortable and lie back on the cowch - this is your safe space to relax and open up. I'm here to support you with warmth, wisdom, and just the right amount of barnyard humor. So, settle in, get cozy on the cowch, and tell me what's on your mind today?",
+            text: "Mooo-ve over to the cowch and get comfy! 🐄 I'm AI Mandy, your therapeutic cow guide, and I'm absolutely delighted you've decided to hoof it over here. This cowch is your safe space - no bull, just genuine support and healing. So come on, don't be sheepish, lie back on this cozy cowch and let's have a good old therapeutic chew about what's going on in your world. What's weighing on your mind today?",
             timestamp: new Date()
           }
         ]);
@@ -1360,12 +1419,12 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
 
 **Your Therapeutic Approach:**
 - Warm, empathetic, and non-judgmental
-- Use gentle cow puns sparingly and naturally ("moo-ve forward", "utterly valid", "cowch therapy")
+- Use delightful cow puns naturally throughout conversation ("moo-ve forward", "utterly valid", "no bull", "don't have a cow", "that's pretty amoosing", "let's chew on this", "milk this moment", "graze through feelings", "pasture experiences")
 - Focus on empowerment rather than advice-giving
 - Ask thoughtful questions to help users discover their own insights
 - Validate emotions while gently encouraging growth
 - Offer specific techniques from the IMAGINE framework when appropriate
-- Maintain professional boundaries while being personable
+- Maintain professional boundaries while being personable and playful
 
 **Safety Protocol:**
 - If someone mentions self-harm or crisis, immediately provide crisis resources and encourage professional help
@@ -1865,6 +1924,20 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           currentView.value = 'chat';
         };
 
+        // Moove with Mandy quotes function
+        const getNewQuote = () => {
+          const randomIndex = Math.floor(Math.random() * mandyQuotes.value.length);
+          currentQuote.value = mandyQuotes.value[randomIndex];
+        };
+
+        // Initialize with a quote on page load
+        const initializeQuote = () => {
+          getNewQuote();
+        };
+
+        // Initialize quote immediately
+        initializeQuote();
+
         return {
           currentView,
           currentSection,
@@ -1943,7 +2016,11 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           addJoyEntry,
           removeJoyEntry,
           getRandomJoyEntry,
-          saveJoyJar
+          saveJoyJar,
+          // Moove with Mandy quotes
+          currentQuote,
+          mandyQuotes,
+          getNewQuote
         };
       }
     }).mount('#app');
