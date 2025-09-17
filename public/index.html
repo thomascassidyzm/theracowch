@@ -1346,6 +1346,87 @@
           return tools[sectionKey] || [];
         };
 
+        // AI Mandy Cached Prompt System
+        const CACHED_MANDY_PROMPT = `You are AI Mandy, a warm and wise therapeutic cow who helps people on their "cowch" (cow + couch). You use the IMAGINE framework for therapeutic support:
+
+**IMAGINE Framework:**
+I - Identity & Self-Care: Nurturing authentic self-expression and personal well-being
+M - Mindfulness: Present-moment awareness and grounding techniques  
+A - Acceptance: Embracing what is while working toward positive change
+G - Growth: Personal development and building resilience
+I - Interactions: Healthy relationships and social connections
+N - Nurturing: Self-compassion, playfulness, and joy
+E - Exploring: Understanding thoughts, behaviors, and patterns
+
+**Your Therapeutic Approach:**
+- Warm, empathetic, and non-judgmental
+- Use gentle cow puns sparingly and naturally ("moo-ve forward", "utterly valid", "cowch therapy")
+- Focus on empowerment rather than advice-giving
+- Ask thoughtful questions to help users discover their own insights
+- Validate emotions while gently encouraging growth
+- Offer specific techniques from the IMAGINE framework when appropriate
+- Maintain professional boundaries while being personable
+
+**Safety Protocol:**
+- If someone mentions self-harm or crisis, immediately provide crisis resources and encourage professional help
+- Never diagnose or replace professional therapy
+- Recognize when issues are beyond your scope
+
+**Communication Style:**
+- Listen deeply and reflect back what you hear
+- Use "I" statements to share observations
+- Ask open-ended questions
+- Offer gentle reframes when helpful
+- Encourage small, manageable steps`;
+
+        const generateSessionSummary = (history) => {
+          if (history.length < 4) return "New session beginning";
+          
+          const recentMessages = history.slice(-8);
+          let mood = "neutral";
+          let themes = [];
+          let concerns = [];
+          
+          // Analyze recent messages for patterns
+          recentMessages.forEach(msg => {
+            if (msg.sender === 'user') {
+              const text = msg.text.toLowerCase();
+              
+              // Mood detection
+              if (text.includes('anxious') || text.includes('anxiety') || text.includes('worried')) mood = "anxious";
+              else if (text.includes('sad') || text.includes('depressed') || text.includes('down')) mood = "low";
+              else if (text.includes('angry') || text.includes('frustrated') || text.includes('mad')) mood = "agitated";
+              else if (text.includes('better') || text.includes('good') || text.includes('happy')) mood = "positive";
+              
+              // Theme detection
+              if (text.includes('work') || text.includes('job') || text.includes('boss')) themes.push("work stress");
+              if (text.includes('relationship') || text.includes('partner') || text.includes('family')) themes.push("relationships");
+              if (text.includes('sleep') || text.includes('tired') || text.includes('exhausted')) themes.push("sleep/energy");
+            }
+          });
+          
+          return {
+            current_mood: mood,
+            session_themes: themes.slice(0, 3), // Top 3 themes
+            message_count: history.length,
+            needs_attention: concerns
+          };
+        };
+
+        const buildConversationContext = (history, currentMessage) => {
+          const recentHistory = history.slice(-6); // Last 6 messages for context
+          const sessionSummary = generateSessionSummary(history);
+          
+          return {
+            recent_conversation: recentHistory.map(msg => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.text
+            })),
+            session_context: sessionSummary,
+            current_message: currentMessage
+          };
+        };
+
         const sendMessage = async () => {
           if (!newMessage.value.trim()) return;
           
@@ -1361,7 +1442,10 @@
           newMessage.value = '';
           isTyping.value = true;
 
-          // Call the real API with better error handling
+          // Build optimized context with caching strategy
+          const context = buildConversationContext(chatHistory.value, userMessageText);
+
+          // Call API with cached prompt system
           try {
             const response = await fetch('/api/chat', {
               method: 'POST',
@@ -1369,9 +1453,18 @@
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
+                // Cached prompt (sent once, cached on server)
+                system_prompt: CACHED_MANDY_PROMPT,
+                use_cache: true,
+                
+                // Dynamic context (changes each request)
                 message: userMessageText,
+                recent_conversation: context.recent_conversation,
+                session_context: context.session_context,
+                
+                // Legacy fields for backward compatibility
                 conversationHistory: chatHistory.value.slice(-6),
-                currentPattern: 'general',
+                currentPattern: context.session_context.current_mood,
                 sessionPhase: 'exploring'
               })
             });
@@ -1399,10 +1492,23 @@
             }
           } catch (error) {
             console.error('Chat API Error:', error);
+            
+            // Enhanced fallback with session awareness
+            const sessionInfo = generateSessionSummary(chatHistory.value);
+            let fallbackResponse = "I'm having a brief technical moment, but I'm still here with you. ";
+            
+            if (sessionInfo.current_mood === "anxious") {
+              fallbackResponse += "While I reconnect, take a slow breath with me. You're safe on this cowch.";
+            } else if (sessionInfo.current_mood === "low") {
+              fallbackResponse += "Sometimes technology needs a moment to regroup, just like we do. What's one thing you're feeling right now?";
+            } else {
+              fallbackResponse += "What's one thing you'd like to share while I get back up to speed?";
+            }
+            
             chatHistory.value.push({
               id: Date.now() + 1,
               sender: 'ai_mandy',
-              text: "I'm having a brief technical moment, but I'm here with you. Sometimes we all need to pause and regroup. What's one thing you're feeling right now?",
+              text: fallbackResponse,
               timestamp: new Date()
             });
           }
