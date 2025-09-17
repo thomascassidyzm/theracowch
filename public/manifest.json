@@ -1,7 +1,7 @@
 {
-  "name": "COWch - AI Therapeutic Coaching",
+  "name": "COWch - AI Wellness Coaching",
   "short_name": "COWch",
-  "description": "Your therapeutic cowch with AI Mandy for anxiety reduction and wellness support",
+  "description": "Your wellness cowch with AI Mandy for encouragement, pattern-matching insights, and mental wellness habit-building support",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1918",
