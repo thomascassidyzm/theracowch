@@ -2086,11 +2086,64 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
             console.log('SW registered: ', registration);
+            
+            // Request notification permission for daily mootivations
+            requestNotificationPermission();
           })
           .catch((registrationError) => {
             console.log('SW registration failed: ', registrationError);
           });
       });
+    }
+
+    // Request notification permission for daily mootivations
+    async function requestNotificationPermission() {
+      if ('Notification' in window && 'serviceWorker' in navigator) {
+        // Wait a bit before asking for permissions
+        setTimeout(async () => {
+          if (Notification.permission === 'default') {
+            // Show a friendly explanation first
+            const notificationBanner = document.createElement('div');
+            notificationBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg text-white text-center';
+            notificationBanner.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <span class="text-2xl">🐄💝</span>
+                  <div class="text-left">
+                    <p class="font-semibold text-sm">Get Daily Moo-tivations!</p>
+                    <p class="text-xs opacity-80">Like having a therapeutic pet cow in your pocket 🥰</p>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button id="notifications-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Maybe later</button>
+                  <button id="notifications-allow" class="px-4 py-1 text-xs bg-white/20 rounded-full font-medium">Yes please!</button>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(notificationBanner);
+            
+            document.getElementById('notifications-allow').addEventListener('click', async () => {
+              const permission = await Notification.requestPermission();
+              if (permission === 'granted') {
+                console.log('Notifications enabled! Daily mootivations activated! 🐄💝');
+              }
+              notificationBanner.remove();
+            });
+            
+            document.getElementById('notifications-dismiss').addEventListener('click', () => {
+              notificationBanner.remove();
+            });
+            
+            // Auto-dismiss after 12 seconds
+            setTimeout(() => {
+              if (document.body.contains(notificationBanner)) {
+                notificationBanner.remove();
+              }
+            }, 12000);
+          }
+        }, 8000); // Wait 8 seconds after app loads
+      }
     }
 
     // PWA Install Prompt

@@ -49,4 +49,110 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  
+  // Start the daily mootivation scheduler
+  scheduleDailyMootivations();
 });
+
+// Push notification event
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/apple-touch-icon.png',
+      badge: '/icons/icon-96x96.svg',
+      tag: 'mootivation',
+      requireInteraction: false,
+      silent: false,
+      data: data.url ? { url: data.url } : {}
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  }
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  if (event.notification.data && event.notification.data.url) {
+    event.waitUntil(
+      clients.openWindow(event.notification.data.url)
+    );
+  } else {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Daily Mootivations Scheduler
+function scheduleDailyMootivations() {
+  // Schedule random mootivations throughout the day
+  const mootivations = [
+    {
+      title: "🐄 Moo-rning Check-in",
+      body: "Just wanted you to know - you're doing great! Ready for a wonderful day on the cowch? 💝",
+      time: { hour: 9, minute: 0 }
+    },
+    {
+      title: "🌟 Midday Moo-tivation", 
+      body: "Remember: Your feelings are valid, and you deserve support. I'm here whenever you need me!",
+      time: { hour: 14, minute: 30 }
+    },
+    {
+      title: "🌙 Evening Encouragement",
+      body: "You've survived another day, and that's something to be proud of. Sweet dreams! 🐄",
+      time: { hour: 20, minute: 0 }
+    },
+    {
+      title: "💝 Gentle Reminder",
+      body: "Progress, not perfection, is the goal. You're doing better than you think! 🌈",
+      time: { hour: 16, minute: 15 }
+    },
+    {
+      title: "🤗 Cowch Check-in",
+      body: "Just like a loyal pet, I'm always here for you. How are you feeling today? 💙",
+      time: { hour: 11, minute: 45 }
+    }
+  ];
+
+  // Set up notifications for each mootivation
+  mootivations.forEach((moot, index) => {
+    const now = new Date();
+    const scheduledTime = new Date();
+    scheduledTime.setHours(moot.time.hour, moot.time.minute, 0, 0);
+    
+    // If time has passed today, schedule for tomorrow
+    if (scheduledTime < now) {
+      scheduledTime.setDate(scheduledTime.getDate() + 1);
+    }
+    
+    const delay = scheduledTime.getTime() - now.getTime();
+    
+    setTimeout(() => {
+      // Set up recurring notification
+      setInterval(() => {
+        self.registration.showNotification(moot.title, {
+          body: moot.body,
+          icon: '/apple-touch-icon.png',
+          badge: '/icons/icon-96x96.svg',
+          tag: `daily-moot-${index}`,
+          requireInteraction: false
+        });
+      }, 24 * 60 * 60 * 1000); // Repeat every 24 hours
+      
+      // Show first notification
+      self.registration.showNotification(moot.title, {
+        body: moot.body,
+        icon: '/apple-touch-icon.png',
+        badge: '/icons/icon-96x96.svg',
+        tag: `daily-moot-${index}`,
+        requireInteraction: false
+      });
+    }, delay);
+  });
+}
