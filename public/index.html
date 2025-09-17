@@ -390,15 +390,21 @@
                 Moove with Mandy
               </h2>
               <div class="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl p-6 border border-indigo-400/30">
-                <blockquote class="text-lg text-stone-200 italic mb-4" v-if="currentQuote">
-                  "{{ currentQuote.text }}"
-                </blockquote>
-                <p class="text-stone-400 text-sm mb-4" v-if="currentQuote">
-                  — {{ currentQuote.author }}
-                </p>
-                <button @click="getNewQuote" class="btn-glass text-sm px-4 py-2">
+                <div v-if="isLoadingQuote" class="text-center py-4">
+                  <div class="text-stone-300">Loading wisdom from the pasture... 🐄</div>
+                </div>
+                <div v-else-if="currentQuote">
+                  <blockquote class="text-lg text-stone-200 italic mb-4">
+                    "{{ currentQuote.text }}"
+                  </blockquote>
+                  <p class="text-stone-400 text-sm mb-4">
+                    — {{ currentQuote.author }}
+                    <span v-if="currentQuote.source" class="text-stone-500">• {{ currentQuote.source }}</span>
+                  </p>
+                </div>
+                <button @click="getNewQuote" class="btn-glass text-sm px-4 py-2" :disabled="isLoadingQuote">
                   <span class="emoji-bounce mr-1">🔄</span>
-                  Get Another Mooo-tivation
+                  {{ isLoadingQuote ? 'Loading...' : 'Get Another Mooo-tivation' }}
                 </button>
               </div>
             </div>
@@ -1148,40 +1154,44 @@
           { what: '', why: '' }
         ]);
         
-        // Moove with Mandy quotes
+        // Moove with Mandy quotes from her real blog
         const currentQuote = ref(null);
-        const mandyQuotes = ref([
+        const blogQuotes = ref([]);
+        const isLoadingQuote = ref(false);
+        
+        // Authentic Mandy quotes (from her actual work)
+        const authenticQuotes = ref([
           {
-            text: "Sometimes the most productive thing you can do is moo-ve to the cowch and just breathe.",
-            author: "AI Mandy's Wisdom"
+            text: "Whether you just need someone to listen to you or want to make amazing changes, counselling can be the pivotal turning point where good things start to happen",
+            author: "Mandy Kloppers"
           },
           {
-            text: "You can't control the whole farm, but you can control how you graze through each day.",
-            author: "Cowch Therapy Insights"
+            text: "This is the start of your new life...",
+            author: "Mandy Kloppers"
           },
           {
-            text: "Don't let anyone milk your energy without giving something back to the pasture of your soul.",
-            author: "Moo-tivational Mandy"
+            text: "You'll be amazed at what you can achieve when you put your mind to it",
+            author: "Mandy Kloppers"
           },
           {
-            text: "It's okay to have a bad day - even the best cows have udderly terrible moments sometimes.",
-            author: "Therapeutic Truths"
+            text: "Even the darkest night will end and the sun will rise",
+            author: "Mandy Kloppers"
           },
           {
-            text: "Healing happens when you stop fighting the current pasture and start appreciating the grass you're on.",
-            author: "AI Mandy's Philosophy"
+            text: "We will work as a team",
+            author: "Mandy Kloppers"
           },
           {
-            text: "Your feelings are valid, your struggles are real, and you deserve a cozy spot on this cowch.",
-            author: "Cowch Compassion"
+            text: "Help you understand why things are going wrong",
+            author: "Mandy Kloppers"
           },
           {
-            text: "Progress isn't always about moo-ving forward - sometimes it's about learning to stay still on the cowch.",
-            author: "Mindful Moo-ments"
+            text: "Mental health is not a destination, but a process. It's about how you drive, not where you're going",
+            author: "Mandy Kloppers"
           },
           {
-            text: "Self-care isn't selfish - even cows need time to chew their cud and rest in the field.",
-            author: "Barnyard Wisdom"
+            text: "Your mental health is a priority. Your happiness is essential. Your self-care is a necessity",
+            author: "Mandy Kloppers"
           }
         ]);
 
@@ -1924,15 +1934,57 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           currentView.value = 'chat';
         };
 
+        // Fetch quotes from Mandy's blog
+        const fetchBlogQuotes = async () => {
+          try {
+            isLoadingQuote.value = true;
+            
+            // Try to fetch from thoughtsonlifeandlove.com using a CORS proxy or direct fetch
+            const response = await fetch('/api/blog-quotes', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.quotes && data.quotes.length > 0) {
+                blogQuotes.value = data.quotes;
+                return true;
+              }
+            }
+          } catch (error) {
+            console.log('Blog quotes not available, using authentic fallbacks:', error);
+          } finally {
+            isLoadingQuote.value = false;
+          }
+          return false;
+        };
+
         // Moove with Mandy quotes function
-        const getNewQuote = () => {
-          const randomIndex = Math.floor(Math.random() * mandyQuotes.value.length);
-          currentQuote.value = mandyQuotes.value[randomIndex];
+        const getNewQuote = async () => {
+          isLoadingQuote.value = true;
+          
+          // Try blog quotes first, fall back to authentic quotes
+          let quotesArray = blogQuotes.value.length > 0 ? blogQuotes.value : authenticQuotes.value;
+          
+          if (blogQuotes.value.length === 0) {
+            // Try to fetch fresh blog content
+            const fetched = await fetchBlogQuotes();
+            if (fetched) {
+              quotesArray = blogQuotes.value;
+            }
+          }
+          
+          const randomIndex = Math.floor(Math.random() * quotesArray.length);
+          currentQuote.value = quotesArray[randomIndex];
+          isLoadingQuote.value = false;
         };
 
         // Initialize with a quote on page load
-        const initializeQuote = () => {
-          getNewQuote();
+        const initializeQuote = async () => {
+          await getNewQuote();
         };
 
         // Initialize quote immediately
@@ -2019,8 +2071,11 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           saveJoyJar,
           // Moove with Mandy quotes
           currentQuote,
-          mandyQuotes,
-          getNewQuote
+          blogQuotes,
+          authenticQuotes,
+          isLoadingQuote,
+          getNewQuote,
+          fetchBlogQuotes
         };
       }
     }).mount('#app');
