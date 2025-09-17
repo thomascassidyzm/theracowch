@@ -95,27 +95,27 @@ function scheduleDailyMootivations() {
   const mootivations = [
     {
       title: "🐄 Moo-rning Check-in",
-      body: "Just wanted you to know - you're doing great! Ready for a wonderful day on the cowch? 💝",
+      body: "Just wanted you to know - you're doing vache-tastic! Ready for a wonderful day on the cowch? 💝",
       time: { hour: 9, minute: 0 }
     },
     {
-      title: "🌟 Midday Moo-tivation", 
-      body: "Remember: Your feelings are valid, and you deserve support. I'm here whenever you need me!",
+      title: "🏖️ Midday Vaca-tion", 
+      body: "Time for a quick mental vaca-tion! Your feelings are valid, and you deserve this moment of support. I'm here whenever you need me!",
       time: { hour: 14, minute: 30 }
     },
     {
       title: "🌙 Evening Encouragement",
-      body: "You've survived another day, and that's something to be proud of. Sweet dreams! 🐄",
+      body: "You've survived another day, and that's incroy-a-bull to be proud of! Sweet dreams! 🐄",
       time: { hour: 20, minute: 0 }
     },
     {
       title: "💝 Gentle Reminder",
-      body: "Progress, not perfection, is the goal. You're doing better than you think! 🌈",
+      body: "Moo-gress, not perfection, is the goal. You're doing better than you think! Kuh-nderbar! 🌈",
       time: { hour: 16, minute: 15 }
     },
     {
-      title: "🤗 Cowch Check-in",
-      body: "Just like a loyal pet, I'm always here for you. How are you feeling today? 💙",
+      title: "🤗 Cowch Vaca-tion Check-in",
+      body: "Ready for a mini mental vaca-tion? Just like a loyal pet, I'm always here for you. How are you feeling today? 💙",
       time: { hour: 11, minute: 45 }
     }
   ];

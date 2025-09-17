@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>therapy COWch - AI Therapeutic Coaching</title>
+  <title>therapy COWch - AI Pasturel Care</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script>
     // Tailwind CSS configuration for production
@@ -323,7 +323,7 @@
               </div>
               <div>
                 <h1 class="text-xl font-bold gradient-text">therapy COWch</h1>
-                <p class="text-xs text-stone-400">Your therapeutic cowch</p>
+                <p class="text-xs text-stone-400">Your pasturel cowch</p>
               </div>
             </div>
             <!-- Mobile badge -->
@@ -332,7 +332,7 @@
             </div>
             <!-- Desktop badge -->
             <div class="hidden sm:block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
-              ✨ AI Therapeutic Coaching
+              ✨ AI Pasturel Care
             </div>
           </div>
         </div>
@@ -368,12 +368,12 @@
               Moove to the cowch
             </h1>
             <p class="text-xl text-stone-300 mb-8 max-w-2xl mx-auto">
-              Settle in on the wellness cowch with AI Mandy as your guide. No bull - just genuine support, encouragement, and pattern-matching to help build healthy habits for your mental wellness journey
+              Come to the cowch with AI Mandy as your guide. Take a vaca-tion for your mind - no bull, just genuine support, encouragement, and pattern-matching to help build healthy habits for your mental wellness pasture
             </p>
             <div class="flex flex-col sm:flex-row justify-center" style="gap: var(--spacing-md);">
               <button @click="chatWithMandy" class="btn-primary">
                 <span class="emoji-bounce mr-2">💬</span>
-                Chat with AI Mandy
+                Shall we moove to the cowch?
               </button>
               <button @click="exploreImagine" class="btn-glass">
                 <span class="emoji-bounce mr-2">🧠</span>
@@ -388,7 +388,7 @@
               <div class="flex items-start space-x-3">
                 <div class="text-2xl">💙</div>
                 <div class="text-left">
-                  <h3 class="text-lg font-semibold text-amber-200 mb-3">A Warm Note About Your Wellness Journey</h3>
+                  <h3 class="text-lg font-semibold text-amber-200 mb-3">A Warm Note About Your Wellness Pasture</h3>
                   <div class="text-sm text-stone-300 space-y-2 leading-relaxed">
                     <p>The COWch is your special therapeutic couch where <strong>AI Mandy provides wellness coaching</strong> - designed to offer encouragement, pattern-matching insights, and help you build healthy mental wellness habits through evidence-based techniques.</p>
                     <p>While Mandy is here to support you with genuine care and proven frameworks like IMAGINE, <strong>this is not a replacement for professional therapy or medical care</strong>. Mandy uses pattern-matching to offer coaching and encouragement, not diagnosis or treatment.</p>
@@ -432,7 +432,7 @@
           <div v-if="currentView === 'home' || currentView === 'imagine'">
             <div class="text-center" style="margin-bottom: var(--spacing-2xl);">
               <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">The IMAGINE Framework</h2>
-              <p class="text-stone-300">Seven evidence-based domains for holistic mental wellness</p>
+              <p class="text-stone-300">Seven evidence-based domains for legen-dairy mental wellness</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: var(--section-gap);">
@@ -474,7 +474,7 @@
                 </div>
                 <div>
                   <h3 class="font-semibold text-white">AI Mandy</h3>
-                  <p class="text-sm text-stone-400">Your Therapeutic Coach</p>
+                  <p class="text-sm text-stone-400">Your Pasturel Coach</p>
                 </div>
               </div>
               <button @click="goHome" class="btn-small">
@@ -519,8 +519,8 @@
           <!-- Mood Tracker -->
           <div v-if="currentView === 'mood'" class="card max-w-2xl mx-auto">
             <div class="text-center" style="margin-bottom: var(--spacing-xl);">
-              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">How are you feeling today?</h2>
-              <p class="text-stone-300">Track your mood to identify patterns and progress</p>
+              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">How are you MOO-ving today?</h2>
+              <p class="text-stone-300">Track your mood with our cow faces to identify patterns and moo-gress</p>
             </div>
             
             <div class="grid grid-cols-5 mb-8" style="gap: var(--spacing-md);">
@@ -540,7 +540,7 @@
               
               <button @click="saveMoodEntry" class="btn-primary w-full"
                       :disabled="!selectedMood">
-                Save Mood Entry
+                Save MOO-d Entry
               </button>
               
               <button @click="chatWithMandy" class="btn-glass w-full">
@@ -569,7 +569,7 @@
 
             <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
               <div class="glass-dark p-4 rounded-xl">
-                <h3 class="font-semibold text-white mb-2">Guidance</h3>
+                <h3 class="font-semibold text-white mb-2">Cow-dance</h3>
                 <p class="text-stone-300">{{ getSectionGuidance(currentSection.key) }}</p>
               </div>
 
@@ -624,8 +624,8 @@
               <!-- 5-4-3-2-1 Grounding Exercise -->
               <div v-if="currentExercise.id === 'grounding_5432' && currentSection.key === 'mindfulness'">
                 <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
-                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">5-4-3-2-1 Grounding Exercise</h3>
-                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">This exercise helps you connect with the present moment through your senses.</p>
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">5-4-3-2-1 Sense-ational Vaca-tion</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Take a quick vaca-tion for your mind by connecting with the present moment through your senses.</p>
                   
                   <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
                     <div v-for="(step, index) in groundingSteps" :key="index" 
@@ -667,8 +667,8 @@
               <!-- Breathing Exercise -->
               <div v-if="currentExercise.id === 'breathing_4_7_8' && currentSection.key === 'mindfulness'">
                 <div class="glass-dark rounded-xl text-center" style="padding: var(--card-padding);">
-                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">4-7-8 Breathing Exercise</h3>
-                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">A calming breath pattern to reduce anxiety and promote relaxation.</p>
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">4-7-8 Vaca-tion Breathing</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Take a mini vaca-tion for your mind with this calming breath pattern to reduce anxiety and promote relaxation.</p>
                   
                   <div class="mb-8">
                     <div class="w-32 h-32 mx-auto rounded-full border-4 border-indigo-400/30 flex items-center justify-center relative overflow-hidden"
@@ -690,7 +690,7 @@
                     
                     <div class="flex justify-center" style="gap: var(--spacing-md);">
                       <button v-if="!breathingActive" @click="startBreathing" class="btn-primary px-6 py-3">
-                        🫁 Start Breathing
+                        🏖️ Start Your Mind Vaca-tion
                       </button>
                       <button v-if="breathingActive" @click="stopBreathing" class="btn-glass px-6 py-3">
                         ⏸️ Pause
@@ -1089,7 +1089,14 @@
         <div class="mt-16 pt-8 border-t border-stone-700">
           <div class="text-center max-w-4xl mx-auto">
             <h3 class="text-lg font-semibold text-red-400 mb-4">🚨 Need Immediate Help?</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+              <div class="bg-amber-500/10 border border-amber-400/30 rounded-xl p-4">
+                <div class="font-semibold text-amber-300">Contact Mandy</div>
+                <div class="text-stone-300 mt-2">
+                  <a href="https://thoughtsonlifeandlove.com/contact-the-team/" target="_blank" class="text-amber-200 hover:text-amber-100 underline block">📞 Professional Therapy</a>
+                  <div class="text-xs text-stone-400 mt-1">Real therapist support</div>
+                </div>
+              </div>
               <div class="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
                 <div class="font-semibold text-red-300">Crisis Support</div>
                 <div class="text-stone-300 mt-2">
@@ -1168,7 +1175,7 @@
                 </svg>
                 <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full pulse-glow"></div>
               </div>
-              <span class="text-xs font-medium">📈 Progress</span>
+              <span class="text-xs font-medium">📈 Moo-gress</span>
             </button>
           </div>
         </div>
@@ -1216,7 +1223,7 @@
         // Authentic Mandy quotes (from her actual work)
         const authenticQuotes = ref([
           {
-            text: "Whether you just need someone to listen to you or want to make amazing changes, counselling can be the pivotal turning point where good things start to happen",
+            text: "Whether you just need someone to listen to you or want to make udderly amazing changes, counselling can be the pivotal turning point where good things start to happen",
             author: "Mandy Kloppers"
           },
           {
@@ -1283,11 +1290,11 @@
         });
         
         const moodOptions = ref([
-          { value: 1, emoji: '😢', label: 'Very Low' },
-          { value: 2, emoji: '😔', label: 'Low' },
-          { value: 3, emoji: '😐', label: 'Neutral' },
-          { value: 4, emoji: '🙂', label: 'Good' },
-          { value: 5, emoji: '😊', label: 'Great' }
+          { value: 1, emoji: '🐄😢', label: 'Udderly Down' },
+          { value: 2, emoji: '🐄😔', label: 'Feeling Blue-tiful' },
+          { value: 3, emoji: '🐄😐', label: 'Pasture Neutral' },
+          { value: 4, emoji: '🐄🙂', label: 'Moo-ving Along' },
+          { value: 5, emoji: '🐄😊', label: 'Udderly Amazing' }
         ]);
         
         const imagineSections = ref([
@@ -1302,7 +1309,7 @@
           {
             key: 'mindfulness',
             title: 'M - Mindfulness',
-            subtitle: 'Present moment awareness',
+            subtitle: 'Mini vaca-tions for your mind',
             emoji: '🧘‍♀️',
             gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // calm_blues_greens
             shadowColor: 'rgba(79, 172, 254, 0.4)'
@@ -1386,7 +1393,7 @@
           {
             id: 1,
             sender: 'ai_mandy',
-            text: "Mooo-ve over to the cowch and get comfy! 🐄 I'm AI Mandy, your wellness coach, and I'm absolutely delighted you've decided to settle in on this special therapeutic cowch. This cozy cow-couch is your safe space for encouragement and pattern-matching insights - no bull, just genuine support and evidence-based wellness techniques. So lie back, relax on the cowch, and let's have a supportive chat about building healthy habits together. What's on your mind today?",
+            text: "Come to the cowch and get comfy! 🐄 I'm AI Mandy, your wellness coach, and I'm absolutely delighted you've decided to settle in on this special therapeutic cowch for a proper vaca-tion for your mind. This cozy cow-couch is your safe space for encouragement and pattern-matching insights - no bull, just genuine support and evidence-based wellness techniques. So lie back, relax on the cowch, and let's have a supportive chat about building healthy habits together. What's on your mind today?",
             timestamp: new Date()
           }
         ]);
@@ -1425,7 +1432,7 @@
             nurturing: "Joy and playfulness are not luxuries—they're necessities. What brings lightness to your heart?",
             exploring: "Understanding your patterns is the first step to change. What thoughts or behaviors are you curious about?"
           };
-          return guidance[sectionKey] || "Welcome to this section of your wellness journey.";
+          return guidance[sectionKey] || "Welcome to this section of your wellness pasture.";
         };
 
         const getSectionTools = (sectionKey) => {
@@ -1436,8 +1443,8 @@
               { id: "energy_audit", name: "Energy Audit", description: "Identify what drains and energizes you", icon: "⚡" }
             ],
             mindfulness: [
-              { id: "grounding_5432", name: "5-4-3-2-1 Grounding", description: "Connect with your senses", icon: "🌿" },
-              { id: "breathing_4_7_8", name: "4-7-8 Breathing", description: "Calming breath pattern", icon: "🫁" },
+              { id: "grounding_5432", name: "Sense-ational Vaca-tion", description: "Mini mental getaway", icon: "🌿" },
+              { id: "breathing_4_7_8", name: "Vaca-tion Breathing", description: "Mini mental getaway", icon: "🫁" },
               { id: "body_scan", name: "Body Scan", description: "Check in with physical sensations", icon: "🧘" }
             ],
             acceptance: [
@@ -1663,7 +1670,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           chatHistory.value.push({
             id: Date.now(),
             sender: 'system',
-            text: 'Mood entry saved! Tracking your emotional patterns helps identify what supports your wellbeing.',
+            text: 'MOO-d entry saved! Tracking your emotional patterns helps identify what supports your wellbeing.',
             timestamp: new Date()
           });
           
@@ -1724,7 +1731,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
             chatHistory.value.push({
               id: Date.now(),
               sender: 'system',
-              text: 'Great work completing the 5-4-3-2-1 grounding exercise! How do you feel now?',
+              text: 'Kuh-nderbar! You just took a perfect sense-ational vaca-tion for your mind. How refreshed do you feel now?',
               timestamp: new Date()
             });
             currentView.value = 'chat';
@@ -1777,7 +1784,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
             chatHistory.value.push({
               id: Date.now(),
               sender: 'system',
-              text: 'Wonderful! You completed 4 rounds of 4-7-8 breathing. Notice how your body feels now.',
+              text: 'Vache-tastic! You completed your mental vaca-tion with 4 rounds of calming breathing. Notice how refreshed your mind feels now.',
               timestamp: new Date()
             });
           }
@@ -1809,7 +1816,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           chatHistory.value.push({
             id: Date.now(),
             sender: 'system',
-            text: `Beautiful! You recorded ${filledThings.length} meaningful things you're grateful for. This helps rewire your brain to notice more positive experiences.`,
+            text: `Magni-fique-cow! You recorded ${filledThings.length} meaningful things you're grateful for. This helps rewire your brain to notice more positive experiences.`,
             timestamp: new Date()
           });
           
@@ -1830,7 +1837,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           chatHistory.value.push({
             id: Date.now(),
             sender: 'system',
-            text: `Excellent work unhooking from that thought! You practiced seeing it as just mental content rather than absolute truth. The action step you identified: "${actionableReframe.value}" shows you're moving from worry to empowerment.`,
+            text: `Mucca-nificent work unhooking from that thought! You practiced seeing it as just mental content rather than absolute truth. The action step you identified: "${actionableReframe.value}" shows you're moving from worry to empowerment.`,
             timestamp: new Date()
           });
           
@@ -1875,7 +1882,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           chatHistory.value.push({
             id: Date.now(),
             sender: 'system',
-            text: `Wonderful! You've identified your core values: ${selectedValues.value.join(', ')}. These can now serve as your compass for decision-making. When facing choices, ask: "Which option aligns best with my values?"`,
+            text: `Incroy-a-bull! You've identified your core values: ${selectedValues.value.join(', ')}. These can now serve as your compass for decision-making. When facing choices, ask: "Which option aligns best with my values?"`,
             timestamp: new Date()
           });
           
@@ -1935,7 +1942,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           chatHistory.value.push({
             id: Date.now(),
             sender: 'system',
-            text: `Fantastic! You've mapped ${totalConnections} meaningful connections and planned ${plannedActions} ways to strengthen relationships. Connection is the antidote to anxiety - you're building your support network beautifully.`,
+            text: `Vachement fantastic! You've mapped ${totalConnections} meaningful connections and planned ${plannedActions} ways to strengthen relationships. Connection is the antidote to anxiety - you're building your support network beautifully.`,
             timestamp: new Date()
           });
           
