@@ -91,7 +91,7 @@
     }
 
     .btn-primary {
-      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-300 ease-out relative overflow-hidden;
+      @apply inline-flex items-center justify-center px-12 py-5 font-semibold text-white transition-all duration-300 ease-out relative overflow-hidden;
       border-radius: 2rem;
       background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
       background-size: 200% 200%;
@@ -129,7 +129,7 @@
     }
 
     .btn-glass {
-      @apply inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-300 ease-out relative;
+      @apply inline-flex items-center justify-center px-12 py-5 font-semibold text-white transition-all duration-300 ease-out relative;
       border-radius: 2rem;
       border: 1px solid rgba(255, 255, 255, 0.25);
       background: rgba(255, 255, 255, 0.1);
@@ -371,12 +371,12 @@
               Come to the cowch with AI Mandy as your guide. Take a vaca-tion for your mind - no bull, just genuine support, encouragement, and pattern-matching to help build healthy habits for your mental wellness pasture
             </p>
             <div class="flex flex-col md:flex-row justify-center items-center" style="gap: var(--spacing-md);">
-              <button @click="chatWithMandy" class="btn-primary min-w-0 flex-1 md:flex-initial whitespace-nowrap">
-                <span class="emoji-bounce mr-2">💬</span>
+              <button @click="chatWithMandy" class="btn-primary w-full md:w-auto whitespace-nowrap text-lg px-16 py-6">
+                <span class="emoji-bounce mr-4">💬</span>
                 Shall we moove to the cowch?
               </button>
-              <button @click="exploreImagine" class="btn-glass min-w-0 flex-1 md:flex-initial whitespace-nowrap">
-                <span class="emoji-bounce mr-2">🧠</span>
+              <button @click="exploreImagine" class="btn-glass w-full md:w-auto whitespace-nowrap text-lg px-16 py-6">
+                <span class="emoji-bounce mr-4">🧠</span>
                 Explore IMAGINE Framework
               </button>
             </div>
