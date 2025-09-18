@@ -189,24 +189,28 @@
     }
 
     .imagine-card {
-      @apply card cursor-pointer transform transition-all duration-300 relative overflow-hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(249, 230, 211, 0.05));
+      @apply cursor-pointer transform transition-all duration-300 relative overflow-hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      padding: var(--card-padding);
       box-shadow: 
-        0 8px 25px -8px rgba(99, 102, 241, 0.3), 
-        0 4px 12px -4px rgba(236, 72, 153, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 8px 32px -12px rgba(0, 0, 0, 0.3), 
+        0 2px 8px -4px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     .imagine-card:hover {
-      transform: translateY(-6px) scale(1.03);
-      border-color: rgba(255, 255, 255, 0.4);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(249, 230, 211, 0.1));
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(25px);
       box-shadow: 
-        0 20px 40px -8px rgba(99, 102, 241, 0.5), 
-        0 8px 20px -4px rgba(236, 72, 153, 0.3),
-        0 4px 12px -2px rgba(147, 93, 38, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 25px 50px -12px rgba(0, 0, 0, 0.4), 
+        0 8px 25px -8px rgba(0, 0, 0, 0.3),
+        0 4px 12px -2px rgba(0, 0, 0, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
     }
 
     .imagine-card::before {
@@ -1135,45 +1139,45 @@
         <div class="max-w-4xl mx-auto px-4 py-3">
           <div class="flex justify-around items-center">
             <button @click="goHome" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
-                    :class="currentView === 'home' ? 'text-indigo-400 bg-indigo-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+                    :class="currentView === 'home' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
               <div class="relative">
                 <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                 </svg>
-                <div v-if="currentView === 'home'" class="absolute -top-1 -right-1 w-2 h-2 bg-indigo-400 rounded-full pulse-glow"></div>
+                <div v-if="currentView === 'home'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
               </div>
               <span class="text-xs font-medium">🏠 Home</span>
             </button>
             
             <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
-                    :class="currentView === 'chat' ? 'text-purple-400 bg-purple-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+                    :class="currentView === 'chat' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
               <div class="relative">
                 <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
                 </svg>
-                <div v-if="currentView === 'chat'" class="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full pulse-glow"></div>
+                <div v-if="currentView === 'chat'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
               </div>
               <span class="text-xs font-medium">💬 Chat</span>
             </button>
             
             <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
-                    :class="currentView === 'imagine' ? 'text-pink-400 bg-pink-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+                    :class="currentView === 'imagine' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
               <div class="relative">
                 <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
-                <div v-if="currentView === 'imagine'" class="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full pulse-glow"></div>
+                <div v-if="currentView === 'imagine'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
               </div>
               <span class="text-xs font-medium">🧠 IMAGINE</span>
             </button>
             
             <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
-                    :class="currentView === 'mood' ? 'text-emerald-400 bg-emerald-500/20 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-white/10'">
+                    :class="currentView === 'mood' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
               <div class="relative">
                 <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
                 </svg>
-                <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full pulse-glow"></div>
+                <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
               </div>
               <span class="text-xs font-medium">📈 Moo-gress</span>
             </button>
