@@ -1,7 +1,7 @@
 {
-  "name": "COWch - AI Wellness Coaching",
-  "short_name": "COWch",
-  "description": "Settle in on the wellness cowch with AI Mandy as your coach for encouragement, pattern-matching insights, and mental wellness habit-building support",
+  "name": "Cowch - AI Wellness Coaching",
+  "short_name": "Cowch",
+  "description": "Your AI wellness coaching companion - settle in on the cowch with AI Mandy for encouragement, insights, and mental wellness support",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1918",
