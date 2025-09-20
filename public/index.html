@@ -468,10 +468,11 @@
           </div>
 
           <!-- Chat Interface -->
-          <div v-if="currentView === 'chat'" class="card max-w-2xl mx-auto" style="margin-bottom: var(--section-gap);">
-            <div class="flex items-center justify-between mb-6">
+          <div v-if="currentView === 'chat'" class="flex flex-col h-screen">
+            <!-- Chat Header -->
+            <div class="flex items-center px-4 py-3 glass-dark border-b border-white/10">
               <div class="flex items-center" style="gap: var(--spacing-sm);">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/20">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/20">
                   <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy" class="w-full h-full object-cover"
                        style="object-position: center 30%; transform: scale(1.5);">
                 </div>
@@ -480,42 +481,41 @@
                   <p class="text-sm text-stone-400">Your Pasturel Coach</p>
                 </div>
               </div>
-              <button @click="goHome" class="btn-small">
-                ← Back
-              </button>
             </div>
 
             <!-- Chat Messages -->
-            <div class="mb-6 max-h-96 overflow-y-auto" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
-              <div v-for="message in chatHistory" :key="message.id" 
+            <div class="flex-1 overflow-y-auto px-4 py-4" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <div v-for="message in chatHistory" :key="message.id"
                    class="flex" :class="message.sender === 'user' ? 'justify-end' : 'justify-start'">
-                <div class="max-w-xs px-4 py-3 rounded-2xl"
-                     :class="message.sender === 'user' 
-                       ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white' 
-                       : 'glass-dark text-stone-100'">
+                <div class="px-4 py-3 rounded-2xl"
+                     :class="message.sender === 'user'
+                       ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white max-w-xs'
+                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-md'">
                   {{ message.text }}
                 </div>
               </div>
-              
+
               <div v-if="isTyping" class="flex justify-start">
-                <div class="glass-dark px-4 py-3 rounded-2xl">
+                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-md">
                   <div class="flex" style="gap: var(--spacing-xs);">
-                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
-                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
-                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Message Input -->
-            <div class="flex" style="gap: var(--spacing-sm);">
-              <input v-model="newMessage" @keyup.enter="sendMessage" 
-                     placeholder="Share what's on your mind..." 
-                     class="input-field flex-1">
-              <button @click="sendMessage" class="btn-primary px-6">
-                Send
-              </button>
+            <div class="px-4 py-4 glass-dark border-t border-white/10">
+              <div class="flex" style="gap: var(--spacing-sm);">
+                <input v-model="newMessage" @keyup.enter="sendMessage"
+                       placeholder="Share what's on your mind..."
+                       class="input-field flex-1">
+                <button @click="sendMessage" class="btn-primary px-6">
+                  Send
+                </button>
+              </div>
             </div>
           </div>
 
