@@ -486,17 +486,17 @@
             <!-- Chat Messages -->
             <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
               <div v-for="message in chatHistory" :key="message.id"
-                   class="flex" :class="message.sender === 'user' ? 'justify-end mr-2' : 'justify-start ml-2'">
+                   class="flex" :class="message.sender === 'user' ? 'justify-end mr-2' : 'justify-start ml-2 mr-8'">
                 <div class="px-4 py-3 rounded-2xl"
                      :class="message.sender === 'user'
                        ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white max-w-xs mr-2'
-                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-md ml-2'">
+                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-sm ml-2'">
                   {{ message.text }}
                 </div>
               </div>
 
-              <div v-if="isTyping" class="flex justify-start ml-2">
-                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-md ml-2">
+              <div v-if="isTyping" class="flex justify-start ml-2 mr-8">
+                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-sm ml-2">
                   <div class="flex" style="gap: var(--spacing-xs);">
                     <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
                     <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
