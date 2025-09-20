@@ -484,19 +484,19 @@
             </div>
 
             <!-- Chat Messages -->
-            <div class="flex-1 overflow-y-auto px-4 py-4" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
               <div v-for="message in chatHistory" :key="message.id"
-                   class="flex" :class="message.sender === 'user' ? 'justify-end' : 'justify-start'">
+                   class="flex" :class="message.sender === 'user' ? 'justify-end mr-2' : 'justify-start ml-2'">
                 <div class="px-4 py-3 rounded-2xl"
                      :class="message.sender === 'user'
-                       ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white max-w-xs'
-                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-md'">
+                       ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white max-w-xs mr-2'
+                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-md ml-2'">
                   {{ message.text }}
                 </div>
               </div>
 
-              <div v-if="isTyping" class="flex justify-start">
-                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-md">
+              <div v-if="isTyping" class="flex justify-start ml-2">
+                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-md ml-2">
                   <div class="flex" style="gap: var(--spacing-xs);">
                     <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
                     <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
@@ -1089,7 +1089,7 @@
 
         </div>
         <!-- Crisis Resources Footer -->
-        <div class="mt-16 pt-8 border-t border-stone-700">
+        <div v-if="currentView !== 'chat'" class="mt-16 pt-8 border-t border-stone-700">
           <div class="text-center max-w-4xl mx-auto">
             <h3 class="text-lg font-semibold text-red-400 mb-4">🚨 Need Immediate Help?</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
@@ -1562,6 +1562,15 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
           };
         };
 
+        const scrollToBottom = () => {
+          const chatContainer = document.getElementById('chat-messages');
+          if (chatContainer) {
+            setTimeout(() => {
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 100);
+          }
+        };
+
         const sendMessage = async () => {
           if (!newMessage.value.trim()) return;
           
@@ -1576,6 +1585,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
 
           newMessage.value = '';
           isTyping.value = true;
+          scrollToBottom();
 
           // Build optimized context with caching strategy
           const context = buildConversationContext(chatHistory.value, userMessageText);
@@ -1614,6 +1624,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
                 text: data.response,
                 timestamp: new Date()
               });
+              scrollToBottom();
             } else if (data.fallback) {
               // Use the API's fallback response
               chatHistory.value.push({
@@ -1622,6 +1633,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
                 text: data.fallback,
                 timestamp: new Date()
               });
+              scrollToBottom();
             } else {
               throw new Error(`API error: ${response.status}`);
             }
@@ -1646,6 +1658,7 @@ E - Exploring: Understanding thoughts, behaviors, and patterns
               text: fallbackResponse,
               timestamp: new Date()
             });
+            scrollToBottom();
           }
 
           isTyping.value = false;
