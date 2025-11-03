@@ -2,20 +2,20 @@
 
 :root {
     /* Mandy's Website Brand Colors - thoughtsonlifeandlove.com */
-    --bg-primary: #F9F9F9;           /* Light neutral background */
+    --bg-primary: #F5EFE7;           /* Warm cream background */
     --bg-secondary: #FFFFFF;
-    --bg-mandy-message: #E8F4F8;     /* Soft blue-tinted for Mandy */
-    --bg-user-message: #FFF0E6;      /* Soft peach-tinted for user */
+    --bg-mandy-message: #FBF5F0;     /* Very soft peachy cream for Mandy */
+    --bg-user-message: #FDEEE8;      /* Slightly peachy for user */
 
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --text-light: #999999;
+    --text-primary: #2C2416;
+    --text-secondary: #6B5D51;
+    --text-light: #9B8E82;
 
-    --accent-primary: #6EC1E4;       /* Soft blue-gray from website */
-    --accent-secondary: #EE701A;     /* Warm terracotta from website */
-    --accent-hover: #5BAED1;         /* Darker blue on hover */
+    --accent-primary: #E8927C;       /* Soft peachy coral from website */
+    --accent-secondary: #D4CCC4;     /* Warm gray from website */
+    --accent-hover: #D67D66;         /* Darker coral on hover */
 
-    --border-color: #E5E5E5;
+    --border-color: #E5DDD5;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
@@ -69,7 +69,7 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #D4EBF5 0%, #B8DEF0 100%);
+    background: linear-gradient(135deg, #F9E5DF 0%, #F5D5CC 100%);
     display: flex;
     align-items: center;
     justify-content: center;
