@@ -97,7 +97,7 @@ async function handleSendMessage() {
 
     // Add user message to chat
     addMessage(message, 'user');
-    conversationHistory.push({ role: 'user', content: message });
+    conversationHistory.push({ sender: 'user', text: message });
 
     // Clear input
     chatInput.value = '';
@@ -118,7 +118,7 @@ async function handleSendMessage() {
             },
             body: JSON.stringify({
                 message: message,
-                history: conversationHistory.slice(-MAX_HISTORY_MESSAGES)
+                conversationHistory: conversationHistory.slice(-MAX_HISTORY_MESSAGES)
             })
         });
 
@@ -133,7 +133,7 @@ async function handleSendMessage() {
 
         // Add Mandy's response
         addMessage(data.response, 'mandy');
-        conversationHistory.push({ role: 'assistant', content: data.response });
+        conversationHistory.push({ sender: 'ai_mandy', text: data.response });
 
         // Save history
         saveChatHistory();
@@ -301,8 +301,25 @@ function loadChatHistory() {
 
             // Restore messages to UI
             conversationHistory.forEach(msg => {
-                const sender = msg.role === 'user' ? 'user' : 'mandy';
-                addMessage(msg.content, sender);
+                // Handle both old format (role/content) and new format (sender/text)
+                let sender, text;
+
+                if (msg.sender && msg.text) {
+                    // New format
+                    sender = msg.sender === 'user' ? 'user' : 'mandy';
+                    text = msg.text;
+                } else if (msg.role && msg.content) {
+                    // Old format - migrate to new format
+                    sender = msg.role === 'user' ? 'user' : 'mandy';
+                    text = msg.content;
+                    // Update in array for next save
+                    msg.sender = msg.role === 'user' ? 'user' : 'ai_mandy';
+                    msg.text = msg.content;
+                    delete msg.role;
+                    delete msg.content;
+                }
+
+                addMessage(text, sender);
             });
         }
     } catch (error) {
