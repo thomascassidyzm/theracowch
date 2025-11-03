@@ -1,20 +1,21 @@
 /* Theracowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Brand Colors */
-    --bg-primary: #FAF6F3;       /* Warm cream background */
+    /* Mandy's Website Brand Colors - thoughtsonlifeandlove.com */
+    --bg-primary: #F9F9F9;           /* Light neutral background */
     --bg-secondary: #FFFFFF;
-    --bg-mandy-message: #E8DED3;  /* Mandy's messages */
-    --bg-user-message: #D4C4B0;   /* User messages */
+    --bg-mandy-message: #E8F4F8;     /* Soft blue-tinted for Mandy */
+    --bg-user-message: #FFF0E6;      /* Soft peach-tinted for user */
 
-    --text-primary: #2C2416;
-    --text-secondary: #6B5D51;
-    --text-light: #9B8E82;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-light: #999999;
 
-    --accent-primary: #A67C52;    /* Warm brown accent */
-    --accent-hover: #8B6542;
+    --accent-primary: #6EC1E4;       /* Soft blue-gray from website */
+    --accent-secondary: #EE701A;     /* Warm terracotta from website */
+    --accent-hover: #5BAED1;         /* Darker blue on hover */
 
-    --border-color: #E0D5CB;
+    --border-color: #E5E5E5;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
@@ -68,12 +69,13 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #F0E6DC 0%, #E8DED3 100%);
+    background: linear-gradient(135deg, #D4EBF5 0%, #B8DEF0 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
     flex-shrink: 0;
+    border: 2px solid var(--accent-primary);
 }
 
 .header-info {
@@ -177,7 +179,7 @@ body {
 
 .message strong {
     font-weight: 600;
-    color: var(--accent-primary);
+    color: var(--accent-secondary);
 }
 
 .message.typing {
@@ -258,6 +260,11 @@ body {
     color: white;
     border-color: var(--accent-primary);
     transform: translateY(-1px);
+}
+
+.quick-prompt-btn:active {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
 }
 
 /* Chat Input */
