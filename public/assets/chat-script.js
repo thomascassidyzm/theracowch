@@ -45,6 +45,12 @@ window.addEventListener('DOMContentLoaded', () => {
     showWelcomeMessage();
     setupEventListeners();
     focusInput();
+
+    // Hide quick prompts if conversation already exists
+    if (conversationHistory.length > 0) {
+        quickPromptsContainer.style.display = 'none';
+        document.body.classList.add('prompts-hidden');
+    }
 });
 
 // ================================
@@ -94,6 +100,12 @@ async function handleSendMessage() {
     const message = chatInput.value.trim();
 
     if (!message || isTyping) return;
+
+    // Hide quick prompts after first message
+    if (conversationHistory.length === 0) {
+        quickPromptsContainer.style.display = 'none';
+        document.body.classList.add('prompts-hidden');
+    }
 
     // Add user message to chat
     addMessage(message, 'user');
@@ -244,6 +256,11 @@ function handleClearChat() {
         showWelcomeMessage();
         saveChatHistory();
         menuModal.classList.remove('active');
+
+        // Show quick prompts again
+        quickPromptsContainer.style.display = 'flex';
+        document.body.classList.remove('prompts-hidden');
+
         focusInput();
     }
 }

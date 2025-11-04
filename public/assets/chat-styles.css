@@ -130,8 +130,13 @@ body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     padding: 1.5rem;
-    padding-bottom: 10rem; /* Space for quick-prompts + input */
+    padding-bottom: calc(8.5rem + env(safe-area-inset-bottom)); /* Space for quick-prompts + input */
     background: var(--bg-primary);
+}
+
+/* When quick prompts are hidden, reduce bottom padding */
+body.prompts-hidden .chat-messages {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
 .message {
@@ -493,6 +498,11 @@ body {
 
     .chat-messages {
         padding: 1rem;
+        padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+    }
+
+    body.prompts-hidden .chat-messages {
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom));
     }
 
     .message {
