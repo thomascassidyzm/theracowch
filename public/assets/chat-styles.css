@@ -1,23 +1,23 @@
 /* Cowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Website Brand Colors - thoughtsonlifeandlove.com */
-    --bg-primary: #F5EFE7;           /* Warm cream background */
-    --bg-secondary: #FFFFFF;
-    --bg-mandy-message: #FBF5F0;     /* Very soft peachy cream for Mandy */
-    --bg-user-message: #FDEEE8;      /* Slightly peachy for user */
+    /* Mandy's Website Brand Colors - Higher Contrast Version */
+    --bg-primary: #FFFFFF;           /* Clean white background */
+    --bg-secondary: #F8F6F4;         /* Light warm off-white */
+    --bg-mandy-message: #F9E5DF;     /* Peachy cream for Mandy - more saturated */
+    --bg-user-message: #E8DED8;      /* Warm taupe for user - more distinct */
 
-    --text-primary: #2C2416;
-    --text-secondary: #6B5D51;
-    --text-light: #9B8E82;
+    --text-primary: #1A1410;         /* Much darker brown-black for main text */
+    --text-secondary: #4A3F35;       /* Darker secondary text */
+    --text-light: #6B5D51;           /* Darker light text */
 
-    --accent-primary: #E8927C;       /* Soft peachy coral from website */
-    --accent-secondary: #D4CCC4;     /* Warm gray from website */
-    --accent-hover: #D67D66;         /* Darker coral on hover */
+    --accent-primary: #D67856;       /* Stronger terracotta coral */
+    --accent-secondary: #8B7355;     /* Richer warm brown */
+    --accent-hover: #C06642;         /* Even darker coral on hover */
 
-    --border-color: #E5DDD5;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --border-color: #D4C4B8;         /* More visible borders */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* Reset & Base */
@@ -307,7 +307,7 @@ body.prompts-hidden .chat-messages {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.1);
+    box-shadow: 0 0 0 2px rgba(214, 120, 86, 0.2);
 }
 
 #chat-input::placeholder {
