@@ -1,4 +1,4 @@
-// Theracowch Chat - AI Mandy Conversation Interface
+// Cowch Chat - AI Mandy Conversation Interface
 // Inspired by Telegram/WhatsApp messaging patterns
 
 // ================================
@@ -224,7 +224,7 @@ function showWelcomeMessage() {
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'welcome-message';
         welcomeDiv.innerHTML = `
-            <h2>🐮 Welcome to Theracowch</h2>
+            <h2>🐮 Welcome to Cowch</h2>
             <p>I'm Mandy, your AI CBT therapist.</p>
             <p>I use the <strong>IMAGINE framework</strong> to help with anxiety, stress, relationships, and personal growth.</p>
             <p>What's on your mind today?</p>
@@ -350,6 +350,6 @@ if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
 }
 
 // Debug info
-console.log('Theracowch Chat initialized');
+console.log('Cowch Chat initialized');
 console.log('API Endpoint:', API_ENDPOINT);
 console.log('Conversation history:', conversationHistory.length, 'messages');
