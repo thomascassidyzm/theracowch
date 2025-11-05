@@ -1,19 +1,15 @@
 /* Cowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Website Brand Colors - thoughtsonlifeandlove.com */
-    --bg-primary: #F5EFE7;           /* Warm cream background */
+    /* Simplified Color Palette - thoughtsonlifeandlove.com */
+    --bg-primary: #FAF6F3;           /* Soft beige background */
     --bg-secondary: #FFFFFF;
-    --bg-mandy-message: #FBF5F0;     /* Very soft peachy cream for Mandy */
-    --bg-user-message: #FDEEE8;      /* Slightly peachy for user */
 
     --text-primary: #2C2416;
     --text-secondary: #6B5D51;
-    --text-light: #9B8E82;
 
-    --accent-primary: #E8927C;       /* Soft peachy coral from website */
-    --accent-secondary: #D4CCC4;     /* Warm gray from website */
-    --accent-hover: #D67D66;         /* Darker coral on hover */
+    --accent-primary: #EE701A;       /* Burnt sienna/warm orange */
+    --accent-hover: #D96418;         /* Darker on hover */
 
     --border-color: #E5DDD5;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -161,17 +157,19 @@ body.prompts-hidden .chat-messages {
 }
 
 .message.mandy {
-    background: var(--bg-mandy-message);
+    background: var(--bg-secondary);
     border-bottom-left-radius: 4px;
     margin-right: auto;
     color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .message.user {
-    background: var(--bg-user-message);
+    background: rgba(238, 112, 26, 0.08);
     border-bottom-right-radius: 4px;
     margin-left: auto;
     color: var(--text-primary);
+    border: 1px solid rgba(238, 112, 26, 0.15);
 }
 
 .message p {
@@ -184,12 +182,13 @@ body.prompts-hidden .chat-messages {
 
 .message strong {
     font-weight: 600;
-    color: var(--accent-secondary);
+    color: var(--text-primary);
 }
 
 .message.typing {
-    background: var(--bg-mandy-message);
+    background: var(--bg-secondary);
     padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color);
 }
 
 .typing-indicator {
@@ -268,8 +267,9 @@ body.prompts-hidden .chat-messages {
 }
 
 .quick-prompt-btn:active {
-    background: var(--accent-secondary);
-    border-color: var(--accent-secondary);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: white;
 }
 
 /* Chat Input */
@@ -307,11 +307,11 @@ body.prompts-hidden .chat-messages {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.1);
+    box-shadow: 0 0 0 2px rgba(238, 112, 26, 0.1);
 }
 
 #chat-input::placeholder {
-    color: var(--text-light);
+    color: rgba(107, 93, 81, 0.6);
 }
 
 .send-button {
@@ -533,6 +533,47 @@ body.prompts-hidden .chat-messages {
     .send-button {
         width: 40px;
         height: 40px;
+    }
+}
+
+/* Desktop: Constrain width for better readability */
+@media (min-width: 769px) {
+    .chat-header {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 800px;
+        width: 100%;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .chat-messages {
+        max-width: 800px;
+        margin: 0 auto;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .quick-prompts {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 800px;
+        width: 100%;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .chat-input-container {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 800px;
+        width: 100%;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .message {
+        max-width: 65%;
     }
 }
 
