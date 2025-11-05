@@ -34,7 +34,7 @@ html {
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    background: var(--bg-primary);
+    background: #F5F5F5;
     color: var(--text-primary);
     min-height: 100vh;
     min-height: 100dvh;
@@ -44,6 +44,37 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    align-items: center;
+}
+
+/* Desktop: constrain width for better chat experience */
+@media (min-width: 769px) {
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #F5F5F5;
+        z-index: -1;
+    }
+}
+
+/* Main container wrapper */
+body > * {
+    width: 100%;
+    max-width: 100%;
+}
+
+@media (min-width: 769px) {
+    body > * {
+        max-width: 800px;
+    }
+
+    body {
+        background: #F5F5F5;
+    }
 }
 
 /* Header */
@@ -246,6 +277,15 @@ body.prompts-hidden .chat-messages {
     scrollbar-width: none;
 }
 
+@media (min-width: 769px) {
+    .quick-prompts {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 800px;
+        width: 100%;
+    }
+}
+
 .quick-prompts::-webkit-scrollbar {
     display: none;
 }
@@ -287,6 +327,15 @@ body.prompts-hidden .chat-messages {
     border-top: 1px solid var(--border-color);
     flex-shrink: 0;
     z-index: 100;
+}
+
+@media (min-width: 769px) {
+    .chat-input-container {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 800px;
+        width: 100%;
+    }
 }
 
 .input-wrapper {
