@@ -1,23 +1,24 @@
 /* Theracowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Website Brand Colors - Higher Contrast Version */
-    --bg-primary: #FFFFFF;           /* Clean white background */
-    --bg-secondary: #F8F6F4;         /* Light warm off-white */
-    --bg-mandy-message: #F9E5DF;     /* Peachy cream for Mandy - more saturated */
-    --bg-user-message: #E8DED8;      /* Warm taupe for user - more distinct */
+    /* Mandy's Website Brand Colors - Maximum Contrast with Coral */
+    --bg-primary: #FFFFFF;           /* Pure white background */
+    --bg-secondary: #FFF9F7;         /* Very light warm tint */
+    --bg-mandy-message: #FFEEE8;     /* Coral-tinted cream for Mandy */
+    --bg-user-message: #F5F5F5;      /* Light gray for user - maximum distinction */
 
-    --text-primary: #1A1410;         /* Much darker brown-black for main text */
-    --text-secondary: #4A3F35;       /* Darker secondary text */
-    --text-light: #6B5D51;           /* Darker light text */
+    --text-primary: #1a1a1a;         /* Near-black for maximum readability */
+    --text-secondary: #2D2D2D;       /* Very dark gray for secondary text */
+    --text-light: #5A5A5A;           /* Medium gray for tertiary text */
 
-    --accent-primary: #D67856;       /* Stronger terracotta coral */
-    --accent-secondary: #8B7355;     /* Richer warm brown */
-    --accent-hover: #C06642;         /* Even darker coral on hover */
+    --accent-primary: #E8704A;       /* Bold vibrant coral */
+    --accent-secondary: #D67856;     /* Secondary coral tone */
+    --accent-hover: #C85533;         /* Rich darker coral on hover */
 
-    --border-color: #D4C4B8;         /* More visible borders */
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
+    --border-color: #E0E0E0;         /* Clear neutral borders */
+    --border-accent: #FFCAB8;        /* Soft coral for accent borders */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
 /* Reset & Base */
@@ -69,12 +70,14 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #F0E6DC 0%, #E8DED3 100%);
+    background: linear-gradient(135deg, #FFE4DC 0%, #FFDACF 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
     flex-shrink: 0;
+    border: 3px solid var(--accent-primary);
+    box-shadow: 0 2px 8px rgba(232, 112, 74, 0.25);
 }
 
 .header-info {
@@ -159,6 +162,7 @@ body {
     border-bottom-left-radius: 4px;
     margin-right: auto;
     color: var(--text-primary);
+    border-left: 3px solid var(--accent-primary);
 }
 
 .message.user {
@@ -296,7 +300,7 @@ body {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(214, 120, 86, 0.2);
+    box-shadow: 0 0 0 3px rgba(232, 112, 74, 0.25);
 }
 
 #chat-input::placeholder {
