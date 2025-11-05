@@ -11,9 +11,9 @@
     --text-secondary: #2D2D2D;       /* Very dark gray for secondary text */
     --text-light: #5A5A5A;           /* Medium gray for tertiary text */
 
-    --accent-primary: #E8704A;       /* Bold vibrant coral */
-    --accent-secondary: #D67856;     /* Secondary coral tone */
-    --accent-hover: #C85533;         /* Rich darker coral on hover */
+    --accent-primary: #f17663;       /* Burnt sienna - actual brand color */
+    --accent-secondary: #e56451;     /* Darker burnt sienna */
+    --accent-hover: #d94e3a;         /* Even darker on hover */
 
     --border-color: #E0E0E0;         /* Clear neutral borders */
     --border-accent: #FFCAB8;        /* Soft coral for accent borders */
@@ -77,7 +77,7 @@ body {
     font-size: 24px;
     flex-shrink: 0;
     border: 3px solid var(--accent-primary);
-    box-shadow: 0 2px 8px rgba(232, 112, 74, 0.25);
+    box-shadow: 0 2px 8px rgba(241, 118, 99, 0.25);
 }
 
 .header-info {
@@ -300,7 +300,7 @@ body {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(232, 112, 74, 0.25);
+    box-shadow: 0 0 0 3px rgba(241, 118, 99, 0.25);
 }
 
 #chat-input::placeholder {
