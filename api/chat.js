@@ -11,9 +11,9 @@ async function getImagineFrameworkPrompts() {
   }
   
   try {
-    // Fetch IMAGINE framework training data from theracowch.com hidden page
+    // Fetch ENHANCED IMAGINE framework training data with therapeutic interventions
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://theracowch.com';
-    const response = await fetch(`${baseUrl}/imagine-framework-prompts.txt`);
+    const response = await fetch(`${baseUrl}/imagine-framework-prompts-enhanced.txt`);
     if (!response.ok) {
       throw new Error('Failed to fetch IMAGINE framework prompts');
     }
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
       systemPrompt += `\nSession phase: ${sessionPhase}`;
     }
     
-    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum and use collaborative tone.`;
+    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Actively detect patterns and offer therapeutic interventions when appropriate.`;
 
     // Prepare conversation messages
     const messages = [
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
+        max_tokens: 500,  // Increased for guided interventions
         system: [
           {
             type: 'text',
