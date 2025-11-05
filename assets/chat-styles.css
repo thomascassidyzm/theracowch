@@ -1,22 +1,23 @@
 /* Theracowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Brand Colors */
-    --bg-primary: #FAF6F3;       /* Warm cream background */
-    --bg-secondary: #FFFFFF;
-    --bg-mandy-message: #E8DED3;  /* Mandy's messages */
-    --bg-user-message: #D4C4B0;   /* User messages */
+    /* Mandy's Website Brand Colors - Higher Contrast Version */
+    --bg-primary: #FFFFFF;           /* Clean white background */
+    --bg-secondary: #F8F6F4;         /* Light warm off-white */
+    --bg-mandy-message: #F9E5DF;     /* Peachy cream for Mandy - more saturated */
+    --bg-user-message: #E8DED8;      /* Warm taupe for user - more distinct */
 
-    --text-primary: #2C2416;
-    --text-secondary: #6B5D51;
-    --text-light: #9B8E82;
+    --text-primary: #1A1410;         /* Much darker brown-black for main text */
+    --text-secondary: #4A3F35;       /* Darker secondary text */
+    --text-light: #6B5D51;           /* Darker light text */
 
-    --accent-primary: #A67C52;    /* Warm brown accent */
-    --accent-hover: #8B6542;
+    --accent-primary: #D67856;       /* Stronger terracotta coral */
+    --accent-secondary: #8B7355;     /* Richer warm brown */
+    --accent-hover: #C06642;         /* Even darker coral on hover */
 
-    --border-color: #E0D5CB;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --border-color: #D4C4B8;         /* More visible borders */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* Reset & Base */
@@ -295,7 +296,7 @@ body {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.1);
+    box-shadow: 0 0 0 2px rgba(214, 120, 86, 0.2);
 }
 
 #chat-input::placeholder {
