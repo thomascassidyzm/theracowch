@@ -1,11 +1,11 @@
 {
-  "name": "Cowch - AI Wellness Coaching",
-  "short_name": "Cowch",
-  "description": "Your AI wellness coaching companion - settle in on the cowch with AI Mandy for encouragement, insights, and mental wellness support",
+  "name": "Mandy - Your AI Therapist",
+  "short_name": "Mandy",
+  "description": "Chat with Mandy, your compassionate AI therapist. Genuine conversation, therapeutic support, always here when you need it.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1918",
-  "theme_color": "#6366f1",
+  "background_color": "#1A1A1A",
+  "theme_color": "#D67856",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
@@ -76,18 +76,11 @@
   ],
   "shortcuts": [
     {
-      "name": "Chat with AI Mandy",
+      "name": "Chat with Mandy",
       "short_name": "Chat",
-      "description": "Start a conversation with your therapeutic cow coach",
-      "url": "/?chat=true",
+      "description": "Start a conversation with your AI therapist",
+      "url": "/",
       "icons": [{ "src": "/icons/chat-icon.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "IMAGINE Framework",
-      "short_name": "IMAGINE",
-      "description": "Explore the therapeutic framework",
-      "url": "/?imagine=true",
-      "icons": [{ "src": "/icons/imagine-icon.png", "sizes": "96x96" }]
     }
   ]
 }
