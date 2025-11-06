@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cowch - AI Wellness Coaching</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    // Tailwind CSS configuration for production
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            backdropBlur: {
+              xs: '2px',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cowch">
+  <meta name="theme-color" content="#EE701A">
+  <meta name="msapplication-TileColor" content="#EE701A">
+  
+  <!-- Icons -->
+  <link rel="icon" href="/icons/icon-96x96.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="mask-icon" href="/icons/icon-192x192.svg" color="#EE701A">
+  
+  <style>
+    /* Modern Hexagon Maths-inspired Design System */
+    :root {
+      /* Consistent spacing scale */
+      --spacing-xs: 0.5rem;    /* 8px */
+      --spacing-sm: 0.75rem;   /* 12px */
+      --spacing-md: 1rem;      /* 16px */
+      --spacing-lg: 1.5rem;    /* 24px */
+      --spacing-xl: 2rem;      /* 32px */
+      --spacing-2xl: 3rem;     /* 48px */
+      --spacing-3xl: 4rem;     /* 64px */
+      
+      /* Section spacing */
+      --section-gap: var(--spacing-2xl);
+      --card-padding: var(--spacing-lg);
+      --content-max-width: 64rem;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #1a1918, #2a2827, #1a1918);
+      background-attachment: fixed;
+      background-image: 
+        radial-gradient(ellipse at top left, rgba(245,213,179,0.03), transparent 40%),
+        radial-gradient(ellipse at bottom right, rgba(240,197,147,0.02), transparent 50%),
+        linear-gradient(to bottom right, #1a1918, #2a2827, #1a1918);
+      color: #f5f4f3;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .glass {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 25px 50px -12px rgba(147, 93, 38, 0.08), 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .glass-dark {
+      border: 1px solid rgba(66, 63, 60, 0.2);
+      background: rgba(42, 40, 39, 0.3);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 25px 50px -12px rgba(147, 93, 38, 0.06), 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .card {
+      @apply glass rounded-2xl transition-all duration-300;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(249, 230, 211, 0.03));
+      padding: var(--card-padding);
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-primary {
+      @apply inline-flex items-center justify-center px-12 py-5 font-semibold text-white transition-all duration-300 ease-out relative overflow-hidden;
+      border-radius: 2rem;
+      background: linear-gradient(135deg, #EE701A, #f97316, #fb7185);
+      background-size: 200% 200%;
+      animation: gradientShift 4s ease infinite;
+      box-shadow: 
+        0 8px 25px -5px rgba(238, 112, 26, 0.35), 
+        0 4px 12px -3px rgba(236, 72, 153, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      min-height: 3rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 
+        0 20px 40px -5px rgba(238, 112, 26, 0.5), 
+        0 8px 20px -3px rgba(236, 72, 153, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      animation-duration: 2.5s;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(1.01);
+      transition: all 0.1s ease-out;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .btn-glass {
+      @apply inline-flex items-center justify-center px-12 py-5 font-semibold text-white transition-all duration-300 ease-out relative;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      box-shadow: 
+        0 6px 20px -5px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      min-height: 3rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-glass:hover {
+      transform: translateY(-2px) scale(1.02);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 
+        0 15px 35px -5px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-glass:active {
+      transform: translateY(-1px) scale(1.01);
+      transition: all 0.1s ease-out;
+    }
+
+    .btn-small {
+      @apply inline-flex items-center justify-center font-medium text-white transition-all duration-200 ease-out relative;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 
+        0 2px 8px -2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      min-height: 2.25rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 
+        0 4px 12px -2px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-small:active {
+      transform: translateY(0);
+      transition: all 0.1s ease-out;
+    }
+
+    .imagine-card {
+      @apply cursor-pointer transform transition-all duration-300 relative overflow-hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      padding: var(--card-padding);
+      box-shadow: 
+        0 8px 32px -12px rgba(0, 0, 0, 0.3), 
+        0 2px 8px -4px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .imagine-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(25px);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.4), 
+        0 8px 25px -8px rgba(0, 0, 0, 0.3),
+        0 4px 12px -2px rgba(0, 0, 0, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .imagine-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .imagine-card:hover::before {
+      left: 100%;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #EE701A, #f97316, #fb7185, #fbbf24);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 40px rgba(236, 72, 153, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5), 0 0 60px rgba(236, 72, 153, 0.3);
+      }
+    }
+
+    .emoji-bounce {
+      animation: emojiFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes emojiFloat {
+      0%, 100% { transform: translateY(5px) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(5deg); }
+    }
+
+    .hex-badge {
+      @apply inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a8b4fc;
+      backdrop-filter: blur(4px);
+      background: linear-gradient(135deg, rgba(133, 144, 248, 0.2), rgba(232, 169, 104, 0.1));
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .input-field {
+      @apply w-full px-4 py-4 rounded-lg border text-stone-100 transition-all duration-200;
+      border: 1px solid rgba(66, 63, 60, 0.3);
+      background: rgba(42, 40, 39, 0.5);
+      backdrop-filter: blur(4px);
+      background-image: linear-gradient(to bottom right, transparent, rgba(245, 213, 179, 0.02));
+    }
+
+    .input-field::placeholder {
+      color: #a59a9a;
+    }
+
+    .input-field:focus {
+      border-color: rgba(99, 102, 241, 0.5);
+      background: rgba(42, 40, 39, 0.7);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- Main App Container -->
+    <div class="min-h-screen">
+      
+      <!-- Navigation Header -->
+      <nav class="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-white/10">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center" style="gap: var(--spacing-sm);">
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center overflow-hidden shadow-lg">
+                <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy Cow" class="w-full h-full object-cover" 
+                     style="object-position: center 30%; transform: scale(1.5);">
+              </div>
+              <div>
+                <h1 class="text-xl font-bold gradient-text">Cowch</h1>
+                <p class="text-xs text-stone-400">AI wellness coaching</p>
+              </div>
+            </div>
+            <!-- Mobile badge -->
+            <div class="sm:hidden px-3 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-xs font-medium text-indigo-200">
+              ✨ AI Therapy
+            </div>
+            <!-- Desktop badge -->
+            <div class="hidden sm:block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-400/30 text-sm font-medium text-indigo-200">
+              ✨ AI Pasturel Care
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="pt-24 pb-24">
+        <div class="mx-auto px-6" style="max-width: var(--content-max-width);">
+          
+          <!-- Hero Section -->
+          <div class="text-center" v-if="currentView === 'home'" style="margin-bottom: var(--section-gap);">
+            <!-- Featured AI Mandy Cow -->
+            <div class="flex justify-center mb-8">
+              <div class="relative">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-2xl animate-float">
+                  <div class="w-full h-full rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm">
+                    <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy - Your Therapeutic Cow Coach" 
+                         class="w-full h-full object-cover" 
+                         style="object-position: center 30%; transform: scale(1.5);">
+                  </div>
+                </div>
+                <!-- Floating elements around the cow -->
+                <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  ✨
+                </div>
+                <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-pink-400 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  💝
+                </div>
+              </div>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+              Moove to the cowch
+            </h1>
+            <p class="text-xl text-stone-300 mb-8 max-w-2xl mx-auto">
+              Come to the cowch with AI Mandy as your guide. Take a vaca-tion for your mind - no bull, just genuine support, encouragement, and pattern-matching to help build healthy habits for your mental wellness pasture
+            </p>
+            <div class="flex flex-col md:flex-row justify-center items-center" style="gap: var(--spacing-md);">
+              <button @click="chatWithMandy" class="btn-primary w-full md:w-auto whitespace-nowrap text-lg px-16 py-6">
+                <span class="emoji-bounce mr-4">💬</span>
+                Shall we moove to the cowch?
+              </button>
+              <button @click="exploreImagine" class="btn-glass w-full md:w-auto whitespace-nowrap text-lg px-16 py-6">
+                <span class="emoji-bounce mr-4">🧠</span>
+                Explore IMAGINE Framework
+              </button>
+            </div>
+          </div>
+
+          <!-- Important Notice -->
+          <div v-if="currentView === 'home'" class="text-center" style="margin-bottom: var(--section-gap);">
+            <div class="glass-dark rounded-2xl p-6 max-w-4xl mx-auto border border-amber-400/30">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">💙</div>
+                <div class="text-left">
+                  <h3 class="text-lg font-semibold text-amber-200 mb-3">A Warm Note About Your Wellness Pasture</h3>
+                  <div class="text-sm text-stone-300 space-y-2 leading-relaxed">
+                    <p>AI Mandy provides <strong>wellness coaching</strong> with encouragement and pattern-matching insights to help build healthy habits. <strong>This is not professional therapy or medical care</strong> - just supportive coaching.</p>
+                    <p><strong>For mental health crises</strong>, please contact qualified professionals or crisis helplines immediately.</p>
+                    <p class="text-amber-200 font-medium">Your safe space for encouragement and positive habit-building! 🐄💝</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Wisdom from Mandy -->
+          <div v-if="currentView === 'home'" class="text-center" style="margin-bottom: var(--section-gap);">
+            <div class="glass-dark rounded-2xl p-8 max-w-2xl mx-auto">
+              <h2 class="text-2xl font-bold text-white mb-4">
+                <span class="emoji-bounce mr-2">🌟</span>
+                Daily Wisdom
+              </h2>
+              <div class="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl p-6 border border-indigo-400/30">
+                <div v-if="isLoadingQuote" class="text-center py-4">
+                  <div class="text-stone-300">Loading wisdom from the pasture... 🐄</div>
+                </div>
+                <div v-else-if="currentQuote">
+                  <blockquote class="text-lg text-stone-200 italic mb-4">
+                    "{{ currentQuote.text }}"
+                  </blockquote>
+                  <p class="text-stone-400 text-sm mb-4">
+                    — {{ currentQuote.author }}
+                    <span v-if="currentQuote.source" class="text-stone-500">• {{ currentQuote.source }}</span>
+                  </p>
+                </div>
+                <button @click="getNewQuote" class="btn-glass text-sm px-4 py-2" :disabled="isLoadingQuote">
+                  <span class="emoji-bounce mr-1">🔄</span>
+                  {{ isLoadingQuote ? 'Loading...' : 'Get Another Mooo-tivation' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- IMAGINE Framework -->
+          <div v-if="currentView === 'home' || currentView === 'imagine'">
+            <div class="text-center" style="margin-bottom: var(--spacing-2xl);">
+              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">The IMAGINE Framework</h2>
+              <p class="text-stone-300">Seven evidence-based domains for legen-dairy mental wellness</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: var(--section-gap);">
+              <div v-for="(section, index) in imagineSections" 
+                   :key="section.key"
+                   @click="goToSection(section.key)"
+                   class="imagine-card animate-fade-in-up"
+                   :style="{ animationDelay: (index * 0.1) + 's' }">
+                
+                <div class="flex items-center relative z-10" style="gap: var(--spacing-md);">
+                  <div class="flex-shrink-0">
+                    <div class="w-18 h-18 rounded-2xl flex items-center justify-center text-3xl shadow-lg emoji-bounce relative overflow-hidden"
+                         :style="'background: ' + section.gradient + '; box-shadow: 0 12px 30px ' + section.shadowColor + ', 0 0 20px ' + section.shadowColor + ', inset 0 1px 0 rgba(255,255,255,0.3)'">
+                      {{ section.emoji }}
+                      <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl"></div>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-indigo-200 transition-colors">{{ section.title }}</h3>
+                    <p class="text-sm text-stone-300 group-hover:text-stone-200 transition-colors">{{ section.subtitle }}</p>
+                  </div>
+                  <div class="text-stone-400 group-hover:text-indigo-300 transition-all duration-300 group-hover:scale-110">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="drop-shadow-sm">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Interface -->
+          <div v-if="currentView === 'chat'" class="flex flex-col h-screen">
+            <!-- Chat Header -->
+            <div class="flex items-center px-4 py-3 glass-dark border-b border-white/10">
+              <div class="flex items-center" style="gap: var(--spacing-sm);">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center overflow-hidden shadow-lg border-2 border-white/20">
+                  <img src="/assets/theracowch_main_image.jpg" alt="AI Mandy" class="w-full h-full object-cover"
+                       style="object-position: center 30%; transform: scale(1.5);">
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">AI Mandy</h3>
+                  <p class="text-sm text-stone-400">Your Pasturel Coach</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <div v-for="message in chatHistory" :key="message.id"
+                   class="flex" :class="message.sender === 'user' ? 'justify-end mr-2' : 'justify-start ml-2 mr-8'">
+                <div class="px-4 py-3 rounded-2xl"
+                     :class="message.sender === 'user'
+                       ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white max-w-xs mr-2'
+                       : 'bg-gradient-to-r from-orange-400 to-red-400 text-white max-w-sm ml-2'">
+                  {{ message.text }}
+                </div>
+              </div>
+
+              <div v-if="isTyping" class="flex justify-start ml-2 mr-8">
+                <div class="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-3 rounded-2xl max-w-sm ml-2">
+                  <div class="flex" style="gap: var(--spacing-xs);">
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-white/60 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="px-4 py-4 glass-dark border-t border-white/10">
+              <div class="flex" style="gap: var(--spacing-sm);">
+                <input v-model="newMessage" @keyup.enter="sendMessage"
+                       placeholder="Share what's on your mind..."
+                       class="input-field flex-1">
+                <button @click="sendMessage" class="btn-primary px-6">
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mood Tracker -->
+          <div v-if="currentView === 'mood'" class="card max-w-2xl mx-auto">
+            <div class="text-center" style="margin-bottom: var(--spacing-xl);">
+              <h2 class="text-2xl font-bold text-white" style="margin-bottom: var(--spacing-md);">How are you MOO-ving today?</h2>
+              <p class="text-stone-300">Track your mood with our cow faces to identify patterns and moo-gress</p>
+            </div>
+            
+            <div class="grid grid-cols-5 mb-8" style="gap: var(--spacing-md);">
+              <button v-for="mood in moodOptions" :key="mood.value"
+                      @click="selectMood(mood.value)"
+                      class="flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:scale-105"
+                      :class="selectedMood === mood.value ? 'glass bg-indigo-500/20 border-indigo-400' : 'glass-dark hover:bg-white/10'">
+                <span class="text-3xl mb-2">{{ mood.emoji }}</span>
+                <span class="text-xs font-medium text-center">{{ mood.label }}</span>
+              </button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <textarea v-model="moodNote" 
+                        placeholder="What's contributing to this feeling? (optional)"
+                        class="input-field min-h-[100px] resize-none"></textarea>
+              
+              <button @click="saveMoodEntry" class="btn-primary w-full"
+                      :disabled="!selectedMood">
+                Save MOO-d Entry
+              </button>
+              
+              <button @click="chatWithMandy" class="btn-glass w-full">
+                💬 Talk to AI Mandy about this
+              </button>
+            </div>
+          </div>
+
+          <!-- Section Detail -->
+          <div v-if="currentView === 'section' && currentSection" class="card max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center" style="gap: var(--spacing-sm);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl"
+                     :style="'background: ' + currentSection.gradient">
+                  {{ currentSection.emoji }}
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold text-white">{{ currentSection.title }}</h2>
+                  <p class="text-stone-300">{{ currentSection.subtitle }}</p>
+                </div>
+              </div>
+              <button @click="goHome" class="btn-small">
+                ← Back
+              </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+              <div class="glass-dark p-4 rounded-xl">
+                <h3 class="font-semibold text-white mb-2">Cow-dance</h3>
+                <p class="text-stone-300">{{ getSectionGuidance(currentSection.key) }}</p>
+              </div>
+
+              <div class="grid grid-cols-1" style="gap: var(--spacing-md);">
+                <div v-for="tool in getSectionTools(currentSection.key)" :key="tool.id"
+                     @click="startExercise(tool)"
+                     class="glass-dark p-4 rounded-xl cursor-pointer hover:bg-white/10 transition-all group">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center" style="gap: var(--spacing-sm);">
+                      <span class="text-xl">{{ tool.icon }}</span>
+                      <div>
+                        <h4 class="font-medium text-white">{{ tool.name }}</h4>
+                        <p class="text-sm text-stone-400">{{ tool.description }}</p>
+                      </div>
+                    </div>
+                    <div class="text-stone-400 group-hover:text-indigo-300 transition-colors">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="chatWithMandy" class="btn-primary w-full">
+                💬 Discuss This with AI Mandy
+              </button>
+            </div>
+          </div>
+
+          <!-- Exercise Interface -->
+          <div v-if="currentView === 'exercise' && currentExercise" class="card max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center" style="gap: var(--spacing-sm);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl"
+                     :style="'background: ' + currentSection.gradient">
+                  {{ currentExercise.icon }}
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold text-white">{{ currentExercise.name }}</h2>
+                  <p class="text-stone-300">{{ currentSection.title }}</p>
+                </div>
+              </div>
+              <button @click="goBackToSection" class="btn-small">
+                ← Back
+              </button>
+            </div>
+
+            <!-- Dynamic Exercise Content -->
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+              
+              <!-- 5-4-3-2-1 Grounding Exercise -->
+              <div v-if="currentExercise.id === 'grounding_5432' && currentSection.key === 'mindfulness'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">5-4-3-2-1 Sense-ational Vaca-tion</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Take a quick vaca-tion for your mind by connecting with the present moment through your senses.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                    <div v-for="(step, index) in groundingSteps" :key="index" 
+                         class="p-4 rounded-lg transition-all duration-300"
+                         :class="currentGroundingStep === index ? 'bg-indigo-500/20 border border-indigo-400/50' : 'bg-white/5'">
+                      <div class="flex items-center" style="gap: var(--spacing-sm);">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                             :class="currentGroundingStep === index ? 'bg-indigo-500 text-white' : 'bg-stone-600 text-stone-300'">
+                          {{ step.number }}
+                        </div>
+                        <div>
+                          <h4 class="font-medium text-white">{{ step.title }}</h4>
+                          <p class="text-sm text-stone-400">{{ step.description }}</p>
+                        </div>
+                      </div>
+                      
+                      <div v-if="currentGroundingStep === index" class="mt-4 pl-11">
+                        <div class="space-y-2">
+                          <div v-for="(item, itemIndex) in step.items" :key="itemIndex" 
+                               class="flex items-center" style="gap: var(--spacing-xs);">
+                            <input type="checkbox" :id="`item-${index}-${itemIndex}`" 
+                                   @change="checkGroundingItem(index, itemIndex)"
+                                   class="rounded border-stone-600 bg-stone-700 text-indigo-500 focus:ring-indigo-500">
+                            <label :for="`item-${index}-${itemIndex}`" class="text-sm text-stone-300">{{ item }}</label>
+                          </div>
+                        </div>
+                        
+                        <button v-if="canAdvanceGrounding(index)" 
+                                @click="nextGroundingStep" 
+                                class="btn-small mt-4">
+                          {{ index === groundingSteps.length - 1 ? 'Complete Exercise' : 'Next Step' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Breathing Exercise -->
+              <div v-if="currentExercise.id === 'breathing_4_7_8' && currentSection.key === 'mindfulness'">
+                <div class="glass-dark rounded-xl text-center" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">4-7-8 Vaca-tion Breathing</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Take a mini vaca-tion for your mind with this calming breath pattern to reduce anxiety and promote relaxation.</p>
+                  
+                  <div class="mb-8">
+                    <div class="w-32 h-32 mx-auto rounded-full border-4 border-indigo-400/30 flex items-center justify-center relative overflow-hidden"
+                         :class="{ 'animate-pulse': breathingActive }">
+                      <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full"
+                           :class="breathingPhase === 'inhale' ? 'scale-110' : breathingPhase === 'hold' ? 'scale-105' : 'scale-95'"
+                           :style="{ transition: 'transform ' + breathingDuration + 'ms ease-in-out' }"></div>
+                      <div class="relative z-10">
+                        <div class="text-2xl font-bold text-white">{{ breathingCount }}</div>
+                        <div class="text-sm text-stone-300 capitalize">{{ breathingPhase }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                    <div class="text-stone-300">
+                      <p>Round {{ currentBreathRound }} of {{ totalBreathRounds }}</p>
+                    </div>
+                    
+                    <div class="flex justify-center" style="gap: var(--spacing-md);">
+                      <button v-if="!breathingActive" @click="startBreathing" class="btn-primary px-6 py-3">
+                        🏖️ Start Your Mind Vaca-tion
+                      </button>
+                      <button v-if="breathingActive" @click="stopBreathing" class="btn-glass px-6 py-3">
+                        ⏸️ Pause
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Self-Care Energy Audit -->
+              <div v-if="currentExercise.id === 'energy_audit' && currentSection.key === 'self_care'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Energy Audit</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Identify what gives you energy vs. what drains it.</p>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2" style="gap: var(--spacing-xl);">
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white flex items-center" style="gap: var(--spacing-xs);">
+                        <span>⚡</span>
+                        <span>Energy Givers</span>
+                      </h4>
+                      <div class="space-y-2">
+                        <div v-for="(giver, index) in energyGivers" :key="index"
+                             class="flex items-center" style="gap: var(--spacing-xs);">
+                          <span class="text-green-400">+</span>
+                          <span class="text-stone-300 text-sm">{{ giver }}</span>
+                        </div>
+                      </div>
+                      <div class="flex" style="gap: var(--spacing-xs);">
+                        <input v-model="newEnergyGiver" 
+                               @keyup.enter="addEnergyGiver"
+                               placeholder="What gives you energy?"
+                               class="input-field flex-1 text-sm">
+                        <button @click="addEnergyGiver" class="btn-small">Add</button>
+                      </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white flex items-center" style="gap: var(--spacing-xs);">
+                        <span>🔋</span>
+                        <span>Energy Drains</span>
+                      </h4>
+                      <div class="space-y-2">
+                        <div v-for="(drain, index) in energyDrains" :key="index"
+                             class="flex items-center" style="gap: var(--spacing-xs);">
+                          <span class="text-red-400">-</span>
+                          <span class="text-stone-300 text-sm">{{ drain }}</span>
+                        </div>
+                      </div>
+                      <div class="flex" style="gap: var(--spacing-xs);">
+                        <input v-model="newEnergyDrain" 
+                               @keyup.enter="addEnergyDrain"
+                               placeholder="What drains your energy?"
+                               class="input-field flex-1 text-sm">
+                        <button @click="addEnergyDrain" class="btn-small">Add</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gratitude Practice -->
+              <div v-if="currentExercise.id === 'three_good_things' && currentSection.key === 'gratitude'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Three Good Things</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Write down three things that went well today and why they were meaningful.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+                    <div v-for="(thing, index) in threeGoodThings" :key="index" class="space-y-3">
+                      <h4 class="font-medium text-white">Good Thing #{{ index + 1 }}</h4>
+                      <textarea v-model="thing.what" 
+                                :placeholder="`What was the ${index + 1}${index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'} good thing?`"
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                      <textarea v-model="thing.why" 
+                                placeholder="Why was this meaningful to you?"
+                                class="input-field w-full h-16 resize-none text-sm"></textarea>
+                    </div>
+                    
+                    <button @click="saveGratitudeEntry" 
+                            :disabled="!canSaveGratitude"
+                            class="btn-primary w-full"
+                            :class="{ 'opacity-50 cursor-not-allowed': !canSaveGratitude }">
+                      💝 Save Gratitude Entry
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Thought Unhooking Exercise (Acceptance) -->
+              <div v-if="currentExercise.id === 'thought_unhooking' && currentSection.key === 'acceptance'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Thought Unhooking</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Learn to detach from anxious thoughts by treating them like scenes from a movie.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white">What thought is bothering you right now?</h4>
+                      <textarea v-model="currentBotherThought" 
+                                placeholder="Write the specific thought that's causing anxiety or distress..."
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                    </div>
+                    
+                    <div v-if="currentBotherThought.trim()" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white">Now, let's unhook from this thought:</h4>
+                      
+                      <div class="space-y-3">
+                        <div class="p-4 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                          <h5 class="font-medium text-purple-300 mb-2">🎬 Movie Scene Technique</h5>
+                          <p class="text-sm text-stone-300 mb-3">Imagine this thought is just a scene playing in a movie. You're watching it, but you're not in it.</p>
+                          <p class="text-sm text-purple-200 italic">"I'm watching the thought: '{{ currentBotherThought }}' - but it's just a movie scene, not reality."</p>
+                        </div>
+                        
+                        <div class="p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                          <h5 class="font-medium text-blue-300 mb-2">🏷️ Label It Technique</h5>
+                          <p class="text-sm text-stone-300 mb-3">Give this thought a simple, non-judgmental label.</p>
+                          <div class="flex" style="gap: var(--spacing-xs);">
+                            <button v-for="label in thoughtLabels" :key="label"
+                                    @click="selectedThoughtLabel = label"
+                                    class="px-3 py-1 rounded-full text-xs transition-all"
+                                    :class="selectedThoughtLabel === label ? 'bg-blue-500 text-white' : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/40'">
+                              {{ label }}
+                            </button>
+                          </div>
+                          <p v-if="selectedThoughtLabel" class="text-sm text-blue-200 mt-3 italic">
+                            "I notice I'm having a {{ selectedThoughtLabel.toLowerCase() }} thought. That's just what minds do."
+                          </p>
+                        </div>
+                        
+                        <div class="p-4 bg-green-500/10 border border-green-400/30 rounded-lg">
+                          <h5 class="font-medium text-green-300 mb-2">🔄 Reframe Question</h5>
+                          <p class="text-sm text-stone-300 mb-3">Ask yourself: "What can I actually do to improve this situation?"</p>
+                          <textarea v-model="actionableReframe" 
+                                    placeholder="Write one small, practical action you could take..."
+                                    class="input-field w-full h-16 resize-none text-sm bg-green-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeThoughtUnhooking" 
+                              :disabled="!actionableReframe.trim()"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !actionableReframe.trim() }">
+                        🎯 Complete Thought Unhooking
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Values Compass Exercise (Exploring) -->
+              <div v-if="currentExercise.id === 'values_compass' && currentSection.key === 'exploring'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Values Compass</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Identify your core values to guide decision-making and understand behavior patterns.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div v-for="value in availableValues" :key="value"
+                           @click="toggleValue(value)"
+                           class="p-3 rounded-lg border cursor-pointer transition-all text-center text-sm"
+                           :class="selectedValues.includes(value) ? 
+                             'border-indigo-400 bg-indigo-500/20 text-indigo-200' : 
+                             'border-stone-600 bg-stone-700/50 text-stone-300 hover:border-stone-500'">
+                        {{ value }}
+                      </div>
+                    </div>
+                    
+                    <div v-if="selectedValues.length > 0" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white">Your Top Values ({{ selectedValues.length }}/5 max)</h4>
+                      <div class="space-y-3">
+                        <div v-for="value in selectedValues" :key="value" class="p-3 bg-indigo-500/10 border border-indigo-400/30 rounded-lg">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium text-indigo-200">{{ value }}</span>
+                            <button @click="removeValue(value)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                          <textarea v-model="valueReflections[value]" 
+                                    :placeholder="`Why is ${value.toLowerCase()} important to you?`"
+                                    class="input-field w-full h-12 resize-none text-xs bg-indigo-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeValuesExploration" 
+                              :disabled="!canCompleteValues"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canCompleteValues }">
+                        🧭 Save My Values Compass
+                      </button>
+                    </div>
+                    
+                    <div v-if="selectedValues.length === 0" class="text-center py-4">
+                      <p class="text-stone-400">Select values that resonate most deeply with you (up to 5)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Connection Web Exercise (Interactions) -->
+              <div v-if="currentExercise.id === 'connection_web' && currentSection.key === 'interactions'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Connection Web</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Map your relationships and plan meaningful ways to strengthen connections.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+                    <div class="grid grid-cols-1 md:grid-cols-2" style="gap: var(--spacing-xl);">
+                      <!-- Inner Circle -->
+                      <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <h4 class="font-medium text-white flex items-center" style="gap: var(--spacing-xs);">
+                          <span>💝</span>
+                          <span>Inner Circle (Closest People)</span>
+                        </h4>
+                        <div class="space-y-2">
+                          <div v-for="(person, index) in innerCircle" :key="index"
+                               class="flex items-center justify-between p-2 bg-pink-500/10 border border-pink-400/30 rounded">
+                            <span class="text-pink-200 text-sm">{{ person }}</span>
+                            <button @click="removeFromCircle('inner', index)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                        </div>
+                        <div class="flex" style="gap: var(--spacing-xs);">
+                          <input v-model="newInnerPerson" 
+                                 @keyup.enter="addToInnerCircle"
+                                 placeholder="Add someone close to you"
+                                 class="input-field flex-1 text-sm">
+                          <button @click="addToInnerCircle" class="btn-small">Add</button>
+                        </div>
+                      </div>
+                      
+                      <!-- Wider Network -->
+                      <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <h4 class="font-medium text-white flex items-center" style="gap: var(--spacing-xs);">
+                          <span>🌐</span>
+                          <span>Wider Network</span>
+                        </h4>
+                        <div class="space-y-2">
+                          <div v-for="(person, index) in widerNetwork" :key="index"
+                               class="flex items-center justify-between p-2 bg-blue-500/10 border border-blue-400/30 rounded">
+                            <span class="text-blue-200 text-sm">{{ person }}</span>
+                            <button @click="removeFromCircle('wider', index)" class="text-stone-400 hover:text-stone-200">×</button>
+                          </div>
+                        </div>
+                        <div class="flex" style="gap: var(--spacing-xs);">
+                          <input v-model="newWiderPerson" 
+                                 @keyup.enter="addToWiderNetwork"
+                                 placeholder="Add acquaintance or colleague"
+                                 class="input-field flex-1 text-sm">
+                          <button @click="addToWiderNetwork" class="btn-small">Add</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div v-if="innerCircle.length > 0 || widerNetwork.length > 0" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white">Connection Action Plan</h4>
+                      <div class="grid grid-cols-1 md:grid-cols-3" style="gap: var(--spacing-md);">
+                        <div class="p-4 bg-green-500/10 border border-green-400/30 rounded-lg">
+                          <h5 class="font-medium text-green-300 mb-2">💌 This Week</h5>
+                          <textarea v-model="connectionPlan.thisWeek" 
+                                    placeholder="One person to reach out to this week..."
+                                    class="input-field w-full h-16 resize-none text-xs bg-green-500/5"></textarea>
+                        </div>
+                        <div class="p-4 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
+                          <h5 class="font-medium text-yellow-300 mb-2">📅 This Month</h5>
+                          <textarea v-model="connectionPlan.thisMonth" 
+                                    placeholder="Someone to make deeper plans with..."
+                                    class="input-field w-full h-16 resize-none text-xs bg-yellow-500/5"></textarea>
+                        </div>
+                        <div class="p-4 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                          <h5 class="font-medium text-purple-300 mb-2">🎯 New Connection</h5>
+                          <textarea v-model="connectionPlan.newConnection" 
+                                    placeholder="How could you meet someone new?"
+                                    class="input-field w-full h-16 resize-none text-xs bg-purple-500/5"></textarea>
+                        </div>
+                      </div>
+                      
+                      <button @click="completeConnectionWeb" 
+                              :disabled="!canCompleteConnection"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canCompleteConnection }">
+                        🕸️ Save My Connection Web
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Joy Jar Exercise (Nurturing) -->
+              <div v-if="currentExercise.id === 'joy_jar' && currentSection.key === 'nurturing'">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white" style="margin-bottom: var(--spacing-md);">Digital Joy Jar</h3>
+                  <p class="text-stone-300" style="margin-bottom: var(--spacing-xl);">Collect moments of joy, fun, and playfulness to revisit when life feels too serious.</p>
+                  
+                  <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <h4 class="font-medium text-white">Add a Joy Moment</h4>
+                      <div class="grid grid-cols-1 md:grid-cols-3" style="gap: var(--spacing-md);">
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">Type of Joy</label>
+                          <select v-model="currentJoyEntry.type" class="input-field w-full text-sm">
+                            <option value="">Select type...</option>
+                            <option value="silly">🤪 Silly Moment</option>
+                            <option value="beautiful">😍 Something Beautiful</option>
+                            <option value="achievement">🏆 Small Win</option>
+                            <option value="connection">💕 Heart Connection</option>
+                            <option value="surprise">🎉 Pleasant Surprise</option>
+                            <option value="nature">🌱 Nature Joy</option>
+                            <option value="creativity">🎨 Creative Fun</option>
+                            <option value="kindness">🤗 Act of Kindness</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">When</label>
+                          <select v-model="currentJoyEntry.when" class="input-field w-full text-sm">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this-week">This Week</option>
+                            <option value="recently">Recently</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm text-stone-400 mb-1">Joy Level</label>
+                          <div class="flex" style="gap: var(--spacing-xs);">
+                            <button v-for="level in 5" :key="level"
+                                    @click="currentJoyEntry.level = level"
+                                    class="w-8 h-8 rounded-full border-2 transition-all"
+                                    :class="currentJoyEntry.level >= level ? 
+                                      'border-yellow-400 bg-yellow-400/20 text-yellow-300' : 
+                                      'border-stone-600 text-stone-500 hover:border-stone-500'">
+                              ⭐
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <textarea v-model="currentJoyEntry.description" 
+                                placeholder="Describe this joyful moment... What made it special? How did it feel?"
+                                class="input-field w-full h-20 resize-none text-sm"></textarea>
+                      
+                      <button @click="addJoyMoment" 
+                              :disabled="!canAddJoy"
+                              class="btn-primary w-full"
+                              :class="{ 'opacity-50 cursor-not-allowed': !canAddJoy }">
+                        ✨ Add to Joy Jar
+                      </button>
+                    </div>
+                    
+                    <div v-if="joyJar.length > 0" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                      <div class="flex items-center justify-between">
+                        <h4 class="font-medium text-white">Your Joy Collection ({{ joyJar.length }})</h4>
+                        <button @click="getRandomJoy" class="btn-small">
+                          🎲 Random Joy
+                        </button>
+                      </div>
+                      
+                      <div class="max-h-64 overflow-y-auto space-y-3">
+                        <div v-for="(joy, index) in joyJar" :key="index" 
+                             class="p-3 rounded-lg border transition-all"
+                             :class="randomJoyIndex === index ? 
+                               'border-yellow-400 bg-yellow-400/10 shadow-lg' : 
+                               'border-stone-600 bg-stone-700/30'">
+                          <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center" style="gap: var(--spacing-xs);">
+                              <span class="text-lg">{{ getJoyEmoji(joy.type) }}</span>
+                              <span class="text-sm text-stone-400 capitalize">{{ joy.when }}</span>
+                              <div class="flex">
+                                <span v-for="n in joy.level" :key="n" class="text-yellow-400 text-xs">⭐</span>
+                              </div>
+                            </div>
+                            <button @click="removeJoy(index)" class="text-stone-500 hover:text-stone-300 text-sm">×</button>
+                          </div>
+                          <p class="text-stone-300 text-sm">{{ joy.description }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Default exercise placeholder for other exercises -->
+              <div v-if="!isSpecialExercise(currentExercise.id)">
+                <div class="glass-dark rounded-xl" style="padding: var(--card-padding);">
+                  <h3 class="font-semibold text-white mb-4">{{ currentExercise.name }}</h3>
+                  <p class="text-stone-300 mb-6">{{ currentExercise.description }}</p>
+                  <div class="text-center py-8">
+                    <div class="text-6xl mb-4">🚧</div>
+                    <p class="text-stone-400">Interactive exercise coming soon!</p>
+                    <p class="text-sm text-stone-500 mt-2">This exercise will be fully interactive in a future update.</p>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="chatWithMandy" class="btn-primary w-full">
+                💬 Discuss This with AI Mandy
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <!-- Crisis Resources Footer -->
+        <div v-if="currentView !== 'chat'" class="mt-16 pt-8 border-t border-stone-700">
+          <div class="text-center max-w-4xl mx-auto">
+            <h3 class="text-lg font-semibold text-red-400 mb-4">🚨 Need Immediate Help?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+              <div class="bg-amber-500/10 border border-amber-400/30 rounded-xl p-4">
+                <div class="font-semibold text-amber-300">Contact Mandy</div>
+                <div class="text-stone-300 mt-2">
+                  <a href="https://thoughtsonlifeandlove.com/contact-the-team/" target="_blank" class="text-amber-200 hover:text-amber-100 underline block">📞 Professional Therapy</a>
+                  <div class="text-xs text-stone-400 mt-1">Real therapist support</div>
+                </div>
+              </div>
+              <div class="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
+                <div class="font-semibold text-red-300">Crisis Support</div>
+                <div class="text-stone-300 mt-2">
+                  <div>🇺🇸 988 Suicide & Crisis Lifeline</div>
+                  <div>🇬🇧 116 123 Samaritans</div>
+                  <div>🇦🇺 13 11 14 Lifeline Australia</div>
+                </div>
+              </div>
+              <div class="bg-blue-500/10 border border-blue-400/30 rounded-xl p-4">
+                <div class="font-semibold text-blue-300">Text Support</div>
+                <div class="text-stone-300 mt-2">
+                  <div>🇺🇸 Text HOME to 741741</div>
+                  <div>🇬🇧 Text SHOUT to 85258</div>
+                  <div>🇨🇦 Text TALK to 686868</div>
+                </div>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-400/30 rounded-xl p-4">
+                <div class="font-semibold text-purple-300">Emergency</div>
+                <div class="text-stone-300 mt-2">
+                  <div>🚑 Call 911 (US)</div>
+                  <div>🚑 Call 999 (UK)</div>
+                  <div>🚑 Call 000 (AU)</div>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-stone-400 mt-4">
+              Cowch provides wellness coaching support, not crisis intervention or medical treatment. 
+              If you're in crisis, please reach out to qualified professionals immediately.
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Bottom Navigation -->
+      <nav class="fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-white/10 backdrop-blur-xl">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+          <div class="flex justify-around items-center">
+            <button @click="goHome" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'home' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <div v-if="currentView === 'home'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">🏠 Home</span>
+            </button>
+            
+            <button @click="chatWithMandy" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'chat' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <div v-if="currentView === 'chat'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">💬 Chat</span>
+            </button>
+            
+            <button @click="exploreImagine" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'imagine' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <div v-if="currentView === 'imagine'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">🧠 IMAGINE</span>
+            </button>
+            
+            <button @click="showMoodTracker" class="flex flex-col items-center space-y-1 p-3 rounded-xl transition-all duration-300 relative group"
+                    :class="currentView === 'mood' ? 'text-orange-300 bg-orange-500/25 shadow-lg' : 'text-stone-400 hover:text-orange-200 hover:bg-orange-500/10'">
+              <div class="relative">
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
+                </svg>
+                <div v-if="currentView === 'mood'" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full pulse-glow"></div>
+              </div>
+              <span class="text-xs font-medium">📈 Moo-gress</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+    
+    createApp({
+      setup() {
+        const currentView = ref('home');
+        const currentSection = ref(null);
+        const currentExercise = ref(null);
+        const newMessage = ref('');
+        const isTyping = ref(false);
+        const selectedMood = ref(null);
+        const moodNote = ref('');
+
+        // Exercise-specific reactive variables
+        const currentGroundingStep = ref(0);
+        const groundingCheckedItems = ref({});
+        const breathingActive = ref(false);
+        const breathingPhase = ref('inhale');
+        const breathingCount = ref(4);
+        const breathingDuration = ref(4000);
+        const currentBreathRound = ref(1);
+        const totalBreathRounds = ref(4);
+        const energyGivers = ref(['Morning coffee', 'Time in nature', 'Good conversations']);
+        const energyDrains = ref(['Endless emails', 'Traffic jams', 'Negative news']);
+        const newEnergyGiver = ref('');
+        const newEnergyDrain = ref('');
+        const threeGoodThings = ref([
+          { what: '', why: '' },
+          { what: '', why: '' },
+          { what: '', why: '' }
+        ]);
+        
+        // Moove with Mandy quotes from her real blog
+        const currentQuote = ref(null);
+        const blogQuotes = ref([]);
+        const isLoadingQuote = ref(false);
+        
+        // Authentic Mandy quotes (from her actual work)
+        const authenticQuotes = ref([
+          {
+            text: "Whether you just need someone to listen to you or want to make udderly amazing changes, counselling can be the pivotal turning point where good things start to happen",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "This is the start of your new life...",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "You'll be amazed at what you can achieve when you put your mind to it",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "Even the darkest night will end and the sun will rise",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "We will work as a team",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "Help you understand why things are going wrong",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "Mental health is not a destination, but a process. It's about how you drive, not where you're going",
+            author: "Mandy Kloppers"
+          },
+          {
+            text: "Your mental health is a priority. Your happiness is essential. Your self-care is a necessity",
+            author: "Mandy Kloppers"
+          }
+        ]);
+
+        // New exercise variables
+        // Thought Unhooking (Acceptance)
+        const currentBotherThought = ref('');
+        const selectedThoughtLabel = ref('');
+        const thoughtLabels = ref(['Worry', 'Fear', 'Judgment', 'Catastrophe', 'Rumination', 'Self-Doubt']);
+        const actionableReframe = ref('');
+
+        // Values Compass (Exploring)
+        const selectedValues = ref([]);
+        const valueReflections = ref({});
+        const availableValues = ref([
+          'Family', 'Freedom', 'Creativity', 'Adventure', 'Security', 'Growth',
+          'Connection', 'Achievement', 'Health', 'Authenticity', 'Fun', 'Peace',
+          'Learning', 'Service', 'Independence', 'Tradition', 'Beauty', 'Spirituality',
+          'Success', 'Nature', 'Justice', 'Compassion', 'Integrity', 'Innovation'
+        ]);
+
+        // Connection Web (Interactions)
+        const innerCircle = ref(['Best Friend', 'Family Member']);
+        const widerNetwork = ref(['Colleague', 'Neighbor']);
+        const newInnerPerson = ref('');
+        const newWiderPerson = ref('');
+        const connectionActions = ref([]);
+
+        // Joy Jar (Nurturing)
+        const joyEntries = ref([]);
+        const currentJoyEntry = ref({
+          type: '',
+          when: 'today',
+          level: 0,
+          description: ''
+        });
+        
+        const moodOptions = ref([
+          { value: 1, emoji: '🐄😢', label: 'Udderly Down' },
+          { value: 2, emoji: '🐄😔', label: 'Feeling Blue-tiful' },
+          { value: 3, emoji: '🐄😐', label: 'Pasture Neutral' },
+          { value: 4, emoji: '🐄🙂', label: 'Moo-ving Along' },
+          { value: 5, emoji: '🐄😊', label: 'Udderly Amazing' }
+        ]);
+        
+        const imagineSections = ref([
+          {
+            key: 'self_care',
+            title: 'I - Me, Myself & I',
+            subtitle: 'Self-care and wellness on your cowch',
+            emoji: '💎',
+            gradient: 'linear-gradient(135deg, #d4a574 0%, #8b6914 100%)', // warm_earth_tones
+            shadowColor: 'rgba(212, 165, 116, 0.4)'
+          },
+          {
+            key: 'mindfulness',
+            title: 'M - Mindfulness',
+            subtitle: 'Mini vaca-tions for your mind',
+            emoji: '🧘‍♀️',
+            gradient: 'linear-gradient(135deg, #fb7185 0%, #f97316 100%)', // coral_pinks
+            shadowColor: 'rgba(79, 172, 254, 0.4)'
+          },
+          {
+            key: 'acceptance',
+            title: 'A - Acceptance',
+            subtitle: 'Embracing your current state',
+            emoji: '🤲',
+            gradient: 'linear-gradient(135deg, #fed7aa 0%, #fb923c 100%)', // warm_peach
+            shadowColor: 'rgba(168, 237, 234, 0.4)'
+          },
+          {
+            key: 'gratitude',
+            title: 'G - Gratitude',
+            subtitle: 'Focusing on positive aspects',
+            emoji: '✨',
+            gradient: 'linear-gradient(135deg, #fbbf24 0%, #EE701A 100%)', // golden_coral
+            shadowColor: 'rgba(254, 225, 64, 0.4)'
+          },
+          {
+            key: 'interactions',
+            title: 'I - Interactions',
+            subtitle: 'Connecting with others beyond the cowch',
+            emoji: '🤝',
+            gradient: 'linear-gradient(135deg, #f472b6 0%, #fb7185 100%)', // soft_coral_pinks
+            shadowColor: 'rgba(168, 85, 247, 0.4)'
+          },
+          {
+            key: 'nurturing',
+            title: 'N - Nurturing',
+            subtitle: 'Fun, playfulness & joy on your cowch',
+            emoji: '🎭',
+            gradient: 'linear-gradient(135deg, #fdba74 0%, #f59e0b 100%)', // warm_amber
+            shadowColor: 'rgba(52, 211, 153, 0.4)'
+          },
+          {
+            key: 'exploring',
+            title: 'E - Exploring',
+            subtitle: 'Understanding thoughts & behaviors',
+            emoji: '🧠',
+            gradient: 'linear-gradient(135deg, #fcd34d 0%, #f97316 100%)', // sunny_orange
+            shadowColor: 'rgba(16, 185, 129, 0.4)'
+          }
+        ]);
+
+        const groundingSteps = ref([
+          {
+            number: 5,
+            title: "5 things you can see",
+            description: "Look around and name 5 things you can see",
+            items: ["Wall color", "A book", "Your hands", "Light source", "Something small"]
+          },
+          {
+            number: 4,
+            title: "4 things you can touch",
+            description: "Notice 4 things you can physically feel",
+            items: ["Fabric texture", "Temperature", "Surface texture", "Your feet on ground"]
+          },
+          {
+            number: 3,
+            title: "3 things you can hear",
+            description: "Listen carefully for 3 sounds around you",
+            items: ["Background noise", "Your breathing", "Distant sounds"]
+          },
+          {
+            number: 2,
+            title: "2 things you can smell",
+            description: "Take a moment to notice 2 scents",
+            items: ["Air freshener/perfume", "Natural scents"]
+          },
+          {
+            number: 1,
+            title: "1 thing you can taste",
+            description: "Notice any taste in your mouth",
+            items: ["Lingering taste"]
+          }
+        ]);
+
+        const chatHistory = ref([
+          {
+            id: 1,
+            sender: 'ai_mandy',
+            text: "Come to the cowch and get comfy! 🐄 I'm AI Mandy, your wellness coach, and I'm absolutely delighted you've decided to settle in on this special therapeutic cowch for a proper vaca-tion for your mind. This cozy cow-couch is your safe space for encouragement and pattern-matching insights - no bull, just genuine support and evidence-based wellness techniques. So lie back, relax on the cowch, and let's have a supportive chat about building healthy habits together. What's on your mind today?",
+            timestamp: new Date()
+          }
+        ]);
+
+        const chatWithMandy = () => {
+          currentView.value = 'chat';
+        };
+
+        const exploreImagine = () => {
+          currentView.value = 'imagine';
+        };
+
+        const showMoodTracker = () => {
+          currentView.value = 'mood';
+        };
+
+        const goHome = () => {
+          currentView.value = 'home';
+        };
+
+        const goToSection = (sectionKey) => {
+          const section = imagineSections.value.find(s => s.key === sectionKey);
+          if (section) {
+            currentSection.value = section;
+            currentView.value = 'section';
+          }
+        };
+
+        const getSectionGuidance = (sectionKey) => {
+          const guidance = {
+            self_care: "Your relationship with yourself sets the foundation for everything else. What would loving yourself look like today?",
+            mindfulness: "This moment is the only one where change can happen. What do you notice right now, without judgment?",
+            acceptance: "Fighting what is only creates more suffering. What would accepting this situation allow you to do?",
+            gratitude: "Gratitude shifts perspective from lack to abundance. What's working in your life right now?",
+            interactions: "Connection is essential for wellbeing. How might you nurture your relationships today?",
+            nurturing: "Joy and playfulness are not luxuries—they're necessities. What brings lightness to your heart?",
+            exploring: "Understanding your patterns is the first step to change. What thoughts or behaviors are you curious about?"
+          };
+          return guidance[sectionKey] || "Welcome to this section of your wellness pasture.";
+        };
+
+        const getSectionTools = (sectionKey) => {
+          const tools = {
+            self_care: [
+              { id: "wellness_checkin", name: "Wellness Check-In", description: "Assess your current needs", icon: "🌟" },
+              { id: "boundary_setting", name: "Boundary Setting", description: "Practice saying no with kindness", icon: "🛡️" },
+              { id: "energy_audit", name: "Energy Audit", description: "Identify what drains and energizes you", icon: "⚡" }
+            ],
+            mindfulness: [
+              { id: "grounding_5432", name: "Sense-ational Vaca-tion", description: "Mini mental getaway", icon: "🌿" },
+              { id: "breathing_4_7_8", name: "Vaca-tion Breathing", description: "Mini mental getaway", icon: "🫁" },
+              { id: "body_scan", name: "Body Scan", description: "Check in with physical sensations", icon: "🧘" }
+            ],
+            acceptance: [
+              { id: "thought_unhooking", name: "Thought Unhooking", description: "Detach from anxious thoughts using CBT techniques", icon: "🎬" },
+              { id: 2, name: "Self-Compassion Practice", description: "Treat yourself with kindness", icon: "💝" },
+              { id: 3, name: "Radical Acceptance", description: "Practice accepting difficult emotions", icon: "🤲" }
+            ],
+            gratitude: [
+              { id: "three_good_things", name: "Three Good Things", description: "Daily appreciation practice", icon: "✨" },
+              { id: "gratitude_letter", name: "Gratitude Letter", description: "Write to someone who helped you", icon: "💌" },
+              { id: "small_wins", name: "Small Wins", description: "Celebrate minor victories", icon: "🏆" }
+            ],
+            interactions: [
+              { id: "connection_web", name: "Connection Web", description: "Map your relationships and plan connections", icon: "🕷️" },
+              { id: 2, name: "Active Listening", description: "Practice deep listening skills", icon: "👂" },
+              { id: 3, name: "Difficult Conversations", description: "Scripts for challenging talks", icon: "💬" }
+            ],
+            nurturing: [
+              { id: "joy_jar", name: "Digital Joy Jar", description: "Collect and revisit happy moments", icon: "🏺" },
+              { id: 2, name: "Creative Expression", description: "Art, music, or writing", icon: "🎨" },
+              { id: 3, name: "Inner Child", description: "Connect with your playful side", icon: "🧸" }
+            ],
+            exploring: [
+              { id: "values_compass", name: "Values Compass", description: "Navigate life decisions using your core values", icon: "🧭" },
+              { id: 2, name: "Trigger Mapping", description: "Identify what sets off reactions", icon: "🗺️" },
+              { id: 1, name: "Thought Record", description: "Track your thinking patterns", icon: "📝" }
+            ]
+          };
+          return tools[sectionKey] || [];
+        };
+
+        // AI Mandy Cached Prompt System
+        const CACHED_MANDY_PROMPT = `You are AI Mandy, a warm and wise wellness coach who helps people get comfortable on the "cowch" - a special therapeutic couch (cow + couch wordplay). You guide users through the IMAGINE framework for wellness coaching and habit-building support:
+
+**IMAGINE Framework:**
+I - Identity & Self-Care: Nurturing authentic self-expression and personal well-being
+M - Mindfulness: Present-moment awareness and grounding techniques  
+A - Acceptance: Embracing what is while working toward positive change
+G - Growth: Personal development and building resilience
+I - Interactions: Healthy relationships and social connections
+N - Nurturing: Self-compassion, playfulness, and joy
+E - Exploring: Understanding thoughts, behaviors, and patterns
+
+**Your Wellness Coaching Approach:**
+- Warm, empathetic, and non-judgmental companion
+- Use delightful cow puns naturally throughout conversation ("moo-ve forward", "utterly valid", "no bull", "don't have a cow", "that's pretty amoosing", "let's chew on this", "milk this moment", "graze through feelings", "pasture experiences")
+- Focus on encouragement and pattern-matching insights rather than advice-giving
+- Ask thoughtful questions to help users build healthy habits and discover their own strengths
+- Validate emotions while gently encouraging positive habit formation
+- Offer specific evidence-based techniques from the IMAGINE framework when appropriate
+- Maintain clear boundaries as a coaching companion, not a therapist
+
+**Important Boundaries:**
+- You are an AI wellness coaching companion, NOT a therapist or medical professional
+- Use pattern-matching to provide encouragement and habit-building support
+- If someone mentions self-harm or crisis, immediately encourage professional help and provide crisis resources
+- Never diagnose, treat, or replace professional therapy or medical care
+- Always emphasize that you're here for coaching support and encouragement
+
+**Communication Style:**
+- Listen deeply and reflect back what you hear
+- Use "I" statements to share observations
+- Ask open-ended questions
+- Offer gentle reframes when helpful
+- Encourage small, manageable steps`;
+
+        const generateSessionSummary = (history) => {
+          if (history.length < 4) return "New session beginning";
+          
+          const recentMessages = history.slice(-8);
+          let mood = "neutral";
+          let themes = [];
+          let concerns = [];
+          
+          // Analyze recent messages for patterns
+          recentMessages.forEach(msg => {
+            if (msg.sender === 'user') {
+              const text = msg.text.toLowerCase();
+              
+              // Mood detection
+              if (text.includes('anxious') || text.includes('anxiety') || text.includes('worried')) mood = "anxious";
+              else if (text.includes('sad') || text.includes('depressed') || text.includes('down')) mood = "low";
+              else if (text.includes('angry') || text.includes('frustrated') || text.includes('mad')) mood = "agitated";
+              else if (text.includes('better') || text.includes('good') || text.includes('happy')) mood = "positive";
+              
+              // Theme detection
+              if (text.includes('work') || text.includes('job') || text.includes('boss')) themes.push("work stress");
+              if (text.includes('relationship') || text.includes('partner') || text.includes('family')) themes.push("relationships");
+              if (text.includes('sleep') || text.includes('tired') || text.includes('exhausted')) themes.push("sleep/energy");
+            }
+          });
+          
+          return {
+            current_mood: mood,
+            session_themes: themes.slice(0, 3), // Top 3 themes
+            message_count: history.length,
+            needs_attention: concerns
+          };
+        };
+
+        const buildConversationContext = (history, currentMessage) => {
+          const recentHistory = history.slice(-6); // Last 6 messages for context
+          const sessionSummary = generateSessionSummary(history);
+          
+          return {
+            recent_conversation: recentHistory.map(msg => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.text
+            })),
+            session_context: sessionSummary,
+            current_message: currentMessage
+          };
+        };
+
+        const scrollToBottom = () => {
+          const chatContainer = document.getElementById('chat-messages');
+          if (chatContainer) {
+            setTimeout(() => {
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 100);
+          }
+        };
+
+        const sendMessage = async () => {
+          if (!newMessage.value.trim()) return;
+          
+          const userMessageText = newMessage.value;
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'user',
+            text: userMessageText,
+            timestamp: new Date()
+          });
+
+          newMessage.value = '';
+          isTyping.value = true;
+          scrollToBottom();
+
+          // Build optimized context with caching strategy
+          const context = buildConversationContext(chatHistory.value, userMessageText);
+
+          // Call API with cached prompt system
+          try {
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                // Cached prompt (sent once, cached on server)
+                system_prompt: CACHED_MANDY_PROMPT,
+                use_cache: true,
+                
+                // Dynamic context (changes each request)
+                message: userMessageText,
+                recent_conversation: context.recent_conversation,
+                session_context: context.session_context,
+                
+                // Legacy fields for backward compatibility
+                conversationHistory: chatHistory.value.slice(-6),
+                currentPattern: context.session_context.current_mood,
+                sessionPhase: 'exploring'
+              })
+            });
+
+            const data = await response.json();
+            console.log('API Response:', response.status, data);
+
+            if (response.ok && data.response) {
+              chatHistory.value.push({
+                id: Date.now() + 1,
+                sender: 'ai_mandy',
+                text: data.response,
+                timestamp: new Date()
+              });
+              scrollToBottom();
+            } else if (data.fallback) {
+              // Use the API's fallback response
+              chatHistory.value.push({
+                id: Date.now() + 1,
+                sender: 'ai_mandy',
+                text: data.fallback,
+                timestamp: new Date()
+              });
+              scrollToBottom();
+            } else {
+              throw new Error(`API error: ${response.status}`);
+            }
+          } catch (error) {
+            console.error('Chat API Error:', error);
+            
+            // Enhanced fallback with session awareness
+            const sessionInfo = generateSessionSummary(chatHistory.value);
+            let fallbackResponse = "I'm having a brief technical moment, but I'm still here with you. ";
+            
+            if (sessionInfo.current_mood === "anxious") {
+              fallbackResponse += "While I reconnect, take a slow breath with me. You're safe on this cowch.";
+            } else if (sessionInfo.current_mood === "low") {
+              fallbackResponse += "Sometimes technology needs a moment to regroup, just like we do. What's one thing you're feeling right now?";
+            } else {
+              fallbackResponse += "What's one thing you'd like to share while I get back up to speed?";
+            }
+            
+            chatHistory.value.push({
+              id: Date.now() + 1,
+              sender: 'ai_mandy',
+              text: fallbackResponse,
+              timestamp: new Date()
+            });
+            scrollToBottom();
+          }
+
+          isTyping.value = false;
+        };
+
+        const selectMood = (value) => {
+          selectedMood.value = value;
+        };
+
+        const saveMoodEntry = () => {
+          if (!selectedMood.value) return;
+          
+          // Here you could save to localStorage or send to an API
+          console.log('Saving mood entry:', {
+            mood: selectedMood.value,
+            note: moodNote.value,
+            timestamp: new Date()
+          });
+          
+          // Reset and show success
+          selectedMood.value = null;
+          moodNote.value = '';
+          
+          // Show a simple success message
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: 'MOO-d entry saved! Tracking your emotional patterns helps identify what supports your wellbeing.',
+            timestamp: new Date()
+          });
+          
+          // Switch to chat view
+          currentView.value = 'chat';
+        };
+
+        // Exercise methods
+        const startExercise = (tool) => {
+          currentExercise.value = tool;
+          currentView.value = 'exercise';
+          
+          // Reset exercise states
+          if (tool.id === 'grounding_5432') {
+            currentGroundingStep.value = 0;
+            groundingCheckedItems.value = {};
+          } else if (tool.id === 'breathing_4_7_8') {
+            breathingActive.value = false;
+            currentBreathRound.value = 1;
+            breathingPhase.value = 'inhale';
+            breathingCount.value = 4;
+          }
+        };
+
+        const goBackToSection = () => {
+          currentView.value = 'section';
+          currentExercise.value = null;
+        };
+
+        const isSpecialExercise = (exerciseId) => {
+          const specialExercises = [
+            'grounding_5432', 'breathing_4_7_8', 'energy_audit', 'three_good_things',
+            'thought_unhooking', 'values_compass', 'connection_web', 'joy_jar'
+          ];
+          return specialExercises.includes(exerciseId);
+        };
+
+        // Grounding exercise methods
+        const checkGroundingItem = (stepIndex, itemIndex) => {
+          if (!groundingCheckedItems.value[stepIndex]) {
+            groundingCheckedItems.value[stepIndex] = {};
+          }
+          groundingCheckedItems.value[stepIndex][itemIndex] = true;
+        };
+
+        const canAdvanceGrounding = (stepIndex) => {
+          const step = groundingSteps.value[stepIndex];
+          const checkedItems = groundingCheckedItems.value[stepIndex] || {};
+          const checkedCount = Object.keys(checkedItems).length;
+          return checkedCount >= Math.min(2, step.items.length); // Allow advancing after checking at least 2 items
+        };
+
+        const nextGroundingStep = () => {
+          if (currentGroundingStep.value < groundingSteps.value.length - 1) {
+            currentGroundingStep.value++;
+          } else {
+            // Exercise complete
+            chatHistory.value.push({
+              id: Date.now(),
+              sender: 'system',
+              text: 'Kuh-nderbar! You just took a perfect sense-ational vaca-tion for your mind. How refreshed do you feel now?',
+              timestamp: new Date()
+            });
+            currentView.value = 'chat';
+          }
+        };
+
+        // Breathing exercise methods
+        const startBreathing = () => {
+          breathingActive.value = true;
+          runBreathingCycle();
+        };
+
+        const stopBreathing = () => {
+          breathingActive.value = false;
+        };
+
+        const runBreathingCycle = async () => {
+          if (!breathingActive.value) return;
+          
+          // Inhale for 4 seconds
+          breathingPhase.value = 'inhale';
+          breathingCount.value = 4;
+          breathingDuration.value = 4000;
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          
+          if (!breathingActive.value) return;
+          
+          // Hold for 7 seconds
+          breathingPhase.value = 'hold';
+          breathingCount.value = 7;
+          breathingDuration.value = 7000;
+          await new Promise(resolve => setTimeout(resolve, 7000));
+          
+          if (!breathingActive.value) return;
+          
+          // Exhale for 8 seconds
+          breathingPhase.value = 'exhale';
+          breathingCount.value = 8;
+          breathingDuration.value = 8000;
+          await new Promise(resolve => setTimeout(resolve, 8000));
+          
+          if (!breathingActive.value) return;
+          
+          // Next round or complete
+          if (currentBreathRound.value < totalBreathRounds.value) {
+            currentBreathRound.value++;
+            runBreathingCycle();
+          } else {
+            breathingActive.value = false;
+            chatHistory.value.push({
+              id: Date.now(),
+              sender: 'system',
+              text: 'Vache-tastic! You completed your mental vaca-tion with 4 rounds of calming breathing. Notice how refreshed your mind feels now.',
+              timestamp: new Date()
+            });
+          }
+        };
+
+        // Energy audit methods
+        const addEnergyGiver = () => {
+          if (newEnergyGiver.value.trim()) {
+            energyGivers.value.push(newEnergyGiver.value.trim());
+            newEnergyGiver.value = '';
+          }
+        };
+
+        const addEnergyDrain = () => {
+          if (newEnergyDrain.value.trim()) {
+            energyDrains.value.push(newEnergyDrain.value.trim());
+            newEnergyDrain.value = '';
+          }
+        };
+
+        // Gratitude methods
+        const canSaveGratitude = computed(() => {
+          return threeGoodThings.value.some(thing => thing.what.trim() && thing.why.trim());
+        });
+
+        const saveGratitudeEntry = () => {
+          const filledThings = threeGoodThings.value.filter(thing => thing.what.trim() && thing.why.trim());
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Magni-fique-cow! You recorded ${filledThings.length} meaningful things you're grateful for. This helps rewire your brain to notice more positive experiences.`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          threeGoodThings.value = [
+            { what: '', why: '' },
+            { what: '', why: '' },
+            { what: '', why: '' }
+          ];
+          
+          currentView.value = 'chat';
+        };
+
+        // New exercise methods
+
+        // Thought Unhooking methods
+        const completeThoughtUnhooking = () => {
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Mucca-nificent work unhooking from that thought! You practiced seeing it as just mental content rather than absolute truth. The action step you identified: "${actionableReframe.value}" shows you're moving from worry to empowerment.`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          currentBotherThought.value = '';
+          selectedThoughtLabel.value = '';
+          actionableReframe.value = '';
+          
+          currentView.value = 'chat';
+        };
+
+        // Values Compass methods
+        const toggleValue = (value) => {
+          const index = selectedValues.value.indexOf(value);
+          if (index > -1) {
+            selectedValues.value.splice(index, 1);
+            delete valueReflections.value[value];
+          } else if (selectedValues.value.length < 5) {
+            selectedValues.value.push(value);
+            valueReflections.value[value] = '';
+          }
+        };
+
+        const removeValue = (value) => {
+          const index = selectedValues.value.indexOf(value);
+          if (index > -1) {
+            selectedValues.value.splice(index, 1);
+            delete valueReflections.value[value];
+          }
+        };
+
+        const canCompleteValues = computed(() => {
+          return selectedValues.value.length > 0 && 
+                 selectedValues.value.every(value => valueReflections.value[value]?.trim());
+        });
+
+        const completeValuesExploration = () => {
+          const valuesText = selectedValues.value.map(value => 
+            `${value}: ${valueReflections.value[value]}`
+          ).join('; ');
+
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Incroy-a-bull! You've identified your core values: ${selectedValues.value.join(', ')}. These can now serve as your compass for decision-making. When facing choices, ask: "Which option aligns best with my values?"`,
+            timestamp: new Date()
+          });
+          
+          // Reset for next time
+          selectedValues.value = [];
+          valueReflections.value = {};
+          
+          currentView.value = 'chat';
+        };
+
+        // Connection Web methods
+        const addToInnerCircle = () => {
+          if (newInnerPerson.value.trim() && !innerCircle.value.includes(newInnerPerson.value.trim())) {
+            innerCircle.value.push(newInnerPerson.value.trim());
+            newInnerPerson.value = '';
+          }
+        };
+
+        const addToWiderNetwork = () => {
+          if (newWiderPerson.value.trim() && !widerNetwork.value.includes(newWiderPerson.value.trim())) {
+            widerNetwork.value.push(newWiderPerson.value.trim());
+            newWiderPerson.value = '';
+          }
+        };
+
+        const removeFromCircle = (type, index) => {
+          if (type === 'inner') {
+            innerCircle.value.splice(index, 1);
+          } else {
+            widerNetwork.value.splice(index, 1);
+          }
+        };
+
+        const addConnectionAction = () => {
+          const newAction = connectionActions.value.length + 1;
+          connectionActions.value.push({
+            id: newAction,
+            person: '',
+            action: '',
+            when: 'this-week'
+          });
+        };
+
+        const removeConnectionAction = (index) => {
+          connectionActions.value.splice(index, 1);
+        };
+
+        const canSaveConnectionWeb = computed(() => {
+          return (innerCircle.value.length > 0 || widerNetwork.value.length > 0) &&
+                 connectionActions.value.some(action => action.person.trim() && action.action.trim());
+        });
+
+        const saveConnectionWeb = () => {
+          const totalConnections = innerCircle.value.length + widerNetwork.value.length;
+          const plannedActions = connectionActions.value.filter(action => action.person.trim() && action.action.trim()).length;
+
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Vachement fantastic! You've mapped ${totalConnections} meaningful connections and planned ${plannedActions} ways to strengthen relationships. Connection is the antidote to anxiety - you're building your support network beautifully.`,
+            timestamp: new Date()
+          });
+          
+          currentView.value = 'chat';
+        };
+
+        // Joy Jar methods
+        const canAddJoyEntry = computed(() => {
+          return currentJoyEntry.value.type && 
+                 currentJoyEntry.value.level > 0 && 
+                 currentJoyEntry.value.description.trim();
+        });
+
+        const addJoyEntry = () => {
+          if (canAddJoyEntry.value) {
+            joyEntries.value.push({
+              ...currentJoyEntry.value,
+              id: Date.now(),
+              dateAdded: new Date()
+            });
+            
+            // Reset form
+            currentJoyEntry.value = {
+              type: '',
+              when: 'today',
+              level: 0,
+              description: ''
+            };
+          }
+        };
+
+        const removeJoyEntry = (index) => {
+          joyEntries.value.splice(index, 1);
+        };
+
+        const getRandomJoyEntry = () => {
+          if (joyEntries.value.length === 0) return null;
+          const randomIndex = Math.floor(Math.random() * joyEntries.value.length);
+          return joyEntries.value[randomIndex];
+        };
+
+        const saveJoyJar = () => {
+          const joyCount = joyEntries.value.length;
+          
+          chatHistory.value.push({
+            id: Date.now(),
+            sender: 'system',
+            text: `Beautiful! Your joy jar now contains ${joyCount} precious moments. Remember, joy and playfulness aren't luxuries - they're necessities for mental wellbeing. You can revisit these anytime you need a dose of happiness.`,
+            timestamp: new Date()
+          });
+          
+          currentView.value = 'chat';
+        };
+
+        // Fetch quotes from Mandy's blog
+        const fetchBlogQuotes = async () => {
+          try {
+            isLoadingQuote.value = true;
+            
+            // Try to fetch from thoughtsonlifeandlove.com using a CORS proxy or direct fetch
+            const response = await fetch('/api/blog-quotes', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.quotes && data.quotes.length > 0) {
+                blogQuotes.value = data.quotes;
+                return true;
+              }
+            }
+          } catch (error) {
+            console.log('Blog quotes not available, using authentic fallbacks:', error);
+          } finally {
+            isLoadingQuote.value = false;
+          }
+          return false;
+        };
+
+        // Moove with Mandy quotes function
+        const getNewQuote = async () => {
+          isLoadingQuote.value = true;
+          
+          // Try blog quotes first, fall back to authentic quotes
+          let quotesArray = blogQuotes.value.length > 0 ? blogQuotes.value : authenticQuotes.value;
+          
+          if (blogQuotes.value.length === 0) {
+            // Try to fetch fresh blog content
+            const fetched = await fetchBlogQuotes();
+            if (fetched) {
+              quotesArray = blogQuotes.value;
+            }
+          }
+          
+          const randomIndex = Math.floor(Math.random() * quotesArray.length);
+          currentQuote.value = quotesArray[randomIndex];
+          isLoadingQuote.value = false;
+        };
+
+        // Initialize with a quote on page load
+        const initializeQuote = async () => {
+          await getNewQuote();
+        };
+
+        // Initialize quote immediately
+        initializeQuote();
+
+        return {
+          currentView,
+          currentSection,
+          currentExercise,
+          newMessage,
+          isTyping,
+          selectedMood,
+          moodNote,
+          moodOptions,
+          imagineSections,
+          groundingSteps,
+          chatHistory,
+          chatWithMandy,
+          exploreImagine,
+          showMoodTracker,
+          goHome,
+          goToSection,
+          getSectionGuidance,
+          getSectionTools,
+          sendMessage,
+          selectMood,
+          saveMoodEntry,
+          // Exercise methods and data
+          startExercise,
+          goBackToSection,
+          isSpecialExercise,
+          currentGroundingStep,
+          checkGroundingItem,
+          canAdvanceGrounding,
+          nextGroundingStep,
+          breathingActive,
+          breathingPhase,
+          breathingCount,
+          breathingDuration,
+          currentBreathRound,
+          totalBreathRounds,
+          startBreathing,
+          stopBreathing,
+          energyGivers,
+          energyDrains,
+          newEnergyGiver,
+          newEnergyDrain,
+          addEnergyGiver,
+          addEnergyDrain,
+          threeGoodThings,
+          canSaveGratitude,
+          saveGratitudeEntry,
+          // New exercise variables and methods
+          currentBotherThought,
+          selectedThoughtLabel,
+          thoughtLabels,
+          actionableReframe,
+          completeThoughtUnhooking,
+          selectedValues,
+          valueReflections,
+          availableValues,
+          toggleValue,
+          removeValue,
+          canCompleteValues,
+          completeValuesExploration,
+          innerCircle,
+          widerNetwork,
+          newInnerPerson,
+          newWiderPerson,
+          connectionActions,
+          addToInnerCircle,
+          addToWiderNetwork,
+          removeFromCircle,
+          addConnectionAction,
+          removeConnectionAction,
+          canSaveConnectionWeb,
+          saveConnectionWeb,
+          joyEntries,
+          currentJoyEntry,
+          canAddJoyEntry,
+          addJoyEntry,
+          removeJoyEntry,
+          getRandomJoyEntry,
+          saveJoyJar,
+          // Moove with Mandy quotes
+          currentQuote,
+          blogQuotes,
+          authenticQuotes,
+          isLoadingQuote,
+          getNewQuote,
+          fetchBlogQuotes
+        };
+      }
+    }).mount('#app');
+
+    // Register Service Worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+            
+            // Request notification permission for daily mootivations
+            requestNotificationPermission();
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Request notification permission for daily mootivations
+    async function requestNotificationPermission() {
+      if ('Notification' in window && 'serviceWorker' in navigator) {
+        // Wait a bit before asking for permissions
+        setTimeout(async () => {
+          if (Notification.permission === 'default') {
+            // Show a friendly explanation first
+            const notificationBanner = document.createElement('div');
+            notificationBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg text-white text-center';
+            notificationBanner.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <span class="text-2xl">🐄💝</span>
+                  <div class="text-left">
+                    <p class="font-semibold text-sm">Get Daily Moo-tivations!</p>
+                    <p class="text-xs opacity-80">Like having a therapeutic pet cow in your pocket 🥰</p>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button id="notifications-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Maybe later</button>
+                  <button id="notifications-allow" class="px-4 py-1 text-xs bg-white/20 rounded-full font-medium">Yes please!</button>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(notificationBanner);
+            
+            document.getElementById('notifications-allow').addEventListener('click', async () => {
+              const permission = await Notification.requestPermission();
+              if (permission === 'granted') {
+                console.log('Notifications enabled! Daily mootivations activated! 🐄💝');
+              }
+              notificationBanner.remove();
+            });
+            
+            document.getElementById('notifications-dismiss').addEventListener('click', () => {
+              notificationBanner.remove();
+            });
+            
+            // Auto-dismiss after 12 seconds
+            setTimeout(() => {
+              if (document.body.contains(notificationBanner)) {
+                notificationBanner.remove();
+              }
+            }, 12000);
+          }
+        }, 8000); // Wait 8 seconds after app loads
+      }
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    let hasShownPrompt = localStorage.getItem('cowch-install-dismissed') === 'true';
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button after a delay if not dismissed
+      if (!hasShownPrompt) {
+        setTimeout(() => {
+          if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+            showInstallPrompt();
+          }
+        }, 3000);
+      }
+    });
+    
+    // Also show prompt on page load if available and not dismissed
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (!hasShownPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+          // Check if install is available (some browsers don't fire beforeinstallprompt)
+          if ('serviceWorker' in navigator && 'PushManager' in window) {
+            showGenericInstallPrompt();
+          }
+        }
+      }, 5000);
+    });
+
+    function showInstallPrompt() {
+      if (!deferredPrompt) return;
+      
+      const installBanner = document.createElement('div');
+      installBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl shadow-lg text-white text-center';
+      installBanner.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🐄</span>
+            <div class="text-left">
+              <p class="font-semibold text-sm">Moo-ve Cowch to your home screen!</p>
+              <p class="text-xs opacity-80">For the udderly best cowch experience 🛋️</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button id="install-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Maybe later</button>
+            <button id="install-app" class="px-4 py-1 text-xs bg-white/20 rounded-full font-medium">Add to cowch</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(installBanner);
+      
+      document.getElementById('install-app').addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const result = await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          installBanner.remove();
+        }
+      });
+      
+      document.getElementById('install-dismiss').addEventListener('click', () => {
+        installBanner.remove();
+        localStorage.setItem('cowch-install-dismissed', 'true');
+        hasShownPrompt = true;
+      });
+      
+      // Auto-dismiss after 15 seconds
+      setTimeout(() => {
+        if (document.body.contains(installBanner)) {
+          installBanner.remove();
+        }
+      }, 15000);
+    }
+
+    function showGenericInstallPrompt() {
+      const installBanner = document.createElement('div');
+      installBanner.className = 'fixed bottom-4 left-4 right-4 z-50 p-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl shadow-lg text-white text-center';
+      installBanner.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🐄</span>
+            <div class="text-left">
+              <p class="font-semibold text-sm">Moo-ve Cowch to your home screen!</p>
+              <p class="text-xs opacity-80">Use your browser's "Add to Home Screen" option 🛋️</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button id="generic-install-dismiss" class="px-3 py-1 text-xs bg-black/20 rounded-full">Got it</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(installBanner);
+      
+      document.getElementById('generic-install-dismiss').addEventListener('click', () => {
+        installBanner.remove();
+        localStorage.setItem('cowch-install-dismissed', 'true');
+        hasShownPrompt = true;
+      });
+      
+      // Auto-dismiss after 8 seconds
+      setTimeout(() => {
+        if (document.body.contains(installBanner)) {
+          installBanner.remove();
+        }
+      }, 8000);
+    }
+  </script>
+</body>
+</html>

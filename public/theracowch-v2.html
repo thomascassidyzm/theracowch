@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theracowch - Your Daily Wellness Companion</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FFF5E6">
+
+  <style>
+    :root {
+      --peach-50: #FFF5E6;
+      --peach-100: #FFE4CC;
+      --peach-200: #FFD4B3;
+      --peach-300: #FFC399;
+      --peach-400: #FFB380;
+      --orange-500: #EE701A;
+      --orange-600: #D66318;
+      --brown-700: #935D26;
+      --brown-800: #6B4319;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--peach-50) 0%, #FFFFFF 50%, var(--peach-100) 100%);
+      background-attachment: fixed;
+      color: var(--brown-800);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(238, 112, 26, 0.1);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(238, 112, 26, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(238, 112, 26, 0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange-500), #f97316);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(238, 112, 26, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(238, 112, 26, 0.4);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--orange-500);
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      border: 2px solid var(--orange-500);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--peach-50);
+    }
+
+    .imagine-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .connection-node {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: move;
+      transition: all 0.3s ease;
+      position: absolute;
+    }
+
+    .connection-node.supportive {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: white;
+      box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+    }
+
+    .connection-node.neutral {
+      background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+      color: #374151;
+      box-shadow: 0 4px 15px rgba(156, 163, 175, 0.3);
+    }
+
+    .connection-node.draining {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+      box-shadow: 0 4px 15px rgba(248, 113, 113, 0.4);
+    }
+
+    .connection-web-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      background: linear-gradient(135deg, rgba(255, 245, 230, 0.5), rgba(255, 255, 255, 0.8));
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+
+    .connection-circle {
+      position: absolute;
+      border: 2px dashed rgba(238, 112, 26, 0.3);
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    .soothing-popup {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, var(--orange-500), #f97316);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 30px rgba(238, 112, 26, 0.4);
+      animation: slideIn 0.5s ease, fadeOut 0.5s ease 4.5s;
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(500px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .scale-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #f87171, #fbbf24, #4ade80);
+      appearance: none;
+    }
+
+    .scale-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--orange-500);
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(238, 112, 26, 0.4);
+    }
+
+    .cow-logo {
+      font-size: 4rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Soothing Message Popup -->
+    <transition name="fade">
+      <div v-if="showSoothingMessage" class="soothing-popup">
+        <p class="font-medium">{{ currentSoothingMessage }}</p>
+      </div>
+    </transition>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+
+      <!-- Header with Cow Logo -->
+      <header class="text-center mb-12">
+        <div class="cow-logo mb-4">🐄</div>
+        <h1 class="text-5xl font-bold mb-4" style="color: var(--orange-500);">Theracowch</h1>
+        <p class="text-xl text-gray-700">Your Daily Wellness Companion</p>
+        <p class="text-md text-gray-600 mt-2">Settle in on the cowch with AI Mandy</p>
+      </header>
+
+      <!-- Main Navigation -->
+      <nav class="flex flex-wrap justify-center gap-4 mb-8">
+        <button @click="currentView = 'home'" :class="currentView === 'home' ? 'btn-primary' : 'btn-secondary'">
+          🏠 Home
+        </button>
+        <button @click="currentView = 'imagine'" :class="currentView === 'imagine' ? 'btn-primary' : 'btn-secondary'">
+          ✨ Explore IMAGINE
+        </button>
+        <button @click="currentView = 'chat'" :class="currentView === 'chat' ? 'btn-primary' : 'btn-secondary'">
+          💬 Chat with AI Mandy
+        </button>
+        <button @click="currentView = 'progress'" :class="currentView === 'progress' ? 'btn-primary' : 'btn-secondary'">
+          📊 My Progress
+        </button>
+      </nav>
+
+      <!-- HOME VIEW -->
+      <div v-if="currentView === 'home'">
+        <div class="card text-center mb-8">
+          <h2 class="text-3xl font-bold mb-4" style="color: var(--orange-500);">Welcome Back! 🌟</h2>
+          <p class="text-lg text-gray-700 mb-6">{{ getGreeting() }}</p>
+
+          <!-- Daily Quote -->
+          <div class="bg-gradient-to-r from-orange-50 to-peach-50 p-6 rounded-xl mb-6">
+            <p class="text-xl italic mb-2">"{{ dailyQuote.text }}"</p>
+            <p class="text-sm text-gray-600">— {{ dailyQuote.author }}</p>
+          </div>
+
+          <button @click="currentView = 'imagine'" class="btn-primary text-lg">
+            Start Your IMAGINE Journey 🚀
+          </button>
+        </div>
+
+        <!-- Quick Mood Check-In -->
+        <div class="card mb-8">
+          <h3 class="text-2xl font-bold mb-4" style="color: var(--orange-500);">Quick Mood Check-In</h3>
+          <p class="mb-4">How are you feeling right now?</p>
+          <div class="flex items-center gap-4 mb-4">
+            <span>1</span>
+            <input type="range" min="1" max="10" v-model="currentMood" class="scale-slider flex-1" />
+            <span>10</span>
+          </div>
+          <p class="text-center text-2xl font-bold" style="color: var(--orange-500);">{{ currentMood }}/10</p>
+          <p class="text-sm text-gray-600 text-center mt-2">{{ getMoodLabel(currentMood) }}</p>
+          <button @click="saveMoodEntry" class="btn-primary w-full mt-4">Save Mood Entry</button>
+        </div>
+      </div>
+
+      <!-- IMAGINE VIEW -->
+      <div v-if="currentView === 'imagine'">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl font-bold mb-4" style="color: var(--orange-500);">The IMAGINE Framework</h2>
+          <p class="text-lg text-gray-700">Seven pathways to wellness, guided by therapeutic wisdom</p>
+        </div>
+
+        <div class="imagine-grid">
+          <!-- I - Me, Myself and I -->
+          <div class="card cursor-pointer" @click="selectedSection = 'self-care'">
+            <div class="text-4xl mb-3">🌱</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">I - Me, Myself & I</h3>
+            <p class="text-gray-700">Self-care and personal wellness</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Wellness Check-in<br>
+              ✓ Boundary Setting<br>
+              ✓ Energy Audit<br>
+              ✓ Mindfulness Practices
+            </div>
+          </div>
+
+          <!-- M - Mindfulness -->
+          <div class="card cursor-pointer" @click="selectedSection = 'mindfulness'">
+            <div class="text-4xl mb-3">🧘</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">M - Mindfulness</h3>
+            <p class="text-gray-700">Present moment awareness</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ 5 Senses Exercise<br>
+              ✓ Body Scan (PMR)<br>
+              ✓ Breathing Techniques
+            </div>
+          </div>
+
+          <!-- A - Acceptance -->
+          <div class="card cursor-pointer" @click="selectedSection = 'acceptance'">
+            <div class="text-4xl mb-3">🕊️</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">A - Acceptance</h3>
+            <p class="text-gray-700">Embracing your current state</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Thought Unhooking<br>
+              ✓ Radical Acceptance<br>
+              ✓ Self-Compassion (HEAL)
+            </div>
+          </div>
+
+          <!-- G - Gratitude -->
+          <div class="card cursor-pointer" @click="selectedSection = 'gratitude'">
+            <div class="text-4xl mb-3">🙏</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">G - Gratitude</h3>
+            <p class="text-gray-700">Focusing on positive aspects</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Small Wins Journal<br>
+              ✓ Daily Gratitude Practice<br>
+              ✓ Gratitude Meditation
+            </div>
+          </div>
+
+          <!-- I - Interactions -->
+          <div class="card cursor-pointer" @click="selectedSection = 'interactions'">
+            <div class="text-4xl mb-3">🤝</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">I - Interactions</h3>
+            <p class="text-gray-700">Connecting with others</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Connection Web<br>
+              ✓ Social Exercises<br>
+              ✓ Difficult Conversations
+            </div>
+          </div>
+
+          <!-- N - Nurturing -->
+          <div class="card cursor-pointer" @click="selectedSection = 'nurturing'">
+            <div class="text-4xl mb-3">🎨</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">N - Nurturing</h3>
+            <p class="text-gray-700">Fun, playfulness, and joy</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Fun Prompt Generator<br>
+              ✓ Inner Child Work<br>
+              ✓ Creative Expression
+            </div>
+          </div>
+
+          <!-- E - Exploring -->
+          <div class="card cursor-pointer" @click="selectedSection = 'exploring'">
+            <div class="text-4xl mb-3">🔍</div>
+            <h3 class="text-2xl font-bold mb-2" style="color: var(--orange-500);">E - Exploring</h3>
+            <p class="text-gray-700">Understanding thoughts & behaviors</p>
+            <div class="mt-4 text-sm text-gray-600">
+              ✓ Values Compass<br>
+              ✓ Thought Record<br>
+              ✓ Trigger Mapping
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAILED SECTION VIEWS -->
+      <div v-if="selectedSection">
+        <button @click="selectedSection = null; currentView = 'imagine'" class="btn-secondary mb-6">
+          ← Back to IMAGINE
+        </button>
+
+        <!-- SELF-CARE SECTION -->
+        <div v-if="selectedSection === 'self-care'" class="space-y-8">
+          <div class="card">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">Me, Myself & I 🌱</h2>
+
+            <!-- Wellness Check-In -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Wellness Check-In</h3>
+              <p class="mb-4">Rate different areas of your life to identify what needs more focus:</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block mb-2 font-semibold">Mood (1 = very low, 10 = very contented)</label>
+                  <input type="range" min="1" max="10" v-model="wellnessScores.mood" class="scale-slider w-full" />
+                  <p class="text-center mt-2">{{ wellnessScores.mood }}/10</p>
+                  <p v-if="wellnessScores.mood < 6" class="text-sm text-orange-600 mt-2">
+                    💡 Try: Go for a walk, listen to happy music, call a friend, play with a pet, or think about something that makes you smile!
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block mb-2 font-semibold">Exercise Satisfaction</label>
+                  <input type="range" min="1" max="10" v-model="wellnessScores.exercise" class="scale-slider w-full" />
+                  <p class="text-center mt-2">{{ wellnessScores.exercise }}/10</p>
+                </div>
+
+                <div>
+                  <label class="block mb-2 font-semibold">Diet Satisfaction</label>
+                  <input type="range" min="1" max="10" v-model="wellnessScores.diet" class="scale-slider w-full" />
+                  <p class="text-center mt-2">{{ wellnessScores.diet }}/10</p>
+                </div>
+
+                <div>
+                  <label class="block mb-2 font-semibold">Appearance & Self-Care</label>
+                  <input type="range" min="1" max="10" v-model="wellnessScores.appearance" class="scale-slider w-full" />
+                  <p class="text-center mt-2">{{ wellnessScores.appearance }}/10</p>
+                </div>
+
+                <div class="mt-6">
+                  <label class="block mb-2 font-semibold">What could you do to improve these areas?</label>
+                  <textarea v-model="wellnessNotes" rows="4"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                    placeholder="Example: Go to the gym twice instead of once per week; eat salad at least once per week; book a massage"></textarea>
+                </div>
+
+                <button @click="saveWellnessCheck()" class="btn-primary">Save Wellness Check-In</button>
+              </div>
+            </div>
+
+            <!-- Energy Audit -->
+            <div class="mb-8 bg-gradient-to-r from-orange-50 to-peach-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Energy Audit ⚡</h3>
+              <p class="mb-4">Identify what brings you energy and what drains it:</p>
+
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block mb-2 font-semibold text-green-700">✅ Things that bring positive energy:</label>
+                  <textarea v-model="energyAudit.positive" rows="6"
+                    class="w-full p-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none"
+                    placeholder="Examples: Good friends, mentors, sleep, fun, watching comedies, music..."></textarea>
+                </div>
+
+                <div>
+                  <label class="block mb-2 font-semibold text-red-700">⚠️ Things that drain energy:</label>
+                  <textarea v-model="energyAudit.negative" rows="6"
+                    class="w-full p-3 border-2 border-red-200 rounded-xl focus:border-red-500 focus:outline-none"
+                    placeholder="Examples: Toxic people, job you hate, lack of sleep, being passive..."></textarea>
+                </div>
+              </div>
+
+              <p class="mt-4 text-sm text-gray-600 text-center">
+                💡 Goal: Keep balance with more positive energy coming into your life!
+              </p>
+            </div>
+
+            <!-- Mindfulness: 5 Senses -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Sensational Vacation (5 Senses) 👁️👂👃👅✋</h3>
+              <p class="mb-4">When you use your 5 senses, your brain doesn't have time to engage with your worries. It's a great mental break!</p>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="block font-semibold mb-2">5 things you can SEE:</label>
+                  <input type="text" v-model="fiveSenses.see" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-2">4 things you can TOUCH:</label>
+                  <input type="text" v-model="fiveSenses.touch" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-2">3 things you can HEAR:</label>
+                  <input type="text" v-model="fiveSenses.hear" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-2">2 things you can SMELL:</label>
+                  <input type="text" v-model="fiveSenses.smell" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-2">1 thing you can TASTE:</label>
+                  <input type="text" v-model="fiveSenses.taste" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+              </div>
+
+              <button @click="completeFiveSenses()" class="btn-primary mt-4">Complete Exercise</button>
+            </div>
+
+            <!-- Body Scan (PMR) -->
+            <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Body Scan - Progressive Muscle Relaxation 🧘</h3>
+              <div class="space-y-4">
+                <p>Progressive Muscle Relaxation (PMR) helps you become aware of tension and learn to relax.</p>
+                <p class="text-sm">When we're tense, we involuntarily send a message to our brains that we feel in danger. PMR helps us feel calm and turn off the amygdala.</p>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">Instructions:</h4>
+                  <ol class="list-decimal list-inside space-y-2 text-sm">
+                    <li>Sit or lie down comfortably</li>
+                    <li>Start with your feet: tense the muscles for 5 seconds, then release and notice the relaxation</li>
+                    <li>Move upward through: legs, stomach, hands, arms, shoulders, face</li>
+                    <li>Tense each group for 5 seconds, then relax</li>
+                    <li>Breathe slowly and notice the difference between tension and calm</li>
+                  </ol>
+                  <p class="mt-4 text-sm font-semibold">💡 Tip: Perfect for better sleep - try before bedtime!</p>
+                </div>
+
+                <button @click="startPMRGuided()" class="btn-primary">Start Guided PMR</button>
+              </div>
+            </div>
+
+            <!-- Thought Unhooking -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Thought Unhooking 🍃</h3>
+              <p class="mb-4">Learn to detach from anxious thoughts by thinking of them as leaves floating by on a stream. You don't need to pick up every leaf (thought) and focus on it.</p>
+
+              <div class="bg-orange-50 p-4 rounded-lg mb-4">
+                <p class="font-semibold mb-2">Did you know?</p>
+                <ul class="text-sm space-y-1">
+                  <li>• Humans have about 6,000 distinct thoughts a day</li>
+                  <li>• Most are repetitive or fleeting</li>
+                  <li>• Only a fraction are directly useful</li>
+                  <li>• <strong>Thoughts aren't facts!!</strong></li>
+                </ul>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">What thought is bothering you right now?</label>
+                  <textarea v-model="thoughtUnhook.original" rows="3"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                    placeholder="Example: Once people really get to know me, they won't like me"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Now reframe this thought - challenge it:</label>
+                  <textarea v-model="thoughtUnhook.reframe" rows="3"
+                    class="w-full p-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none"
+                    placeholder="Example: No one is perfect and not everyone I know dislikes me"></textarea>
+                </div>
+
+                <p class="text-sm italic text-gray-600">Remember: Don't believe every thought you think. Most negative thoughts are based on fear and insecurity, not on truth.</p>
+
+                <button @click="saveThoughtUnhook()" class="btn-primary">Save Reframe</button>
+              </div>
+            </div>
+
+            <!-- Self-Compassion HEAL -->
+            <div class="mb-8 bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Self-Compassion Practice (H-E-A-L) 💝</h3>
+              <p class="mb-4">Treat yourself with kindness! MRI studies show self-criticism activates the brain's threat system, while self-compassion activates areas linked with safety and care.</p>
+
+              <div class="space-y-6">
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">H - Helpful</h4>
+                  <p class="text-sm mb-2">Is this negative thought helpful?</p>
+                  <input type="text" v-model="healFramework.helpful"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="Usually the answer is NO. What we focus on becomes our reality." />
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">E - Evidence</h4>
+                  <p class="text-sm mb-2">Where is the evidence for/against this thought?</p>
+                  <textarea v-model="healFramework.evidence" rows="3"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="Most negative thoughts have very little ACTUAL evidence (the type that would stand up in court)."></textarea>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">A - Alternative</h4>
+                  <p class="text-sm mb-2">What can you tell yourself that will make you feel better?</p>
+                  <textarea v-model="healFramework.alternative" rows="3"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="Reframe the situation in a more balanced way."></textarea>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">L - Loved One</h4>
+                  <p class="text-sm mb-2">What would you say to a loved one in this situation?</p>
+                  <textarea v-model="healFramework.lovedOne" rows="3"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="This is exactly the way you should talk to yourself!"></textarea>
+                </div>
+
+                <button @click="saveHEALPractice()" class="btn-primary">Complete H-E-A-L Practice</button>
+              </div>
+            </div>
+
+            <!-- Radical Acceptance -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Radical Acceptance 🕊️</h3>
+              <p class="mb-4">Resisting what you cannot change creates more suffering. Acceptance isn't approval — it's letting go of extra suffering.</p>
+
+              <div class="bg-orange-50 p-4 rounded-lg mb-4">
+                <p class="font-semibold mb-2">Ask yourself: What am I resisting?</p>
+                <textarea v-model="radicalAcceptance.resisting" rows="3"
+                  class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                  placeholder="Example: Your relationship is over but you keep hoping to get your ex back when they have shown no interest."></textarea>
+              </div>
+
+              <div class="bg-green-50 p-4 rounded-lg mb-4">
+                <p class="font-semibold mb-2">What would accepting this situation allow you to feel/do?</p>
+                <textarea v-model="radicalAcceptance.acceptance" rows="3"
+                  class="w-full p-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  placeholder="Acceptance helps you move forward. Letting go brings peace."></textarea>
+              </div>
+
+              <div class="bg-white p-4 rounded-lg">
+                <h4 class="font-semibold mb-3">Acceptance Reaffirmation Exercise:</h4>
+                <ol class="text-sm space-y-2 list-decimal list-inside">
+                  <li>Take a slow breath and tell yourself: "This is the reality right now."</li>
+                  <li>Whisper: "I don't have to fight this. I can let go."</li>
+                  <li>Remind yourself: "Acceptance helps me move forward."</li>
+                  <li>Place your hand on your heart and notice the warmth.</li>
+                  <li>Let the sense of relief sink in.</li>
+                </ol>
+                <p class="mt-3 text-sm italic">Your power lies within. You control your thoughts and behaviors.</p>
+              </div>
+
+              <button @click="saveRadicalAcceptance()" class="btn-primary mt-4">Save Reflection</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRATITUDE SECTION -->
+        <div v-if="selectedSection === 'gratitude'" class="space-y-8">
+          <div class="card">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">Gratitude 🙏</h2>
+
+            <!-- Small Wins Celebration -->
+            <div class="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Celebrate Small Wins 🌟</h3>
+              <p class="mb-4">Small wins = quiet victories. They're the building blocks of big change!</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">Think of one small win from today or yesterday:</label>
+                  <input type="text" v-model="smallWin.achievement"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                    placeholder="It could be finishing a task, getting out of bed, sending a message, or just breathing..." />
+                </div>
+
+                <div class="text-center p-4 bg-white rounded-lg">
+                  <p class="text-lg font-semibold mb-2">Acknowledge it:</p>
+                  <p class="text-2xl" style="color: var(--orange-500);">"That mattered. I did that."</p>
+                </div>
+
+                <div>
+                  <p class="font-semibold mb-2">How did this make you feel?</p>
+                  <div class="flex flex-wrap gap-2">
+                    <button @click="smallWin.feeling = 'Proud'" :class="smallWin.feeling === 'Proud' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">😊 Proud</button>
+                    <button @click="smallWin.feeling = 'Grateful'" :class="smallWin.feeling === 'Grateful' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🙏 Grateful</button>
+                    <button @click="smallWin.feeling = 'Accomplished'" :class="smallWin.feeling === 'Accomplished' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">✨ Accomplished</button>
+                    <button @click="smallWin.feeling = 'Hopeful'" :class="smallWin.feeling === 'Hopeful' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🌈 Hopeful</button>
+                  </div>
+                </div>
+
+                <button @click="saveSmallWin()" class="btn-primary w-full">Celebrate This Win! 🎉</button>
+              </div>
+            </div>
+
+            <!-- Gratitude Journal -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Gratitude Journal 📔</h3>
+              <p class="mb-4">Write down happy things to read when you need a boost:</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">Today I'm grateful for:</label>
+                  <textarea v-model="gratitudeEntry.content" rows="4"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                    placeholder="What brought you joy, peace, or comfort today?"></textarea>
+                </div>
+
+                <button @click="saveGratitudeEntry()" class="btn-primary">Add to Journal</button>
+              </div>
+
+              <div v-if="gratitudeJournal.length > 0" class="mt-6">
+                <h4 class="font-bold mb-3">Your Gratitude Entries:</h4>
+                <div class="space-y-3">
+                  <div v-for="(entry, index) in gratitudeJournal" :key="index" class="bg-white p-4 rounded-lg border-2 border-orange-100">
+                    <p class="text-sm text-gray-500 mb-1">{{ entry.date }}</p>
+                    <p>{{ entry.content }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Daily Gratitude Practice -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">30-Second Gratitude Practice ⏱️</h3>
+              <p class="mb-4">Repetition is key! Do this daily:</p>
+
+              <div class="bg-white p-4 rounded-lg mb-4">
+                <ol class="space-y-2 text-sm">
+                  <li><strong>Pause:</strong> Close your eyes, take one slow breath in and out.</li>
+                  <li><strong>Recall:</strong> Think of one small win from today.</li>
+                  <li><strong>Acknowledge:</strong> Say to yourself, "That mattered. I did that."</li>
+                  <li><strong>Feel:</strong> Place your hand on your heart and notice the warmth.</li>
+                  <li><strong>Finish:</strong> Smile gently and whisper, "Small wins move me forward."</li>
+                </ol>
+              </div>
+
+              <button @click="startQuickGratitude()" class="btn-primary w-full">Start 30-Second Practice</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- INTERACTIONS SECTION -->
+        <div v-if="selectedSection === 'interactions'" class="space-y-8">
+          <div class="card">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">Interactions 🤝</h2>
+
+            <!-- Connection Web -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Your Connection Web 🕸️</h3>
+              <p class="mb-4">Visualize your relationships. Drag people closer or further based on how they make you feel.</p>
+
+              <div class="connection-web-container">
+                <!-- Concentric circles -->
+                <div class="connection-circle" style="width: 150px; height: 150px; left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+                <div class="connection-circle" style="width: 300px; height: 300px; left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+                <div class="connection-circle" style="width: 450px; height: 450px; left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+
+                <!-- Center (Me) -->
+                <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: bold; z-index: 10;">
+                  ME
+                </div>
+
+                <!-- Connection Nodes -->
+                <div v-for="(connection, index) in connections" :key="index"
+                     :class="['connection-node', connection.type]"
+                     :style="{ left: connection.x + 'px', top: connection.y + 'px' }"
+                     @mousedown="startDrag(index, $event)"
+                     @click="showConnectionDetails(connection)">
+                  {{ connection.name }}
+                </div>
+              </div>
+
+              <div class="mt-6 flex gap-4">
+                <button @click="showAddConnection = true" class="btn-primary">➕ Add Connection</button>
+                <button @click="saveConnectionWeb()" class="btn-secondary">💾 Save Web</button>
+              </div>
+
+              <!-- Add Connection Modal -->
+              <div v-if="showAddConnection" class="mt-6 bg-white p-6 rounded-xl border-2 border-orange-200">
+                <h4 class="font-bold mb-4">Add a Connection:</h4>
+                <div class="space-y-4">
+                  <input type="text" v-model="newConnection.name" placeholder="Name or nickname"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+
+                  <select v-model="newConnection.type" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none">
+                    <option value="supportive">☀️ Supportive</option>
+                    <option value="neutral">⚪ Neutral</option>
+                    <option value="draining">⚡ Draining</option>
+                  </select>
+
+                  <div class="flex gap-2">
+                    <button @click="addConnection()" class="btn-primary flex-1">Add</button>
+                    <button @click="showAddConnection = false" class="btn-secondary flex-1">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 bg-orange-50 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Reflection Prompts:</h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Who in your inner circle lifts you up the most?</li>
+                  <li>• Is there someone draining you who might need a boundary?</li>
+                  <li>• Is there a connection you'd like to strengthen?</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Social Exercises -->
+            <div class="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Daily Connection Exercises 💬</h3>
+
+              <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">📱 Daily Check-In</h4>
+                  <p class="text-sm mb-2">Send a kind message to one person today (e.g., "thinking of you")</p>
+                  <input type="text" placeholder="Who will you message today?"
+                    class="w-full p-2 border-2 border-blue-200 rounded-lg" />
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">👂 Active Listening</h4>
+                  <p class="text-sm">In your next conversation: Listen fully, pause before replying, reflect back one thing they said.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">🙏 Gratitude Note</h4>
+                  <p class="text-sm mb-2">Write one thing you appreciate about someone:</p>
+                  <textarea rows="2" placeholder="What do you appreciate?"
+                    class="w-full p-2 border-2 border-blue-200 rounded-lg"></textarea>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                  <h4 class="font-bold mb-2">😊 Kindness Ripple</h4>
+                  <p class="text-sm">Perform one small act of kindness (hold a door, compliment, share a smile)</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Difficult Conversations -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Difficult Conversations 💬</h3>
+              <p class="mb-4">Use this assertive script template to communicate clearly and kindly:</p>
+
+              <div class="bg-orange-50 p-4 rounded-lg mb-4">
+                <h4 class="font-bold mb-3">Assertive Script Template:</h4>
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <label class="font-semibold">I feel _________</label>
+                    <input type="text" v-model="difficultConvo.feeling" placeholder="e.g., frustrated, upset"
+                      class="w-full mt-1 p-2 border-2 border-orange-200 rounded-lg" />
+                  </div>
+
+                  <div>
+                    <label class="font-semibold">...when _________</label>
+                    <input type="text" v-model="difficultConvo.behavior" placeholder="e.g., meetings start late"
+                      class="w-full mt-1 p-2 border-2 border-orange-200 rounded-lg" />
+                  </div>
+
+                  <div>
+                    <label class="font-semibold">...because _________</label>
+                    <input type="text" v-model="difficultConvo.impact" placeholder="e.g., it throws off my schedule"
+                      class="w-full mt-1 p-2 border-2 border-orange-200 rounded-lg" />
+                  </div>
+
+                  <div>
+                    <label class="font-semibold">I would appreciate if _________</label>
+                    <input type="text" v-model="difficultConvo.request" placeholder="e.g., we could start on time"
+                      class="w-full mt-1 p-2 border-2 border-orange-200 rounded-lg" />
+                  </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-white rounded-lg">
+                  <p class="font-semibold mb-2">Your Script:</p>
+                  <p class="italic">
+                    "I feel {{ difficultConvo.feeling || '___' }} when {{ difficultConvo.behavior || '___' }}
+                    because {{ difficultConvo.impact || '___' }}. I would appreciate if {{ difficultConvo.request || '___' }}."
+                  </p>
+                </div>
+
+                <button @click="saveDifficultConvo()" class="btn-primary mt-4 w-full">Save Script</button>
+              </div>
+
+              <div class="text-sm text-gray-600">
+                <p class="font-semibold mb-2">💡 Best Practices:</p>
+                <ul class="space-y-1">
+                  <li>• Avoid "You always" or "You never" - they make people defensive</li>
+                  <li>• Use concrete examples, speak calmly</li>
+                  <li>• Listen as well as share - create space for understanding</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NURTURING SECTION -->
+        <div v-if="selectedSection === 'nurturing'" class="space-y-8">
+          <div class="card">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">Nurturing 🎨</h2>
+
+            <!-- Fun Prompt Generator -->
+            <div class="mb-8 bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Fun Prompt Generator 🎲</h3>
+              <p class="mb-4">Get a daily playful prompt to add lightness to your day!</p>
+
+              <div class="text-center">
+                <div v-if="currentFunPrompt" class="bg-white p-6 rounded-xl mb-4">
+                  <p class="text-2xl mb-4">{{ currentFunPrompt }}</p>
+                  <div class="space-y-2">
+                    <button @click="logFunPrompt('yes')" class="btn-primary">✅ I did it!</button>
+                    <button @click="logFunPrompt('skip')" class="btn-secondary">⏭️ Skip this one</button>
+                  </div>
+                </div>
+
+                <button @click="getRandomFunPrompt()" class="btn-primary text-lg">
+                  🎲 Get My Fun Prompt!
+                </button>
+              </div>
+
+              <div v-if="funPromptStreak > 0" class="mt-4 text-center">
+                <p class="text-lg font-bold" style="color: var(--orange-500);">
+                  🔥 {{ funPromptStreak }} Day Silly Streak!
+                </p>
+              </div>
+            </div>
+
+            <!-- Fun & Playfulness Diary -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Fun & Playfulness Diary 📝</h3>
+              <p class="mb-4">Check in a few times per week to track how much fun you're having!</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">Today I had fun when...</label>
+                  <input type="text" v-model="funDiary.activity"
+                    class="w-full p-3 border-2 border-pink-200 rounded-xl focus:border-pink-500 focus:outline-none"
+                    placeholder="What brought you joy?" />
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">How did it make you feel?</label>
+                  <div class="flex flex-wrap gap-2">
+                    <button @click="funDiary.feeling = 'joyful'" :class="funDiary.feeling === 'joyful' ? 'bg-pink-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">😄 Joyful</button>
+                    <button @click="funDiary.feeling = 'silly'" :class="funDiary.feeling === 'silly' ? 'bg-pink-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🤪 Silly</button>
+                    <button @click="funDiary.feeling = 'free'" :class="funDiary.feeling = 'free' ? 'bg-pink-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🌈 Free</button>
+                    <button @click="funDiary.feeling = 'peaceful'" :class="funDiary.feeling === 'peaceful' ? 'bg-pink-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🕊️ Peaceful</button>
+                  </div>
+                </div>
+
+                <button @click="saveFunDiary()" class="btn-primary">Save Entry</button>
+              </div>
+            </div>
+
+            <!-- Inner Child Work -->
+            <div class="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Inner Child Play 🧸</h3>
+              <p class="mb-4">Reconnect with your inner child through playful activities!</p>
+
+              <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('color')">
+                  <div class="text-3xl mb-2">🎨</div>
+                  <h4 class="font-bold">Doodle & Color</h4>
+                  <p class="text-sm text-gray-600">Without worrying how it looks</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('bubbles')">
+                  <div class="text-3xl mb-2">🫧</div>
+                  <h4 class="font-bold">Blow Bubbles</h4>
+                  <p class="text-sm text-gray-600">Or imagine doing it</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('dance')">
+                  <div class="text-3xl mb-2">💃</div>
+                  <h4 class="font-bold">Childhood Dance</h4>
+                  <p class="text-sm text-gray-600">Put on a favorite song</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('fort')">
+                  <div class="text-3xl mb-2">🏰</div>
+                  <h4 class="font-bold">Build a Fort</h4>
+                  <p class="text-sm text-gray-600">Tiny pillow fort & sit inside</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('skip')">
+                  <div class="text-3xl mb-2">🦘</div>
+                  <h4 class="font-bold">Skip & Hop</h4>
+                  <p class="text-sm text-gray-600">Just for fun!</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg cursor-pointer hover:shadow-lg transition" @click="selectInnerChildActivity('superhero')">
+                  <div class="text-3xl mb-2">🦸</div>
+                  <h4 class="font-bold">Power Pose</h4>
+                  <p class="text-sm text-gray-600">Strike your best superhero pose</p>
+                </div>
+              </div>
+
+              <div v-if="innerChildReflection" class="bg-white p-4 rounded-lg">
+                <h4 class="font-bold mb-3">How did that make you feel?</h4>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <button @click="innerChildFeeling = 'calm'" :class="innerChildFeeling === 'calm' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🌿 Calm</button>
+                  <button @click="innerChildFeeling = 'joyful'" :class="innerChildFeeling === 'joyful' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">😄 Joyful</button>
+                  <button @click="innerChildFeeling = 'nostalgic'" :class="innerChildFeeling === 'nostalgic' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">💭 Nostalgic</button>
+                  <button @click="innerChildFeeling = 'silly'" :class="innerChildFeeling === 'silly' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🎈 Silly</button>
+                  <button @click="innerChildFeeling = 'free'" :class="innerChildFeeling === 'free' ? 'bg-orange-500 text-white' : 'bg-gray-200'" class="px-4 py-2 rounded-full">🌈 Free</button>
+                </div>
+
+                <label class="block font-semibold mb-2">Connecting with my inner child reminded me that...</label>
+                <textarea v-model="innerChildThought" rows="3"
+                  class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"></textarea>
+
+                <button @click="saveInnerChildReflection()" class="btn-primary mt-4">Save Reflection</button>
+              </div>
+            </div>
+
+            <!-- Creative Expression Log -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Creative Expression Log 🎭</h3>
+              <p class="mb-4">Track your creative hobbies and activities!</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">Creative Activity:</label>
+                  <input type="text" v-model="creativityLog.activity"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="e.g., Painting, playing music, flying drone, pottery..." />
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block font-semibold mb-2">Achievement (1-10):</label>
+                    <input type="range" min="1" max="10" v-model="creativityLog.achievement" class="scale-slider w-full" />
+                    <p class="text-center">{{ creativityLog.achievement }}/10</p>
+                  </div>
+
+                  <div>
+                    <label class="block font-semibold mb-2">Enjoyment (1-10):</label>
+                    <input type="range" min="1" max="10" v-model="creativityLog.enjoyment" class="scale-slider w-full" />
+                    <p class="text-center">{{ creativityLog.enjoyment }}/10</p>
+                  </div>
+
+                  <div>
+                    <label class="block font-semibold mb-2">Closeness (if with others):</label>
+                    <input type="range" min="1" max="10" v-model="creativityLog.closeness" class="scale-slider w-full" />
+                    <p class="text-center">{{ creativityLog.closeness }}/10</p>
+                  </div>
+                </div>
+
+                <button @click="saveCreativityLog()" class="btn-primary">Save Creative Activity</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXPLORING SECTION -->
+        <div v-if="selectedSection === 'exploring'" class="space-y-8">
+          <div class="card">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">Exploring 🔍</h2>
+
+            <!-- Values Compass -->
+            <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Values Compass 🧭</h3>
+              <p class="mb-4">Identify your core values to guide your decisions and actions.</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">What values are most important to you?</label>
+                  <div class="grid md:grid-cols-3 gap-2">
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.family" />
+                      Family
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.health" />
+                      Health
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.creativity" />
+                      Creativity
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.honesty" />
+                      Honesty
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.growth" />
+                      Growth
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.kindness" />
+                      Kindness
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.adventure" />
+                      Adventure
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.security" />
+                      Security
+                    </label>
+                    <label class="flex items-center gap-2 bg-white p-2 rounded">
+                      <input type="checkbox" v-model="values.freedom" />
+                      Freedom
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">How well are you living according to these values? (1-10)</label>
+                  <input type="range" min="1" max="10" v-model="valuesAlignment" class="scale-slider w-full" />
+                  <p class="text-center text-lg mt-2">{{ valuesAlignment }}/10</p>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">What actions would align better with your values?</label>
+                  <textarea v-model="valuesActions" rows="4"
+                    class="w-full p-3 border-2 border-blue-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                    placeholder="When your actions align with your values, you feel authentic and fulfilled..."></textarea>
+                </div>
+
+                <button @click="saveValues()" class="btn-primary">Save Values Compass</button>
+              </div>
+            </div>
+
+            <!-- Thought Record -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Thought Record 📝</h3>
+              <p class="mb-4">Track and challenge unhelpful thinking patterns using CBT techniques.</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">Situation (What was happening?):</label>
+                  <input type="text" v-model="thoughtRecord.situation"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none" />
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Automatic Thought:</label>
+                  <textarea v-model="thoughtRecord.thought" rows="2"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block font-semibold mb-2">Emotion:</label>
+                    <input type="text" v-model="thoughtRecord.emotion"
+                      class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                      placeholder="e.g., Anxious, Sad, Angry" />
+                  </div>
+
+                  <div>
+                    <label class="block font-semibold mb-2">Intensity (0-100):</label>
+                    <input type="range" min="0" max="100" v-model="thoughtRecord.intensity" class="scale-slider w-full" />
+                    <p class="text-center">{{ thoughtRecord.intensity }}%</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Evidence FOR the thought:</label>
+                  <textarea v-model="thoughtRecord.evidenceFor" rows="2"
+                    class="w-full p-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Evidence AGAINST the thought:</label>
+                  <textarea v-model="thoughtRecord.evidenceAgainst" rows="2"
+                    class="w-full p-3 border-2 border-red-200 rounded-xl focus:border-red-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Balanced Alternative Thought:</label>
+                  <textarea v-model="thoughtRecord.balanced" rows="3"
+                    class="w-full p-3 border-2 border-blue-200 rounded-xl focus:border-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Emotion Intensity After (0-100):</label>
+                  <input type="range" min="0" max="100" v-model="thoughtRecord.intensityAfter" class="scale-slider w-full" />
+                  <p class="text-center">{{ thoughtRecord.intensityAfter }}%</p>
+                </div>
+
+                <button @click="saveThoughtRecord()" class="btn-primary">Save Thought Record</button>
+              </div>
+            </div>
+
+            <!-- Trigger Mapping -->
+            <div class="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl">
+              <h3 class="text-2xl font-bold mb-4">Trigger Mapping 🗺️</h3>
+              <p class="mb-4">Identify patterns and triggers for difficult emotions.</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">What situations, people, or thoughts trigger anxiety/stress?</label>
+                  <textarea v-model="triggerMap.triggers" rows="4"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Physical responses when triggered:</label>
+                  <textarea v-model="triggerMap.physical" rows="3"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                    placeholder="e.g., Racing heart, tight chest, shallow breathing..."></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Coping strategies for these triggers:</label>
+                  <textarea v-model="triggerMap.coping" rows="4"
+                    class="w-full p-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"></textarea>
+                </div>
+
+                <button @click="saveTriggerMap()" class="btn-primary">Save Trigger Map</button>
+              </div>
+            </div>
+
+            <!-- Safety Behaviors -->
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">Safety Behaviors 🛡️</h3>
+              <p class="mb-4">Recognize behaviors that maintain anxiety and build true confidence by gradually reducing them.</p>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block font-semibold mb-2">What do you avoid to feel safe?</label>
+                  <textarea v-model="safetyBehaviors.avoidance" rows="3"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"
+                    placeholder="e.g., Social situations, phone calls, trying new things..."></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">Subtle safety behaviors (checking, seeking reassurance, over-preparing):</label>
+                  <textarea v-model="safetyBehaviors.subtle" rows="3"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">How do these behaviors prevent you from learning you're safe?</label>
+                  <textarea v-model="safetyBehaviors.consequences" rows="3"
+                    class="w-full p-3 border-2 border-orange-200 rounded-xl focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block font-semibold mb-2">One small step to drop a safety behavior:</label>
+                  <input type="text" v-model="safetyBehaviors.smallStep"
+                    class="w-full p-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none"
+                    placeholder="e.g., Make one phone call without preparing a script..." />
+                </div>
+
+                <button @click="saveSafetyBehaviors()" class="btn-primary">Save & Commit to Change</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT VIEW -->
+      <div v-if="currentView === 'chat'">
+        <div class="card max-w-3xl mx-auto">
+          <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🐄</div>
+            <h2 class="text-3xl font-bold mb-2" style="color: var(--orange-500);">Chat with AI Mandy</h2>
+            <p class="text-gray-700">Your therapeutic companion, guided by Mandy Kloppers' wisdom</p>
+          </div>
+
+          <!-- Chat Messages -->
+          <div class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+            <div v-for="(msg, index) in chatMessages" :key="index"
+                 :class="msg.sender === 'user' ? 'text-right' : 'text-left'">
+              <div :class="msg.sender === 'user' ? 'bg-orange-100 ml-auto' : 'bg-gray-100'"
+                   class="inline-block p-4 rounded-2xl max-w-md">
+                <p>{{ msg.text }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ msg.time }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="flex gap-2">
+            <input type="text" v-model="chatInput" @keyup.enter="sendMessage"
+                   placeholder="Share what's on your mind..."
+                   class="flex-1 p-4 border-2 border-orange-200 rounded-2xl focus:border-orange-500 focus:outline-none" />
+            <button @click="sendMessage" class="btn-primary px-8">Send</button>
+          </div>
+
+          <p class="text-xs text-gray-500 text-center mt-4">
+            AI Mandy provides coaching support, not therapy. For mental health emergencies, contact professional services.
+          </p>
+        </div>
+      </div>
+
+      <!-- PROGRESS VIEW -->
+      <div v-if="currentView === 'progress'">
+        <div class="card">
+          <h2 class="text-3xl font-bold mb-6" style="color: var(--orange-500);">My Progress 📊</h2>
+
+          <!-- Streaks -->
+          <div class="grid md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl text-center">
+              <div class="text-4xl mb-2">🔥</div>
+              <p class="text-3xl font-bold" style="color: var(--orange-500);">{{ totalDays }}</p>
+              <p class="text-gray-700">Days Active</p>
+            </div>
+
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl text-center">
+              <div class="text-4xl mb-2">✨</div>
+              <p class="text-3xl font-bold" style="color: var(--orange-500);">{{ activitiesCompleted }}</p>
+              <p class="text-gray-700">Activities Completed</p>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl text-center">
+              <div class="text-4xl mb-2">🙏</div>
+              <p class="text-3xl font-bold" style="color: var(--orange-500);">{{ gratitudeCount }}</p>
+              <p class="text-gray-700">Gratitude Entries</p>
+            </div>
+          </div>
+
+          <!-- Mood Trend -->
+          <div class="bg-gradient-to-r from-orange-50 to-peach-50 p-6 rounded-xl mb-6">
+            <h3 class="text-2xl font-bold mb-4">Mood Trend</h3>
+            <p class="text-lg mb-2">Average mood this week: <span class="font-bold" style="color: var(--orange-500);">{{ averageMood }}/10</span></p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full transition-all"
+                   :style="{ width: (averageMood * 10) + '%' }"></div>
+            </div>
+          </div>
+
+          <!-- Section Usage -->
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Your IMAGINE Journey</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🌱 Me, Myself & I</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.selfCare }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🧘 Mindfulness</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.mindfulness }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🕊️ Acceptance</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.acceptance }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🙏 Gratitude</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.gratitude }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🤝 Interactions</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.interactions }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🎨 Nurturing</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.nurturing }} visits</span>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <span>🔍 Exploring</span>
+                <span class="font-bold" style="color: var(--orange-500);">{{ sectionProgress.exploring }} visits</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          // Navigation
+          currentView: 'home',
+          selectedSection: null,
+
+          // User data
+          currentMood: 5,
+          wellnessScores: {
+            mood: 5,
+            exercise: 5,
+            diet: 5,
+            appearance: 5
+          },
+          wellnessNotes: '',
+          energyAudit: {
+            positive: '',
+            negative: ''
+          },
+          fiveSenses: {
+            see: '',
+            touch: '',
+            hear: '',
+            smell: '',
+            taste: ''
+          },
+          thoughtUnhook: {
+            original: '',
+            reframe: ''
+          },
+          healFramework: {
+            helpful: '',
+            evidence: '',
+            alternative: '',
+            lovedOne: ''
+          },
+          radicalAcceptance: {
+            resisting: '',
+            acceptance: ''
+          },
+          smallWin: {
+            achievement: '',
+            feeling: ''
+          },
+          gratitudeEntry: {
+            content: ''
+          },
+          gratitudeJournal: [],
+
+          // Connections
+          connections: [
+            { name: 'Best Friend', type: 'supportive', x: 200, y: 150 },
+            { name: 'Colleague', type: 'neutral', x: 400, y: 200 },
+            { name: 'Ex', type: 'draining', x: 500, y: 400 }
+          ],
+          showAddConnection: false,
+          newConnection: {
+            name: '',
+            type: 'supportive',
+            x: 300,
+            y: 300
+          },
+          draggingIndex: null,
+
+          // Difficult Conversations
+          difficultConvo: {
+            feeling: '',
+            behavior: '',
+            impact: '',
+            request: ''
+          },
+
+          // Nurturing
+          funPrompts: [
+            'Do a silly dance for 30 seconds! 💃',
+            'Tell yourself the worst (cheesiest) joke you can think of 🧀',
+            'Put a random object on your head and see how long it balances ⚖️',
+            'Hum your favorite song out loud like nobody\'s listening 🎵',
+            'Try speaking in a silly accent for a minute 🗣️',
+            'Draw a doodle with your non-dominant hand ✏️',
+            'Pretend you\'re a kid again — skip, hop, or spin in a circle! 🦘',
+            'Find one tiny thing that makes you smile right now 😊'
+          ],
+          currentFunPrompt: '',
+          funPromptStreak: 0,
+          funDiary: {
+            activity: '',
+            feeling: ''
+          },
+          innerChildReflection: false,
+          innerChildFeeling: '',
+          innerChildThought: '',
+          creativityLog: {
+            activity: '',
+            achievement: 5,
+            enjoyment: 5,
+            closeness: 5
+          },
+
+          // Exploring
+          values: {
+            family: false,
+            health: false,
+            creativity: false,
+            honesty: false,
+            growth: false,
+            kindness: false,
+            adventure: false,
+            security: false,
+            freedom: false
+          },
+          valuesAlignment: 5,
+          valuesActions: '',
+          thoughtRecord: {
+            situation: '',
+            thought: '',
+            emotion: '',
+            intensity: 50,
+            evidenceFor: '',
+            evidenceAgainst: '',
+            balanced: '',
+            intensityAfter: 50
+          },
+          triggerMap: {
+            triggers: '',
+            physical: '',
+            coping: ''
+          },
+          safetyBehaviors: {
+            avoidance: '',
+            subtle: '',
+            consequences: '',
+            smallStep: ''
+          },
+
+          // Chat
+          chatMessages: [
+            {
+              sender: 'ai',
+              text: 'Hello! I\'m AI Mandy. Whether you just need someone to listen or want to make amazing changes, I\'m here to support you. What\'s on your mind today?',
+              time: new Date().toLocaleTimeString()
+            }
+          ],
+          chatInput: '',
+
+          // Progress
+          totalDays: 1,
+          activitiesCompleted: 0,
+          gratitudeCount: 0,
+          averageMood: 7,
+          sectionProgress: {
+            selfCare: 0,
+            mindfulness: 0,
+            acceptance: 0,
+            gratitude: 0,
+            interactions: 0,
+            nurturing: 0,
+            exploring: 0
+          },
+
+          // Soothing Messages
+          soothingMessages: [
+            "Every small step counts — take a moment to thank yourself for it.",
+            "Celebrate the little wins; they're the building blocks of big change.",
+            "Gratitude grows when you notice the small things you've achieved today.",
+            "Even the tiniest progress is proof you're moving forward.",
+            "Pause, smile, and give thanks for what you managed today — it matters.",
+            "Small wins = quiet victories. Be grateful for each one."
+          ],
+          currentSoothingMessage: '',
+          showSoothingMessage: false,
+
+          // Daily Quote
+          dailyQuote: {
+            text: "Whether you just need someone to listen to you or want to make amazing changes, counselling can be the pivotal turning point where good things start to happen",
+            author: "Mandy Kloppers"
+          }
+        };
+      },
+
+      methods: {
+        getGreeting() {
+          const hour = new Date().getHours();
+          if (hour < 12) return 'Good morning! Ready to settle in on the cowch? 🌅';
+          if (hour < 18) return 'Good afternoon! Time for some wellness time on the cowch 🌤️';
+          return 'Good evening! Let\'s wind down on the cowch together 🌙';
+        },
+
+        getMoodLabel(mood) {
+          if (mood <= 3) return 'Struggling - You deserve support 💙';
+          if (mood <= 5) return 'Below average - Let\'s work on raising this';
+          if (mood <= 7) return 'Doing okay - Keep going! 👍';
+          if (mood <= 9) return 'Feeling good - Wonderful! 🌟';
+          return 'Excellent! - Celebrate this feeling! 🎉';
+        },
+
+        saveMoodEntry() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          alert('Mood entry saved! 📝');
+        },
+
+        saveWellnessCheck() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.selfCare++;
+          alert('Wellness check-in saved! Great self-awareness 🌱');
+        },
+
+        completeFiveSenses() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.mindfulness++;
+          alert('5 Senses exercise complete! You\'ve grounded yourself beautifully 👏');
+        },
+
+        startPMRGuided() {
+          alert('Starting Progressive Muscle Relaxation...\n\nFind a comfortable position and follow along. 🧘');
+          this.activitiesCompleted++;
+          this.sectionProgress.mindfulness++;
+        },
+
+        saveThoughtUnhook() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.acceptance++;
+          alert('Thought reframe saved! Remember: thoughts aren\'t facts 🍃');
+        },
+
+        saveHEALPractice() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.selfCare++;
+          alert('H-E-A-L practice complete! You\'re treating yourself with compassion 💝');
+        },
+
+        saveRadicalAcceptance() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.acceptance++;
+          alert('Radical acceptance reflection saved! Letting go brings peace 🕊️');
+        },
+
+        saveSmallWin() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.gratitudeCount++;
+          this.sectionProgress.gratitude++;
+          alert('Small win celebrated! 🎉 Keep recognizing your progress!');
+        },
+
+        saveGratitudeEntry() {
+          if (this.gratitudeEntry.content) {
+            this.gratitudeJournal.unshift({
+              date: new Date().toLocaleDateString(),
+              content: this.gratitudeEntry.content
+            });
+            this.gratitudeEntry.content = '';
+            this.gratitudeCount++;
+            this.activitiesCompleted++;
+            this.sectionProgress.gratitude++;
+            this.showSoothingPopup();
+            alert('Gratitude entry added! 🙏');
+          }
+        },
+
+        startQuickGratitude() {
+          alert('Starting 30-second gratitude practice...\n\nClose your eyes and follow along. 🙏');
+          this.activitiesCompleted++;
+          this.sectionProgress.gratitude++;
+        },
+
+        addConnection() {
+          if (this.newConnection.name) {
+            this.connections.push({
+              name: this.newConnection.name,
+              type: this.newConnection.type,
+              x: Math.random() * 400 + 100,
+              y: Math.random() * 400 + 100
+            });
+            this.newConnection = { name: '', type: 'supportive', x: 300, y: 300 };
+            this.showAddConnection = false;
+            this.activitiesCompleted++;
+            this.sectionProgress.interactions++;
+          }
+        },
+
+        saveConnectionWeb() {
+          this.showSoothingPopup();
+          alert('Connection web saved! 🕸️ Your relationships are mapped!');
+        },
+
+        startDrag(index, event) {
+          this.draggingIndex = index;
+        },
+
+        showConnectionDetails(connection) {
+          alert(`${connection.name}\nType: ${connection.type}\n\nTap and drag to move!`);
+        },
+
+        saveDifficultConvo() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.interactions++;
+          alert('Conversation script saved! You\'re prepared for assertive communication 💬');
+        },
+
+        getRandomFunPrompt() {
+          this.currentFunPrompt = this.funPrompts[Math.floor(Math.random() * this.funPrompts.length)];
+        },
+
+        logFunPrompt(action) {
+          if (action === 'yes') {
+            this.funPromptStreak++;
+            this.activitiesCompleted++;
+            this.sectionProgress.nurturing++;
+            this.showSoothingPopup();
+            alert('Wonderful! Keep that playful energy going! 🎉');
+          }
+          this.currentFunPrompt = '';
+        },
+
+        saveFunDiary() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.nurturing++;
+          alert('Fun diary entry saved! 📝 Fun is essential for wellbeing!');
+        },
+
+        selectInnerChildActivity(activity) {
+          this.innerChildReflection = true;
+          this.activitiesCompleted++;
+          this.sectionProgress.nurturing++;
+          alert(`Great choice! Enjoy reconnecting with your inner child through ${activity}! 🧸`);
+        },
+
+        saveInnerChildReflection() {
+          this.showSoothingPopup();
+          alert('Inner child reflection saved! 🌈 Beautiful self-discovery!');
+          this.innerChildReflection = false;
+        },
+
+        saveCreativityLog() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.nurturing++;
+          alert('Creative activity logged! 🎨 Keep nurturing your creativity!');
+        },
+
+        saveValues() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.exploring++;
+          alert('Values compass saved! 🧭 Living aligned with your values brings authenticity!');
+        },
+
+        saveThoughtRecord() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.exploring++;
+          alert('Thought record saved! 📝 You\'re challenging unhelpful thinking patterns!');
+        },
+
+        saveTriggerMap() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.exploring++;
+          alert('Trigger map saved! 🗺️ Awareness is the first step to change!');
+        },
+
+        saveSafetyBehaviors() {
+          this.showSoothingPopup();
+          this.activitiesCompleted++;
+          this.sectionProgress.exploring++;
+          alert('Safety behaviors identified! 🛡️ You\'re building true confidence!');
+        },
+
+        sendMessage() {
+          if (this.chatInput.trim()) {
+            this.chatMessages.push({
+              sender: 'user',
+              text: this.chatInput,
+              time: new Date().toLocaleTimeString()
+            });
+
+            // Simple AI response (in production, this would call the API)
+            setTimeout(() => {
+              this.chatMessages.push({
+                sender: 'ai',
+                text: this.getAIResponse(this.chatInput),
+                time: new Date().toLocaleTimeString()
+              });
+            }, 1000);
+
+            this.chatInput = '';
+          }
+        },
+
+        getAIResponse(message) {
+          const lowerMsg = message.toLowerCase();
+
+          if (lowerMsg.includes('anxious') || lowerMsg.includes('worried') || lowerMsg.includes('stress')) {
+            return 'I hear that you\'re feeling anxious. That\'s completely valid. Anxiety is your mind trying to protect you. What happens just before that anxious feeling kicks in? Sometimes naming it helps us understand it better.';
+          } else if (lowerMsg.includes('sad') || lowerMsg.includes('down') || lowerMsg.includes('depressed')) {
+            return 'I\'m sorry you\'re feeling this way. Even the darkest night will end and the sun will rise. What small step could you take right now to care for yourself?';
+          } else if (lowerMsg.includes('help') || lowerMsg.includes('don\'t know')) {
+            return 'I\'m here with you. We will work as a team to explore what\'s troubling you. What\'s one thing that\'s on your mind right now?';
+          } else {
+            return 'Thank you for sharing that with me. I\'m curious - what would it feel like to be completely okay with where you are right now? What would that give you?';
+          }
+        },
+
+        showSoothingPopup() {
+          this.currentSoothingMessage = this.soothingMessages[
+            Math.floor(Math.random() * this.soothingMessages.length)
+          ];
+          this.showSoothingMessage = true;
+
+          setTimeout(() => {
+            this.showSoothingMessage = false;
+          }, 5000);
+        }
+      },
+
+      mounted() {
+        // Load saved data from localStorage if available
+        const savedData = localStorage.getItem('theracowch-data');
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          Object.assign(this, data);
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(() => {
+          localStorage.setItem('theracowch-data', JSON.stringify({
+            wellnessScores: this.wellnessScores,
+            gratitudeJournal: this.gratitudeJournal,
+            connections: this.connections,
+            sectionProgress: this.sectionProgress,
+            activitiesCompleted: this.activitiesCompleted,
+            gratitudeCount: this.gratitudeCount
+          }));
+        }, 30000);
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

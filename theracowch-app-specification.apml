@@ -20,6 +20,11 @@ app TheracowchApp:
     personality: playful_therapeutic_coaching
     mascot: ai_mandy_cow_character
     tone: warm_encouraging_gently_humorous
+
+  design_system:
+    background_color: white_or_light_peach
+    logo_presentation: cow_only_no_heart_emoji_no_yellow_circle
+    navigation_order: explore_imagine_before_moove_to_cowch
     
   triadic_compliance:
     trinity_messaging: complete_user_interaction_coverage
@@ -79,6 +84,13 @@ data DailyQuote:
   quote_text: text required
   author: text default "Mandy Kloppers"
   source_url: text optional
+  category: text required
+  last_shown: timestamp optional
+
+data SoothingOneLiner:
+  message_id: unique_id required
+  message_text: text required
+  context: text required
   category: text required
   last_shown: timestamp optional
 
@@ -189,10 +201,166 @@ interface imagine_section_interactions:
     activity_options: list_of_available_exercises_tools
     
   display self_care_tools:
-    self_assessment: quick_wellness_check
-    self_care_planning: personalized_activity_suggestions
-    boundary_setting: practical_exercises
-    energy_management: tips_and_tracking
+    wellness_check_in:
+      mood_rating: scale_1_to_10_very_low_to_very_contented
+      improvement_prompt: if_below_6_suggest_one_point_raise_activity
+      suggestions: walk_happy_music_call_friend_play_with_pet_smile_thinking
+      exercise_rating: scale_1_to_10_satisfaction_with_routine
+      diet_rating: scale_1_to_10_eating_habits_satisfaction
+      appearance_rating: scale_1_to_10_hygiene_physical_mental_health_care
+      improvement_planning: write_suggestions_to_improve_low_areas
+
+    boundary_setting:
+      reflection_prompt: identify_people_who_overstepped_boundaries
+      healthy_boundaries_benefit: improved_self_confidence_and_relationships
+      practice_saying_no: self_care_comes_first_always
+      brave_boundary_communication: assertiveness_exercises
+
+    energy_audit:
+      positive_energy_list: things_that_bring_positive_energy
+      negative_energy_list: things_that_drain_energy
+      balance_goal: more_positive_than_negative_energy
+      positive_examples: good_friends_mentors_sleep_fun_comedies_music
+      negative_examples: toxic_people_hated_job_lack_of_sleep_passivity
+
+    mindfulness_practices:
+      sensational_vacation_5_senses:
+        instruction: using_5_senses_prevents_worry_engagement
+        five_things_see: list_with_explanations
+        mental_break_benefit: great_for_mind_and_body
+
+      body_scan_pmr:
+        description: progressive_muscle_relaxation_awareness_of_tension
+        tension_danger_signal: tense_body_sends_danger_message_to_brain
+        amygdala_response: triggers_fight_flight_freeze_faun_feint_mode
+        pmr_benefit: calms_body_turns_off_amygdala_reduces_exhaustion
+        instructions:
+          sit_or_lie_comfortably: true
+          start_with_feet: tense_5_seconds_then_release_notice_relaxation
+          move_upward: legs_stomach_hands_arms_shoulders_face
+          breathe_slowly: notice_difference_between_tension_and_calm
+          duration: few_minutes_looser_body_calmer_mind
+          bedtime_tip: perfect_for_better_sleep
+
+    acceptance_practices:
+      basic_acceptance:
+        instruction: take_slow_breath_tell_self_this_is_reality_right_now
+        key_principle: acceptance_is_not_approval_its_letting_go_of_extra_suffering
+
+      cow_dance_acceptance:
+        reflection: resisting_unchangeable_creates_more_suffering
+        prompt: think_of_situations_you_resist_instead_of_accepting
+        question: what_would_accepting_allow_you_to_feel_or_do
+
+    thought_unhooking:
+      metaphor: thoughts_as_leaves_floating_on_stream
+      practice: let_thoughts_pass_dont_focus_on_every_one
+      facts:
+        daily_thoughts: 6000_distinct_thoughts_per_day
+        nature: most_repetitive_or_fleeting
+        useful_fraction: small_fraction_directly_useful
+        key_reminder: thoughts_are_not_facts
+      exercise:
+        identify: what_thought_bothers_you_right_now
+        write_thought: capture_negative_thought
+        reframe: challenge_negative_thoughts_regularly
+        example_original: once_people_know_me_they_wont_like_me
+        example_reframe: no_one_is_perfect_not_everyone_dislikes_me
+        principle: dont_believe_every_thought_most_based_on_fear_not_truth
+
+    self_compassion_heal:
+      background: self_compassion_calms_mind_and_body
+      mri_evidence: self_criticism_activates_threat_system
+      compassion_effect: activates_safety_and_care_brain_areas
+      key_principle: being_gentle_is_not_indulgent_its_proven_stress_reduction
+
+      heal_framework:
+        h_helpful:
+          question: is_negative_thought_helpful
+          usual_answer: no
+          benefit: awareness_to_let_go_not_focus
+          principle: what_we_focus_on_becomes_reality_determines_quality_of_life
+
+        e_evidence:
+          question: where_is_evidence_for_against_thought
+          finding: most_negative_thoughts_have_little_actual_evidence
+          example_situation: colleague_ignores_hello
+          error_personalizing: rushing_to_think_you_did_something_wrong
+          error_mind_reading: making_assumptions_without_evidence
+          analysis: ask_where_is_evidence_of_wrongdoing
+
+        a_alternative:
+          description: reframing_discussed_in_previous_section
+          instruction: what_can_you_tell_yourself_to_feel_better
+          example: colleague_not_annoyed_just_having_bad_day
+
+        l_loved_one:
+          principle: self_compassion_application
+          question: what_would_you_say_to_loved_one_in_situation
+          unlikely_response: telling_them_theyre_wrong_or_loser
+          correct_approach: supportive_and_encouraging
+          key_message: this_is_how_you_should_talk_to_yourself
+
+      reminder: self_compassion_calms_body_self_criticism_triggers_threat_system
+
+    radical_acceptance:
+      question: what_am_i_resisting
+      example: relationship_over_but_hoping_for_ex_back_with_no_interest
+      problem: self_pity_and_why_me_dialogue_prolongs_suffering
+
+      exercise_1:
+        notice_struggle: bring_to_mind_unfair_painful_uncontrollable_situation
+        name_reality: silently_say_this_is_whats_happening_right_now
+        drop_fight: instead_of_it_shouldnt_be_this_way_soften_into_acceptance
+        acceptance_statement: i_may_not_like_it_but_this_is_reality_i_face
+        breathe_into_it: slow_breath_imagine_making_space_around_pain
+        shift_toward_peace: remind_self_accepting_doesnt_mean_approving
+        freedom_message: freeing_myself_from_extra_suffering
+
+      exercise_2_reaffirmation:
+        settle_and_breathe: sit_comfortably_close_eyes_slow_breaths
+        recall_struggle: think_of_recent_resistance_or_holding_on
+        whisper_acceptance: i_dont_have_to_fight_this_i_can_let_go
+        reaffirm_benefits:
+          acceptance_helps_move_forward: true
+          letting_go_brings_peace: true
+          when_accept_feel_lighter_calmer_centered: true
+          letting_go_of_uncontrollable_helps_contentment: true
+        rest_in_calm: hand_on_heart_notice_warmth_sit_quietly
+        result: calmer_body_quieter_mind_gentle_reminder
+
+      key_message: let_go_of_what_you_cant_control
+      empowerment: control_over_thoughts_and_behaviors_power_within
+
+    gratitude_practices:
+      small_wins_celebration:
+        pause_reflect: think_back_over_today_or_yesterday
+        identify: one_small_win_finishing_task_getting_up_sending_message_breathing
+        acknowledge: say_to_self_that_mattered_i_did_that
+        feel_gratitude: hand_on_chest_slow_breath_thankful_for_effort
+        lock_it_in: smile_gently_whisper_small_steps_lead_to_big_changes
+        benefit: builds_confidence_motivation_sense_of_progress
+
+      gratitude_journal:
+        purpose: create_journal_to_read_when_need_boost
+        instruction: write_down_happy_things
+        easy_access: simple_journal_interface
+
+      daily_gratitude_exercise:
+        duration: 30_to_60_seconds
+        key: repetition_is_essential
+        steps:
+          pause: close_eyes_one_slow_breath_in_out
+          recall: one_small_win_from_today_or_yesterday
+          acknowledge: say_that_mattered_i_did_that
+          feel: hand_on_heart_notice_warmth_let_gratitude_settle
+          finish: smile_gently_whisper_small_wins_move_forward
+        time_required: less_than_one_minute
+        effect: calm_grounded_sense_of_progress_and_self_appreciation
+
+      guided_audio_option:
+        availability: could_be_added_with_mandy_narrating
+        script_provided: full_guided_meditation_script_available
     
   display mindfulness_tools:
     breathing_exercises: guided_audio_visual
@@ -213,22 +381,254 @@ interface imagine_section_interactions:
     perspective_shifting: finding_positives_in_challenges
     
   display interactions_tools:
-    social_energy_check: assessing_social_needs
-    connection_planning: scheduling_meaningful_interactions
-    boundary_communication: scripts_for_difficult_conversations
-    empathy_exercises: understanding_others_perspectives
+    connection_web:
+      visual_layout:
+        design: concentric_circles_like_ripples_in_water
+        center: user_me
+        inner_circle: closest_most_supportive_relationships
+        middle_circle: moderate_or_situational_connections_friends_coworkers
+        outer_circle: distant_or_draining_connections
+        benefit: clear_visual_of_closeness_and_emotional_impact
+
+      adding_connections:
+        action: tap_add_connection
+        name_field: name_or_nickname_best_friend_sister
+        type_options: family_friend_partner_work_professional_other
+        emotional_impact: supportive_neutral_draining
+        icons: sun_white_circle_lightning
+        display: node_appears_in_chosen_ring
+
+      interactivity:
+        drag_drop: move_connections_closer_or_further_as_relationships_change
+        color_coding:
+          supportive: green_or_blue
+          neutral: grey
+          draining: red_or_orange
+        tap_node_popup:
+          add_note: eg_i_feel_calmer_after_talking_to_them
+          quick_actions: reach_out_set_boundary_express_gratitude
+
+      reflection_prompts:
+        prompt_1: who_in_inner_circle_lifts_you_up_most
+        prompt_2: is_someone_draining_who_needs_boundary
+        prompt_3: is_connection_you_want_to_strengthen
+        purpose: becomes_self_reflection_tool_not_just_map
+
+      progress_tracking:
+        save_versions: track_web_over_time
+        revisit_shifts: notice_movements_closer_or_further
+        awareness: celebrate_letting_go_of_draining_connections
+
+      soothing_design:
+        colors: soft_rounded_edges
+        animation: circles_pulse_slowly_like_breath
+        reassuring_text:
+          message_1: every_relationship_teaches_you_something
+          message_2: its_okay_to_protect_your_peace
+
+    general_interaction_exercises:
+      daily_connection_check_in:
+        prompt: send_kind_message_to_one_person_today
+        examples: thinking_of_you
+        benefit: builds_consistency_strengthens_bonds
+
+      active_listening_mini_practice:
+        instruction: listen_fully_pause_before_replying_reflect_back
+        benefit: improves_conversation_quality_fosters_empathy
+
+      gratitude_in_relationships:
+        exercise: write_one_thing_you_appreciate_about_someone
+        option: share_with_them
+        benefit: increases_warmth_and_reciprocity
+
+      connection_goals:
+        weekly_prompt: who_to_connect_with_this_week
+        action: schedule_one_interaction
+        benefit: encourages_proactive_social_planning
+
+      kindness_ripple:
+        task: one_small_act_of_kindness_holding_door_compliment_smile
+        benefit: boosts_mood_increases_social_approach_behaviors
+
+    social_anxiety_exercises:
+      comfort_zone_ladder:
+        description: small_ladder_of_social_challenges
+        step_1: make_eye_contact
+        step_2: smile_at_someone
+        step_3: say_hello
+        step_4: ask_small_question
+        guidance: practice_one_step_at_time
+
+      breathing_before_social:
+        quick_exercise: breathe_in_4_hold_2_breathe_out_6
+        purpose: prepares_body_to_feel_calmer_before_interactions
+
+      reframing_social_thoughts:
+        prompt: whats_one_anxious_thought_before_talking
+        instruction: write_kinder_more_balanced_version
+        example_anxious: theyll_think_im_awkward
+        example_reframe: theyre_just_another_human_likely_glad_i_said_hi
+        fact: one_in_four_people_live_with_anxiety_disorder_not_alone
+
+      self_compassion_after_interaction:
+        reflection: no_matter_how_it_went_i_showed_courage
+        purpose: soothes_harsh_self_criticism
+
+      celebrate_small_social_wins:
+        encouragement: even_smallest_interaction_is_progress
+        reinforcement: positive_feedback_after_each_step
+
+    interaction_programs:
+      one_week_general:
+        day_1: send_short_kind_message_to_one_person
+        day_2: active_listening_pause_and_reflect_back
+        day_3: write_appreciation_note_optionally_share
+        day_4: small_act_of_kindness
+        day_5: schedule_connection_with_one_person
+        day_6: list_three_people_who_support_you_reflect
+        day_7: reflect_which_connection_felt_strongest_plan_next_week
+
+    difficult_conversations:
+      assertive_script_template:
+        state_feeling: i_feel_____(upset_overlooked)
+        describe_behavior: when_____(messages_not_answered_meetings_late)
+        explain_why_matters: because_____(makes_me_feel_unimportant_throws_off_schedule)
+        make_clear_request: i_would_appreciate_if_____(reply_when_have_time_start_on_time)
+
+      example_script:
+        full_example: i_feel_stressed_when_interrupted_because_lose_train_of_thought_appreciate_finishing_point_before_respond
+
+      best_practices:
+        avoid: you_always_you_never_phrases_make_defensive
+        use: concrete_examples_speak_calmly_listen_as_well_as_share
+        creates: space_for_real_understanding
     
   display nurturing_tools:
-    playfulness_prompts: silly_fun_activity_suggestions
-    humor_therapy: joke_sharing_and_laughter_exercises
-    creative_expression: art_music_writing_prompts
-    joy_cultivation: identifying_and_pursuing_happiness
+    fun_prompt_generator:
+      description: daily_playful_suggestion_small_easy_uplifting
+      example_prompts:
+        prompt_1: do_silly_dance_for_30_seconds
+        prompt_2: tell_yourself_worst_cheesiest_joke
+        prompt_3: put_random_object_on_head_balance
+        prompt_4: hum_favorite_song_like_nobody_listening
+        prompt_5: speak_in_silly_accent_for_minute
+        prompt_6: draw_doodle_with_non_dominant_hand
+        prompt_7: pretend_youre_kid_skip_hop_spin
+        prompt_8: find_one_tiny_thing_that_makes_you_smile
+
+      interaction:
+        daily_spin: tap_get_my_fun_prompt_random_activity_appears
+        log_it: did_i_do_it_how_did_it_feel
+        streaks_rewards: unlock_playful_badges_silly_streak_dance_break_hero
+
+    fun_playfulness_diary:
+      purpose: check_in_few_times_per_week_awareness_of_fun
+      why_matters: fun_not_just_for_children_lifts_mood_reduces_stress
+      reminder: few_minutes_of_play_can_shift_energy
+
+      daily_log:
+        today_had_fun_when: text_field
+        something_playful_tried: text_field
+        how_it_made_feel: emoji_picker_or_word_field
+
+      ideas_for_playfulness:
+        idea_1: be_silly_make_funny_face_in_mirror
+        idea_2: put_on_favorite_song_dance_around_room
+        idea_3: tell_joke_or_look_up_cheesy_one
+        idea_4: playful_challenge_like_balancing_on_head
+        idea_5: remind_okay_to_laugh_at_myself_not_take_life_seriously
+        idea_6: watch_funny_movie
+        idea_7: try_mud_bath_for_fun_and_good_shower
+
+      calming_playful_prompts:
+        prompt_1: light_candle_watch_flame_dance_for_minute
+        prompt_2: gently_sway_side_to_side_eyes_closed_like_tree
+        prompt_3: pick_random_word_see_how_many_rhymes
+        prompt_4: close_eyes_imagine_favorite_cozy_place
+        prompt_5: make_tiny_story_about_object_near_you
+        prompt_6: trace_smiley_face_with_finger_on_palm
+        prompt_7: listen_to_song_tap_along_softly
+        prompt_8: look_for_something_shaped_like_heart
+
+    creative_expression:
+      choose_hobby: flying_drone_painting_drawing_pottery_whatever_you_fancy
+      schedule: time_each_month
+      bonus: learning_new_skill
+
+      creativity_log:
+        date: timestamp
+        creative_activity: description
+        achievement_rating: scale_1_to_10
+        enjoyment_rating: scale_1_to_10
+        closeness_rating: scale_1_to_10_if_with_others
+
+    inner_child_work:
+      inner_child_play_exercise:
+        pause_remember: close_eyes_think_childhood_loved_activity
+        examples: coloring_blowing_bubbles_skipping_eating_messily_building_forts
+        choose_one: pick_simple_version_to_do_now_or_later
+        play_5_minutes: no_pressure_no_goal_no_judgment_just_fun
+        notice_feeling: how_does_inner_child_feel_right_now
+        enjoy: freedom_silliness_calm
+
+      inner_child_prompts:
+        prompt_1: doodle_or_color_without_worrying_how_looks
+        prompt_2: blow_bubbles_or_imagine_doing_it
+        prompt_3: favorite_childhood_song_dance_like_back_then
+        prompt_4: build_tiny_pillow_fort_sit_inside
+        prompt_5: eat_childhood_snack_mindfully_enjoying_each_bite
+        prompt_6: skip_hop_spin_in_circle_for_fun
+        prompt_7: watch_short_cartoon_or_funny_childhood_video
+        prompt_8: play_with_textures_playdough_clay_roll_pen
+        prompt_9: pretend_superhero_strike_power_pose
+        prompt_10: think_of_younger_self_whisper_youre_safe_can_play
+
+      inner_child_reflection:
+        how_did_i_feel:
+          calm: true
+          joyful: true
+          nostalgic: true
+          silly: true
+          free: true
+          other: text_field
+        complete_thought: connecting_with_inner_child_reminded_me_that_____
     
   display exploring_tools:
-    thought_pattern_identification: cbt_thought_tracking
-    behavior_analysis: safety_behavior_recognition
-    confidence_building: challenging_avoidance_patterns
-    anxiety_cycle_breaking: interrupting_negative_spirals
+    values_compass:
+      description: identify_core_values_guide_decisions
+      values_categories: list_of_value_domains
+      alignment_check: rate_how_well_living_according_to_values
+      goal_setting: align_goals_with_identified_values
+      reflection_prompts: when_actions_align_with_values_feel_authentic
+
+    trigger_mapping:
+      description: identify_patterns_and_triggers_for_difficult_emotions
+      trigger_identification: what_situations_people_thoughts_trigger_anxiety_stress
+      physical_response: notice_body_sensations_when_triggered
+      thought_patterns: recognize_automatic_thoughts_in_triggered_state
+      coping_strategies: develop_specific_responses_to_identified_triggers
+      pattern_tracking: notice_recurring_triggers_over_time
+
+    thought_record:
+      description: cbt_thought_tracking_tool
+      situation: what_was_happening_when_feeling_arose
+      automatic_thought: first_thought_that_came_to_mind
+      emotion: identify_and_rate_emotion_intensity_0_to_100
+      physical_sensations: notice_body_responses
+      evidence_for: what_supports_this_thought
+      evidence_against: what_contradicts_this_thought
+      balanced_thought: more_realistic_alternative_perspective
+      emotion_after: rate_emotion_intensity_after_reframing
+
+    safety_behaviors:
+      description: gain_confidence_maximize_potential
+      identification: recognize_behaviors_that_maintain_anxiety
+      avoidance_patterns: what_do_you_avoid_to_feel_safe
+      subtle_safety_behaviors: checking_seeking_reassurance_over_preparing
+      consequences: how_safety_behaviors_prevent_learning_youre_safe
+      gradual_reduction: step_by_step_dropping_safety_behaviors
+      confidence_building: face_fears_without_safety_nets_build_true_confidence
+      evidence_gathering: learn_through_experience_not_just_thinking
 
 interface mood_progress_tracking:
   show mood_entry_interface:
@@ -346,12 +746,35 @@ logic privacy_first_architecture:
       encrypt_sensitive_conversation_data
       provide_cloud_backup_as_option
       respect_user_privacy_preferences
-      
+
   process ai_integration:
     when communicating_with_claude_api:
       send_conversation_context_without_personal_identifiers
       maintain_conversation_continuity_through_local_storage
       respect_user_data_retention_preferences
+
+logic soothing_messages_system:
+  define gratitude_small_wins_messages:
+    message_1: "Every small step counts — take a moment to thank yourself for it."
+    message_2: "Celebrate the little wins; they're the building blocks of big change."
+    message_3: "Gratitude grows when you notice the small things you've achieved today."
+    message_4: "Even the tiniest progress is proof you're moving forward."
+    message_5: "Pause, smile, and give thanks for what you managed today — it matters."
+    message_6: "Small wins = quiet victories. Be grateful for each one."
+
+  process popup_rotation:
+    when user_completes_activity:
+      randomly_select_soothing_message
+      display_contextually_appropriate_oneliner
+      rotate_messages_to_prevent_repetition
+      match_message_to_imagine_section_context
+
+  define guided_audio_scripts:
+    gratitude_for_small_wins:
+      duration: 60_to_90_seconds
+      narration: mandy_kloppers_voice_option
+      script: full_meditation_script_with_pauses
+      availability: optional_feature_with_audio_recording
 
 validate theracowch_completeness:
   check core_functionality:
