@@ -212,7 +212,7 @@
           <div class="launch-controls">
             <select v-model="selectedCourse" class="course-select">
               <option v-for="course in availableCourses" :key="course.code" :value="course">
-                {{ course.name }}
+                {{ course.phaseIcon }} {{ course.name }} ({{ course.phaseName }})
               </option>
             </select>
             <button @click="launchAutomation" :disabled="!canLaunch" class="btn btn-primary">
@@ -222,30 +222,55 @@
           <div class="automation-status" v-if="automationStatus">
             <p>{{ automationStatus.message }}</p>
           </div>
+          <div v-if="isLoading" class="loading">Loading courses...</div>
         </div>`,
           setup() {
-            
+
         const mcpConnected = ref(false);
         const selectedCourse = ref(null);
         const availableCourses = ref([]);
         const automationStatus = ref(null);
-        
+        const isLoading = ref(false);
+
         const canLaunch = computed(() => mcpConnected.value && selectedCourse.value);
-        
+
+        const loadCourses = async () => {
+          isLoading.value = true;
+          try {
+            const response = await fetch('/api/courses');
+            const data = await response.json();
+            if (data.success) {
+              availableCourses.value = data.courses;
+            } else {
+              console.error('Failed to load courses:', data.error);
+            }
+          } catch (error) {
+            console.error('Error loading courses:', error);
+          } finally {
+            isLoading.value = false;
+          }
+        };
+
         const launchAutomation = async () => {
           if (!canLaunch.value) return;
-          
+
           automationStatus.value = { message: 'Launching automation...' };
           // Launch logic would be implemented here
         };
-        
+
+        // Load courses on mount
+        onMounted(() => {
+          loadCourses();
+        });
+
         return {
           mcpConnected,
           selectedCourse,
           availableCourses,
           automationStatus,
           canLaunch,
-          launchAutomation
+          launchAutomation,
+          isLoading
         };
           }
         },
@@ -399,14 +424,74 @@
           }
         },
         'dashboard-home': {
-          template: `<div class="component-placeholder">
-          <h2>Dashboard Home</h2>
-          <p>Component generated from APML specification</p>
+          template: `
+        <div class="dashboard-home" style="max-width: 1200px; margin: 0 auto;">
+          <h2>Language Learning Courses</h2>
+          <p style="color: var(--ssi-accent); margin-bottom: 30px;">
+            GitHub-First Workflow - Source: public/vfs/courses/
+          </p>
+
+          <div v-if="isLoading" class="component-placeholder">
+            <p>Loading courses...</p>
+          </div>
+
+          <div v-else-if="courses.length === 0" class="component-placeholder">
+            <h3>No Courses Found</h3>
+            <p>Create a new course by adding a directory to <code>public/vfs/courses/</code></p>
+          </div>
+
+          <div v-else class="courses-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            <div v-for="course in courses" :key="course.code"
+                 class="component-placeholder"
+                 style="text-align: left; cursor: pointer; transition: transform 0.2s;"
+                 @mouseover="$event.currentTarget.style.transform = 'translateY(-4px)'"
+                 @mouseout="$event.currentTarget.style.transform = 'translateY(0)'">
+              <div style="font-size: 48px; margin-bottom: 10px;">{{ course.phaseIcon }}</div>
+              <h3 style="color: var(--ssi-accent); margin: 10px 0;">{{ course.name }}</h3>
+              <p style="font-size: 14px; color: #999; margin: 5px 0;">{{ course.phaseName }}</p>
+              <p v-if="course.description" style="font-size: 14px; margin: 10px 0;">{{ course.description }}</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: #666;">
+                <span>{{ course.itemCount }} items</span>
+                <code style="background: rgba(0,255,136,0.1); padding: 2px 6px; border-radius: 3px;">{{ course.code }}</code>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 40px; padding: 20px; background: var(--ssi-bg-secondary); border-radius: 8px;">
+            <h3>Quick Start</h3>
+            <p style="font-size: 14px; color: #999;">Create a new course:</p>
+            <pre style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px;">mkdir public/vfs/courses/my_course
+echo '{"courseName": "My Course", "courseId": "my_course", "phase": 1, "seedPairs": []}' > public/vfs/courses/my_course/seed_pairs.json
+git add . && git commit -m "Add my_course" && git push</pre>
+          </div>
         </div>`,
           setup() {
-            
-            const componentState = ref('initialized');
-            return { componentState };
+
+            const courses = ref([]);
+            const isLoading = ref(false);
+
+            const loadCourses = async () => {
+              isLoading.value = true;
+              try {
+                const response = await fetch('/api/courses');
+                const data = await response.json();
+                if (data.success) {
+                  courses.value = data.courses;
+                } else {
+                  console.error('Failed to load courses:', data.error);
+                }
+              } catch (error) {
+                console.error('Error loading courses:', error);
+              } finally {
+                isLoading.value = false;
+              }
+            };
+
+            onMounted(() => {
+              loadCourses();
+            });
+
+            return { courses, isLoading };
           }
         }
       }
