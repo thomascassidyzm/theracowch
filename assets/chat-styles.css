@@ -1,19 +1,23 @@
-/* Cowch Chat Styles - Telegram/WhatsApp inspired */
+/* Theracowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Simplified Color Palette - thoughtsonlifeandlove.com */
-    --bg-primary: #FAF6F3;           /* Soft beige background */
-    --bg-secondary: #FFFFFF;
+    /* Mandy's Website Brand Colors - Grey Version */
+    --bg-primary: #E8E8E8;           /* Light grey background */
+    --bg-secondary: #D4D4D4;         /* Medium grey */
+    --bg-mandy-message: #F9E5DF;     /* Peachy cream for Mandy - more saturated */
+    --bg-user-message: #D8D4D0;      /* Warm grey for user */
 
-    --text-primary: #2C2416;
-    --text-secondary: #6B5D51;
+    --text-primary: #1A1410;         /* Much darker brown-black for main text */
+    --text-secondary: #4A3F35;       /* Darker secondary text */
+    --text-light: #6B5D51;           /* Darker light text */
 
-    --accent-primary: #EE701A;       /* Burnt sienna/warm orange */
-    --accent-hover: #D96418;         /* Darker on hover */
+    --accent-primary: #D67856;       /* Stronger terracotta coral */
+    --accent-secondary: #8B7355;     /* Richer warm brown */
+    --accent-hover: #C06642;         /* Even darker coral on hover */
 
-    --border-color: #E5DDD5;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --border-color: #D4C4B8;         /* More visible borders */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* Reset & Base */
@@ -65,13 +69,12 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #F9E5DF 0%, #F5D5CC 100%);
+    background: linear-gradient(135deg, #F0E6DC 0%, #E8DED3 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
     flex-shrink: 0;
-    border: 2px solid var(--accent-primary);
 }
 
 .header-info {
@@ -126,13 +129,8 @@ body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     padding: 1.5rem;
-    padding-bottom: calc(8.5rem + env(safe-area-inset-bottom)); /* Space for quick-prompts + input */
+    padding-bottom: 10rem; /* Space for quick-prompts + input */
     background: var(--bg-primary);
-}
-
-/* When quick prompts are hidden, reduce bottom padding */
-body.prompts-hidden .chat-messages {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
 .message {
@@ -157,19 +155,17 @@ body.prompts-hidden .chat-messages {
 }
 
 .message.mandy {
-    background: var(--bg-secondary);
+    background: var(--bg-mandy-message);
     border-bottom-left-radius: 4px;
     margin-right: auto;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
 }
 
 .message.user {
-    background: rgba(238, 112, 26, 0.08);
+    background: var(--bg-user-message);
     border-bottom-right-radius: 4px;
     margin-left: auto;
     color: var(--text-primary);
-    border: 1px solid rgba(238, 112, 26, 0.15);
 }
 
 .message p {
@@ -182,13 +178,12 @@ body.prompts-hidden .chat-messages {
 
 .message strong {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--accent-primary);
 }
 
 .message.typing {
-    background: var(--bg-secondary);
+    background: var(--bg-mandy-message);
     padding: 1rem 1.25rem;
-    border: 1px solid var(--border-color);
 }
 
 .typing-indicator {
@@ -266,12 +261,6 @@ body.prompts-hidden .chat-messages {
     transform: translateY(-1px);
 }
 
-.quick-prompt-btn:active {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-    color: white;
-}
-
 /* Chat Input */
 .chat-input-container {
     position: fixed;
@@ -307,11 +296,11 @@ body.prompts-hidden .chat-messages {
 
 #chat-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px rgba(238, 112, 26, 0.1);
+    box-shadow: 0 0 0 2px rgba(214, 120, 86, 0.2);
 }
 
 #chat-input::placeholder {
-    color: rgba(107, 93, 81, 0.6);
+    color: var(--text-light);
 }
 
 .send-button {
@@ -498,11 +487,6 @@ body.prompts-hidden .chat-messages {
 
     .chat-messages {
         padding: 1rem;
-        padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
-    }
-
-    body.prompts-hidden .chat-messages {
-        padding-bottom: calc(5rem + env(safe-area-inset-bottom));
     }
 
     .message {
@@ -533,47 +517,6 @@ body.prompts-hidden .chat-messages {
     .send-button {
         width: 40px;
         height: 40px;
-    }
-}
-
-/* Desktop: Constrain width for better readability */
-@media (min-width: 769px) {
-    .chat-header {
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 800px;
-        width: 100%;
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-    }
-
-    .chat-messages {
-        max-width: 800px;
-        margin: 0 auto;
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-    }
-
-    .quick-prompts {
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 800px;
-        width: 100%;
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-    }
-
-    .chat-input-container {
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 800px;
-        width: 100%;
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-    }
-
-    .message {
-        max-width: 65%;
     }
 }
 
