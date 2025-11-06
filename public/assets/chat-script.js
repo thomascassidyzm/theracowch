@@ -54,6 +54,12 @@ const promptAction = document.getElementById('prompt-action');
 const promptNew = document.getElementById('prompt-new');
 const promptDismiss = document.getElementById('prompt-dismiss');
 
+// Confirmation Modal
+const confirmModal = document.getElementById('confirm-modal');
+const confirmModalMessage = document.getElementById('confirm-modal-message');
+const confirmCancelButton = document.getElementById('confirm-cancel');
+const confirmOkButton = document.getElementById('confirm-ok');
+
 // ================================
 // State Management
 // ================================
@@ -385,14 +391,14 @@ function showWelcomeMessage() {
 // ================================
 
 function handleClearChat() {
-    if (confirm('Are you sure you want to clear this conversation? This cannot be undone.')) {
+    showConfirm('Are you sure you want to clear this conversation? This cannot be undone.', () => {
         conversationHistory = [];
         chatMessages.innerHTML = '';
         showWelcomeMessage();
         saveChatHistory();
         menuPanel.classList.remove('active');
         focusInput();
-    }
+    });
 }
 
 function handlePrivacyInfo() {
@@ -408,6 +414,50 @@ function handlePrivacyInfo() {
 This is a supportive tool for self-reflection and learning, but not medical advice.`;
 
     addMessage(privacyInfo, 'mandy');
+}
+
+// ================================
+// Custom Confirmation Dialog
+// ================================
+
+function showConfirm(message, onConfirm) {
+    confirmModalMessage.textContent = message;
+    confirmModal.classList.add('active');
+
+    // Handle OK click
+    const handleOk = () => {
+        confirmModal.classList.remove('active');
+        confirmOkButton.removeEventListener('click', handleOk);
+        confirmCancelButton.removeEventListener('click', handleCancel);
+        if (onConfirm) onConfirm();
+    };
+
+    // Handle Cancel click
+    const handleCancel = () => {
+        confirmModal.classList.remove('active');
+        confirmOkButton.removeEventListener('click', handleOk);
+        confirmCancelButton.removeEventListener('click', handleCancel);
+    };
+
+    // Add event listeners
+    confirmOkButton.addEventListener('click', handleOk);
+    confirmCancelButton.addEventListener('click', handleCancel);
+
+    // Close on backdrop click
+    confirmModal.addEventListener('click', (e) => {
+        if (e.target === confirmModal) {
+            handleCancel();
+        }
+    });
+
+    // Close on Escape key
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            handleCancel();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 }
 
 // ================================

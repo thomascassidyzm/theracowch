@@ -1097,6 +1097,81 @@ body {
     background: var(--bg-secondary);
 }
 
+/* Confirmation Modal */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    padding: 1rem;
+}
+
+.confirm-modal.active {
+    display: flex;
+}
+
+.confirm-modal-content {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.confirm-modal-message {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.confirm-modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.btn-confirm {
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.btn-confirm-cancel {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-confirm-cancel:hover {
+    background: var(--bg-secondary);
+}
+
+.btn-confirm-ok {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.btn-confirm-ok:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
 /* Desktop adjustments for slide panels */
 @media (min-width: 769px) {
     .slide-panel {
