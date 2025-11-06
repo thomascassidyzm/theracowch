@@ -21,8 +21,8 @@ const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
 const quickPromptsContainer = document.getElementById('quick-prompts');
 const menuButton = document.getElementById('menu-button');
-const menuModal = document.getElementById('menu-modal');
-const closeMenuButton = document.getElementById('close-menu');
+const menuPanel = document.getElementById('menu-panel');
+const closeMenuPanelButton = document.getElementById('close-menu-panel');
 
 // Menu options
 const clearChatButton = document.getElementById('clear-chat');
@@ -100,14 +100,9 @@ function setupEventListeners() {
         });
     });
 
-    // Menu
-    menuButton.addEventListener('click', () => menuModal.classList.add('active'));
-    closeMenuButton.addEventListener('click', () => menuModal.classList.remove('active'));
-    menuModal.addEventListener('click', (e) => {
-        if (e.target === menuModal) {
-            menuModal.classList.remove('active');
-        }
-    });
+    // Menu Panel
+    menuButton.addEventListener('click', () => menuPanel.classList.add('active'));
+    closeMenuPanelButton.addEventListener('click', () => menuPanel.classList.remove('active'));
 
     // Menu options
     clearChatButton.addEventListener('click', handleClearChat);
@@ -115,12 +110,12 @@ function setupEventListeners() {
 
     // Slide panels
     openImaginePanelButton.addEventListener('click', () => {
-        menuModal.classList.remove('active');
+        menuPanel.classList.remove('active');
         imaginePanel.classList.add('active');
     });
 
     openExercisePanelButton.addEventListener('click', () => {
-        menuModal.classList.remove('active');
+        menuPanel.classList.remove('active');
         exercisePanel.classList.add('active');
     });
 
@@ -164,8 +159,8 @@ function setupEventListeners() {
                 imaginePanel.classList.remove('active');
             } else if (exercisePanel.classList.contains('active')) {
                 exercisePanel.classList.remove('active');
-            } else if (menuModal.classList.contains('active')) {
-                menuModal.classList.remove('active');
+            } else if (menuPanel.classList.contains('active')) {
+                menuPanel.classList.remove('active');
             }
         }
     });
@@ -326,7 +321,7 @@ function showWelcomeMessage() {
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'welcome-message';
         welcomeDiv.innerHTML = `
-            <h2>🐮 Welcome to Theracowch</h2>
+            <h2>🐮 Welcome to Cowch</h2>
             <p>I'm Mandy, your AI CBT therapist.</p>
             <p>I use the <strong>IMAGINE framework</strong> to help with anxiety, stress, relationships, and personal growth.</p>
             <p>What's on your mind today?</p>
@@ -345,13 +340,13 @@ function handleClearChat() {
         chatMessages.innerHTML = '';
         showWelcomeMessage();
         saveChatHistory();
-        menuModal.classList.remove('active');
+        menuPanel.classList.remove('active');
         focusInput();
     }
 }
 
 function handlePrivacyInfo() {
-    menuModal.classList.remove('active');
+    menuPanel.classList.remove('active');
 
     const privacyInfo = `**Privacy & Safety:**
 
