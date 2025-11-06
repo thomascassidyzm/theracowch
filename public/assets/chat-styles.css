@@ -620,3 +620,348 @@ body.prompts-hidden .chat-messages {
         border: 2px solid var(--border-color);
     }
 }
+
+/* Slide-in Panels */
+.slide-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: var(--bg-primary);
+    z-index: 1100;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+}
+
+.slide-panel.active {
+    right: 0;
+}
+
+.slide-panel-header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: var(--shadow);
+}
+
+.slide-panel-header h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: 600;
+}
+
+.slide-panel-back {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.slide-panel-back:hover {
+    background: var(--bg-primary);
+    color: var(--accent-primary);
+}
+
+.slide-panel-content {
+    flex: 1;
+    padding: 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+/* Resource Cards */
+.resource-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+    animation: cardSlideIn 0.3s ease-out;
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.resource-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow);
+}
+
+.resource-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.resource-card-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #F9E5DF 0%, #F5D5CC 100%);
+    border-radius: 12px;
+    border: 2px solid var(--accent-primary);
+}
+
+.resource-card-title {
+    flex: 1;
+}
+
+.resource-card-title h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+}
+
+.resource-card-title .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.resource-card-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.resource-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    color: white;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+}
+
+.btn-secondary:hover {
+    background: rgba(238, 112, 26, 0.08);
+}
+
+/* Category Headers */
+.category-header {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin: 2rem 0 1rem 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.category-header:first-child {
+    margin-top: 0;
+}
+
+.category-header::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--accent-primary);
+    border-radius: 2px;
+}
+
+/* Exercise Modal (overlay on chat) */
+.exercise-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    padding: 1rem;
+}
+
+.exercise-modal.active {
+    display: flex;
+}
+
+.exercise-modal-content {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease-out;
+    text-align: center;
+}
+
+.exercise-modal-header {
+    margin-bottom: 1.5rem;
+}
+
+.exercise-modal-header h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.exercise-modal-header .close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.exercise-visual {
+    margin: 2rem 0;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.breathing-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, #D8956D 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.breathing-circle.inhale {
+    transform: scale(1.4);
+}
+
+.breathing-circle.exhale {
+    transform: scale(1);
+}
+
+.exercise-instruction {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 1rem 0;
+    font-weight: 500;
+    min-height: 2rem;
+}
+
+.exercise-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+.btn-exercise {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-exercise-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.btn-exercise-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-exercise-secondary {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-exercise-secondary:hover {
+    background: var(--bg-secondary);
+}
+
+/* Desktop adjustments for slide panels */
+@media (min-width: 769px) {
+    .slide-panel {
+        width: 500px;
+        right: -500px;
+        border-left: 1px solid var(--border-color);
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .slide-panel.active {
+        right: 0;
+    }
+}
