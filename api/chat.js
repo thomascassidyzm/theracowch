@@ -124,7 +124,16 @@ export default async function handler(req, res) {
       systemPrompt += `\nSession phase: ${sessionPhase}`;
     }
     
-    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Actively detect patterns and offer therapeutic interventions when appropriate.`;
+    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Actively detect patterns and offer therapeutic interventions when appropriate.
+
+FORMATTING: Use markdown to structure your responses for better readability:
+- Use **bold** for key concepts or important phrases
+- Use *italics* for gentle emphasis or reflections
+- Use ## for section headers when introducing a new topic or framework
+- Use - for bullet points when listing steps, techniques, or multiple ideas
+- Break longer responses into paragraphs with clear spacing
+
+Keep formatting subtle and purposeful - it should enhance clarity, not distract from the therapeutic connection.`;
 
     // Prepare conversation messages
     const messages = [

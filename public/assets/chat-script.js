@@ -260,14 +260,64 @@ function addMessage(content, sender) {
 }
 
 function formatMessage(content) {
-    // Simple markdown-like formatting
+    // Enhanced markdown-like formatting
     let formatted = content;
+
+    // Process line by line to handle lists and headers
+    const lines = formatted.split('\n');
+    const processedLines = [];
+    let inList = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // Headers (##, ###, etc.)
+        if (line.match(/^#{1,3}\s+/)) {
+            const level = line.match(/^#{1,3}/)[0].length;
+            const text = line.replace(/^#{1,3}\s+/, '');
+            line = `<h${level + 2}>${text}</h${level + 2}>`; // h3, h4, h5 (since h1, h2 are for page structure)
+        }
+        // Unordered lists (- or *)
+        else if (line.match(/^[-*]\s+/)) {
+            const text = line.replace(/^[-*]\s+/, '');
+            if (!inList) {
+                line = '<ul><li>' + text + '</li>';
+                inList = true;
+            } else {
+                line = '<li>' + text + '</li>';
+            }
+        }
+        // Close list if we were in one
+        else if (inList && line.trim() !== '') {
+            processedLines.push('</ul>');
+            inList = false;
+        }
+
+        processedLines.push(line);
+    }
+
+    // Close list if still open
+    if (inList) {
+        processedLines.push('</ul>');
+    }
+
+    formatted = processedLines.join('\n');
 
     // Bold **text**
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
+    // Italic *text* or _text_ (but not in URLs or markdown already processed)
+    formatted = formatted.replace(/(?<![*_])\*(?!\*)([^*]+)\*(?![*_])/g, '<em>$1</em>');
+    formatted = formatted.replace(/(?<![*_])_(?!_)([^_]+)_(?![*_])/g, '<em>$1</em>');
+
     // Paragraphs (double newline)
-    formatted = formatted.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    formatted = formatted.split('\n\n').map(p => {
+        // Don't wrap if already wrapped in block elements
+        if (p.match(/^<(h[3-5]|ul|li)/)) {
+            return p;
+        }
+        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('');
 
     return formatted;
 }
