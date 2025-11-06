@@ -119,7 +119,7 @@ const PATTERN_PROMPTS = {
 // Exercise Suggestions
 // ================================
 
-const EXERCISES = {
+const EXERCISE_DEFINITIONS = {
     'box-breathing': {
         name: 'Box Breathing',
         description: 'A calming breath practice: breathe in for 4, hold for 4, out for 4, hold for 4. Repeat 4 times.',
