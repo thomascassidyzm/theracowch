@@ -131,6 +131,7 @@ FORMATTING: Use markdown to structure your responses for better readability:
 - Use *italics* for gentle emphasis or reflections
 - Use ## for section headers when introducing a new topic or framework
 - Use - for bullet points when listing steps, techniques, or multiple ideas
+- Use --- for horizontal rules to separate sections or create visual breaks
 - Break longer responses into paragraphs with clear spacing
 
 Keep formatting subtle and purposeful - it should enhance clarity, not distract from the therapeutic connection.`;

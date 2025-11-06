@@ -237,6 +237,13 @@ body {
     opacity: 0.95;
 }
 
+.message hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1rem 0;
+    opacity: 0.5;
+}
+
 .message.typing {
     background: var(--bg-mandy-message);
     padding: 1rem 1.25rem;
@@ -950,6 +957,47 @@ body {
 
 .btn-secondary:hover {
     background: rgba(238, 112, 26, 0.08);
+}
+
+/* Compact Resource Cards */
+.resource-card-compact {
+    padding: 1rem;
+}
+
+.resource-card-compact .resource-card-header {
+    margin-bottom: 0.75rem;
+}
+
+.resource-card-compact .resource-card-description {
+    display: none;
+}
+
+/* IMAGINE Framework Footer */
+.imagine-footer {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.imagine-footer p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0 0 1rem 0;
+}
+
+.imagine-footer-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.imagine-footer-buttons .btn-secondary {
+    flex: 0 1 auto;
+    white-space: nowrap;
 }
 
 /* Category Headers */

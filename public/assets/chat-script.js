@@ -277,8 +277,12 @@ function formatMessage(content) {
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
 
+        // Horizontal rules (---, ___, ***)
+        if (line.match(/^([-_*]){3,}$/)) {
+            line = '<hr>';
+        }
         // Headers (##, ###, etc.)
-        if (line.match(/^#{1,3}\s+/)) {
+        else if (line.match(/^#{1,3}\s+/)) {
             const level = line.match(/^#{1,3}/)[0].length;
             const text = line.replace(/^#{1,3}\s+/, '');
             line = `<h${level + 2}>${text}</h${level + 2}>`; // h3, h4, h5 (since h1, h2 are for page structure)
@@ -319,7 +323,7 @@ function formatMessage(content) {
     // Paragraphs (double newline)
     formatted = formatted.split('\n\n').map(p => {
         // Don't wrap if already wrapped in block elements
-        if (p.match(/^<(h[3-5]|ul|li)/)) {
+        if (p.match(/^<(h[3-5]|ul|li|hr)/)) {
             return p;
         }
         return `<p>${p.replace(/\n/g, '<br>')}</p>`;
@@ -642,62 +646,55 @@ const IMAGINE_DOMAINS = [
         title: 'Me, Myself & I',
         subtitle: 'Self-care & wellness',
         icon: '🧘',
-        description: 'Taking care of your physical, emotional, and mental wellbeing. Setting boundaries, checking in with yourself, and honoring your needs.',
-        prompt: 'Tell me about self-care and the "Me, Myself & I" domain of the IMAGINE framework'
+        prompt: 'Tell me about the "Me, Myself & I" domain'
     },
     {
         letter: 'M',
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
         icon: '🪷',
-        description: 'Being fully present in the moment. Noticing thoughts and feelings without judgment, grounding yourself in the here and now.',
-        prompt: 'I want to learn about mindfulness and being present in the moment'
+        prompt: 'Tell me about Mindfulness'
     },
     {
         letter: 'A',
         title: 'Acceptance',
         subtitle: 'Letting go & self-compassion',
         icon: '🤲',
-        description: 'Accepting what you cannot change, practicing self-compassion, and letting go of perfectionism and control.',
-        prompt: 'Help me understand acceptance and how to be more compassionate with myself'
+        prompt: 'Tell me about Acceptance'
     },
     {
         letter: 'G',
         title: 'Gratitude',
         subtitle: 'Appreciation & perspective',
         icon: '🌟',
-        description: 'Noticing and appreciating the good in your life. Shifting perspective to see what\'s working, not just what\'s broken.',
-        prompt: 'I want to explore gratitude and appreciating the good things in my life'
+        prompt: 'Tell me about Gratitude'
     },
     {
         letter: 'I',
         title: 'Interactions',
         subtitle: 'Relationships & connection',
         icon: '💬',
-        description: 'Building and maintaining healthy relationships. Communication, boundaries, and navigating difficult conversations.',
-        prompt: 'I need help with relationships and how I interact with others'
+        prompt: 'Tell me about Interactions'
     },
     {
         letter: 'N',
         title: 'Nurturing',
         subtitle: 'Fun, playfulness & joy',
         icon: '🎨',
-        description: 'Making time for activities that bring you joy. Play, creativity, humor, and connecting with your inner child.',
-        prompt: 'Tell me about nurturing myself through fun and playfulness'
+        prompt: 'Tell me about Nurturing'
     },
     {
         letter: 'E',
         title: 'Exploring',
         subtitle: 'Understanding patterns',
         icon: '🔍',
-        description: 'Identifying and understanding your thoughts, feelings, and behavioral patterns. Recognizing safety behaviors and unhelpful thinking.',
-        prompt: 'Help me explore and understand my thought patterns and behaviors'
+        prompt: 'Tell me about Exploring'
     }
 ];
 
 function populateImaginePanel() {
-    imagineContent.innerHTML = IMAGINE_DOMAINS.map(domain => `
-        <div class="resource-card">
+    const domainCards = IMAGINE_DOMAINS.map(domain => `
+        <div class="resource-card resource-card-compact">
             <div class="resource-card-header">
                 <div class="resource-card-icon">${domain.icon}</div>
                 <div class="resource-card-title">
@@ -705,7 +702,6 @@ function populateImaginePanel() {
                     <p class="subtitle">${domain.subtitle}</p>
                 </div>
             </div>
-            <p class="resource-card-description">${domain.description}</p>
             <div class="resource-card-actions">
                 <button class="btn-primary chat-trigger" data-prompt="${domain.prompt}">
                     Chat with Mandy →
@@ -713,6 +709,22 @@ function populateImaginePanel() {
             </div>
         </div>
     `).join('');
+
+    const footer = `
+        <div class="imagine-footer">
+            <p>Want to learn more?</p>
+            <div class="imagine-footer-buttons">
+                <button class="btn-secondary chat-trigger" data-prompt="How does the IMAGINE framework work?">
+                    How does it work?
+                </button>
+                <button class="btn-secondary chat-trigger" data-prompt="Why these 7 categories in the IMAGINE framework?">
+                    Why these categories?
+                </button>
+            </div>
+        </div>
+    `;
+
+    imagineContent.innerHTML = domainCards + footer;
 
     // Add event listeners to chat triggers
     document.querySelectorAll('#imagine-content .chat-trigger').forEach(btn => {
