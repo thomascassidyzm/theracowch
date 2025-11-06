@@ -1014,7 +1014,8 @@ body {
 }
 
 .resource-card-minimal .resource-card-title .subtitle {
-    display: none;
+    font-size: 0.8rem;
+    color: var(--text-light);
 }
 
 .resource-card-minimal .resource-card-description {

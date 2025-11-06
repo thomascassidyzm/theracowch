@@ -712,42 +712,49 @@ const IMAGINE_DOMAINS = [
     {
         letter: 'I',
         title: 'Me, Myself & I',
+        subtitle: 'Self-care & wellness',
         icon: '🧘',
         prompt: 'Tell me about "Me, Myself & I"'
     },
     {
         letter: 'M',
         title: 'Mindfulness',
+        subtitle: 'Present moment awareness',
         icon: '🪷',
         prompt: 'Tell me about Mindfulness'
     },
     {
         letter: 'A',
         title: 'Acceptance',
+        subtitle: 'Letting go & self-compassion',
         icon: '🤲',
         prompt: 'Tell me about Acceptance'
     },
     {
         letter: 'G',
         title: 'Gratitude',
+        subtitle: 'Appreciation & perspective',
         icon: '🌟',
         prompt: 'Tell me about Gratitude'
     },
     {
         letter: 'I',
         title: 'Interactions',
+        subtitle: 'Relationships & connection',
         icon: '💬',
         prompt: 'Tell me about Interactions'
     },
     {
         letter: 'N',
         title: 'Nurturing',
+        subtitle: 'Fun, playfulness & joy',
         icon: '🎨',
         prompt: 'Tell me about Nurturing'
     },
     {
         letter: 'E',
         title: 'Exploring',
+        subtitle: 'Understanding patterns',
         icon: '🔍',
         prompt: 'Tell me about Exploring'
     }
@@ -760,6 +767,7 @@ function populateImaginePanel() {
                 <div class="resource-card-icon">${domain.icon}</div>
                 <div class="resource-card-title">
                     <h3>${domain.letter} - ${domain.title}</h3>
+                    <p class="subtitle">${domain.subtitle}</p>
                 </div>
             </div>
             <div class="resource-card-actions">
