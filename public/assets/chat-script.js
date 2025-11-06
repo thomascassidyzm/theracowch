@@ -1,4 +1,4 @@
-// Cowch Chat - AI Mandy Conversation Interface
+// Theracowch Chat - AI Mandy Conversation Interface
 // Inspired by Telegram/WhatsApp messaging patterns
 
 // ================================
@@ -29,12 +29,21 @@ const clearChatButton = document.getElementById('clear-chat');
 const aboutImagineButton = document.getElementById('about-imagine');
 const privacyInfoButton = document.getElementById('privacy-info');
 
+// On-Demand Prompts
+const promptButton = document.getElementById('prompt-button');
+const promptBanner = document.getElementById('prompt-banner');
+const promptMessage = document.getElementById('prompt-message');
+const promptAction = document.getElementById('prompt-action');
+const promptNew = document.getElementById('prompt-new');
+const promptDismiss = document.getElementById('prompt-dismiss');
+
 // ================================
 // State Management
 // ================================
 
 let conversationHistory = [];
 let isTyping = false;
+let currentPrompt = null;
 
 // ================================
 // Initialize
@@ -44,13 +53,8 @@ window.addEventListener('DOMContentLoaded', () => {
     loadChatHistory();
     showWelcomeMessage();
     setupEventListeners();
+    checkAndShowPrompt();
     focusInput();
-
-    // Hide quick prompts if conversation already exists
-    if (conversationHistory.length > 0) {
-        quickPromptsContainer.style.display = 'none';
-        document.body.classList.add('prompts-hidden');
-    }
 });
 
 // ================================
@@ -90,6 +94,15 @@ function setupEventListeners() {
     clearChatButton.addEventListener('click', handleClearChat);
     aboutImagineButton.addEventListener('click', handleAboutImagine);
     privacyInfoButton.addEventListener('click', handlePrivacyInfo);
+
+    // On-Demand Prompts
+    promptButton.addEventListener('click', handlePromptButtonClick);
+    promptAction.addEventListener('click', handlePromptAction);
+    promptNew.addEventListener('click', handlePromptNew);
+    promptDismiss.addEventListener('click', hidePromptBanner);
+
+    // Pull-to-refresh on chat messages
+    setupPullToRefresh();
 }
 
 // ================================
@@ -101,15 +114,9 @@ async function handleSendMessage() {
 
     if (!message || isTyping) return;
 
-    // Hide quick prompts after first message
-    if (conversationHistory.length === 0) {
-        quickPromptsContainer.style.display = 'none';
-        document.body.classList.add('prompts-hidden');
-    }
-
     // Add user message to chat
     addMessage(message, 'user');
-    conversationHistory.push({ sender: 'user', text: message });
+    conversationHistory.push({ role: 'user', content: message });
 
     // Clear input
     chatInput.value = '';
@@ -117,6 +124,14 @@ async function handleSendMessage() {
 
     // Save history
     saveChatHistory();
+
+    // Update last message time (for prompt generation)
+    if (window.MandyPrompts) {
+        window.MandyPrompts.updateLastMessageTime();
+    }
+
+    // Hide prompt banner if visible
+    hidePromptBanner();
 
     // Show typing indicator
     showTypingIndicator();
@@ -130,7 +145,7 @@ async function handleSendMessage() {
             },
             body: JSON.stringify({
                 message: message,
-                conversationHistory: conversationHistory.slice(-MAX_HISTORY_MESSAGES)
+                history: conversationHistory.slice(-MAX_HISTORY_MESSAGES)
             })
         });
 
@@ -145,7 +160,7 @@ async function handleSendMessage() {
 
         // Add Mandy's response
         addMessage(data.response, 'mandy');
-        conversationHistory.push({ sender: 'ai_mandy', text: data.response });
+        conversationHistory.push({ role: 'assistant', content: data.response });
 
         // Save history
         saveChatHistory();
@@ -236,7 +251,7 @@ function showWelcomeMessage() {
         const welcomeDiv = document.createElement('div');
         welcomeDiv.className = 'welcome-message';
         welcomeDiv.innerHTML = `
-            <h2>🐮 Welcome to Cowch</h2>
+            <h2>🐮 Welcome to Theracowch</h2>
             <p>I'm Mandy, your AI CBT therapist.</p>
             <p>I use the <strong>IMAGINE framework</strong> to help with anxiety, stress, relationships, and personal growth.</p>
             <p>What's on your mind today?</p>
@@ -256,11 +271,6 @@ function handleClearChat() {
         showWelcomeMessage();
         saveChatHistory();
         menuModal.classList.remove('active');
-
-        // Show quick prompts again
-        quickPromptsContainer.style.display = 'flex';
-        document.body.classList.remove('prompts-hidden');
-
         focusInput();
     }
 }
@@ -318,31 +328,135 @@ function loadChatHistory() {
 
             // Restore messages to UI
             conversationHistory.forEach(msg => {
-                // Handle both old format (role/content) and new format (sender/text)
-                let sender, text;
-
-                if (msg.sender && msg.text) {
-                    // New format
-                    sender = msg.sender === 'user' ? 'user' : 'mandy';
-                    text = msg.text;
-                } else if (msg.role && msg.content) {
-                    // Old format - migrate to new format
-                    sender = msg.role === 'user' ? 'user' : 'mandy';
-                    text = msg.content;
-                    // Update in array for next save
-                    msg.sender = msg.role === 'user' ? 'user' : 'ai_mandy';
-                    msg.text = msg.content;
-                    delete msg.role;
-                    delete msg.content;
-                }
-
-                addMessage(text, sender);
+                const sender = msg.role === 'user' ? 'user' : 'mandy';
+                addMessage(msg.content, sender);
             });
         }
     } catch (error) {
         console.error('Error loading chat history:', error);
         conversationHistory = [];
     }
+}
+
+// ================================
+// On-Demand Prompts
+// ================================
+
+function checkAndShowPrompt() {
+    // Only show auto-prompt if MandyPrompts is available
+    if (!window.MandyPrompts) return;
+
+    // Check if we should show a prompt
+    if (window.MandyPrompts.shouldShowPromptOnOpen(conversationHistory)) {
+        // Get daily cached prompt
+        const prompt = window.MandyPrompts.getDailyPrompt(conversationHistory);
+        if (prompt) {
+            showPromptBanner(prompt);
+        }
+    }
+}
+
+function handlePromptButtonClick() {
+    // Get fresh on-demand prompt
+    if (!window.MandyPrompts) return;
+
+    const prompt = window.MandyPrompts.getOnDemandPrompt(conversationHistory);
+    if (prompt) {
+        showPromptBanner(prompt);
+        // Add a little animation to the button
+        promptButton.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            promptButton.style.transform = 'scale(1)';
+        }, 100);
+    }
+}
+
+function handlePromptNew() {
+    // Get another fresh prompt
+    if (!window.MandyPrompts) return;
+
+    const prompt = window.MandyPrompts.getOnDemandPrompt(conversationHistory);
+    if (prompt) {
+        showPromptBanner(prompt);
+    }
+}
+
+function handlePromptAction() {
+    // Use the prompt as a conversation starter
+    if (currentPrompt) {
+        chatInput.value = currentPrompt.content;
+        hidePromptBanner();
+        handleSendMessage();
+    }
+}
+
+function showPromptBanner(prompt) {
+    if (!prompt) return;
+
+    currentPrompt = prompt;
+    promptMessage.textContent = prompt.content;
+
+    // Update action button text based on prompt type
+    if (prompt.action) {
+        promptAction.textContent = prompt.action;
+    } else {
+        promptAction.textContent = "Let's explore this";
+    }
+
+    // Show banner with animation
+    promptBanner.classList.remove('hidden');
+    setTimeout(() => {
+        promptBanner.classList.add('visible');
+    }, 10);
+}
+
+function hidePromptBanner() {
+    promptBanner.classList.remove('visible');
+    setTimeout(() => {
+        promptBanner.classList.add('hidden');
+        currentPrompt = null;
+    }, 300);
+}
+
+// Pull-to-refresh functionality
+function setupPullToRefresh() {
+    let startY = 0;
+    let pullDistance = 0;
+    let isPulling = false;
+
+    chatMessages.addEventListener('touchstart', (e) => {
+        // Only activate if scrolled to top
+        if (chatMessages.scrollTop === 0) {
+            startY = e.touches[0].pageY;
+            isPulling = true;
+        }
+    }, { passive: true });
+
+    chatMessages.addEventListener('touchmove', (e) => {
+        if (!isPulling || !startY) return;
+
+        pullDistance = e.touches[0].pageY - startY;
+
+        // Only allow pull down
+        if (pullDistance > 0 && chatMessages.scrollTop === 0) {
+            // Add visual feedback (optional - could add a pull indicator)
+            if (pullDistance > 80) {
+                // Could show "Release to get a thought from Mandy..."
+            }
+        }
+    }, { passive: true });
+
+    chatMessages.addEventListener('touchend', () => {
+        if (isPulling && pullDistance > 80) {
+            // Trigger prompt generation
+            handlePromptButtonClick();
+        }
+
+        // Reset
+        startY = 0;
+        pullDistance = 0;
+        isPulling = false;
+    });
 }
 
 // ================================
@@ -367,6 +481,6 @@ if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
 }
 
 // Debug info
-console.log('Cowch Chat initialized');
+console.log('Theracowch Chat initialized');
 console.log('API Endpoint:', API_ENDPOINT);
 console.log('Conversation history:', conversationHistory.length, 'messages');
