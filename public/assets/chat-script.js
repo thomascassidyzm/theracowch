@@ -234,8 +234,11 @@ async function handleSendMessage() {
         // Remove typing indicator
         removeTypingIndicator();
 
-        // Add Mandy's response
-        addMessage(data.response, 'mandy');
+        // Generate quick replies based on pattern and response
+        const quickReplies = generateQuickReplies(data.pattern, data.response);
+
+        // Add Mandy's response with quick replies
+        addMessage(data.response, 'mandy', quickReplies);
         conversationHistory.push({ role: 'assistant', content: data.response });
 
         // Save history
@@ -253,13 +256,78 @@ async function handleSendMessage() {
     }
 }
 
-function addMessage(content, sender) {
+function generateQuickReplies(pattern, response) {
+    // Don't show quick replies too frequently
+    const messageCount = conversationHistory.length;
+    if (messageCount > 0 && messageCount % 3 !== 0) {
+        return null;
+    }
+
+    const lowerResponse = response.toLowerCase();
+    const replies = [];
+
+    // Pattern-specific quick replies
+    if (pattern === 'anxiety') {
+        replies.push(
+            { text: 'Tell me more', prompt: 'Can you tell me more about managing anxiety?' },
+            { text: 'Try an exercise', prompt: 'Can you guide me through a calming exercise?' },
+            { text: 'Why do I feel this way?', prompt: 'Why do I feel anxious?' }
+        );
+    } else if (pattern === 'depression') {
+        replies.push(
+            { text: 'What can I do?', prompt: 'What practical steps can I take?' },
+            { text: 'Tell me more', prompt: 'Can you tell me more about this?' },
+            { text: 'Why do I feel this way?', prompt: 'Why do I feel like this?' }
+        );
+    } else if (pattern === 'relationships') {
+        replies.push(
+            { text: 'Communication tips', prompt: 'How can I communicate better?' },
+            { text: 'Setting boundaries', prompt: 'How do I set healthy boundaries?' },
+            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+        );
+    } else if (lowerResponse.includes('imagine') || lowerResponse.includes('framework')) {
+        replies.push(
+            { text: 'How does it work?', prompt: 'How does the IMAGINE framework work?' },
+            { text: 'Why these 7?', prompt: 'Why these 7 categories?' },
+            { text: 'Show me more', prompt: 'Can you tell me more about applying this?' }
+        );
+    } else {
+        // General follow-ups
+        replies.push(
+            { text: 'Tell me more', prompt: 'Can you tell me more about this?' },
+            { text: 'How do I apply this?', prompt: 'How can I apply this in my life?' },
+            { text: 'What else?', prompt: 'What else should I know?' }
+        );
+    }
+
+    return replies.slice(0, 3); // Max 3 quick replies
+}
+
+function addMessage(content, sender, quickReplies = null) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
 
     // Convert markdown-style formatting
     const formattedContent = formatMessage(content);
     messageDiv.innerHTML = formattedContent;
+
+    // Add quick reply buttons if provided (only for Mandy's messages)
+    if (quickReplies && sender === 'mandy') {
+        const quickRepliesDiv = document.createElement('div');
+        quickRepliesDiv.className = 'quick-replies';
+
+        quickReplies.forEach(reply => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.textContent = reply.text;
+            button.addEventListener('click', () => {
+                triggerChatPrompt(reply.prompt);
+            });
+            quickRepliesDiv.appendChild(button);
+        });
+
+        messageDiv.appendChild(quickRepliesDiv);
+    }
 
     chatMessages.appendChild(messageDiv);
     scrollToBottom();
@@ -644,49 +712,42 @@ const IMAGINE_DOMAINS = [
     {
         letter: 'I',
         title: 'Me, Myself & I',
-        subtitle: 'Self-care & wellness',
         icon: '🧘',
-        prompt: 'Tell me about the "Me, Myself & I" domain'
+        prompt: 'Tell me about "Me, Myself & I"'
     },
     {
         letter: 'M',
         title: 'Mindfulness',
-        subtitle: 'Present moment awareness',
         icon: '🪷',
         prompt: 'Tell me about Mindfulness'
     },
     {
         letter: 'A',
         title: 'Acceptance',
-        subtitle: 'Letting go & self-compassion',
         icon: '🤲',
         prompt: 'Tell me about Acceptance'
     },
     {
         letter: 'G',
         title: 'Gratitude',
-        subtitle: 'Appreciation & perspective',
         icon: '🌟',
         prompt: 'Tell me about Gratitude'
     },
     {
         letter: 'I',
         title: 'Interactions',
-        subtitle: 'Relationships & connection',
         icon: '💬',
         prompt: 'Tell me about Interactions'
     },
     {
         letter: 'N',
         title: 'Nurturing',
-        subtitle: 'Fun, playfulness & joy',
         icon: '🎨',
         prompt: 'Tell me about Nurturing'
     },
     {
         letter: 'E',
         title: 'Exploring',
-        subtitle: 'Understanding patterns',
         icon: '🔍',
         prompt: 'Tell me about Exploring'
     }
@@ -694,12 +755,11 @@ const IMAGINE_DOMAINS = [
 
 function populateImaginePanel() {
     const domainCards = IMAGINE_DOMAINS.map(domain => `
-        <div class="resource-card resource-card-compact">
+        <div class="resource-card resource-card-minimal">
             <div class="resource-card-header">
                 <div class="resource-card-icon">${domain.icon}</div>
                 <div class="resource-card-title">
                     <h3>${domain.letter} - ${domain.title}</h3>
-                    <p class="subtitle">${domain.subtitle}</p>
                 </div>
             </div>
             <div class="resource-card-actions">
@@ -712,13 +772,16 @@ function populateImaginePanel() {
 
     const footer = `
         <div class="imagine-footer">
-            <p>Want to learn more?</p>
+            <p>Want to learn more about the IMAGINE Framework?</p>
             <div class="imagine-footer-buttons">
+                <button class="btn-secondary chat-trigger" data-prompt="What is the IMAGINE framework?">
+                    What is it?
+                </button>
+                <button class="btn-secondary chat-trigger" data-prompt="Why is the IMAGINE framework useful?">
+                    Why is it useful?
+                </button>
                 <button class="btn-secondary chat-trigger" data-prompt="How does the IMAGINE framework work?">
                     How does it work?
-                </button>
-                <button class="btn-secondary chat-trigger" data-prompt="Why these 7 categories in the IMAGINE framework?">
-                    Why these categories?
                 </button>
             </div>
         </div>

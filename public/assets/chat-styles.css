@@ -244,6 +244,34 @@ body {
     opacity: 0.5;
 }
 
+/* Quick Reply Buttons */
+.quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.quick-reply-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    padding: 0.5rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.quick-reply-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
 .message.typing {
     background: var(--bg-mandy-message);
     padding: 1rem 1.25rem;
@@ -969,6 +997,27 @@ body {
 }
 
 .resource-card-compact .resource-card-description {
+    display: none;
+}
+
+/* Minimal Resource Cards */
+.resource-card-minimal {
+    padding: 1rem;
+}
+
+.resource-card-minimal .resource-card-header {
+    margin-bottom: 0.75rem;
+}
+
+.resource-card-minimal .resource-card-title h3 {
+    font-size: 1rem;
+}
+
+.resource-card-minimal .resource-card-title .subtitle {
+    display: none;
+}
+
+.resource-card-minimal .resource-card-description {
     display: none;
 }
 
