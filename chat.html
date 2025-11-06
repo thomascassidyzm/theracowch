@@ -31,6 +31,12 @@
             </div>
         </div>
         <div class="header-right">
+            <button class="icon-button prompt-button" id="prompt-button" aria-label="Get a thought from Mandy" title="What's Mandy thinking?">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <path d="M8 10h.01M12 10h.01M16 10h.01"/>
+                </svg>
+            </button>
             <button class="icon-button" id="menu-button" aria-label="Menu">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="1"/>
@@ -40,6 +46,22 @@
             </button>
         </div>
     </header>
+
+    <!-- On-Demand Prompt Banner (hidden by default) -->
+    <div class="prompt-banner hidden" id="prompt-banner">
+        <div class="prompt-content">
+            <div class="prompt-icon">💭</div>
+            <div class="prompt-text">
+                <div class="prompt-label">Mandy's thought for you:</div>
+                <div class="prompt-message" id="prompt-message"></div>
+            </div>
+            <button class="prompt-dismiss" id="prompt-dismiss" aria-label="Dismiss">×</button>
+        </div>
+        <div class="prompt-actions">
+            <button class="prompt-action-btn primary" id="prompt-action">Let's explore this</button>
+            <button class="prompt-action-btn secondary" id="prompt-new">Show me another</button>
+        </div>
+    </div>
 
     <!-- Chat Messages -->
     <main class="chat-messages" id="chat-messages">
@@ -111,6 +133,7 @@
         </div>
     </div>
 
+    <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js"></script>
 </body>
 </html>
