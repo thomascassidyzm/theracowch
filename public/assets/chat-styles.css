@@ -497,6 +497,7 @@ body {
 
     .chat-messages {
         padding: 1rem;
+        padding-bottom: calc(12rem + env(safe-area-inset-bottom, 0));
     }
 
     .message {
