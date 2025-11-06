@@ -4,8 +4,8 @@
     /* Mandy's Website Brand Colors - Dark Grey Version */
     --bg-primary: #2D2D2D;           /* Dark grey background */
     --bg-secondary: #3A3A3A;         /* Medium-dark grey */
-    --bg-mandy-message: #3F3F3F;     /* Darker grey for Mandy messages */
-    --bg-user-message: #4A4A4A;      /* Lighter grey for user messages */
+    --bg-mandy-message: #D67856;     /* Burnt sienna for Mandy messages */
+    --bg-user-message: #4A4A4A;      /* Grey for user messages */
 
     --text-primary: #FFFFFF;         /* White text for readability */
     --text-secondary: #CCCCCC;       /* Light grey secondary text */
@@ -178,6 +178,14 @@ body {
 
 .message strong {
     font-weight: 600;
+}
+
+.message.mandy strong {
+    color: #FFFFFF;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message.user strong {
     color: var(--accent-primary);
 }
 
@@ -447,15 +455,17 @@ body {
 .welcome-message {
     text-align: center;
     padding: 2rem 1rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
     max-width: 400px;
     margin: 0 auto;
+    opacity: 0.8;
 }
 
 .welcome-message h2 {
-    color: var(--accent-primary);
+    color: var(--text-secondary);
     font-size: 1.5rem;
     margin-bottom: 0.75rem;
+    font-weight: 500;
 }
 
 .welcome-message p {
