@@ -10,8 +10,8 @@ test_*
 validate_*.cjs
 *_whitelist.json
 
-# Local development VFS (never commit - use GitHub for course data)
-vfs/
+# Local development VFS at root only (DO commit public/vfs/courses/)
+/vfs/
 
 # Keep useful scripts (exceptions to above patterns)
 !validate_extraction.js
