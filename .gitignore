@@ -3,3 +3,16 @@
 node_modules/
 package-lock.json
 *.log
+
+# Temporary and test files (prevent accidental commits)
+temp_*
+test_*
+validate_*.cjs
+*_whitelist.json
+
+# Local development VFS (never commit - use GitHub for course data)
+vfs/
+
+# Keep useful scripts (exceptions to above patterns)
+!validate_extraction.js
+!test_v5_1_api.js
