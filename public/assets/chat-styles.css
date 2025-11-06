@@ -1,11 +1,11 @@
 /* Theracowch Chat Styles - Telegram/WhatsApp inspired */
 
 :root {
-    /* Mandy's Website Brand Colors - Higher Contrast Version */
-    --bg-primary: #FFFFFF;           /* Clean white background */
-    --bg-secondary: #F8F6F4;         /* Light warm off-white */
+    /* Mandy's Website Brand Colors - Grey Version */
+    --bg-primary: #E8E8E8;           /* Light grey background */
+    --bg-secondary: #D4D4D4;         /* Medium grey */
     --bg-mandy-message: #F9E5DF;     /* Peachy cream for Mandy - more saturated */
-    --bg-user-message: #E8DED8;      /* Warm taupe for user - more distinct */
+    --bg-user-message: #D8D4D0;      /* Warm grey for user */
 
     --text-primary: #1A1410;         /* Much darker brown-black for main text */
     --text-secondary: #4A3F35;       /* Darker secondary text */
