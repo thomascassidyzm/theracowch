@@ -1,34 +1,38 @@
-/* Dark Theme Variables */
+/* Warm Dark Theme Variables with Glassmorphism */
 :root {
-    /* Dark Backgrounds */
-    --bg-primary: #1A1A1A;
-    --bg-secondary: #242424;
-    --bg-elevated: #2D2D2D;
-    
-    /* White Text */
-    --text-primary: #FFFFFF;
-    --text-secondary: #B8B8B8;
-    --text-tertiary: #808080;
-    
-    /* Burnt Sienna Accent */
-    --accent-primary: #D67856;
-    --accent-hover: #E88A6A;
-    --accent-glow: rgba(214, 120, 86, 0.15);
-    
-    /* Message Bubbles */
-    --mandy-bg: #2D2D2D;
-    --user-bg: #3A3A3A;
-    --bg-mandy-message: #2D2D2D;
-    --bg-user-message: #3A3A3A;
-    
-    /* Borders & Shadows */
-    --border-color: rgba(255, 255, 255, 0.1);
-    --border-subtle: rgba(255, 255, 255, 0.1);
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-    
-    /* Glass Effect */
+    /* Warm Dark Backgrounds - Rich browns with depth */
+    --bg-primary: #1C1714;           /* Deep warm charcoal (not grey!) */
+    --bg-secondary: #26211D;         /* Rich dark brown */
+    --bg-elevated: #2F2823;          /* Elevated warm brown */
+    --bg-mandy-message: #2F2823;     /* Warm brown for Mandy messages */
+    --bg-user-message: #3A3228;      /* Slightly warmer brown for user */
+
+    /* Text - High contrast with warmth */
+    --text-primary: #F5F0EA;         /* Warm off-white (not pure white) */
+    --text-secondary: #C4B5A8;       /* Warm beige secondary */
+    --text-tertiary: #9B8A7A;        /* Muted warm brown */
+    --text-light: #9B8A7A;           /* Muted warm brown (alias) */
+
+    /* Terracotta Accent - Punchy and warm */
+    --accent-primary: #E88A6A;       /* Bright warm terracotta */
+    --accent-secondary: #D67856;     /* Medium terracotta */
+    --accent-hover: #F29D7E;         /* Lighter hover */
+    --accent-glow: rgba(232, 138, 106, 0.25);
+
+    /* Glassmorphism Effects */
     --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-strong: rgba(255, 255, 255, 0.08);
+
+    /* Borders & Shadows - Subtle but present */
+    --border-color: rgba(255, 255, 255, 0.12);
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 20px rgba(232, 138, 106, 0.15);
+
+    /* Legacy aliases for backwards compatibility */
+    --mandy-bg: #2F2823;
+    --user-bg: #3A3228;
 }
