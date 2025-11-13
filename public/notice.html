@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Notice | Cowch</title>
+    <meta name="description" content="A simple space to notice what's happening - no judgment, no pressure.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1C1714">
+
+    <style>
+        /* Warm Dark Theme */
+        :root {
+            --bg-primary: #1C1714;
+            --bg-secondary: #26211D;
+            --bg-elevated: #2F2823;
+
+            --text-primary: #F5F0EA;
+            --text-secondary: #C4B5A8;
+            --text-tertiary: #9B8A7A;
+
+            --accent-primary: #E88A6A;
+            --accent-secondary: #D67856;
+            --accent-hover: #F29D7E;
+            --accent-glow: rgba(232, 138, 106, 0.25);
+
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-strong: rgba(255, 255, 255, 0.08);
+
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(38, 33, 29, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 1.5rem;
+            padding-top: max(1.25rem, env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.25s;
+        }
+
+        .back-btn:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+        }
+
+        /* Toggle View Buttons */
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-elevated);
+            padding: 0.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .view-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .view-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Today's Notice */
+        .today-section {
+            display: none;
+        }
+
+        .today-section.active {
+            display: block;
+        }
+
+        .section-intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-intro h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-intro p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 4px var(--glass-bg);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+
+        /* Energy Slider */
+        .slider-container {
+            margin-bottom: 2rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        /* Prompt */
+        .prompt {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Save Button */
+        .save-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 24px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Timeline View */
+        .timeline-section {
+            display: none;
+        }
+
+        .timeline-section.active {
+            display: block;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .day-label {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            padding: 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-cell:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-primary);
+        }
+
+        .day-cell.empty {
+            background: var(--bg-secondary);
+            cursor: default;
+        }
+
+        .day-cell.empty:hover {
+            transform: none;
+            border-color: var(--glass-border);
+        }
+
+        .day-number {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.25rem;
+        }
+
+        .day-cell.today {
+            border-color: var(--accent-primary);
+            border-width: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .color-picker {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/chat.html" class="back-btn">← Back</a>
+        <h1 class="header-title">Notice</h1>
+        <div style="width: 80px;"></div> <!-- Spacer for centering -->
+    </header>
+
+    <div class="container">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+            <button class="view-btn active" id="btn-today">Today</button>
+            <button class="view-btn" id="btn-timeline">Timeline</button>
+        </div>
+
+        <!-- Today's Notice -->
+        <div class="today-section active" id="today-view">
+            <div class="section-intro">
+                <h2>What do you notice today?</h2>
+                <p>No pressure, no judgment. Just notice.</p>
+            </div>
+
+            <div class="card">
+                <h3>How does today feel?</h3>
+                <div class="color-picker" id="color-picker">
+                    <div class="color-option" data-color="#E88A6A" style="background: #E88A6A;"></div>
+                    <div class="color-option" data-color="#F29D7E" style="background: #F29D7E;"></div>
+                    <div class="color-option" data-color="#D67856" style="background: #D67856;"></div>
+                    <div class="color-option" data-color="#8B7355" style="background: #8B7355;"></div>
+                    <div class="color-option" data-color="#C4B5A8" style="background: #C4B5A8;"></div>
+                    <div class="color-option" data-color="#9B8A7A" style="background: #9B8A7A;"></div>
+
+                    <div class="color-option" data-color="#6B9BA8" style="background: #6B9BA8;"></div>
+                    <div class="color-option" data-color="#7EA88B" style="background: #7EA88B;"></div>
+                    <div class="color-option" data-color="#A8A07E" style="background: #A8A07E;"></div>
+                    <div class="color-option" data-color="#A87E8B" style="background: #A87E8B;"></div>
+                    <div class="color-option" data-color="#8B7EA8" style="background: #8B7EA8;"></div>
+                    <div class="color-option" data-color="#4A4237" style="background: #4A4237;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Energy level</h3>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="energy-slider">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="prompt" id="daily-prompt">What did I give myself today?</div>
+                <textarea id="notice-text" placeholder="Write as much or as little as you want..."></textarea>
+            </div>
+
+            <button class="save-btn" id="save-btn">Save this notice</button>
+        </div>
+
+        <!-- Timeline View -->
+        <div class="timeline-section" id="timeline-view">
+            <div class="section-intro">
+                <h2>Your notices</h2>
+                <p>Patterns you notice are yours to explore</p>
+            </div>
+
+            <div id="timeline-container">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <p>No notices yet. Start noticing today.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daily prompts to rotate
+        const prompts = [
+            "What did I give myself today?",
+            "What surprised me today?",
+            "Where did I feel most like myself?",
+            "What did I notice today?",
+            "What mattered to me today?"
+        ];
+
+        // Get today's prompt (based on day of year)
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        document.getElementById('daily-prompt').textContent = prompts[dayOfYear % prompts.length];
+
+        // Local storage key
+        const STORAGE_KEY = 'cowch_notices';
+
+        // Load notices from localStorage
+        function getNotices() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveNotices(notices) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notices));
+        }
+
+        // Get today's date string
+        function getTodayKey() {
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        }
+
+        // Color picker
+        const colorOptions = document.querySelectorAll('.color-option');
+        let selectedColor = null;
+
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedColor = option.dataset.color;
+            });
+        });
+
+        // Load today's notice if exists
+        function loadTodayNotice() {
+            const notices = getNotices();
+            const today = getTodayKey();
+            const todayNotice = notices[today];
+
+            if (todayNotice) {
+                // Set color
+                if (todayNotice.color) {
+                    selectedColor = todayNotice.color;
+                    const colorOption = document.querySelector(`[data-color="${todayNotice.color}"]`);
+                    if (colorOption) {
+                        colorOptions.forEach(o => o.classList.remove('selected'));
+                        colorOption.classList.add('selected');
+                    }
+                }
+
+                // Set energy
+                if (todayNotice.energy !== undefined) {
+                    document.getElementById('energy-slider').value = todayNotice.energy;
+                }
+
+                // Set text
+                if (todayNotice.text) {
+                    document.getElementById('notice-text').value = todayNotice.text;
+                }
+            }
+        }
+
+        loadTodayNotice();
+
+        // Save notice
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const energy = document.getElementById('energy-slider').value;
+            const text = document.getElementById('notice-text').value;
+
+            if (!selectedColor && !text.trim()) {
+                return; // Nothing to save
+            }
+
+            const notices = getNotices();
+            const today = getTodayKey();
+
+            notices[today] = {
+                color: selectedColor,
+                energy: parseInt(energy),
+                text: text.trim(),
+                prompt: document.getElementById('daily-prompt').textContent
+            };
+
+            saveNotices(notices);
+
+            // Show feedback
+            const btn = document.getElementById('save-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Saved ✓';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+
+            // Refresh timeline
+            renderTimeline();
+        });
+
+        // View toggle
+        document.getElementById('btn-today').addEventListener('click', () => {
+            document.getElementById('btn-today').classList.add('active');
+            document.getElementById('btn-timeline').classList.remove('active');
+            document.getElementById('today-view').classList.add('active');
+            document.getElementById('timeline-view').classList.remove('active');
+        });
+
+        document.getElementById('btn-timeline').addEventListener('click', () => {
+            document.getElementById('btn-timeline').classList.add('active');
+            document.getElementById('btn-today').classList.remove('active');
+            document.getElementById('timeline-view').classList.add('active');
+            document.getElementById('today-view').classList.remove('active');
+            renderTimeline();
+        });
+
+        // Render timeline
+        function renderTimeline() {
+            const notices = getNotices();
+            const container = document.getElementById('timeline-container');
+
+            if (Object.keys(notices).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        <p>No notices yet. Start noticing today.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get current month
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            // Month name
+            const monthName = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            let html = `
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <h3 style="color: var(--text-primary); font-size: 1.25rem;">${monthName}</h3>
+                </div>
+                <div class="timeline-grid">
+                    <div class="day-label">S</div>
+                    <div class="day-label">M</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">W</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">F</div>
+                    <div class="day-label">S</div>
+            `;
+
+            // Empty cells before first day
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += '<div class="day-cell empty"></div>';
+            }
+
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const notice = notices[dateKey];
+                const isToday = day === now.getDate();
+
+                if (notice && notice.color) {
+                    html += `
+                        <div class="day-cell ${isToday ? 'today' : ''}"
+                             style="background: ${notice.color};"
+                             data-date="${dateKey}">
+                            <div class="day-number">${day}</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="day-cell empty ${isToday ? 'today' : ''}">
+                            <div class="day-number">${day}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Add click handlers to show notice details
+            container.querySelectorAll('.day-cell[data-date]').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const dateKey = cell.dataset.date;
+                    const notice = notices[dateKey];
+                    if (notice) {
+                        showNoticeDetail(dateKey, notice);
+                    }
+                });
+            });
+        }
+
+        // Show notice detail (simple alert for now)
+        function showNoticeDetail(date, notice) {
+            const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            let message = `${formattedDate}\n\n`;
+            if (notice.prompt) {
+                message += `"${notice.prompt}"\n\n`;
+            }
+            if (notice.text) {
+                message += notice.text;
+            } else {
+                message += '(No text recorded)';
+            }
+
+            alert(message);
+        }
+
+        console.log('Notice initialized');
+    </script>
+</body>
+</html>
