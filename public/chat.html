@@ -19,15 +19,11 @@
     <link rel="stylesheet" href="/assets/chat-styles.css">
 </head>
 <body>
-    <!-- Top Navigation -->
-    <nav class="top-nav">
-        <a href="/" class="top-nav-logo">
-            <div class="top-nav-logo-icon">
-                <img src="/assets/theracowch_main_image.jpg" alt="Cowch">
-            </div>
-            <span>Cowch</span>
-        </a>
-        <div class="top-nav-actions">
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="back-btn">← Home</a>
+        <h1 class="header-title">Chat with Mandy</h1>
+        <div class="header-actions">
             <button class="icon-button prompt-button" id="prompt-button" aria-label="Get a thought from Mandy" title="What's Mandy thinking?">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -42,7 +38,7 @@
                 </svg>
             </button>
         </div>
-    </nav>
+    </header>
 
     <!-- On-Demand Prompt Banner (hidden by default) -->
     <div class="prompt-banner hidden" id="prompt-banner">
