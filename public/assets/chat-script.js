@@ -1147,7 +1147,7 @@ function showGroundingPhase() {
     // Build checklist
     let checklistHTML = '';
     for (let i = 0; i < phase.number; i++) {
-        checklistHTML += `<div class="grounding-check ${i < groundingChecks ? 'completed' : ''}"></div>`;
+        checklistHTML += `<div class="grounding-check ${i < groundingChecks ? 'completed' : ''}" data-index="${i}"></div>`;
     }
 
     groundingContainer.innerHTML = `
@@ -1159,36 +1159,22 @@ function showGroundingPhase() {
         </div>
     `;
 
-    // Add click handler to progress through checks
-    const checks = groundingContainer.querySelectorAll('.grounding-check');
-    checks.forEach((check, index) => {
-        if (index === groundingChecks && !check.classList.contains('completed')) {
-            check.addEventListener('click', () => {
-                check.classList.add('completed');
-                groundingChecks++;
-                if (groundingChecks >= phase.number) {
-                    startGroundingButton.textContent = groundingPhase < 4 ? 'Next Sense →' : 'Complete';
-                }
-            });
-        }
-    });
-
-    // Auto-advance on spacebar/enter
-    const advanceOnKeyHandler = (e) => {
-        if (e.key === ' ' || e.key === 'Enter') {
-            if (groundingChecks < phase.number) {
-                checks[groundingChecks].classList.add('completed');
-                groundingChecks++;
-                if (groundingChecks >= phase.number) {
-                    startGroundingButton.textContent = groundingPhase < 4 ? 'Next Sense →' : 'Complete';
-                }
+    // Add click handler to advance checks
+    const advanceCheck = () => {
+        const checks = groundingContainer.querySelectorAll('.grounding-check');
+        if (groundingChecks < phase.number) {
+            checks[groundingChecks].classList.add('completed');
+            groundingChecks++;
+            if (groundingChecks >= phase.number) {
+                startGroundingButton.textContent = groundingPhase < 4 ? 'Next Sense →' : 'Complete';
             }
-            e.preventDefault();
         }
     };
 
-    document.addEventListener('keydown', advanceOnKeyHandler);
-    groundingContainer.dataset.keyHandler = 'active';
+    // Click anywhere in the grounding sense area
+    const senseArea = groundingContainer.querySelector('.grounding-sense');
+    senseArea.style.cursor = 'pointer';
+    senseArea.addEventListener('click', advanceCheck);
 }
 
 function advanceGrounding() {

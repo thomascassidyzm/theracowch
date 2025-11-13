@@ -298,7 +298,7 @@ function generateContextualPrompt(conversationHistory) {
 
     // Priority 2: Suggest relevant exercise (if pattern detected)
     if (analysis.dominantCount >= 1) {
-        const relevantExercises = Object.entries(EXERCISES)
+        const relevantExercises = Object.entries(EXERCISE_DEFINITIONS)
             .filter(([_, ex]) => ex.suggested_for.includes(analysis.dominantPattern));
 
         if (relevantExercises.length > 0 && Math.random() > 0.5) {
@@ -379,6 +379,11 @@ function getOnDemandPrompt(conversationHistory) {
 // ================================
 
 function shouldShowPromptOnOpen(conversationHistory) {
+    // Never show on first visit (no conversation history)
+    if (conversationHistory.length === 0) {
+        return false;
+    }
+
     const timeSince = getTimeSinceLastMessage(conversationHistory);
 
     // Don't show if just chatted (< 1 hour)
@@ -414,7 +419,7 @@ window.MandyPrompts = {
     getIMAGINEPrompts: () => IMAGINE_PROMPTS,
 
     // Get all exercises
-    getExercises: () => EXERCISES
+    getExercises: () => EXERCISE_DEFINITIONS
 };
 
 console.log('Mandy On-Demand Prompts initialized');
