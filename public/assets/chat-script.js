@@ -94,7 +94,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     populateImaginePanel();
     populateExercisePanel();
-    checkAndShowPrompt();
+    // Don't show prompt banner on chat page - it's messy
+    // checkAndShowPrompt();
     focusInput();
 });
 
