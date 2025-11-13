@@ -187,6 +187,76 @@
         </div>
     </div>
 
+    <!-- 5-4-3-2-1 Grounding Exercise Modal -->
+    <div class="exercise-modal" id="grounding-modal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h3>5-4-3-2-1 Grounding</h3>
+                <button class="close-modal" id="close-grounding" aria-label="Close exercise">×</button>
+            </div>
+            <div class="exercise-visual">
+                <div class="grounding-container" id="grounding-container">
+                    <div class="grounding-sense active" data-sense="see">
+                        <div class="grounding-icon">👁️</div>
+                        <div class="grounding-number">5</div>
+                        <div class="grounding-label">things you can see</div>
+                        <div class="grounding-checklist"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-instruction" id="grounding-instruction">
+                Name 5 things you can see around you
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-primary" id="start-grounding">Start</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-grounding">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progressive Muscle Relaxation Modal -->
+    <div class="exercise-modal" id="pmr-modal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h3>Progressive Muscle Relaxation</h3>
+                <button class="close-modal" id="close-pmr" aria-label="Close exercise">×</button>
+            </div>
+            <div class="exercise-visual">
+                <svg class="body-diagram" id="body-diagram" viewBox="0 0 200 400" width="200" height="400">
+                    <!-- Head -->
+                    <ellipse cx="100" cy="50" rx="35" ry="40" class="body-part" data-part="head" data-label="Face & Jaw"/>
+                    <!-- Neck -->
+                    <rect x="85" y="85" width="30" height="25" rx="5" class="body-part" data-part="neck" data-label="Neck"/>
+                    <!-- Shoulders -->
+                    <ellipse cx="60" cy="120" rx="25" ry="15" class="body-part" data-part="shoulders" data-label="Shoulders"/>
+                    <ellipse cx="140" cy="120" rx="25" ry="15" class="body-part" data-part="shoulders" data-label="Shoulders"/>
+                    <!-- Arms -->
+                    <rect x="35" y="130" width="15" height="80" rx="7" class="body-part" data-part="arms" data-label="Arms"/>
+                    <rect x="150" y="130" width="15" height="80" rx="7" class="body-part" data-part="arms" data-label="Arms"/>
+                    <!-- Chest -->
+                    <ellipse cx="100" cy="150" rx="35" ry="35" class="body-part" data-part="chest" data-label="Chest"/>
+                    <!-- Stomach -->
+                    <ellipse cx="100" cy="200" rx="30" ry="30" class="body-part" data-part="stomach" data-label="Stomach"/>
+                    <!-- Hips -->
+                    <ellipse cx="100" cy="240" rx="35" ry="20" class="body-part" data-part="hips" data-label="Hips"/>
+                    <!-- Legs -->
+                    <rect x="75" y="255" width="18" height="100" rx="9" class="body-part" data-part="legs" data-label="Legs"/>
+                    <rect x="107" y="255" width="18" height="100" rx="9" class="body-part" data-part="legs" data-label="Legs"/>
+                    <!-- Feet -->
+                    <ellipse cx="84" cy="370" rx="12" ry="18" class="body-part" data-part="feet" data-label="Feet"/>
+                    <ellipse cx="116" cy="370" rx="12" ry="18" class="body-part" data-part="feet" data-label="Feet"/>
+                </svg>
+            </div>
+            <div class="exercise-instruction" id="pmr-instruction">
+                Ready to release tension from your body?
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-primary" id="start-pmr">Start</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-pmr">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">

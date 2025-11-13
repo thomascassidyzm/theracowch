@@ -1168,6 +1168,104 @@ body {
     background: var(--bg-secondary);
 }
 
+/* 5-4-3-2-1 Grounding Exercise */
+.grounding-container {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+.grounding-sense {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.grounding-sense.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.grounding-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: gentlePulse 2s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.grounding-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+}
+
+.grounding-label {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.grounding-checklist {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.grounding-check {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    border: 2px solid var(--glass-border);
+    transition: all 0.3s;
+}
+
+.grounding-check.completed {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    transform: scale(1.2);
+}
+
+/* Progressive Muscle Relaxation */
+.body-diagram {
+    max-width: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+.body-part {
+    fill: var(--bg-primary);
+    stroke: var(--glass-border);
+    stroke-width: 2;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.body-part:hover {
+    fill: rgba(232, 138, 106, 0.3);
+}
+
+.body-part.tense {
+    fill: var(--accent-secondary);
+    stroke: var(--accent-primary);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.body-part.relaxed {
+    fill: rgba(126, 168, 139, 0.4);
+    stroke: #7EA88B;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 6px rgba(126, 168, 139, 0.3));
+}
+
 /* Desktop adjustments for slide panels */
 @media (min-width: 769px) {
     .slide-panel {

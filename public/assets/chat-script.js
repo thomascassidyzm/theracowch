@@ -46,6 +46,22 @@ const talkAboutBreathingButton = document.getElementById('talk-about-breathing')
 const breathingCircle = document.getElementById('breathing-circle');
 const breathingInstruction = document.getElementById('breathing-instruction');
 
+// Grounding exercise modal
+const groundingModal = document.getElementById('grounding-modal');
+const closeGroundingButton = document.getElementById('close-grounding');
+const startGroundingButton = document.getElementById('start-grounding');
+const talkAboutGroundingButton = document.getElementById('talk-about-grounding');
+const groundingContainer = document.getElementById('grounding-container');
+const groundingInstruction = document.getElementById('grounding-instruction');
+
+// PMR modal
+const pmrModal = document.getElementById('pmr-modal');
+const closePmrButton = document.getElementById('close-pmr');
+const startPmrButton = document.getElementById('start-pmr');
+const talkAboutPmrButton = document.getElementById('talk-about-pmr');
+const bodyDiagram = document.getElementById('body-diagram');
+const pmrInstruction = document.getElementById('pmr-instruction');
+
 // On-Demand Prompts
 const promptButton = document.getElementById('prompt-button');
 const promptBanner = document.getElementById('prompt-banner');
@@ -147,11 +163,53 @@ function setupEventListeners() {
         triggerChatPrompt("Can you guide me through box breathing and explain how it helps with anxiety?");
     });
 
+    // Grounding exercise
+    closeGroundingButton.addEventListener('click', () => {
+        stopGrounding();
+        groundingModal.classList.remove('active');
+    });
+
+    startGroundingButton.addEventListener('click', startGroundingExercise);
+
+    talkAboutGroundingButton.addEventListener('click', () => {
+        groundingModal.classList.remove('active');
+        exercisePanel.classList.remove('active');
+        triggerChatPrompt("Guide me through the 5-4-3-2-1 grounding technique");
+    });
+
+    // PMR exercise
+    closePmrButton.addEventListener('click', () => {
+        stopPMR();
+        pmrModal.classList.remove('active');
+    });
+
+    startPmrButton.addEventListener('click', startPMRExercise);
+
+    talkAboutPmrButton.addEventListener('click', () => {
+        pmrModal.classList.remove('active');
+        exercisePanel.classList.remove('active');
+        triggerChatPrompt("Guide me through progressive muscle relaxation");
+    });
+
     // Close modals on backdrop click
     breathingModal.addEventListener('click', (e) => {
         if (e.target === breathingModal) {
             stopBreathing();
             breathingModal.classList.remove('active');
+        }
+    });
+
+    groundingModal.addEventListener('click', (e) => {
+        if (e.target === groundingModal) {
+            stopGrounding();
+            groundingModal.classList.remove('active');
+        }
+    });
+
+    pmrModal.addEventListener('click', (e) => {
+        if (e.target === pmrModal) {
+            stopPMR();
+            pmrModal.classList.remove('active');
         }
     });
 
@@ -824,14 +882,14 @@ const EXERCISES = [
             {
                 name: '5-4-3-2-1 Grounding',
                 description: 'Use your 5 senses to anchor yourself in the present moment',
-                hasInteractive: false,
+                hasInteractive: true,
                 prompt: 'Guide me through the 5-4-3-2-1 grounding technique'
             },
             {
-                name: 'Body Scan',
-                description: 'Notice tension and sensations throughout your body',
-                hasInteractive: false,
-                prompt: 'Help me do a body scan meditation'
+                name: 'Progressive Muscle Relaxation',
+                description: 'Release tension by tensing and relaxing muscle groups',
+                hasInteractive: true,
+                prompt: 'Guide me through progressive muscle relaxation'
             }
         ]
     },
@@ -946,8 +1004,14 @@ function populateExercisePanel() {
     document.querySelectorAll('#exercise-content .start-exercise').forEach(btn => {
         btn.addEventListener('click', () => {
             const exerciseName = btn.dataset.exercise;
+            exercisePanel.classList.remove('active');
+
             if (exerciseName === 'Box Breathing') {
                 breathingModal.classList.add('active');
+            } else if (exerciseName === '5-4-3-2-1 Grounding') {
+                groundingModal.classList.add('active');
+            } else if (exerciseName === 'Progressive Muscle Relaxation') {
+                pmrModal.classList.add('active');
             }
         });
     });
@@ -1048,6 +1112,215 @@ function stopBreathing() {
     startBreathingButton.removeEventListener('click', pauseBreathing);
     startBreathingButton.removeEventListener('click', resumeBreathing);
     startBreathingButton.addEventListener('click', startBreathingExercise);
+}
+
+// ================================
+// 5-4-3-2-1 Grounding Exercise
+// ================================
+
+let groundingPhase = 0;
+let groundingChecks = 0;
+
+const GROUNDING_PHASES = [
+    { icon: '👁️', number: 5, label: 'things you can see', instruction: 'Name 5 things you can see around you' },
+    { icon: '✋', number: 4, label: 'things you can touch', instruction: 'Name 4 things you can touch or feel' },
+    { icon: '👂', number: 3, label: 'things you can hear', instruction: 'Name 3 things you can hear right now' },
+    { icon: '👃', number: 2, label: 'things you can smell', instruction: 'Name 2 things you can smell' },
+    { icon: '👅', number: 1, label: 'thing you can taste', instruction: 'Name 1 thing you can taste' }
+];
+
+function startGroundingExercise() {
+    groundingPhase = 0;
+    groundingChecks = 0;
+    showGroundingPhase();
+
+    startGroundingButton.textContent = 'Next';
+    startGroundingButton.removeEventListener('click', startGroundingExercise);
+    startGroundingButton.addEventListener('click', advanceGrounding);
+}
+
+function showGroundingPhase() {
+    const phase = GROUNDING_PHASES[groundingPhase];
+
+    groundingInstruction.textContent = phase.instruction;
+
+    // Build checklist
+    let checklistHTML = '';
+    for (let i = 0; i < phase.number; i++) {
+        checklistHTML += `<div class="grounding-check ${i < groundingChecks ? 'completed' : ''}"></div>`;
+    }
+
+    groundingContainer.innerHTML = `
+        <div class="grounding-sense active" data-sense="${groundingPhase}">
+            <div class="grounding-icon">${phase.icon}</div>
+            <div class="grounding-number">${phase.number}</div>
+            <div class="grounding-label">${phase.label}</div>
+            <div class="grounding-checklist">${checklistHTML}</div>
+        </div>
+    `;
+
+    // Add click handler to progress through checks
+    const checks = groundingContainer.querySelectorAll('.grounding-check');
+    checks.forEach((check, index) => {
+        if (index === groundingChecks && !check.classList.contains('completed')) {
+            check.addEventListener('click', () => {
+                check.classList.add('completed');
+                groundingChecks++;
+                if (groundingChecks >= phase.number) {
+                    startGroundingButton.textContent = groundingPhase < 4 ? 'Next Sense →' : 'Complete';
+                }
+            });
+        }
+    });
+
+    // Auto-advance on spacebar/enter
+    const advanceOnKeyHandler = (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            if (groundingChecks < phase.number) {
+                checks[groundingChecks].classList.add('completed');
+                groundingChecks++;
+                if (groundingChecks >= phase.number) {
+                    startGroundingButton.textContent = groundingPhase < 4 ? 'Next Sense →' : 'Complete';
+                }
+            }
+            e.preventDefault();
+        }
+    };
+
+    document.addEventListener('keydown', advanceOnKeyHandler);
+    groundingContainer.dataset.keyHandler = 'active';
+}
+
+function advanceGrounding() {
+    const phase = GROUNDING_PHASES[groundingPhase];
+
+    if (groundingChecks < phase.number) {
+        // Not done with this phase yet
+        return;
+    }
+
+    groundingPhase++;
+    groundingChecks = 0;
+
+    if (groundingPhase >= GROUNDING_PHASES.length) {
+        // Complete!
+        groundingInstruction.textContent = 'Well done! Notice how you feel now';
+        groundingContainer.innerHTML = `
+            <div class="grounding-sense active">
+                <div class="grounding-icon">✨</div>
+                <div class="grounding-number" style="font-size: 1.5rem;">Grounded</div>
+            </div>
+        `;
+        startGroundingButton.textContent = 'Done';
+        startGroundingButton.removeEventListener('click', advanceGrounding);
+        startGroundingButton.addEventListener('click', () => {
+            groundingModal.classList.remove('active');
+            stopGrounding();
+        });
+    } else {
+        showGroundingPhase();
+    }
+}
+
+function stopGrounding() {
+    groundingPhase = 0;
+    groundingChecks = 0;
+    groundingInstruction.textContent = 'Name 5 things you can see around you';
+    groundingContainer.innerHTML = `
+        <div class="grounding-sense active" data-sense="see">
+            <div class="grounding-icon">👁️</div>
+            <div class="grounding-number">5</div>
+            <div class="grounding-label">things you can see</div>
+            <div class="grounding-checklist"></div>
+        </div>
+    `;
+    startGroundingButton.textContent = 'Start';
+    startGroundingButton.removeEventListener('click', advanceGrounding);
+    startGroundingButton.addEventListener('click', startGroundingExercise);
+}
+
+// ================================
+// Progressive Muscle Relaxation
+// ================================
+
+let pmrPhase = 0;
+let pmrInterval = null;
+
+const PMR_SEQUENCE = [
+    { part: 'head', label: 'Face & Jaw', tenseInstruction: 'Scrunch your face tight', relaxInstruction: 'Release and notice the relaxation' },
+    { part: 'neck', label: 'Neck', tenseInstruction: 'Tense your neck muscles', relaxInstruction: 'Let all the tension go' },
+    { part: 'shoulders', label: 'Shoulders', tenseInstruction: 'Raise your shoulders to your ears', relaxInstruction: 'Drop your shoulders down' },
+    { part: 'arms', label: 'Arms', tenseInstruction: 'Make tight fists and flex your arms', relaxInstruction: 'Release and let your arms hang loose' },
+    { part: 'chest', label: 'Chest', tenseInstruction: 'Take a deep breath and hold', relaxInstruction: 'Breathe out slowly' },
+    { part: 'stomach', label: 'Stomach', tenseInstruction: 'Tighten your stomach muscles', relaxInstruction: 'Let your belly soften' },
+    { part: 'hips', label: 'Hips', tenseInstruction: 'Squeeze your glutes', relaxInstruction: 'Release completely' },
+    { part: 'legs', label: 'Legs', tenseInstruction: 'Straighten and tense your legs', relaxInstruction: 'Let them relax' },
+    { part: 'feet', label: 'Feet', tenseInstruction: 'Curl your toes tight', relaxInstruction: 'Wiggle them free' }
+];
+
+function startPMRExercise() {
+    pmrPhase = 0;
+    startPmrButton.textContent = 'Next';
+    startPmrButton.removeEventListener('click', startPMRExercise);
+    startPmrButton.addEventListener('click', advancePMR);
+    runPMRPhase();
+}
+
+function runPMRPhase() {
+    if (pmrPhase >= PMR_SEQUENCE.length) {
+        // Complete
+        pmrInstruction.textContent = 'Complete! Notice the relaxation in your body';
+        const allParts = bodyDiagram.querySelectorAll('.body-part');
+        allParts.forEach(part => {
+            part.classList.remove('tense');
+            part.classList.add('relaxed');
+        });
+        startPmrButton.textContent = 'Done';
+        startPmrButton.removeEventListener('click', advancePMR);
+        startPmrButton.addEventListener('click', () => {
+            pmrModal.classList.remove('active');
+            stopPMR();
+        });
+        return;
+    }
+
+    const sequence = PMR_SEQUENCE[pmrPhase];
+    const bodyParts = bodyDiagram.querySelectorAll(`[data-part="${sequence.part}"]`);
+
+    // Tense phase
+    pmrInstruction.textContent = `${sequence.label}: ${sequence.tenseInstruction}`;
+    bodyParts.forEach(part => {
+        part.classList.remove('relaxed');
+        part.classList.add('tense');
+    });
+
+    // After 5 seconds, relax
+    pmrInterval = setTimeout(() => {
+        pmrInstruction.textContent = `${sequence.label}: ${sequence.relaxInstruction}`;
+        bodyParts.forEach(part => {
+            part.classList.remove('tense');
+            part.classList.add('relaxed');
+        });
+    }, 5000);
+}
+
+function advancePMR() {
+    clearTimeout(pmrInterval);
+    pmrPhase++;
+    runPMRPhase();
+}
+
+function stopPMR() {
+    clearTimeout(pmrInterval);
+    pmrPhase = 0;
+    pmrInstruction.textContent = 'Ready to release tension from your body?';
+    const allParts = bodyDiagram.querySelectorAll('.body-part');
+    allParts.forEach(part => {
+        part.classList.remove('tense', 'relaxed');
+    });
+    startPmrButton.textContent = 'Start';
+    startPmrButton.removeEventListener('click', advancePMR);
+    startPmrButton.addEventListener('click', startPMRExercise);
 }
 
 // Debug info
