@@ -1,4 +1,4 @@
-// Theracowch Chat - AI Mandy Conversation Interface
+// Cowch Chat - AI Mandy Conversation Interface
 // Inspired by Telegram/WhatsApp messaging patterns
 
 // ================================
@@ -1310,6 +1310,6 @@ function stopPMR() {
 }
 
 // Debug info
-console.log('Theracowch Chat initialized');
+console.log('Cowch Chat initialized');
 console.log('API Endpoint:', API_ENDPOINT);
 console.log('Conversation history:', conversationHistory.length, 'messages');

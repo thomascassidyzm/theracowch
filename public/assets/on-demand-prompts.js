@@ -1,4 +1,4 @@
-// Theracowch On-Demand Prompts
+// Cowch On-Demand Prompts
 // "Pull, Don't Push" - User-initiated contextual therapeutic prompts
 // All analysis happens client-side for complete privacy
 
