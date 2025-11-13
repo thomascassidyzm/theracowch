@@ -95,6 +95,131 @@
             color: var(--text-primary);
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .icon-button:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        /* Unified Slide Panel Menu */
+        .slide-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            max-width: 85vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(38, 33, 29, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-left: 1px solid var(--glass-border);
+            padding-top: max(0, env(safe-area-inset-top));
+            padding-bottom: max(0, env(safe-area-inset-bottom));
+            z-index: 1100;
+            overflow-y: auto;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-panel.active {
+            right: 0;
+        }
+
+        .slide-panel-header {
+            position: sticky;
+            top: 0;
+            background: rgba(38, 33, 29, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .slide-panel-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .slide-panel-back {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .slide-panel-back:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+        }
+
+        .slide-panel-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .menu-option:hover {
+            background: var(--glass-strong);
+            border-color: var(--accent-primary);
+            transform: translateX(-4px);
+        }
+
+        .menu-option svg {
+            flex-shrink: 0;
+            color: var(--text-secondary);
+        }
+
+        .menu-option span {
+            flex: 1;
+        }
+
         /* Main Content */
         .container {
             flex: 1;
@@ -413,7 +538,15 @@
     <header class="header">
         <a href="/" class="back-btn">← Home</a>
         <h1 class="header-title">Notice</h1>
-        <div style="width: 80px;"></div> <!-- Spacer for centering -->
+        <div class="header-actions">
+            <button class="icon-button" id="menu-button" aria-label="Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                </svg>
+            </button>
+        </div>
     </header>
 
     <div class="container">
@@ -483,6 +616,56 @@
                     <p>No notices yet. Start noticing today.</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Unified Menu Panel -->
+    <div class="slide-panel" id="menu-panel">
+        <div class="slide-panel-header">
+            <button class="slide-panel-back" id="close-menu-panel" aria-label="Close menu">
+                ← Back
+            </button>
+            <h2>Menu</h2>
+        </div>
+        <div class="slide-panel-content">
+            <a href="/" class="menu-option">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>🏠 Home</span>
+            </a>
+            <a href="/chat.html" class="menu-option">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>💬 Chat with Mandy</span>
+            </a>
+            <a href="/#imagine" class="menu-option">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>🧭 IMAGINE Framework</span>
+            </a>
+            <a href="/chat.html" class="menu-option">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                <span>💪 Exercise Library</span>
+            </a>
+            <a href="/chat.html" class="menu-option">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>🔒 Privacy & Safety</span>
+            </a>
+            <a href="https://thoughtsonlifeandlove.com" class="menu-option" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+                </svg>
+                <span>🌐 Mandy's Website</span>
+            </a>
         </div>
     </div>
 
@@ -725,6 +908,35 @@
         }
 
         console.log('Notice initialized');
+
+        // Unified Menu System
+        const menuButton = document.getElementById('menu-button');
+        const menuPanel = document.getElementById('menu-panel');
+        const closeMenuPanel = document.getElementById('close-menu-panel');
+
+        // Open menu
+        menuButton.addEventListener('click', () => {
+            menuPanel.classList.add('active');
+        });
+
+        // Close menu
+        closeMenuPanel.addEventListener('click', () => {
+            menuPanel.classList.remove('active');
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                menuPanel.classList.remove('active');
+            }
+        });
+
+        // Close when clicking backdrop
+        menuPanel.addEventListener('click', (e) => {
+            if (e.target === menuPanel) {
+                menuPanel.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
