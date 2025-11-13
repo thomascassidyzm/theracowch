@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content">
-    <title>Chat with Mandy | Cowch</title>
-    <meta name="description" content="Chat with AI Mandy - CBT-focused therapeutic support using the IMAGINE framework for anxiety, stress, and personal growth.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Cowch - AI Therapy with Mandy</title>
+    <meta name="description" content="Welcome to Cowch - Your compassionate AI therapist using CBT and the IMAGINE framework. Take a seat and chat with Mandy.">
 
     <!-- Favicon -->
     <link rel="icon" href="/assets/theracowch_main_image.jpg">
@@ -13,194 +13,441 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Chat with Mandy">
-    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-title" content="Cowch">
+    <meta name="theme-color" content="#1C1714">
 
-    <link rel="stylesheet" href="/assets/chat-styles.css">
+    <style>
+        /* Warm Dark Theme - Matching chat interface */
+        :root {
+            --bg-primary: #1C1714;
+            --bg-secondary: #26211D;
+            --bg-elevated: #2F2823;
+
+            --text-primary: #F5F0EA;
+            --text-secondary: #C4B5A8;
+            --text-tertiary: #9B8A7A;
+
+            --accent-primary: #E88A6A;
+            --accent-secondary: #D67856;
+            --accent-hover: #F29D7E;
+            --accent-glow: rgba(232, 138, 106, 0.25);
+
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-strong: rgba(255, 255, 255, 0.08);
+
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 20px rgba(232, 138, 106, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(232, 138, 106, 0.08), transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(214, 120, 86, 0.05), transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5%, -5%); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+
+        .cow-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px var(--accent-glow), var(--shadow-glow);
+            border: 3px solid var(--glass-border);
+            overflow: hidden;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        .cow-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            font-weight: 500;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: white;
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px var(--accent-glow), var(--shadow-glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--glass-strong);
+            color: var(--text-primary);
+            border: 1.5px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+
+        .btn-secondary:hover {
+            background: var(--glass-bg);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .scroll-indicator {
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+
+        .scroll-indicator svg {
+            width: 24px;
+            height: 24px;
+            margin-top: 0.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* IMAGINE Framework Section */
+        .imagine-section {
+            padding: 4rem 2rem;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .imagine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .imagine-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .imagine-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow), 0 0 20px var(--accent-glow);
+        }
+
+        .imagine-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .imagine-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .imagine-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: var(--accent-hover);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .cow-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .imagine-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="chat-header">
-        <div class="header-left">
-            <div class="mandy-avatar">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="cow-avatar">
                 <img src="/assets/theracowch_main_image.jpg" alt="Mandy the Cow">
             </div>
-            <div class="header-info">
-                <h1 class="header-title">Mandy</h1>
-                <p class="header-subtitle">CBT Therapist • IMAGINE Framework</p>
+            <h1>Come to the <span class="gradient-text">Cowch</span></h1>
+            <p class="tagline">Your compassionate AI therapist, trained in CBT and the IMAGINE framework. Take a seat and let's talk.</p>
+
+            <div class="cta-buttons">
+                <a href="/chat.html" class="btn btn-primary">
+                    💬 Start chatting with Mandy
+                </a>
+                <a href="#imagine" class="btn btn-secondary">
+                    🧭 Explore IMAGINE Framework
+                </a>
+            </div>
+
+            <div class="scroll-indicator">
+                Learn more
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                </svg>
             </div>
         </div>
-        <div class="header-right">
-            <button class="icon-button prompt-button" id="prompt-button" aria-label="Get a thought from Mandy" title="What's Mandy thinking?">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    <path d="M8 10h.01M12 10h.01M16 10h.01"/>
-                </svg>
-            </button>
-            <button class="icon-button" id="menu-button" aria-label="Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                </svg>
-            </button>
-        </div>
-    </header>
+    </section>
 
-    <!-- On-Demand Prompt Banner (hidden by default) -->
-    <div class="prompt-banner hidden" id="prompt-banner">
-        <div class="prompt-content">
-            <div class="prompt-icon">💭</div>
-            <div class="prompt-text">
-                <div class="prompt-label">Mandy's thought for you:</div>
-                <div class="prompt-message" id="prompt-message"></div>
+    <!-- IMAGINE Framework Section -->
+    <section class="imagine-section" id="imagine">
+        <div class="section-header">
+            <h2>The <span class="gradient-text">IMAGINE</span> Framework</h2>
+            <p>A holistic approach to mental wellbeing and personal growth, with 7 interconnected domains</p>
+        </div>
+
+        <div class="imagine-grid">
+            <div class="imagine-card">
+                <div class="imagine-card-icon">🔍</div>
+                <h3>Introspection</h3>
+                <p>Understanding your inner world, patterns, and self-concept. Who are you beyond external labels?</p>
             </div>
-            <button class="prompt-dismiss" id="prompt-dismiss" aria-label="Dismiss">×</button>
-        </div>
-        <div class="prompt-actions">
-            <button class="prompt-action-btn primary" id="prompt-action">Let's explore this</button>
-            <button class="prompt-action-btn secondary" id="prompt-new">Show me another</button>
-        </div>
-    </div>
 
-    <!-- Chat Messages -->
-    <main class="chat-messages" id="chat-messages">
-        <!-- Messages will be inserted here dynamically -->
-    </main>
+            <div class="imagine-card">
+                <div class="imagine-card-icon">🧘</div>
+                <h3>Mindfulness</h3>
+                <p>Being present in the moment. Observing thoughts and feelings without judgment.</p>
+            </div>
 
-    <!-- Quick IMAGINE Prompts (appears above input) -->
-    <div class="quick-prompts" id="quick-prompts">
-        <button class="quick-prompt-btn" data-prompt="I'm feeling anxious and need help calming down">😰 Feeling anxious</button>
-        <button class="quick-prompt-btn" data-prompt="I'm being too hard on myself again">🔄 Perfectionism</button>
-        <button class="quick-prompt-btn" data-prompt="I need help with a relationship issue">💬 Relationships</button>
-        <button class="quick-prompt-btn" data-prompt="Tell me about the IMAGINE framework">🧭 IMAGINE</button>
-    </div>
+            <div class="imagine-card">
+                <div class="imagine-card-icon">🤝</div>
+                <h3>Acceptance</h3>
+                <p>Letting go of control. Making peace with what is, while working toward what could be.</p>
+            </div>
 
-    <!-- Chat Input -->
-    <div class="chat-input-container">
-        <div class="input-wrapper">
-            <input
-                type="text"
-                id="chat-input"
-                placeholder="What's on your mind..."
-                autocomplete="off"
-                autocorrect="on"
-                autocapitalize="sentences"
-                spellcheck="true"
-                aria-label="Message input">
-            <button class="send-button" id="send-button" aria-label="Send message">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                </svg>
-            </button>
+            <div class="imagine-card">
+                <div class="imagine-card-icon">🙏</div>
+                <h3>Gratitude</h3>
+                <p>Recognizing the good. Shifting focus from what's missing to what's present.</p>
+            </div>
+
+            <div class="imagine-card">
+                <div class="imagine-card-icon">💬</div>
+                <h3>Interactions</h3>
+                <p>Nurturing connections. Setting boundaries. Understanding relationship patterns.</p>
+            </div>
+
+            <div class="imagine-card">
+                <div class="imagine-card-icon">💚</div>
+                <h3>Nurturing</h3>
+                <p>Treating yourself with kindness. Rest, play, and activities that restore you.</p>
+            </div>
+
+            <div class="imagine-card">
+                <div class="imagine-card-icon">🔄</div>
+                <h3>Exploring Patterns</h3>
+                <p>Examining recurring themes in your life. Understanding your story to rewrite it.</p>
+            </div>
         </div>
-    </div>
 
-    <!-- Menu Panel -->
-    <div class="slide-panel" id="menu-panel">
-        <div class="slide-panel-header">
-            <button class="slide-panel-back" id="close-menu-panel" aria-label="Back to chat">
-                ← Back to Chat
-            </button>
-            <h2>Menu</h2>
-        </div>
-        <div class="slide-panel-content">
-            <button class="menu-option" id="open-imagine-panel">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-                <span>🧭 IMAGINE Framework</span>
-            </button>
-            <button class="menu-option" id="open-exercise-panel">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-                <span>💪 Exercise Library</span>
-            </button>
-            <button class="menu-option" id="clear-chat">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                </svg>
-                <span>Clear conversation</span>
-            </button>
-            <button class="menu-option" id="privacy-info">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                <span>Privacy & Safety</span>
-            </button>
-            <a href="https://thoughtsonlifeandlove.com" class="menu-option" target="_blank">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
-                </svg>
-                <span>Visit Mandy's website</span>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/chat.html" class="btn btn-primary">
+                Ready to explore? Chat with Mandy
             </a>
         </div>
-    </div>
+    </section>
 
-    <!-- IMAGINE Framework Panel -->
-    <div class="slide-panel" id="imagine-panel">
-        <div class="slide-panel-header">
-            <button class="slide-panel-back" id="close-imagine-panel" aria-label="Back to chat">
-                ← Back to Chat
-            </button>
-            <h2>IMAGINE Framework</h2>
-        </div>
-        <div class="slide-panel-content" id="imagine-content">
-            <!-- Domain cards will be inserted here by JavaScript -->
-        </div>
-    </div>
-
-    <!-- Exercise Library Panel -->
-    <div class="slide-panel" id="exercise-panel">
-        <div class="slide-panel-header">
-            <button class="slide-panel-back" id="close-exercise-panel" aria-label="Back to chat">
-                ← Back to Chat
-            </button>
-            <h2>Exercise Library</h2>
-        </div>
-        <div class="slide-panel-content" id="exercise-content">
-            <!-- Exercise cards will be inserted here by JavaScript -->
-        </div>
-    </div>
-
-    <!-- Box Breathing Exercise Modal -->
-    <div class="exercise-modal" id="breathing-modal">
-        <div class="exercise-modal-content">
-            <div class="exercise-modal-header">
-                <h3>Box Breathing</h3>
-                <button class="close-modal" id="close-breathing" aria-label="Close exercise">×</button>
-            </div>
-            <div class="exercise-visual">
-                <div class="breathing-circle" id="breathing-circle">
-                    🫁
-                </div>
-            </div>
-            <div class="exercise-instruction" id="breathing-instruction">
-                Ready to begin?
-            </div>
-            <div class="exercise-controls">
-                <button class="btn-exercise btn-exercise-primary" id="start-breathing">Start</button>
-                <button class="btn-exercise btn-exercise-secondary" id="talk-about-breathing">Talk to Mandy</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div class="confirm-modal" id="confirm-modal">
-        <div class="confirm-modal-content">
-            <div class="confirm-modal-message" id="confirm-modal-message">
-                Are you sure?
-            </div>
-            <div class="confirm-modal-buttons">
-                <button class="btn-confirm btn-confirm-cancel" id="confirm-cancel">Cancel</button>
-                <button class="btn-confirm btn-confirm-ok" id="confirm-ok">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="/assets/on-demand-prompts.js"></script>
-    <script src="/assets/chat-script.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Mandy is an AI trained on <strong>Mandy Kloppers'</strong> therapeutic approach</p>
+        <p>
+            <a href="https://thoughtsonlifeandlove.com" target="_blank">Visit Mandy's Website</a> •
+            <a href="/chat.html">Start Chatting</a>
+        </p>
+        <p style="font-size: 0.875rem; color: var(--text-tertiary); margin-top: 1.5rem;">
+            Not a replacement for professional therapy. For crisis support, call 988 (US) or visit your local emergency services.
+        </p>
+    </footer>
 </body>
 </html>
