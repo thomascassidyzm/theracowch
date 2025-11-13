@@ -439,32 +439,87 @@
         }
 
         .nav-mobile-menu {
-            display: none;
             position: fixed;
-            top: calc(env(safe-area-inset-top) + 4rem);
-            left: 0;
-            right: 0;
-            background: rgba(38, 33, 29, 0.95);
+            top: 0;
+            right: -100%;
+            width: 300px;
+            max-width: 85vw;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-secondary);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem;
+            border-left: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            padding-top: calc(2rem + env(safe-area-inset-top));
+            display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 1rem;
+            z-index: 1001;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .nav-mobile-menu.active {
-            display: flex;
+            right: 0;
+        }
+
+        /* Mobile menu overlay */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
         }
 
         .nav-mobile-link {
-            padding: 1rem;
+            padding: 1.25rem 1.5rem;
             border-radius: 12px;
             text-decoration: none;
             color: var(--text-primary);
             font-weight: 600;
+            font-size: 1.05rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-mobile-link:hover {
+            background: var(--glass-strong);
+            border-color: var(--accent-primary);
+            transform: translateX(-4px);
+        }
+
+        .nav-mobile-close {
+            align-self: flex-end;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            text-align: center;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.25s;
+        }
+
+        .nav-mobile-close:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
         }
 
         @media (max-width: 768px) {
@@ -508,10 +563,29 @@
             </svg>
         </button>
     </nav>
+
+    <!-- Mobile menu overlay -->
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Mobile menu -->
     <div class="nav-mobile-menu" id="nav-mobile-menu">
-        <a href="/chat.html" class="nav-mobile-link">💬 Chat with Mandy</a>
-        <a href="/notice.html" class="nav-mobile-link">✨ Notice</a>
-        <a href="/#imagine" class="nav-mobile-link">🧭 IMAGINE Framework</a>
+        <button class="nav-mobile-close" id="nav-close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+        <a href="/chat.html" class="nav-mobile-link">
+            <span>💬</span>
+            <span>Chat with Mandy</span>
+        </a>
+        <a href="/notice.html" class="nav-mobile-link">
+            <span>✨</span>
+            <span>Notice</span>
+        </a>
+        <a href="/#imagine" class="nav-mobile-link">
+            <span>🧭</span>
+            <span>IMAGINE Framework</span>
+        </a>
     </div>
 
     <!-- Hero Section -->
@@ -615,23 +689,36 @@
         // Mobile nav toggle
         const navToggle = document.getElementById('nav-toggle');
         const navMobileMenu = document.getElementById('nav-mobile-menu');
+        const navOverlay = document.getElementById('nav-overlay');
+        const navClose = document.getElementById('nav-close');
 
-        navToggle.addEventListener('click', () => {
-            navMobileMenu.classList.toggle('active');
+        function openMobileMenu() {
+            navMobileMenu.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            navMobileMenu.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Open menu
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openMobileMenu();
         });
+
+        // Close button
+        navClose.addEventListener('click', closeMobileMenu);
+
+        // Close when clicking overlay
+        navOverlay.addEventListener('click', closeMobileMenu);
 
         // Close mobile menu when clicking a link
         document.querySelectorAll('.nav-mobile-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navMobileMenu.classList.remove('active');
-            });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!navToggle.contains(e.target) && !navMobileMenu.contains(e.target)) {
-                navMobileMenu.classList.remove('active');
-            }
+            link.addEventListener('click', closeMobileMenu);
         });
     </script>
 </body>
