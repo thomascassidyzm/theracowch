@@ -350,9 +350,170 @@
         html {
             scroll-behavior: smooth;
         }
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(38, 33, 29, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            padding-top: max(1rem, env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .nav-logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 0.625rem 1.25rem;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.25s;
+            background: transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+        }
+
+        .nav-link.primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .nav-link.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        /* Mobile nav */
+        .nav-mobile-toggle {
+            display: none;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-mobile-menu {
+            display: none;
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 4rem);
+            left: 0;
+            right: 0;
+            background: rgba(38, 33, 29, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-mobile-menu.active {
+            display: flex;
+        }
+
+        .nav-mobile-link {
+            padding: 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-mobile-toggle {
+                display: flex;
+            }
+
+            .nav {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        /* Adjust hero for nav */
+        .hero {
+            padding-top: calc(4rem + env(safe-area-inset-top));
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="/" class="nav-logo">
+            <div class="nav-logo-icon">
+                <img src="/assets/theracowch_main_image.jpg" alt="Cowch">
+            </div>
+            <span>Cowch</span>
+        </a>
+        <div class="nav-links">
+            <a href="/chat.html" class="nav-link">Chat</a>
+            <a href="/notice.html" class="nav-link">Notice</a>
+            <a href="/#imagine" class="nav-link">IMAGINE</a>
+            <a href="/chat.html" class="nav-link primary">Start chatting</a>
+        </div>
+        <button class="nav-mobile-toggle" id="nav-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+        </button>
+    </nav>
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/chat.html" class="nav-mobile-link">💬 Chat with Mandy</a>
+        <a href="/notice.html" class="nav-mobile-link">✨ Notice</a>
+        <a href="/#imagine" class="nav-mobile-link">🧭 IMAGINE Framework</a>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -449,5 +610,29 @@
             Not a replacement for professional therapy. For crisis support, call 988 (US) or visit your local emergency services.
         </p>
     </footer>
+
+    <script>
+        // Mobile nav toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navMobileMenu = document.getElementById('nav-mobile-menu');
+
+        navToggle.addEventListener('click', () => {
+            navMobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMobileMenu.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navMobileMenu.contains(e.target)) {
+                navMobileMenu.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
