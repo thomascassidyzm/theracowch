@@ -248,6 +248,12 @@ async function handleSendMessage() {
 
     if (!message || isTyping) return;
 
+    // Hide quick prompts after first message
+    const quickPrompts = document.getElementById('quick-prompts');
+    if (quickPrompts && conversationHistory.length === 0) {
+        quickPrompts.style.display = 'none';
+    }
+
     // Add user message to chat
     addMessage(message, 'user');
     conversationHistory.push({ role: 'user', content: message });
@@ -324,18 +330,24 @@ function generateQuickReplies(pattern, response) {
     const lowerResponse = response.toLowerCase();
     const replies = [];
 
-    // Pattern-specific quick replies
-    if (pattern === 'anxiety') {
+    // Pattern-specific quick replies with exercise suggestions
+    if (pattern === 'anxiety' || lowerResponse.match(/\b(anxious|anxiety|worried|panic|stress|overwhelmed)\b/)) {
         replies.push(
-            { text: 'Tell me more', prompt: 'Can you tell me more about managing anxiety?' },
-            { text: 'Try an exercise', prompt: 'Can you guide me through a calming exercise?' },
-            { text: 'Why do I feel this way?', prompt: 'Why do I feel anxious?' }
+            { text: '🌬️ Try Box Breathing', action: 'exercise', exercise: 'breathing' },
+            { text: '🧘 5-4-3-2-1 Grounding', action: 'exercise', exercise: 'grounding' },
+            { text: 'Tell me more', prompt: 'Can you tell me more about managing anxiety?' }
+        );
+    } else if (pattern === 'stress' || lowerResponse.match(/\b(tense|tension|muscle|tight|relaxation)\b/)) {
+        replies.push(
+            { text: '💆 Muscle Relaxation', action: 'exercise', exercise: 'pmr' },
+            { text: '🌬️ Try Box Breathing', action: 'exercise', exercise: 'breathing' },
+            { text: 'Tell me more', prompt: 'Can you tell me more?' }
         );
     } else if (pattern === 'depression') {
         replies.push(
             { text: 'What can I do?', prompt: 'What practical steps can I take?' },
-            { text: 'Tell me more', prompt: 'Can you tell me more about this?' },
-            { text: 'Why do I feel this way?', prompt: 'Why do I feel like this?' }
+            { text: '💪 See all exercises', action: 'exercises' },
+            { text: 'Tell me more', prompt: 'Can you tell me more about this?' }
         );
     } else if (pattern === 'relationships') {
         replies.push(
@@ -346,8 +358,14 @@ function generateQuickReplies(pattern, response) {
     } else if (lowerResponse.includes('imagine') || lowerResponse.includes('framework')) {
         replies.push(
             { text: 'How does it work?', prompt: 'How does the IMAGINE framework work?' },
-            { text: 'Why these 7?', prompt: 'Why these 7 categories?' },
+            { text: '🧭 Explore IMAGINE', action: 'imagine' },
             { text: 'Show me more', prompt: 'Can you tell me more about applying this?' }
+        );
+    } else if (lowerResponse.match(/\b(exercise|breathing|grounding|relaxation|practice)\b/)) {
+        replies.push(
+            { text: '💪 See all exercises', action: 'exercises' },
+            { text: 'Tell me more', prompt: 'Can you tell me more?' },
+            { text: 'How do I apply this?', prompt: 'How can I apply this in my life?' }
         );
     } else {
         // General follow-ups
@@ -379,7 +397,25 @@ function addMessage(content, sender, quickReplies = null) {
             button.className = 'quick-reply-btn';
             button.textContent = reply.text;
             button.addEventListener('click', () => {
-                triggerChatPrompt(reply.prompt);
+                if (reply.action === 'exercise') {
+                    // Open specific exercise
+                    if (reply.exercise === 'breathing') {
+                        breathingModal.classList.add('active');
+                    } else if (reply.exercise === 'grounding') {
+                        groundingModal.classList.add('active');
+                    } else if (reply.exercise === 'pmr') {
+                        pmrModal.classList.add('active');
+                    }
+                } else if (reply.action === 'exercises') {
+                    // Open exercise library panel
+                    exercisePanel.classList.add('active');
+                } else if (reply.action === 'imagine') {
+                    // Open IMAGINE panel
+                    imaginePanel.classList.add('active');
+                } else if (reply.prompt) {
+                    // Standard chat prompt
+                    triggerChatPrompt(reply.prompt);
+                }
             });
             quickRepliesDiv.appendChild(button);
         });
