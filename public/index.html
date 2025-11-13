@@ -693,19 +693,19 @@
                 </svg>
                 <span>✨ Notice</span>
             </a>
-            <a href="/#imagine" class="menu-option">
+            <button class="menu-option" id="open-imagine-panel">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 16v-4M12 8h.01"/>
                 </svg>
                 <span>🧭 IMAGINE Framework</span>
-            </a>
-            <a href="/chat.html" class="menu-option">
+            </button>
+            <button class="menu-option" id="open-exercise-panel">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                 </svg>
                 <span>💪 Exercise Library</span>
-            </a>
+            </button>
             <a href="/chat.html" class="menu-option">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -718,6 +718,32 @@
                 </svg>
                 <span>🌐 Mandy's Website</span>
             </a>
+        </div>
+    </div>
+
+    <!-- IMAGINE Framework Panel -->
+    <div class="slide-panel" id="imagine-panel">
+        <div class="slide-panel-header">
+            <button class="slide-panel-back" id="close-imagine-panel" aria-label="Back to menu">
+                ← Back
+            </button>
+            <h2>IMAGINE Framework</h2>
+        </div>
+        <div class="slide-panel-content" id="imagine-content">
+            <!-- Domain cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Exercise Library Panel -->
+    <div class="slide-panel" id="exercise-panel">
+        <div class="slide-panel-header">
+            <button class="slide-panel-back" id="close-exercise-panel" aria-label="Back to menu">
+                ← Back
+            </button>
+            <h2>Exercise Library</h2>
+        </div>
+        <div class="slide-panel-content" id="exercise-content">
+            <!-- Exercise cards will be inserted here by JavaScript -->
         </div>
     </div>
 
@@ -824,20 +850,60 @@
         const menuPanel = document.getElementById('menu-panel');
         const closeMenuPanel = document.getElementById('close-menu-panel');
 
-        // Open menu
+        // Sub-panels
+        const imaginePanel = document.getElementById('imagine-panel');
+        const exercisePanel = document.getElementById('exercise-panel');
+        const closeImaginePanel = document.getElementById('close-imagine-panel');
+        const closeExercisePanel = document.getElementById('close-exercise-panel');
+        const openImagineButton = document.getElementById('open-imagine-panel');
+        const openExerciseButton = document.getElementById('open-exercise-panel');
+
+        // Open main menu
         navToggle.addEventListener('click', () => {
             menuPanel.classList.add('active');
         });
 
-        // Close menu
+        // Close main menu
         closeMenuPanel.addEventListener('click', () => {
             menuPanel.classList.remove('active');
         });
+
+        // Open IMAGINE panel
+        if (openImagineButton) {
+            openImagineButton.addEventListener('click', () => {
+                menuPanel.classList.remove('active');
+                imaginePanel.classList.add('active');
+            });
+        }
+
+        // Close IMAGINE panel
+        if (closeImaginePanel) {
+            closeImaginePanel.addEventListener('click', () => {
+                imaginePanel.classList.remove('active');
+            });
+        }
+
+        // Open Exercise panel
+        if (openExerciseButton) {
+            openExerciseButton.addEventListener('click', () => {
+                menuPanel.classList.remove('active');
+                exercisePanel.classList.add('active');
+            });
+        }
+
+        // Close Exercise panel
+        if (closeExercisePanel) {
+            closeExercisePanel.addEventListener('click', () => {
+                exercisePanel.classList.remove('active');
+            });
+        }
 
         // Close on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 menuPanel.classList.remove('active');
+                imaginePanel.classList.remove('active');
+                exercisePanel.classList.remove('active');
             }
         });
 
@@ -847,6 +913,51 @@
                 menuPanel.classList.remove('active');
             }
         });
+
+        if (imaginePanel) {
+            imaginePanel.addEventListener('click', (e) => {
+                if (e.target === imaginePanel) {
+                    imaginePanel.classList.remove('active');
+                }
+            });
+        }
+
+        if (exercisePanel) {
+            exercisePanel.addEventListener('click', (e) => {
+                if (e.target === exercisePanel) {
+                    exercisePanel.classList.remove('active');
+                }
+            });
+        }
+
+        // Populate IMAGINE panel (simplified for landing page)
+        const imagineContent = document.getElementById('imagine-content');
+        if (imagineContent) {
+            imagineContent.innerHTML = `
+                <div style="padding: 1rem; text-align: center;">
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Learn about the IMAGINE framework on this page, or chat with Mandy to explore how it applies to your life.</p>
+                    <a href="/#imagine" class="menu-option" style="text-decoration: none; display: inline-block; margin-bottom: 1rem;" onclick="document.getElementById('imagine-panel').classList.remove('active')">
+                        <span>📖 Read about IMAGINE</span>
+                    </a>
+                    <a href="/chat.html" class="menu-option" style="text-decoration: none; display: inline-block;">
+                        <span>💬 Chat with Mandy about IMAGINE</span>
+                    </a>
+                </div>
+            `;
+        }
+
+        // Populate Exercise panel (simplified for landing page)
+        const exerciseContent = document.getElementById('exercise-content');
+        if (exerciseContent) {
+            exerciseContent.innerHTML = `
+                <div style="padding: 1rem; text-align: center;">
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Try interactive exercises and guided practices to support your mental wellbeing.</p>
+                    <a href="/chat.html" class="menu-option" style="text-decoration: none; display: inline-block;">
+                        <span>💪 Go to Exercise Library</span>
+                    </a>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
