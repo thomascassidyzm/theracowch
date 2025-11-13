@@ -54,6 +54,8 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* TEST: If you see this comment in devtools, CSS is loading */
+    border-top: 5px solid #FF0000; /* OBVIOUS RED BORDER TEST */
 }
 
 /* Header - Glassmorphism */
