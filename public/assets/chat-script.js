@@ -694,11 +694,13 @@ function handlePrivacyInfo() {
     const privacyInfo = `**Privacy & Safety:**
 
 ✓ Your conversations are stored locally on your device only
-✓ I'm an AI assistant, not a replacement for professional mental health support
+✓ I'm an AI assistant, not a replacement for professional therapy
 ✓ For crisis support, please contact emergency services or a crisis hotline
-✓ Visit Mandy's website at thoughtsonlifeandlove.com for professional wellness services
+✓ Visit Mandy's website at thoughtsonlifeandlove.com for professional therapy services
 
-This is a supportive tool for self-reflection and learning, but not medical advice.`;
+Mandy Kloppers is a qualified CBT Therapist: BA(UNISA); PG Dip Psych(Open); PG Dip CBT(NewBucks); BABCP(Accred)
+
+This AI tool is for wellness support and self-reflection, but not medical advice.`;
 
     addMessage(privacyInfo, 'mandy');
 }
