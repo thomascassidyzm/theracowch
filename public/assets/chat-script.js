@@ -809,7 +809,7 @@ const IMAGINE_DOMAINS = [
         title: 'Me, Myself & I',
         subtitle: 'Self-care & wellness',
         icon: '🧘',
-        prompt: 'Tell me about "Me, Myself & I"'
+        prompt: 'Tell me about Me, Myself & I (Introspection)'
     },
     {
         letter: 'M',
@@ -1197,6 +1197,9 @@ function showGroundingPhase() {
     `;
 
     // Add click handler to advance checks
+    const senseArea = groundingContainer.querySelector('.grounding-sense');
+    senseArea.style.cursor = 'pointer';
+
     const advanceCheck = () => {
         const checks = groundingContainer.querySelectorAll('.grounding-check');
         if (groundingChecks < phase.number) {
@@ -1208,10 +1211,8 @@ function showGroundingPhase() {
         }
     };
 
-    // Click anywhere in the grounding sense area
-    const senseArea = groundingContainer.querySelector('.grounding-sense');
-    senseArea.style.cursor = 'pointer';
-    senseArea.addEventListener('click', advanceCheck);
+    // Remove old listener if exists and add new one
+    senseArea.onclick = advanceCheck;
 }
 
 function advanceGrounding() {
