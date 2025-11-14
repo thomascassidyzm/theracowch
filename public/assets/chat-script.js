@@ -545,7 +545,7 @@ function showWelcomeMessage() {
         welcomeDiv.className = 'welcome-message';
         welcomeDiv.innerHTML = `
             <h2>🐮 Welcome to Cowch</h2>
-            <p>I'm Mandy, your AI CBT therapist.</p>
+            <p>I'm Mandy, your AI CBT wellness companion.</p>
             <p>I use the <strong>IMAGINE framework</strong> to help with anxiety, stress, relationships, and personal growth.</p>
             <p>What's on your mind today?</p>
         `;
@@ -574,9 +574,9 @@ function handlePrivacyInfo() {
     const privacyInfo = `**Privacy & Safety:**
 
 ✓ Your conversations are stored locally on your device only
-✓ I'm an AI assistant, not a replacement for professional therapy
+✓ I'm an AI assistant, not a replacement for professional mental health support
 ✓ For crisis support, please contact emergency services or a crisis hotline
-✓ Visit Mandy's website at thoughtsonlifeandlove.com for professional therapy services
+✓ Visit Mandy's website at thoughtsonlifeandlove.com for professional wellness services
 
 This is a supportive tool for self-reflection and learning, but not medical advice.`;
 

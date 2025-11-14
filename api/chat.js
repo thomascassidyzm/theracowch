@@ -11,7 +11,7 @@ async function getImagineFrameworkPrompts() {
   }
   
   try {
-    // Fetch ENHANCED IMAGINE framework training data with therapeutic interventions
+    // Fetch ENHANCED IMAGINE framework training data with wellness interventions
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://theracowch.com';
     const response = await fetch(`${baseUrl}/imagine-framework-prompts-enhanced.txt`);
     if (!response.ok) {
@@ -26,7 +26,7 @@ async function getImagineFrameworkPrompts() {
   } catch (error) {
     console.error('Error fetching IMAGINE framework prompts:', error);
     // Return basic fallback prompts with authentic Mandy voice
-    return `You are Mandy Kloppers, a qualified therapist with BA in Psychology and Sociology, Post-Graduate CBT degree, and over two decades of therapeutic experience. You specialize in CBT combined with psycho-dynamic counseling.
+    return `You are Mandy Kloppers, a qualified wellness coach with BA in Psychology and Sociology, Post-Graduate CBT degree, and over two decades of wellness experience. You specialize in CBT combined with psycho-dynamic approaches.
 
 MANDY'S AUTHENTIC COACHING PHILOSOPHY:
 "I believe every person has the answers within them - my role is to help you uncover those insights and build practical tools for your wellbeing journey. We're in this together."
@@ -71,7 +71,7 @@ TONE & REGISTER:
 - Comfortable with pause and reflection
 - Doesn't rush to solve or fix
 - Validates feelings while introducing new perspectives
-- Uses everyday language, not therapy jargon
+- Uses everyday language, not clinical jargon
 - Balances support with gentle challenge
 
 IMAGINE FRAMEWORK - 7 DOMAINS:
@@ -118,13 +118,13 @@ export default async function handler(req, res) {
     
     // Add current session context
     if (currentPattern) {
-      systemPrompt += `\n\nCurrent therapeutic focus: ${currentPattern}`;
+      systemPrompt += `\n\nCurrent wellness focus: ${currentPattern}`;
     }
     if (sessionPhase) {
       systemPrompt += `\nSession phase: ${sessionPhase}`;
     }
     
-    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Actively detect patterns and offer therapeutic interventions when appropriate.
+    systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Actively detect patterns and offer wellness interventions when appropriate.
 
 IMAGINE FRAMEWORK EXPLANATIONS:
 When asked about the IMAGINE framework, use this specific format:
@@ -163,7 +163,7 @@ FORMATTING: Use markdown to structure your responses for better readability:
 - Use --- for horizontal rules to separate sections or create visual breaks
 - Break longer responses into paragraphs with clear spacing
 
-Keep formatting subtle and purposeful - it should enhance clarity, not distract from the therapeutic connection.`;
+Keep formatting subtle and purposeful - it should enhance clarity, not distract from the connection.`;
 
     // Prepare conversation messages
     const messages = [
@@ -220,7 +220,7 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
     const data = await response.json();
     const aiResponse = data.content[0].text;
 
-    // Enhanced pattern recognition based on Mandy's therapeutic specialties
+    // Enhanced pattern recognition based on Mandy's wellness specialties
     let detectedPattern = 'general';
     const lowerMessage = message.toLowerCase();
     
