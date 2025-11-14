@@ -302,8 +302,8 @@ async function handleSendMessage() {
         // Generate quick replies based on pattern and response
         const quickReplies = generateQuickReplies(data.pattern, data.response);
 
-        // Add Mandy's response with quick replies
-        addMessage(data.response, 'mandy', quickReplies);
+        // Add Mandy's response with typing effect
+        await addMessageWithTypingEffect(data.response, 'mandy', quickReplies);
         conversationHistory.push({ role: 'assistant', content: data.response });
 
         // Save history
@@ -426,6 +426,126 @@ function addMessage(content, sender, quickReplies = null) {
 
     chatMessages.appendChild(messageDiv);
     scrollToBottom();
+}
+
+// Add message with typing effect (for Mandy's messages)
+async function addMessageWithTypingEffect(content, sender, quickReplies = null) {
+    // Keep input disabled during typing
+    isTyping = true;
+    sendButton.disabled = true;
+    chatInput.disabled = true;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+
+    // Create container for text content
+    const textContainer = document.createElement('div');
+    messageDiv.appendChild(textContainer);
+    chatMessages.appendChild(messageDiv);
+
+    // Type out the message character by character
+    await typeText(textContainer, content);
+
+    // Add quick reply buttons after typing is complete
+    if (quickReplies && sender === 'mandy') {
+        const quickRepliesDiv = document.createElement('div');
+        quickRepliesDiv.className = 'quick-replies';
+
+        quickReplies.forEach(reply => {
+            const button = document.createElement('button');
+            button.className = 'quick-reply-btn';
+            button.textContent = reply.text;
+            button.addEventListener('click', () => {
+                if (reply.action === 'exercise') {
+                    if (reply.exercise === 'breathing') {
+                        breathingModal.classList.add('active');
+                    } else if (reply.exercise === 'grounding') {
+                        groundingModal.classList.add('active');
+                    } else if (reply.exercise === 'pmr') {
+                        pmrModal.classList.add('active');
+                    }
+                } else if (reply.action === 'exercises') {
+                    exercisePanel.classList.add('active');
+                } else if (reply.action === 'imagine') {
+                    imaginePanel.classList.add('active');
+                } else if (reply.prompt) {
+                    triggerChatPrompt(reply.prompt);
+                }
+            });
+            quickRepliesDiv.appendChild(button);
+        });
+
+        messageDiv.appendChild(quickRepliesDiv);
+    }
+
+    // Re-enable input after typing
+    isTyping = false;
+    sendButton.disabled = false;
+    chatInput.disabled = false;
+    focusInput();
+}
+
+// Type text character by character with natural pauses
+async function typeText(container, text) {
+    const formattedContent = formatMessage(text);
+
+    // Create a temporary div to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = formattedContent;
+
+    // Type through all nodes
+    await typeNodes(container, tempDiv.childNodes);
+    scrollToBottom();
+}
+
+// Recursively type through DOM nodes
+async function typeNodes(targetParent, nodes) {
+    for (let node of nodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            // Text node - type character by character
+            const text = node.textContent;
+            const textNode = document.createTextNode('');
+            targetParent.appendChild(textNode);
+
+            for (let i = 0; i < text.length; i++) {
+                textNode.textContent += text[i];
+                scrollToBottom();
+
+                // Natural pauses at punctuation
+                const char = text[i];
+                let delay = 25; // Base speed
+
+                if (char === '.' || char === '!' || char === '?') {
+                    delay = 400; // Long pause after sentences
+                } else if (char === ',' || char === ':' || char === ';') {
+                    delay = 200; // Medium pause after clauses
+                } else if (char === '\n') {
+                    delay = 300; // Pause at line breaks
+                } else if (char === ' ') {
+                    delay = 30; // Slight pause between words
+                }
+
+                await sleep(delay);
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Element node - recreate and type its children
+            const element = document.createElement(node.nodeName);
+
+            // Copy attributes
+            for (let attr of node.attributes || []) {
+                element.setAttribute(attr.name, attr.value);
+            }
+
+            targetParent.appendChild(element);
+
+            // Recursively type children
+            await typeNodes(element, node.childNodes);
+        }
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function formatMessage(content) {
