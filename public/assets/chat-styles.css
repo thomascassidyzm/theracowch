@@ -1152,24 +1152,17 @@ body {
     justify-content: center;
     color: white;
     font-size: 3rem;
-    transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
+    transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1), font-size 4s cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 .breathing-circle.inhale {
     transform: scale(1.4);
-}
-
-.breathing-circle.inhale svg,
-.breathing-circle.inhale::before {
-    transform: scale(3);
+    font-size: 6rem;
 }
 
 .breathing-circle.exhale {
     transform: scale(1);
-}
-
-.breathing-circle svg {
-    transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
+    font-size: 3rem;
 }
 
 .exercise-instruction {
