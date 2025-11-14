@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Choice | Cowch</title>
+    <meta name="description" content="Track the choices you notice yourself making - strengthening your sense of agency.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1C1714">
+
+    <style>
+        /* Warm Dark Theme */
+        :root {
+            --bg-primary: #1C1714;
+            --bg-secondary: #26211D;
+            --bg-elevated: #2F2823;
+
+            --text-primary: #F5F0EA;
+            --text-secondary: #C4B5A8;
+            --text-tertiary: #9B8A7A;
+
+            --accent-primary: #E88A6A;
+            --accent-secondary: #D67856;
+            --accent-hover: #F29D7E;
+            --accent-glow: rgba(232, 138, 106, 0.25);
+
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-strong: rgba(255, 255, 255, 0.08);
+
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+            /* Nature colors for tree */
+            --tree-trunk: #5D4A3C;
+            --tree-branch: #6B5747;
+            --leaf-green: #7EA88B;
+            --leaf-light: #9BC4A7;
+            --leaf-gold: #C4A572;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(38, 33, 29, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 1.5rem;
+            padding-top: max(1.25rem, env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.25s;
+        }
+
+        .back-btn:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .icon-button:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-elevated);
+            padding: 0.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .view-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .view-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-intro h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-intro p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Tree Visualization */
+        .tree-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .tree-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tree-trunk {
+            fill: var(--tree-trunk);
+        }
+
+        .tree-branch {
+            stroke: var(--tree-branch);
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .tree-leaf {
+            fill: var(--leaf-green);
+            opacity: 0;
+            animation: leafGrow 0.5s ease-out forwards;
+        }
+
+        @keyframes leafGrow {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .choice-count {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .choice-count strong {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+        }
+
+        /* Add Choice Form */
+        .card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 24px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* History View */
+        .choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .choice-item {
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.25s;
+        }
+
+        .choice-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateX(-4px);
+        }
+
+        .choice-date {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .choice-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .tree-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="back-btn">← Home</a>
+        <h1 class="header-title">Choice</h1>
+        <div class="header-actions">
+            <button class="icon-button" id="menu-button" aria-label="Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+            <button class="view-btn active" id="btn-today">Today</button>
+            <button class="view-btn" id="btn-tree">My Tree</button>
+            <button class="view-btn" id="btn-history">History</button>
+        </div>
+
+        <!-- Today's Choice -->
+        <div class="section active" id="today-view">
+            <div class="section-intro">
+                <h2>What choice did you notice today?</h2>
+                <p>Every choice you recognize strengthens your agency</p>
+            </div>
+
+            <div class="card">
+                <div class="prompt">I chose to...</div>
+                <textarea id="choice-text" placeholder="Even small choices matter - what did you choose today that you're noticing?"></textarea>
+            </div>
+
+            <button class="save-btn" id="save-btn">Add this choice</button>
+        </div>
+
+        <!-- Tree View -->
+        <div class="section" id="tree-view">
+            <div class="section-intro">
+                <h2>Your Choice Tree</h2>
+                <p>Each leaf represents a choice you noticed</p>
+            </div>
+
+            <div class="tree-container">
+                <svg class="tree-svg" id="tree-svg" viewBox="0 0 300 400">
+                    <!-- Trunk -->
+                    <rect class="tree-trunk" x="135" y="250" width="30" height="150" rx="5"/>
+
+                    <!-- Branches will be dynamically added -->
+                    <g id="branches"></g>
+
+                    <!-- Leaves will be dynamically added -->
+                    <g id="leaves"></g>
+                </svg>
+            </div>
+
+            <div class="choice-count">
+                <strong id="choice-count">0</strong> choices noticed
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div class="section" id="history-view">
+            <div class="section-intro">
+                <h2>Your Choices</h2>
+                <p>A record of your agency</p>
+            </div>
+
+            <div id="choice-list-container">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <p>No choices tracked yet. Start noticing today.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'cowch_choices';
+
+        // Load choices from localStorage
+        function getChoices() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveChoices(choices) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(choices));
+        }
+
+        // Add new choice
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const text = document.getElementById('choice-text').value.trim();
+
+            if (!text) return;
+
+            const choices = getChoices();
+            choices.push({
+                text: text,
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                })
+            });
+
+            saveChoices(choices);
+
+            // Clear input
+            document.getElementById('choice-text').value = '';
+
+            // Show feedback
+            const btn = document.getElementById('save-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Choice added! 🌱';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+
+            // Refresh tree and history
+            renderTree();
+            renderHistory();
+        });
+
+        // Render tree
+        function renderTree() {
+            const choices = getChoices();
+            const count = choices.length;
+
+            document.getElementById('choice-count').textContent = count;
+
+            const leavesGroup = document.getElementById('leaves');
+            leavesGroup.innerHTML = '';
+
+            // Generate leaf positions in a natural tree shape
+            const leafPositions = generateLeafPositions(count);
+
+            leafPositions.forEach((pos, index) => {
+                const leaf = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                leaf.setAttribute('class', 'tree-leaf');
+                leaf.setAttribute('cx', pos.x);
+                leaf.setAttribute('cy', pos.y);
+                leaf.setAttribute('r', '6');
+                leaf.style.animationDelay = `${index * 0.05}s`;
+
+                // Vary leaf colors
+                if (index % 3 === 0) {
+                    leaf.style.fill = 'var(--leaf-light)';
+                } else if (index % 3 === 1) {
+                    leaf.style.fill = 'var(--leaf-green)';
+                } else {
+                    leaf.style.fill = 'var(--leaf-gold)';
+                }
+
+                leavesGroup.appendChild(leaf);
+            });
+
+            // Add branches
+            const branchesGroup = document.getElementById('branches');
+            branchesGroup.innerHTML = '';
+
+            if (count > 0) {
+                // Main branches
+                addBranch(branchesGroup, 150, 250, 120, 180);
+                addBranch(branchesGroup, 150, 250, 180, 180);
+            }
+            if (count > 5) {
+                // Secondary branches
+                addBranch(branchesGroup, 120, 180, 90, 140);
+                addBranch(branchesGroup, 180, 180, 210, 140);
+            }
+            if (count > 10) {
+                // Tertiary branches
+                addBranch(branchesGroup, 90, 140, 70, 100);
+                addBranch(branchesGroup, 210, 140, 230, 100);
+            }
+        }
+
+        function addBranch(group, x1, y1, x2, y2) {
+            const branch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            branch.setAttribute('class', 'tree-branch');
+            branch.setAttribute('x1', x1);
+            branch.setAttribute('y1', y1);
+            branch.setAttribute('x2', x2);
+            branch.setAttribute('y2', y2);
+            group.appendChild(branch);
+        }
+
+        function generateLeafPositions(count) {
+            const positions = [];
+            const layers = Math.ceil(count / 8);
+
+            for (let i = 0; i < count; i++) {
+                const layer = Math.floor(i / 8);
+                const angle = (i % 8) * (Math.PI / 4) + Math.random() * 0.3;
+                const distance = 40 + layer * 25 + Math.random() * 15;
+
+                const x = 150 + Math.cos(angle) * distance;
+                const y = 200 - Math.sin(angle) * distance * 0.6;
+
+                positions.push({ x, y });
+            }
+
+            return positions;
+        }
+
+        // Render history
+        function renderHistory() {
+            const choices = getChoices();
+            const container = document.getElementById('choice-list-container');
+
+            if (choices.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        <p>No choices tracked yet. Start noticing today.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = choices
+                .slice()
+                .reverse()
+                .map(choice => `
+                    <div class="choice-item">
+                        <div class="choice-date">${choice.date}</div>
+                        <div class="choice-text">${choice.text}</div>
+                    </div>
+                `)
+                .join('');
+
+            container.innerHTML = `<div class="choice-list">${html}</div>`;
+        }
+
+        // View toggle
+        document.getElementById('btn-today').addEventListener('click', () => {
+            setActiveView('today');
+        });
+
+        document.getElementById('btn-tree').addEventListener('click', () => {
+            setActiveView('tree');
+            renderTree();
+        });
+
+        document.getElementById('btn-history').addEventListener('click', () => {
+            setActiveView('history');
+            renderHistory();
+        });
+
+        function setActiveView(view) {
+            // Update buttons
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${view}`).classList.add('active');
+
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(`${view}-view`).classList.add('active');
+        }
+
+        // Initialize tree on load
+        renderTree();
+
+        console.log('Choice tracker initialized');
+    </script>
+</body>
+</html>
