@@ -1159,8 +1159,17 @@ body {
     transform: scale(1.4);
 }
 
+.breathing-circle.inhale svg,
+.breathing-circle.inhale::before {
+    transform: scale(1.8);
+}
+
 .breathing-circle.exhale {
     transform: scale(1);
+}
+
+.breathing-circle svg {
+    transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 .exercise-instruction {
