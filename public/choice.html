@@ -374,6 +374,96 @@
             opacity: 0.3;
         }
 
+        /* Unified Slide Panel Menu */
+        .slide-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            max-width: 85vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(38, 33, 29, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-left: 1px solid var(--glass-border);
+            padding-top: max(0, env(safe-area-inset-top));
+            padding-bottom: max(0, env(safe-area-inset-bottom));
+            z-index: 1100;
+            overflow-y: auto;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-panel.active {
+            right: 0;
+        }
+
+        .slide-panel-header {
+            position: sticky;
+            top: 0;
+            background: rgba(38, 33, 29, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .slide-panel-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .slide-panel-back {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .slide-panel-back:hover {
+            background: var(--glass-strong);
+            color: var(--accent-primary);
+        }
+
+        .slide-panel-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .menu-option:hover {
+            background: var(--glass-strong);
+            border-color: var(--accent-primary);
+            transform: translateX(-4px);
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             .container {
@@ -464,6 +554,27 @@
                     <p>No choices tracked yet. Start noticing today.</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Unified Menu Panel -->
+    <div class="slide-panel" id="menu-panel">
+        <div class="slide-panel-header">
+            <button class="slide-panel-back" id="close-menu-panel" aria-label="Close menu">
+                ← Back
+            </button>
+            <h2>Menu</h2>
+        </div>
+        <div class="slide-panel-content">
+            <a href="/" class="menu-option">🏠 Home</a>
+            <a href="/chat.html" class="menu-option">💬 Chat with Mandy</a>
+            <a href="/notice.html" class="menu-option">✨ Notice</a>
+            <a href="/choice.html" class="menu-option">🌳 Choice</a>
+            <a href="/values.html" class="menu-option">🎯 Values</a>
+            <a href="/#imagine" class="menu-option">🧭 IMAGINE Framework</a>
+            <a href="/chat.html" class="menu-option">💪 Exercise Library</a>
+            <a href="/chat.html" class="menu-option">🔒 Privacy & Safety</a>
+            <a href="https://thoughtsonlifeandlove.com" class="menu-option" target="_blank">🌐 Mandy's Website</a>
         </div>
     </div>
 
@@ -661,6 +772,33 @@
         renderTree();
 
         console.log('Choice tracker initialized');
+
+        // Unified Menu System
+        const menuButton = document.getElementById('menu-button');
+        const menuPanel = document.getElementById('menu-panel');
+        const closeMenuPanel = document.getElementById('close-menu-panel');
+
+        menuButton.addEventListener('click', () => {
+            menuPanel.classList.add('active');
+        });
+
+        closeMenuPanel.addEventListener('click', () => {
+            menuPanel.classList.remove('active');
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                menuPanel.classList.remove('active');
+            }
+        });
+
+        // Close when clicking backdrop
+        menuPanel.addEventListener('click', (e) => {
+            if (e.target === menuPanel) {
+                menuPanel.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
