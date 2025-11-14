@@ -1,7 +1,7 @@
 {
-  "name": "Mandy - Your AI Therapist",
-  "short_name": "Mandy",
-  "description": "Chat with Mandy, your compassionate AI therapist. Genuine conversation, therapeutic support, always here when you need it.",
+  "name": "Cowch - Your AI Wellness Coach",
+  "short_name": "Cowch",
+  "description": "Chat with Mandy, your compassionate AI wellness coach. Genuine conversation, wellness support, always here when you need it.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1A1A1A",
@@ -78,7 +78,7 @@
     {
       "name": "Chat with Mandy",
       "short_name": "Chat",
-      "description": "Start a conversation with your AI therapist",
+      "description": "Start a conversation with your AI wellness coach",
       "url": "/",
       "icons": [{ "src": "/icons/chat-icon.png", "sizes": "96x96" }]
     }
