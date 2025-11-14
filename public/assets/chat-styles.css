@@ -1157,7 +1157,7 @@ body {
 
 .breathing-circle.inhale {
     transform: scale(1.4);
-    font-size: 6rem;
+    font-size: 12rem;
 }
 
 .breathing-circle.exhale {
