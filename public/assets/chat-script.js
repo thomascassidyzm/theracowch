@@ -96,8 +96,29 @@ window.addEventListener('DOMContentLoaded', () => {
     populateExercisePanel();
     // Don't show prompt banner on chat page - it's messy
     // checkAndShowPrompt();
+
+    // Handle hash navigation (e.g., #privacy, #exercises)
+    handleHashNavigation();
+
     focusInput();
 });
+
+// Handle hash-based navigation from other pages
+function handleHashNavigation() {
+    const hash = window.location.hash.slice(1); // Remove the '#'
+
+    if (hash === 'privacy') {
+        // Show privacy info automatically
+        handlePrivacyInfo();
+        // Clear hash to avoid re-triggering
+        history.replaceState(null, null, ' ');
+    } else if (hash === 'exercises') {
+        // Open exercise panel automatically
+        exercisePanel.classList.add('active');
+        // Clear hash to avoid re-triggering
+        history.replaceState(null, null, ' ');
+    }
+}
 
 // ================================
 // Event Listeners
