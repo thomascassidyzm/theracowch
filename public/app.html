@@ -783,6 +783,34 @@
             background: var(--bg-user-message);
         }
 
+        /* Markdown styles in messages */
+        .message p {
+            margin: 0 0 0.75em 0;
+        }
+
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message strong {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .message em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .message ul {
+            margin: 0.5em 0;
+            padding-left: 1.25em;
+        }
+
+        .message li {
+            margin: 0.25em 0;
+        }
+
         .chat-input-area {
             background: var(--bg-secondary);
             border-top: 1px solid var(--glass-border);
@@ -1650,8 +1678,8 @@
                 // Remove typing indicator
                 typingDiv.remove();
 
-                // Add response
-                addMessage(data.response, 'mandy');
+                // Add response with typing effect
+                await addMessageWithTyping(data.response, 'mandy');
                 conversationHistory.push({ role: 'assistant', content: data.response });
                 saveChatHistory();
 
@@ -1662,14 +1690,103 @@
             }
 
             isTyping = false;
+            chatSendBtn.disabled = false;
         }
 
-        function addMessage(content, sender) {
+        function addMessage(content, sender, skipTyping = false) {
             const div = document.createElement('div');
             div.className = `message ${sender}`;
-            div.textContent = content;
+            div.innerHTML = formatMessage(content);
             chatMessages.appendChild(div);
             scrollToBottom();
+        }
+
+        // Add message with typing effect for Mandy
+        async function addMessageWithTyping(content, sender) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            chatMessages.appendChild(div);
+
+            const formattedContent = formatMessage(content);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = formattedContent;
+
+            await typeNodes(div, tempDiv.childNodes);
+            scrollToBottom();
+        }
+
+        // Type through DOM nodes with natural pauses
+        async function typeNodes(target, nodes) {
+            for (const node of nodes) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const textNode = document.createTextNode('');
+                    target.appendChild(textNode);
+                    for (const char of text) {
+                        textNode.textContent += char;
+                        scrollToBottom();
+                        // Natural typing delays
+                        let delay = 12 + Math.random() * 8;
+                        if ('.!?'.includes(char)) delay = 150;
+                        else if (',;:'.includes(char)) delay = 80;
+                        await sleep(delay);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const el = document.createElement(node.tagName.toLowerCase());
+                    for (const attr of node.attributes) {
+                        el.setAttribute(attr.name, attr.value);
+                    }
+                    target.appendChild(el);
+                    await typeNodes(el, node.childNodes);
+                }
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Markdown formatting
+        function formatMessage(content) {
+            let formatted = content;
+
+            // Process line by line for lists and headers
+            const lines = formatted.split('\n');
+            const processed = [];
+            let inList = false;
+
+            for (let line of lines) {
+                if (line.match(/^[-*]\s+/)) {
+                    const text = line.replace(/^[-*]\s+/, '');
+                    if (!inList) {
+                        line = '<ul><li>' + text + '</li>';
+                        inList = true;
+                    } else {
+                        line = '<li>' + text + '</li>';
+                    }
+                } else if (inList && line.trim() !== '') {
+                    processed.push('</ul>');
+                    inList = false;
+                }
+                processed.push(line);
+            }
+            if (inList) processed.push('</ul>');
+
+            formatted = processed.join('\n');
+
+            // Bold **text**
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Italic *text*
+            formatted = formatted.replace(/(?<![*])\*(?!\*)([^*]+)\*(?![*])/g, '<em>$1</em>');
+
+            // Paragraphs
+            formatted = formatted.split('\n\n').map(p => {
+                if (p.match(/^<(ul|li|h)/)) return p;
+                return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
+
+            return formatted;
         }
 
         function scrollToBottom() {
