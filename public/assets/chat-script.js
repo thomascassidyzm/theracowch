@@ -482,9 +482,9 @@ async function handleSendMessage() {
     // Haptic feedback for send action
     hapticFeedback('light');
 
-    // Hide quick prompts after first message
+    // Hide quick prompts once chat is active
     const quickPrompts = document.getElementById('quick-prompts');
-    if (quickPrompts && conversationHistory.length === 0) {
+    if (quickPrompts) {
         quickPrompts.style.display = 'none';
     }
 
@@ -746,16 +746,16 @@ async function typeNodes(targetParent, nodes) {
 
                 // Natural pauses at punctuation
                 const char = text[i];
-                let delay = 25; // Base speed
+                let delay = 12; // Base speed (faster)
 
                 if (char === '.' || char === '!' || char === '?') {
-                    delay = 400; // Long pause after sentences
+                    delay = 150; // Pause after sentences
                 } else if (char === ',' || char === ':' || char === ';') {
-                    delay = 200; // Medium pause after clauses
+                    delay = 80; // Pause after clauses
                 } else if (char === '\n') {
-                    delay = 300; // Pause at line breaks
+                    delay = 100; // Pause at line breaks
                 } else if (char === ' ') {
-                    delay = 30; // Slight pause between words
+                    delay = 15; // Slight pause between words
                 }
 
                 await sleep(delay);
@@ -1007,6 +1007,14 @@ function loadChatHistory() {
                 const sender = msg.role === 'user' ? 'user' : 'mandy';
                 addMessage(msg.content, sender);
             });
+
+            // Hide quick prompts if there's existing history
+            if (conversationHistory.length > 0) {
+                const quickPrompts = document.getElementById('quick-prompts');
+                if (quickPrompts) {
+                    quickPrompts.style.display = 'none';
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading chat history:', error);
@@ -2553,7 +2561,22 @@ if (weatherBackButton) {
 if (talkAboutWeatherButton) {
     talkAboutWeatherButton.addEventListener('click', () => {
         closeWeatherModal();
-        const prompt = `I just did an inner weather check. I'm feeling ${weatherData.emotion}, noticed ${weatherData.body.join(', ')} in my body, and I think I need ${weatherData.need}. Can you help me process this?`;
+        // Build prompt with available data, skipping null/empty values
+        const parts = ['I just did an inner weather check.'];
+        if (weatherData.emotion) {
+            parts.push(`I'm feeling ${weatherData.emotion}.`);
+        }
+        if (weatherData.body && weatherData.body.length > 0) {
+            parts.push(`I noticed ${weatherData.body.join(', ')} in my body.`);
+        }
+        if (weatherData.thought) {
+            parts.push(`A thought that keeps coming up: "${weatherData.thought}".`);
+        }
+        if (weatherData.need) {
+            parts.push(`I think I need ${weatherData.need}.`);
+        }
+        parts.push('Can you help me process this?');
+        const prompt = parts.join(' ');
         triggerChatPrompt(prompt);
     });
 }
