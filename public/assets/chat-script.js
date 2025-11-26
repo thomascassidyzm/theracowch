@@ -12,6 +12,141 @@ const API_ENDPOINT = window.location.hostname === 'localhost' || window.location
 const STORAGE_KEY = 'theracowch_chat_history';
 const MAX_HISTORY_MESSAGES = 6; // Last 6 messages for context
 
+// IMAGINE engagement tracking - just noticing, not scoring
+const IMAGINE_STORAGE_KEY = 'cowch_imagine_engagement';
+
+// Get engagement data from localStorage
+function getImagineEngagement() {
+    try {
+        const data = localStorage.getItem(IMAGINE_STORAGE_KEY);
+        return data ? JSON.parse(data) : {
+            I: [],    // timestamps of "I, Me, Myself" exercises
+            M: [],    // timestamps of "Mindfulness" exercises
+            A: [],    // timestamps of "Acceptance" exercises
+            G: [],    // timestamps of "Gratitude" exercises
+            I2: [],   // timestamps of "Interactions" exercises
+            N: [],    // timestamps of "Nurture/Play" exercises
+            E: []     // timestamps of "Explore" exercises
+        };
+    } catch (e) {
+        return { I: [], M: [], A: [], G: [], I2: [], N: [], E: [] };
+    }
+}
+
+// Save engagement data
+function saveImagineEngagement(data) {
+    try {
+        localStorage.setItem(IMAGINE_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+        console.warn('Could not save IMAGINE engagement');
+    }
+}
+
+// Record that user engaged with an exercise in a domain
+function recordImagineEngagement(letter) {
+    const data = getImagineEngagement();
+    const now = Date.now();
+
+    // Add timestamp to the domain
+    if (data[letter]) {
+        data[letter].push(now);
+
+        // Keep only last 30 days of data (clean up old timestamps)
+        const thirtyDaysAgo = now - (30 * 24 * 60 * 60 * 1000);
+        data[letter] = data[letter].filter(ts => ts > thirtyDaysAgo);
+    }
+
+    saveImagineEngagement(data);
+    updateImagineTracker();
+}
+
+// Map exercise to its IMAGINE letter
+function getExerciseLetter(exerciseName) {
+    // Find which category this exercise belongs to
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (exercise.name === exerciseName || exercise.title === exerciseName) {
+                // Handle the two "I" categories
+                if (category.title === 'Interactions') {
+                    return 'I2';
+                }
+                return category.letter;
+            }
+        }
+    }
+    return null;
+}
+
+// Update the visual tracker in the menu panel
+function updateImagineTracker() {
+    const data = getImagineEngagement();
+    const now = Date.now();
+    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+
+    // For each letter, count engagements in the last 7 days
+    const letters = ['I', 'M', 'A', 'G', 'I2', 'N', 'E'];
+
+    letters.forEach(letter => {
+        const letterElement = document.querySelector(`.imagine-tracker-letter[data-letter="${letter}"]`);
+        if (!letterElement) return;
+
+        const timestamps = data[letter] || [];
+        const recentCount = timestamps.filter(ts => ts > sevenDaysAgo).length;
+
+        // Cap at 5 for display (5 dots max)
+        const dotCount = Math.min(recentCount, 5);
+
+        // Update dots
+        const dots = letterElement.querySelectorAll('.dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('filled', i < dotCount);
+        });
+
+        // Add active class if engaged today
+        const today = new Date().setHours(0, 0, 0, 0);
+        const engagedToday = timestamps.some(ts => ts >= today);
+        letterElement.classList.toggle('active', engagedToday);
+    });
+}
+
+// Get color for IMAGINE letter
+function getColorForLetter(letter) {
+    const colors = {
+        'I': '#E88A6A',
+        'M': '#7EA88B',
+        'A': '#B8860B',
+        'G': '#DDA0DD',
+        'I2': '#6B8E9F',
+        'N': '#F4A460',
+        'E': '#8FBC8F'
+    };
+    return colors[letter] || '#E88A6A';
+}
+
+// Setup click handlers for tracker letters
+function setupTrackerLetterClicks() {
+    document.querySelectorAll('.imagine-tracker-letter').forEach(letterEl => {
+        letterEl.addEventListener('click', () => {
+            const letter = letterEl.dataset.letter;
+            hapticFeedback('light');
+
+            // Close menu panel
+            menuPanel.classList.remove('active');
+
+            // Open exercise panel
+            exercisePanel.classList.add('active');
+
+            // Scroll to the matching category
+            setTimeout(() => {
+                const categoryHeader = document.querySelector(`.imagine-letter[style*="${getColorForLetter(letter)}"]`);
+                if (categoryHeader) {
+                    categoryHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
+        });
+    });
+}
+
 // ================================
 // DOM Elements
 // ================================
@@ -61,6 +196,11 @@ const startPmrButton = document.getElementById('start-pmr');
 const talkAboutPmrButton = document.getElementById('talk-about-pmr');
 const bodyDiagram = document.getElementById('body-diagram');
 const pmrInstruction = document.getElementById('pmr-instruction');
+
+// IMAGINE Exercise modals
+const weatherModal = document.getElementById('weather-modal');
+const socialModal = document.getElementById('social-modal');
+const ladderModal = document.getElementById('ladder-modal');
 
 // On-Demand Prompts
 const promptButton = document.getElementById('prompt-button');
@@ -140,6 +280,15 @@ window.addEventListener('DOMContentLoaded', () => {
         stopPMR();
         pmrModal.classList.remove('active');
     });
+    if (ladderModal) {
+        addSwipeToDismiss(ladderModal.querySelector('.exercise-modal-content'), closeLadderModal);
+    }
+
+    // Initialize IMAGINE tracker on page load
+    updateImagineTracker();
+
+    // Make tracker letters clickable
+    setupTrackerLetterClicks();
 
     focusInput();
 });
@@ -286,14 +435,26 @@ function setupEventListeners() {
     // Escape key closes panels and modals
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (breathingModal.classList.contains('active')) {
+            if (breathingModal && breathingModal.classList.contains('active')) {
                 stopBreathing();
                 breathingModal.classList.remove('active');
-            } else if (imaginePanel.classList.contains('active')) {
+            } else if (groundingModal && groundingModal.classList.contains('active')) {
+                stopGrounding();
+                groundingModal.classList.remove('active');
+            } else if (pmrModal && pmrModal.classList.contains('active')) {
+                stopPMR();
+                pmrModal.classList.remove('active');
+            } else if (weatherModal && weatherModal.classList.contains('active')) {
+                closeWeatherModal();
+            } else if (socialModal && socialModal.classList.contains('active')) {
+                closeSocialModal();
+            } else if (ladderModal && ladderModal.classList.contains('active')) {
+                closeLadderModal();
+            } else if (imaginePanel && imaginePanel.classList.contains('active')) {
                 imaginePanel.classList.remove('active');
-            } else if (exercisePanel.classList.contains('active')) {
+            } else if (exercisePanel && exercisePanel.classList.contains('active')) {
                 exercisePanel.classList.remove('active');
-            } else if (menuPanel.classList.contains('active')) {
+            } else if (menuPanel && menuPanel.classList.contains('active')) {
                 menuPanel.classList.remove('active');
             }
         }
@@ -1102,130 +1263,318 @@ function populateImaginePanel() {
 // Exercise Library Panel
 // ================================
 
-const EXERCISES = [
+const IMAGINE_EXERCISES = [
     {
-        category: '🌬️ Grounding & Calming',
+        letter: 'I',
+        title: 'I, Me, Myself',
+        subtitle: 'Self-care, boundaries & compassion',
+        color: '#E88A6A', // Terracotta
+        exercises: [
+            {
+                name: 'Daily Mini-Movement',
+                title: '5-Minute Body Reset',
+                description: 'Boost energy through small intentional movement',
+                hasInteractive: true,
+                duration: '5 min',
+                prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.'
+            },
+            {
+                name: 'Work/Leisure Balance Audit',
+                title: 'Where Did My Day Go?',
+                description: 'Understand your balance between doing and resting',
+                hasInteractive: false,
+                prompt: 'Can you help me do a work/leisure balance audit? I want to understand how I split my time between responsibilities and rest today.'
+            },
+            {
+                name: 'Boundary Practice',
+                title: 'The 1% Boundary',
+                description: 'Build confidence in saying "no" or setting limits',
+                hasInteractive: false,
+                prompt: 'Can you guide me through the 1% Boundary exercise? I want to practice setting small, healthy boundaries.'
+            },
+            {
+                name: 'Self-Compassion Buddy',
+                title: 'Talk to Yourself Like a Friend',
+                description: 'Reduce harsh self-talk and build resilience',
+                hasInteractive: false,
+                prompt: 'Can you help me practice self-compassion? I noticed some harsh self-talk and want to respond to myself like I would a friend.'
+            },
+            {
+                name: 'Mood & Nutrition Check',
+                title: 'What Fuels Me?',
+                description: 'Create awareness of your food/mood connection',
+                hasInteractive: true,
+                duration: '2 min',
+                prompt: 'Can you help me explore the connection between what I eat and how I feel? I want to notice patterns.'
+            },
+            {
+                name: 'Leisure Yes List',
+                title: 'Something Just for Me',
+                description: 'Strengthen self-care through intentional enjoyment',
+                hasInteractive: false,
+                prompt: 'Can you help me create a "yes list" of things I enjoy but haven\'t done recently? I want to schedule something just for me.'
+            },
+            {
+                name: 'Self-Compassion Action Plan',
+                title: 'My Compassion Toolkit',
+                description: 'Build a personal plan for when you\'re struggling',
+                hasInteractive: false,
+                prompt: 'Can you help me create a self-compassion action plan? I want to identify my triggers, warning signs, and helpful responses.'
+            }
+        ]
+    },
+    {
+        letter: 'M',
+        title: 'Mindfulness',
+        subtitle: 'Present moment awareness',
+        color: '#7EA88B', // Sage green
         exercises: [
             {
                 name: 'Box Breathing',
-                description: '4-4-4-4 breathing technique to calm your nervous system',
+                title: 'Box Breathing',
+                description: '4-4-4-4 breathing to calm your nervous system',
                 hasInteractive: true,
+                duration: '4 min',
                 prompt: 'Can you guide me through box breathing?'
             },
             {
                 name: '5-4-3-2-1 Grounding',
-                description: 'Use your 5 senses to anchor yourself in the present moment',
+                title: '5-4-3-2-1 Grounding',
+                description: 'Use your senses to anchor in the present',
                 hasInteractive: true,
-                prompt: 'Guide me through the 5-4-3-2-1 grounding technique'
+                duration: '3 min',
+                prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?'
             },
             {
-                name: 'Progressive Muscle Relaxation',
-                description: 'Release tension by tensing and relaxing muscle groups',
+                name: 'Mind Unclutter',
+                title: 'Give Your Brain a Breather',
+                description: 'A 2-minute mindfulness reset',
+                hasInteractive: false,
+                duration: '2 min',
+                prompt: 'Can you guide me through a 2-minute mind unclutter exercise? I need to step out of constant thinking and just notice.'
+            }
+        ]
+    },
+    {
+        letter: 'A',
+        title: 'Acceptance',
+        subtitle: 'Making peace with what is',
+        color: '#B8860B', // Golden
+        exercises: [
+            {
+                name: 'Resistance Scan',
+                title: 'What Am I Pushing Away?',
+                description: 'Notice thoughts or feelings you might be avoiding',
+                hasInteractive: false,
+                prompt: 'Can you guide me through a resistance scan? I want to gently notice what I might be avoiding or pushing away.'
+            },
+            {
+                name: 'Wave Exercise',
+                title: 'Let the Feeling Rise & Fall',
+                description: 'Learn that emotions come in waves, not permanent states',
+                hasInteractive: false,
+                prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.'
+            },
+            {
+                name: 'Circle of Control',
+                title: 'Sort It Out',
+                description: 'Distinguish between what you can and cannot control',
                 hasInteractive: true,
-                prompt: 'Guide me through progressive muscle relaxation'
+                prompt: 'Can you help me do the circle of control exercise? I want to sort out what I can control versus what I need to accept.'
             }
         ]
     },
     {
-        category: '🧠 Cognitive Work',
+        letter: 'G',
+        title: 'Gratitude',
+        subtitle: 'Noticing the good',
+        color: '#DDA0DD', // Soft purple
         exercises: [
             {
-                name: 'H-E-A-L Method',
-                description: 'Reframe negative thoughts using evidence and compassion',
-                hasInteractive: false,
-                prompt: 'Teach me the H-E-A-L method for reframing negative thoughts'
+                name: 'Tiny Wins',
+                title: 'Notice the Small Stuff',
+                description: 'Tune into subtle positives you might have missed',
+                hasInteractive: true,
+                duration: '2 min',
+                prompt: 'Can you help me with the tiny wins gratitude check? I want to notice three small things that made today even slightly better.'
             },
             {
-                name: 'Thought Unhooking',
-                description: 'Distance yourself from unhelpful thoughts (Passengers on the bus)',
+                name: 'Gratitude Lens',
+                title: 'A Different Angle',
+                description: 'Reframe a challenge through appreciation',
                 hasInteractive: false,
-                prompt: 'Help me unhook from negative thoughts using the "passengers on the bus" metaphor'
-            },
-            {
-                name: 'Evidence For/Against',
-                description: 'Examine the facts supporting or contradicting your thoughts',
-                hasInteractive: false,
-                prompt: 'Guide me through examining the evidence for and against my thoughts'
+                prompt: 'Can you guide me through the gratitude lens exercise? I have a challenge I\'d like to look at from a different angle.'
             }
         ]
     },
     {
-        category: '💖 Self-Compassion',
+        letter: 'I',
+        title: 'Interactions',
+        subtitle: 'Connection with others',
+        color: '#6B8E9F', // Soft blue
         exercises: [
             {
-                name: 'Self-Compassion Break',
-                description: 'Three steps to respond to yourself with kindness',
-                hasInteractive: false,
-                prompt: 'Walk me through a self-compassion break'
+                name: 'Social Pulse Check',
+                title: 'How Connected Was Today?',
+                description: 'Build awareness of your daily interaction levels',
+                hasInteractive: true,
+                duration: '2 min',
+                prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.'
             },
             {
-                name: 'Compassionate Letter',
-                description: 'Write to yourself as you would a dear friend',
+                name: 'Connection Tracker',
+                title: 'Who Did I See This Week?',
+                description: 'Spot patterns in how often you connect',
                 hasInteractive: false,
-                prompt: 'Help me write a compassionate letter to myself'
+                prompt: 'Can you help me with the connection tracker? I want to reflect on who I\'ve connected with this week and notice patterns.'
+            },
+            {
+                name: 'One-Step Outward',
+                title: 'A Small Step Away From Isolation',
+                description: 'Break isolation with one tiny, achievable action',
+                hasInteractive: false,
+                prompt: 'Can you guide me through the one-step outward challenge? I want to take a small step toward connection today.'
+            },
+            {
+                name: 'Social Routine Anchors',
+                title: 'Build Your Weekly Connection Anchor',
+                description: 'Create gentle, predictable connection habits',
+                hasInteractive: false,
+                prompt: 'Can you help me build a social routine anchor? I want to create a simple, repeatable way to stay connected.'
             }
         ]
     },
     {
-        category: '🎯 Values & Purpose',
+        letter: 'N',
+        title: 'Nurture Fun & Play',
+        subtitle: 'Joy and lightness',
+        color: '#F4A460', // Sandy orange
         exercises: [
             {
-                name: 'Values Compass',
-                description: 'Identify what truly matters to you in life',
-                hasInteractive: false,
-                prompt: 'Help me identify my core values using the values compass'
+                name: 'Play Break',
+                title: 'Scheduled Silly Time',
+                description: 'Interrupt seriousness with 10 minutes of play',
+                hasInteractive: true,
+                duration: '10 min',
+                prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.'
             },
             {
-                name: 'Valued Living Assessment',
-                description: 'Check if your actions align with your values',
+                name: 'Childhood Micro-Joy',
+                title: 'Replaying Joy',
+                description: 'Unlock playfulness through nostalgia',
                 hasInteractive: false,
-                prompt: 'Guide me through assessing whether I\'m living according to my values'
+                prompt: 'Can you guide me through the childhood micro-joy exercise? I want to rediscover something I loved as a child.'
+            },
+            {
+                name: 'Laugh Starter',
+                title: 'The Mini Laugh Experiment',
+                description: 'Trigger laughter on purpose to shift your state',
+                hasInteractive: false,
+                duration: '3 min',
+                prompt: 'Can you guide me through the 3-minute laugh starter? I want to try triggering laughter even if I don\'t feel like it.'
+            },
+            {
+                name: 'Humour Hunt',
+                title: 'Find Today\'s Funny',
+                description: 'Train your brain to notice amusing moments',
+                hasInteractive: false,
+                prompt: 'Can you help me with the humour hunt? I want to look for something funny, silly, or unexpected today.'
             }
         ]
     },
     {
-        category: '🪷 Acceptance',
+        letter: 'E',
+        title: 'Explore',
+        subtitle: 'Growth and discovery',
+        color: '#8FBC8F', // Dark sea green
         exercises: [
             {
-                name: 'Radical Acceptance',
-                description: 'Practice accepting reality as it is, not as you wish it to be',
+                name: 'Safety Behaviours',
+                title: 'What\'s Protecting You... and Limiting You?',
+                description: 'Identify behaviours that block growth',
                 hasInteractive: false,
-                prompt: 'Teach me about radical acceptance and how to practice it'
+                prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.'
             },
             {
-                name: 'Leaves on a Stream',
-                description: 'Watch your thoughts float by without getting caught in them',
+                name: '10% Stretch',
+                title: 'Grow Without Overwhelm',
+                description: 'Try something 10% more challenging',
                 hasInteractive: false,
-                prompt: 'Guide me through the "leaves on a stream" mindfulness exercise'
+                prompt: 'Can you guide me through the 10% stretch exercise? I want to gently push my comfort zone without overwhelming myself.'
+            },
+            {
+                name: 'Curious Detective',
+                title: 'Investigate Instead of Assuming',
+                description: 'Replace anxious predictions with curiosity',
+                hasInteractive: false,
+                prompt: 'Can you help me be a curious detective? I have a situation where I\'m assuming the worst and want to gather real evidence instead.'
+            },
+            {
+                name: 'Micro-Adventures',
+                title: 'Small Steps Into the Unknown',
+                description: 'Gentle novelty-seeking and confidence building',
+                hasInteractive: false,
+                prompt: 'Can you suggest a micro-adventure for me? I want to try something small and new in the next 24 hours.'
+            },
+            {
+                name: 'Uncertainty Ladder',
+                title: 'Climb, Don\'t Leap',
+                description: 'Build tolerance for uncertainty in gradual steps',
+                hasInteractive: true,
+                prompt: 'Can you help me with the uncertainty ladder? I want to practice tolerating uncertainty in small, manageable steps.'
+            },
+            {
+                name: 'Inner Weather Report',
+                title: 'Explore Your Inner Landscape',
+                description: 'Check in with your internal state without judgment',
+                hasInteractive: true,
+                duration: '3 min',
+                prompt: 'Can you guide me through an inner weather report? I want to explore what\'s happening inside me right now.'
             }
         ]
     }
 ];
 
+// Keep backward compatibility - flatten for existing code that expects EXERCISES
+const EXERCISES = IMAGINE_EXERCISES.map(category => ({
+    category: `${category.letter} - ${category.title}`,
+    exercises: category.exercises
+}));
+
 function populateExercisePanel() {
-    exerciseContent.innerHTML = EXERCISES.map(category => `
-        <h3 class="category-header">${category.category}</h3>
-        ${category.exercises.map(exercise => `
-            <div class="resource-card">
-                <div class="resource-card-title">
-                    <h3>${exercise.name}</h3>
-                </div>
-                <p class="resource-card-description">${exercise.description}</p>
-                <div class="resource-card-actions">
-                    ${exercise.hasInteractive ? `
-                        <button class="btn-primary start-exercise" data-exercise="${exercise.name}">
-                            Start Exercise
-                        </button>
-                    ` : ''}
-                    <button class="${exercise.hasInteractive ? 'btn-secondary' : 'btn-primary'} chat-trigger" data-prompt="${exercise.prompt}">
-                        ${exercise.hasInteractive ? 'Ask Mandy →' : 'Chat with Mandy →'}
-                    </button>
+    exerciseContent.innerHTML = IMAGINE_EXERCISES.map(category => `
+        <div class="imagine-category" style="--category-color: ${category.color}">
+            <div class="imagine-category-header">
+                <span class="imagine-letter" style="background: ${category.color}">${category.letter}</span>
+                <div class="imagine-category-info">
+                    <h3>${category.title}</h3>
+                    <p class="imagine-subtitle">${category.subtitle}</p>
                 </div>
             </div>
-        `).join('')}
+            ${category.exercises.map(exercise => `
+                <div class="resource-card imagine-card">
+                    <div class="resource-card-title">
+                        <h3>${exercise.title}</h3>
+                        ${exercise.duration ? `<span class="exercise-duration">${exercise.duration}</span>` : ''}
+                    </div>
+                    <p class="resource-card-description">${exercise.description}</p>
+                    <div class="resource-card-actions">
+                        ${exercise.hasInteractive ? `
+                            <button class="btn-primary start-exercise" data-exercise="${exercise.name}">
+                                Start Exercise
+                            </button>
+                        ` : ''}
+                        <button class="btn-${exercise.hasInteractive ? 'secondary' : 'primary'} chat-trigger"
+                                data-prompt="${exercise.prompt}">
+                            ${exercise.hasInteractive ? 'Ask Mandy →' : 'Explore with Mandy →'}
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
     `).join('');
 
-    // Add event listeners
+    // Add event listeners to chat triggers
     document.querySelectorAll('#exercise-content .chat-trigger').forEach(btn => {
         btn.addEventListener('click', () => {
             const prompt = btn.dataset.prompt;
@@ -1234,18 +1583,79 @@ function populateExercisePanel() {
         });
     });
 
+    // Add event listeners to start exercise buttons
     document.querySelectorAll('#exercise-content .start-exercise').forEach(btn => {
         btn.addEventListener('click', () => {
             const exerciseName = btn.dataset.exercise;
+
+            // Record engagement when starting an interactive exercise
+            const letter = getExerciseLetter(exerciseName);
+            if (letter) {
+                recordImagineEngagement(letter);
+            }
+
+            // Close exercise panel first
             exercisePanel.classList.remove('active');
 
-            if (exerciseName === 'Box Breathing') {
-                breathingModal.classList.add('active');
-            } else if (exerciseName === '5-4-3-2-1 Grounding') {
-                groundingModal.classList.add('active');
-            } else if (exerciseName === 'Progressive Muscle Relaxation') {
-                pmrModal.classList.add('active');
+            // Open the appropriate modal
+            switch(exerciseName) {
+                // Existing exercises
+                case 'Box Breathing':
+                    if (breathingModal) breathingModal.classList.add('active');
+                    break;
+                case '5-4-3-2-1 Grounding':
+                    if (groundingModal) groundingModal.classList.add('active');
+                    break;
+                case 'Progressive Muscle Relaxation':
+                    if (pmrModal) pmrModal.classList.add('active');
+                    break;
+
+                // New IMAGINE exercises
+                case 'Inner Weather Report':
+                    if (typeof openWeatherModal === 'function') {
+                        openWeatherModal();
+                    } else if (weatherModal) {
+                        weatherModal.classList.add('active');
+                    }
+                    break;
+                case 'Social Pulse Check':
+                    if (typeof openSocialModal === 'function') {
+                        openSocialModal();
+                    } else if (socialModal) {
+                        socialModal.classList.add('active');
+                    }
+                    break;
+                case 'Uncertainty Ladder':
+                    if (typeof openLadderModal === 'function') {
+                        openLadderModal();
+                    } else if (ladderModal) {
+                        ladderModal.classList.add('active');
+                    }
+                    break;
+
+                // Exercises that could be interactive but fall back to chat
+                case 'Daily Mini-Movement':
+                case 'Mood & Nutrition Check':
+                case 'Circle of Control':
+                case 'Tiny Wins':
+                case 'Play Break':
+                    // These could have modals in the future, for now trigger chat
+                    const exercise = findExerciseByName(exerciseName);
+                    if (exercise && exercise.prompt) {
+                        triggerChatPrompt(exercise.prompt);
+                    }
+                    break;
+
+                default:
+                    // For any other interactive exercise, try to find and trigger its prompt
+                    const fallbackExercise = findExerciseByName(exerciseName);
+                    if (fallbackExercise && fallbackExercise.prompt) {
+                        triggerChatPrompt(fallbackExercise.prompt);
+                    }
+                    console.log('No modal found for exercise:', exerciseName);
             }
+
+            hapticFeedback('light');
         });
     });
 }
@@ -1254,7 +1664,26 @@ function populateExercisePanel() {
 // Chat Trigger Function
 // ================================
 
-function triggerChatPrompt(promptText) {
+function triggerChatPrompt(promptText, exerciseName = null) {
+    // Record engagement when user explores an exercise with Mandy
+    if (exerciseName) {
+        const letter = getExerciseLetter(exerciseName);
+        if (letter) {
+            recordImagineEngagement(letter);
+        }
+    } else {
+        // Try to infer exercise from prompt text
+        for (const category of IMAGINE_EXERCISES) {
+            for (const exercise of category.exercises) {
+                if (exercise.prompt === promptText) {
+                    const letter = category.title === 'Interactions' ? 'I2' : category.letter;
+                    recordImagineEngagement(letter);
+                    break;
+                }
+            }
+        }
+    }
+
     // Fill chat input with the prompt
     chatInput.value = promptText;
 
@@ -1263,6 +1692,21 @@ function triggerChatPrompt(promptText) {
 
     // Auto-send the message
     handleSendMessage();
+}
+
+// ================================
+// Exercise Helper Functions
+// ================================
+
+function findExerciseByName(name) {
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (exercise.name === name || exercise.title === name) {
+                return exercise;
+            }
+        }
+    }
+    return null;
 }
 
 // ================================
@@ -1546,6 +1990,183 @@ function stopPMR() {
     startPmrButton.addEventListener('click', startPMRExercise);
 }
 
+// ============================================
+// Social Pulse Check Exercise
+// ============================================
+
+const closeSocialButton = document.getElementById('close-social');
+const socialNextButton = document.getElementById('social-next');
+const socialBackButton = document.getElementById('social-back');
+const talkAboutSocialButton = document.getElementById('talk-about-social');
+const socialSummary = document.getElementById('social-summary');
+
+const inpersonSlider = document.getElementById('inperson-slider');
+const digitalSlider = document.getElementById('digital-slider');
+const qualitySlider = document.getElementById('quality-slider');
+
+let socialPhase = 1;
+let socialData = {
+    inperson: 0,
+    digital: 0,
+    quality: 0
+};
+
+function openSocialModal() {
+    socialModal.classList.add('active');
+    hapticFeedback('light');
+    resetSocial();
+}
+
+function closeSocialModal() {
+    socialModal.classList.remove('active');
+    resetSocial();
+}
+
+function resetSocial() {
+    socialPhase = 1;
+    socialData = { inperson: 0, digital: 0, quality: 0 };
+
+    if (inpersonSlider) inpersonSlider.value = 0;
+    if (digitalSlider) digitalSlider.value = 0;
+    if (qualitySlider) qualitySlider.value = 0;
+
+    updateSliderDisplays();
+    showSocialPhase();
+
+    socialNextButton.style.display = '';
+    socialBackButton.style.display = 'none';
+    talkAboutSocialButton.style.display = 'none';
+}
+
+function updateSliderDisplays() {
+    document.getElementById('inperson-value').textContent = socialData.inperson;
+    document.getElementById('digital-value').textContent = socialData.digital;
+    document.getElementById('quality-value').textContent = socialData.quality;
+}
+
+function showSocialPhase() {
+    document.querySelectorAll('.social-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === socialPhase) {
+            section.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.social-progress .social-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < socialPhase);
+        dot.classList.toggle('current', i === socialPhase - 1);
+    });
+
+    socialBackButton.style.display = socialPhase > 1 ? '' : 'none';
+
+    if (socialPhase === 4) {
+        socialNextButton.style.display = 'none';
+        talkAboutSocialButton.style.display = '';
+        generateSocialSummary();
+    } else {
+        socialNextButton.style.display = '';
+        talkAboutSocialButton.style.display = 'none';
+    }
+}
+
+function generateSocialSummary() {
+    const total = socialData.inperson + socialData.digital + socialData.quality;
+
+    let pulseDescription;
+    if (total <= 3) {
+        pulseDescription = "a quieter day for connection";
+    } else if (total <= 8) {
+        pulseDescription = "some moments of connection";
+    } else if (total <= 12) {
+        pulseDescription = "a good amount of connection";
+    } else {
+        pulseDescription = "a socially rich day";
+    }
+
+    const qualityDescriptions = ['not much', 'a little', 'somewhat', 'fairly', 'quite', 'very'];
+
+    socialSummary.innerHTML = `
+        <div class="pulse-total">
+            <span class="pulse-number">${total}</span>
+            <span class="pulse-label">/ 15</span>
+        </div>
+        <p>Today was <strong>${pulseDescription}</strong>.</p>
+        <p>You felt <strong>${qualityDescriptions[socialData.quality]} seen/supported</strong>.</p>
+        <p class="pulse-note">This is just a snapshot—not a score to improve.</p>
+    `;
+}
+
+// Event Listeners
+if (closeSocialButton) {
+    closeSocialButton.addEventListener('click', closeSocialModal);
+}
+
+if (socialNextButton) {
+    socialNextButton.addEventListener('click', () => {
+        if (socialPhase < 4) {
+            hapticFeedback('light');
+            socialPhase++;
+            showSocialPhase();
+        }
+    });
+}
+
+if (socialBackButton) {
+    socialBackButton.addEventListener('click', () => {
+        if (socialPhase > 1) {
+            hapticFeedback('light');
+            socialPhase--;
+            showSocialPhase();
+        }
+    });
+}
+
+if (talkAboutSocialButton) {
+    talkAboutSocialButton.addEventListener('click', () => {
+        closeSocialModal();
+        const total = socialData.inperson + socialData.digital + socialData.quality;
+        const prompt = `I just did a social pulse check. My total was ${total}/15 - in-person: ${socialData.inperson}, digital: ${socialData.digital}, quality: ${socialData.quality}. Can you help me reflect on my connection patterns?`;
+        triggerChatPrompt(prompt);
+    });
+}
+
+// Slider event listeners
+if (inpersonSlider) {
+    inpersonSlider.addEventListener('input', (e) => {
+        socialData.inperson = parseInt(e.target.value);
+        document.getElementById('inperson-value').textContent = socialData.inperson;
+        hapticFeedback('light');
+    });
+}
+
+if (digitalSlider) {
+    digitalSlider.addEventListener('input', (e) => {
+        socialData.digital = parseInt(e.target.value);
+        document.getElementById('digital-value').textContent = socialData.digital;
+        hapticFeedback('light');
+    });
+}
+
+if (qualitySlider) {
+    qualitySlider.addEventListener('input', (e) => {
+        socialData.quality = parseInt(e.target.value);
+        document.getElementById('quality-value').textContent = socialData.quality;
+        hapticFeedback('light');
+    });
+}
+
+// Close modal on backdrop click
+socialModal.addEventListener('click', (e) => {
+    if (e.target === socialModal) {
+        closeSocialModal();
+    }
+});
+
+// Add swipe to dismiss
+if (socialModal) {
+    addSwipeToDismiss(socialModal.querySelector('.exercise-modal-content'), closeSocialModal);
+}
+
 // ================================
 // Swipe-to-Dismiss for Modals
 // ================================
@@ -1674,4 +2295,323 @@ function showInstallBanner() {
 // Debug info
 console.log('Cowch Chat initialized');
 console.log('API Endpoint:', API_ENDPOINT);
-console.log('Conversation history:', conversationHistory.length, 'messages');
+console.log('Conversation history:', conversationHistory.length, 'messages');// ============================================
+// Uncertainty Ladder Exercise
+// ============================================
+
+const closeLadderButton = document.getElementById('close-ladder');
+const ladderVisual = document.getElementById('ladder-visual');
+const ladderSelection = document.getElementById('ladder-selection');
+const ladderComplete = document.getElementById('ladder-complete');
+const selectedChallenge = document.getElementById('selected-challenge');
+const ladderCompleteText = document.getElementById('ladder-complete-text');
+const ladderConfirmButton = document.getElementById('ladder-confirm');
+const talkAboutLadderButton = document.getElementById('talk-about-ladder');
+
+let selectedRung = null;
+
+function openLadderModal() {
+    ladderModal.classList.add('active');
+    hapticFeedback('light');
+    resetLadder();
+}
+
+function closeLadderModal() {
+    ladderModal.classList.remove('active');
+    resetLadder();
+}
+
+function resetLadder() {
+    selectedRung = null;
+
+    document.querySelectorAll('.ladder-rung').forEach(rung => {
+        rung.classList.remove('selected');
+    });
+
+    ladderVisual.style.display = '';
+    ladderSelection.style.display = 'none';
+    ladderComplete.style.display = 'none';
+    ladderConfirmButton.style.display = 'none';
+    talkAboutLadderButton.style.display = '';
+}
+
+function selectRung(rung) {
+    // Clear previous selection
+    document.querySelectorAll('.ladder-rung').forEach(r => {
+        r.classList.remove('selected');
+    });
+
+    // Select this rung
+    rung.classList.add('selected');
+    selectedRung = {
+        level: rung.dataset.level,
+        challenge: rung.dataset.challenge
+    };
+
+    // Show selection details
+    selectedChallenge.innerHTML = `
+        <span class="selected-level">Level ${selectedRung.level}</span>
+        <span class="selected-text">${selectedRung.challenge}</span>
+    `;
+
+    ladderSelection.style.display = 'block';
+    ladderConfirmButton.style.display = '';
+
+    hapticFeedback('light');
+
+    // Scroll to show selection
+    ladderSelection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmLadderChoice() {
+    if (!selectedRung) return;
+
+    hapticFeedback('success');
+
+    // Hide ladder, show completion
+    ladderVisual.style.display = 'none';
+    ladderSelection.style.display = 'none';
+    ladderComplete.style.display = 'block';
+    ladderConfirmButton.style.display = 'none';
+
+    ladderCompleteText.textContent = selectedRung.challenge;
+}
+
+// Event Listeners
+if (closeLadderButton) {
+    closeLadderButton.addEventListener('click', closeLadderModal);
+}
+
+// Rung click handlers
+document.querySelectorAll('.ladder-rung').forEach(rung => {
+    rung.addEventListener('click', () => selectRung(rung));
+});
+
+if (ladderConfirmButton) {
+    ladderConfirmButton.addEventListener('click', confirmLadderChoice);
+}
+
+if (talkAboutLadderButton) {
+    talkAboutLadderButton.addEventListener('click', () => {
+        closeLadderModal();
+        let prompt;
+        if (selectedRung) {
+            prompt = `I'm working on the uncertainty ladder. I chose level ${selectedRung.level}: "${selectedRung.challenge}". Can you help me think through this and support me in trying it?`;
+        } else {
+            prompt = `Can you help me with the uncertainty ladder? I want to build my tolerance for uncertainty but I'm not sure which step to start with.`;
+        }
+        triggerChatPrompt(prompt);
+    });
+}
+
+// Close on backdrop click
+if (ladderModal) {
+    ladderModal.addEventListener('click', (e) => {
+        if (e.target === ladderModal) {
+            closeLadderModal();
+        }
+    });
+}
+
+// ============================================
+// Inner Weather Report Exercise
+// ============================================
+
+const closeWeatherButton = document.getElementById('close-weather');
+const weatherSections = document.getElementById('weather-sections');
+const weatherNextButton = document.getElementById('weather-next');
+const weatherBackButton = document.getElementById('weather-back');
+const talkAboutWeatherButton = document.getElementById('talk-about-weather');
+const weatherSummary = document.getElementById('weather-summary');
+
+let weatherPhase = 1;
+let weatherData = {
+    emotion: null,
+    body: [],
+    thought: null,
+    need: null
+};
+
+function openWeatherModal() {
+    weatherModal.classList.add('active');
+    hapticFeedback('light');
+    resetWeather();
+}
+
+function closeWeatherModal() {
+    weatherModal.classList.remove('active');
+    resetWeather();
+}
+
+function resetWeather() {
+    weatherPhase = 1;
+    weatherData = { emotion: null, body: [], thought: null, need: null };
+    showWeatherPhase();
+
+    // Clear all selections
+    document.querySelectorAll('.weather-option.selected').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+
+    weatherNextButton.disabled = true;
+    weatherNextButton.style.display = '';
+    weatherBackButton.style.display = 'none';
+    talkAboutWeatherButton.style.display = 'none';
+}
+
+function showWeatherPhase() {
+    // Update sections visibility
+    document.querySelectorAll('.weather-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === weatherPhase) {
+            section.classList.add('active');
+        }
+    });
+
+    // Update progress dots
+    document.querySelectorAll('.weather-progress .weather-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < weatherPhase);
+        dot.classList.toggle('current', i === weatherPhase - 1);
+    });
+
+    // Update buttons
+    weatherBackButton.style.display = weatherPhase > 1 ? '' : 'none';
+
+    if (weatherPhase === 5) {
+        // Final phase - show summary
+        weatherNextButton.style.display = 'none';
+        talkAboutWeatherButton.style.display = '';
+        generateWeatherSummary();
+    } else {
+        weatherNextButton.style.display = '';
+        weatherNextButton.textContent = 'Next →';
+        talkAboutWeatherButton.style.display = 'none';
+        updateNextButtonState();
+    }
+}
+
+function updateNextButtonState() {
+    let canProceed = false;
+
+    switch(weatherPhase) {
+        case 1: canProceed = weatherData.emotion !== null; break;
+        case 2: canProceed = weatherData.body.length > 0; break;
+        case 3: canProceed = weatherData.thought !== null; break;
+        case 4: canProceed = weatherData.need !== null; break;
+    }
+
+    weatherNextButton.disabled = !canProceed;
+}
+
+function generateWeatherSummary() {
+    const emotionLabels = {
+        'calm': '😌 calm', 'stressed': '😰 stressed', 'content': '😊 content',
+        'anxious': '😟 anxious', 'sad': '😢 sad', 'irritable': '😤 irritable',
+        'hopeful': '🌱 hopeful', 'overwhelmed': '😵 overwhelmed'
+    };
+
+    const needLabels = {
+        'rest': 'rest', 'connection': 'connection', 'movement': 'movement',
+        'reassurance': 'reassurance', 'space': 'space', 'creativity': 'creativity',
+        'nourishment': 'nourishment', 'quiet': 'quiet'
+    };
+
+    weatherSummary.innerHTML = `
+        Right now, you're feeling <strong>${emotionLabels[weatherData.emotion] || weatherData.emotion}</strong>.
+        <br><br>
+        You noticed <strong>${weatherData.body.length}</strong> thing${weatherData.body.length !== 1 ? 's' : ''} in your body.
+        <br><br>
+        What you might need most: <strong>${needLabels[weatherData.need] || weatherData.need}</strong>.
+    `;
+}
+
+// Event Listeners for Weather Modal
+if (closeWeatherButton) {
+    closeWeatherButton.addEventListener('click', closeWeatherModal);
+}
+
+if (weatherNextButton) {
+    weatherNextButton.addEventListener('click', () => {
+        if (weatherPhase < 5) {
+            hapticFeedback('light');
+            weatherPhase++;
+            showWeatherPhase();
+        }
+    });
+}
+
+if (weatherBackButton) {
+    weatherBackButton.addEventListener('click', () => {
+        if (weatherPhase > 1) {
+            hapticFeedback('light');
+            weatherPhase--;
+            showWeatherPhase();
+        }
+    });
+}
+
+if (talkAboutWeatherButton) {
+    talkAboutWeatherButton.addEventListener('click', () => {
+        closeWeatherModal();
+        const prompt = `I just did an inner weather check. I'm feeling ${weatherData.emotion}, noticed ${weatherData.body.join(', ')} in my body, and I think I need ${weatherData.need}. Can you help me process this?`;
+        triggerChatPrompt(prompt);
+    });
+}
+
+// Option selection handlers
+document.querySelectorAll('#emotion-options .weather-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#emotion-options .weather-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        weatherData.emotion = btn.dataset.value;
+        hapticFeedback('light');
+        updateNextButtonState();
+    });
+});
+
+document.querySelectorAll('#body-options .weather-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.classList.toggle('selected');
+        if (btn.classList.contains('selected')) {
+            weatherData.body.push(btn.dataset.value);
+        } else {
+            weatherData.body = weatherData.body.filter(v => v !== btn.dataset.value);
+        }
+        hapticFeedback('light');
+        updateNextButtonState();
+    });
+});
+
+document.querySelectorAll('#thought-options .weather-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#thought-options .weather-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        weatherData.thought = btn.dataset.value;
+        hapticFeedback('light');
+        updateNextButtonState();
+    });
+});
+
+document.querySelectorAll('#need-options .weather-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#need-options .weather-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        weatherData.need = btn.dataset.value;
+        hapticFeedback('light');
+        updateNextButtonState();
+    });
+});
+
+// Add swipe to dismiss
+if (weatherModal) {
+    addSwipeToDismiss(weatherModal.querySelector('.exercise-modal-content'), closeWeatherModal);
+}
+
+// Close on backdrop click
+if (weatherModal) {
+    weatherModal.addEventListener('click', (e) => {
+        if (e.target === weatherModal) {
+            closeWeatherModal();
+        }
+    });
+}

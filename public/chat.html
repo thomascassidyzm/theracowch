@@ -145,6 +145,63 @@
             <h2>Menu</h2>
         </div>
         <div class="slide-panel-content">
+            <!-- IMAGINE Gentle Mirror -->
+            <div class="imagine-tracker">
+                <p class="imagine-tracker-title">How you've been spending time with yourself...</p>
+                <div class="imagine-letters" id="imagine-letters">
+                    <div class="imagine-tracker-letter" data-letter="I" data-domain="self">
+                        <span class="letter">I</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Self</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="M" data-domain="mindfulness">
+                        <span class="letter">M</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Mind</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="A" data-domain="acceptance">
+                        <span class="letter">A</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Accept</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="G" data-domain="gratitude">
+                        <span class="letter">G</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Thanks</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="I2" data-domain="interactions">
+                        <span class="letter">I</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Connect</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="N" data-domain="nurture">
+                        <span class="letter">N</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Play</span>
+                    </div>
+                    <div class="imagine-tracker-letter" data-letter="E" data-domain="explore">
+                        <span class="letter">E</span>
+                        <div class="letter-dots">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <span class="letter-label">Explore</span>
+                    </div>
+                </div>
+                <p class="imagine-tracker-footer">No goals. Just noticing. 🐄</p>
+            </div>
+
             <a href="/" class="menu-option">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -321,6 +378,257 @@
             <div class="exercise-controls">
                 <button class="btn-exercise btn-exercise-primary" id="start-pmr">Start</button>
                 <button class="btn-exercise btn-exercise-secondary" id="talk-about-pmr">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uncertainty Ladder Modal -->
+    <div class="exercise-modal" id="ladder-modal">
+        <div class="exercise-modal-content ladder-content">
+            <div class="exercise-modal-header">
+                <h3>Uncertainty Ladder</h3>
+                <button class="close-modal" id="close-ladder">×</button>
+            </div>
+
+            <p class="ladder-intro">Small steps build tolerance. Pick one rung that feels doable today...</p>
+
+            <div class="ladder-visual" id="ladder-visual">
+                <div class="ladder-rung" data-level="5" data-challenge="Go somewhere new without planning every detail">
+                    <span class="rung-level">5</span>
+                    <span class="rung-text">Go somewhere new without planning</span>
+                    <span class="rung-difficulty">Harder</span>
+                </div>
+                <div class="ladder-rung" data-level="4" data-challenge="Make a decision without asking anyone's opinion">
+                    <span class="rung-level">4</span>
+                    <span class="rung-text">Decide without asking others</span>
+                </div>
+                <div class="ladder-rung" data-level="3" data-challenge="Message someone without editing it multiple times">
+                    <span class="rung-level">3</span>
+                    <span class="rung-text">Send a message without re-editing</span>
+                </div>
+                <div class="ladder-rung" data-level="2" data-challenge="Try something without checking reviews first">
+                    <span class="rung-level">2</span>
+                    <span class="rung-text">Try something without checking reviews</span>
+                </div>
+                <div class="ladder-rung" data-level="1" data-challenge="Leave a small task unfinished for an hour">
+                    <span class="rung-level">1</span>
+                    <span class="rung-text">Leave a small task unfinished</span>
+                    <span class="rung-difficulty">Easier</span>
+                </div>
+            </div>
+
+            <div class="ladder-selection" id="ladder-selection" style="display: none;">
+                <div class="ladder-selected-challenge" id="selected-challenge"></div>
+
+                <div class="ladder-reflection">
+                    <p class="ladder-question">After you try this, notice:</p>
+                    <ul class="ladder-notice-list">
+                        <li>How anxious did it feel? (That's okay)</li>
+                        <li>What actually happened?</li>
+                        <li>What did you learn about handling uncertainty?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="ladder-complete" id="ladder-complete" style="display: none;">
+                <div class="ladder-complete-icon">🌟</div>
+                <h4>You chose a step</h4>
+                <p class="ladder-complete-text" id="ladder-complete-text"></p>
+                <p class="ladder-encouragement">Any rung is progress. There's no rush. 🐄</p>
+            </div>
+
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-primary" id="ladder-confirm" style="display: none;">I'll try this →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-ladder">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Pulse Check Modal -->
+    <div class="exercise-modal" id="social-modal">
+        <div class="exercise-modal-content social-content">
+            <div class="exercise-modal-header">
+                <h3>Social Pulse Check</h3>
+                <button class="close-modal" id="close-social">×</button>
+            </div>
+
+            <p class="social-intro">Let's notice how connected you felt today...</p>
+
+            <div class="social-sections" id="social-sections">
+                <!-- Section 1: In-person -->
+                <div class="social-section active" data-section="1">
+                    <div class="social-icon">👥</div>
+                    <h4>In-Person Interactions</h4>
+                    <p class="social-question">Chatting, seeing someone, brief conversations...</p>
+                    <div class="social-slider-container">
+                        <input type="range" min="0" max="5" value="0" class="social-slider" id="inperson-slider">
+                        <div class="social-slider-labels">
+                            <span>None</span>
+                            <span>Some</span>
+                            <span>Lots</span>
+                        </div>
+                        <div class="social-slider-value" id="inperson-value">0</div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Digital -->
+                <div class="social-section" data-section="2">
+                    <div class="social-icon">📱</div>
+                    <h4>Digital Interactions</h4>
+                    <p class="social-question">Messages, calls, meaningful social media use...</p>
+                    <div class="social-slider-container">
+                        <input type="range" min="0" max="5" value="0" class="social-slider" id="digital-slider">
+                        <div class="social-slider-labels">
+                            <span>None</span>
+                            <span>Some</span>
+                            <span>Lots</span>
+                        </div>
+                        <div class="social-slider-value" id="digital-value">0</div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Quality -->
+                <div class="social-section" data-section="3">
+                    <div class="social-icon">💜</div>
+                    <h4>Quality of Connection</h4>
+                    <p class="social-question">Did you feel seen or supported today?</p>
+                    <div class="social-slider-container">
+                        <input type="range" min="0" max="5" value="0" class="social-slider" id="quality-slider">
+                        <div class="social-slider-labels">
+                            <span>Not really</span>
+                            <span>Somewhat</span>
+                            <span>Very much</span>
+                        </div>
+                        <div class="social-slider-value" id="quality-value">0</div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Reflection -->
+                <div class="social-section" data-section="4">
+                    <div class="social-icon">🌟</div>
+                    <h4>Your Social Pulse Today</h4>
+                    <div class="social-summary" id="social-summary">
+                        <!-- Filled dynamically -->
+                    </div>
+                    <p class="social-reflection">Just noticing. No judgment, no goals. 🐄</p>
+                </div>
+            </div>
+
+            <div class="social-progress">
+                <span class="social-dot active"></span>
+                <span class="social-dot"></span>
+                <span class="social-dot"></span>
+                <span class="social-dot"></span>
+            </div>
+
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="social-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="social-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-social" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inner Weather Report Modal -->
+    <div class="exercise-modal" id="weather-modal">
+        <div class="exercise-modal-content weather-content">
+            <div class="exercise-modal-header">
+                <h3>Inner Weather Report</h3>
+                <button class="close-modal" id="close-weather">×</button>
+            </div>
+
+            <p class="weather-intro">Let's gently check in with how you're doing right now...</p>
+
+            <div class="weather-sections" id="weather-sections">
+                <!-- Section 1: Emotional Weather -->
+                <div class="weather-section active" data-section="1">
+                    <div class="weather-icon">🌤️</div>
+                    <h4>Emotional Weather</h4>
+                    <p class="weather-question">What emotion is most present right now?</p>
+                    <div class="weather-options" id="emotion-options">
+                        <button class="weather-option" data-value="calm">😌 Calm</button>
+                        <button class="weather-option" data-value="stressed">😰 Stressed</button>
+                        <button class="weather-option" data-value="content">😊 Content</button>
+                        <button class="weather-option" data-value="anxious">😟 Anxious</button>
+                        <button class="weather-option" data-value="sad">😢 Sad</button>
+                        <button class="weather-option" data-value="irritable">😤 Irritable</button>
+                        <button class="weather-option" data-value="hopeful">🌱 Hopeful</button>
+                        <button class="weather-option" data-value="overwhelmed">😵 Overwhelmed</button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Physical Climate -->
+                <div class="weather-section" data-section="2">
+                    <div class="weather-icon">🌡️</div>
+                    <h4>Physical Climate</h4>
+                    <p class="weather-question">What sensations do you notice in your body?</p>
+                    <div class="weather-options multi" id="body-options">
+                        <button class="weather-option" data-value="tight-jaw">Tight jaw</button>
+                        <button class="weather-option" data-value="heavy-chest">Heavy chest</button>
+                        <button class="weather-option" data-value="warm-hands">Warm hands</button>
+                        <button class="weather-option" data-value="tired-eyes">Tired eyes</button>
+                        <button class="weather-option" data-value="lightness">Lightness</button>
+                        <button class="weather-option" data-value="restless">Restless legs</button>
+                        <button class="weather-option" data-value="stomach-knot">Knot in stomach</button>
+                        <button class="weather-option" data-value="relaxed">Relaxed</button>
+                    </div>
+                </div>
+
+                <!-- Section 3: Mental Clouds -->
+                <div class="weather-section" data-section="3">
+                    <div class="weather-icon">☁️</div>
+                    <h4>Mental Clouds</h4>
+                    <p class="weather-question">What thought keeps drifting through?</p>
+                    <div class="weather-options" id="thought-options">
+                        <button class="weather-option" data-value="perfectionism">"I need to get everything right"</button>
+                        <button class="weather-option" data-value="worry">"Something bad might happen"</button>
+                        <button class="weather-option" data-value="not-enough">"I'm not doing enough"</button>
+                        <button class="weather-option" data-value="capable">"I can handle this"</button>
+                        <button class="weather-option" data-value="need-break">"I need a break"</button>
+                        <button class="weather-option" data-value="hopeful">"I feel hopeful"</button>
+                    </div>
+                </div>
+
+                <!-- Section 4: What Do I Need -->
+                <div class="weather-section" data-section="4">
+                    <div class="weather-icon">💝</div>
+                    <h4>What Do I Need?</h4>
+                    <p class="weather-question">What small need could you meet today?</p>
+                    <div class="weather-options" id="need-options">
+                        <button class="weather-option" data-value="rest">🛋️ Rest</button>
+                        <button class="weather-option" data-value="connection">💬 Connection</button>
+                        <button class="weather-option" data-value="movement">🚶 Movement</button>
+                        <button class="weather-option" data-value="reassurance">🤗 Reassurance</button>
+                        <button class="weather-option" data-value="space">🌿 Space</button>
+                        <button class="weather-option" data-value="creativity">🎨 Creativity</button>
+                        <button class="weather-option" data-value="nourishment">🍵 Nourishment</button>
+                        <button class="weather-option" data-value="quiet">🤫 Quiet</button>
+                    </div>
+                </div>
+
+                <!-- Section 5: Reflection -->
+                <div class="weather-section" data-section="5">
+                    <div class="weather-icon">✨</div>
+                    <h4>Just Noticing</h4>
+                    <p class="weather-summary" id="weather-summary">
+                        <!-- Filled dynamically -->
+                    </p>
+                    <p class="weather-reflection">You took a moment to check in with yourself. That matters. 🐄</p>
+                </div>
+            </div>
+
+            <div class="weather-progress">
+                <span class="weather-dot active"></span>
+                <span class="weather-dot"></span>
+                <span class="weather-dot"></span>
+                <span class="weather-dot"></span>
+                <span class="weather-dot"></span>
+            </div>
+
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="weather-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="weather-next" disabled>Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-weather" style="display: none;">Talk to Mandy</button>
             </div>
         </div>
     </div>
