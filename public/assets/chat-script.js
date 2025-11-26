@@ -131,10 +131,10 @@ function setupTrackerLetterClicks() {
             hapticFeedback('light');
 
             // Close menu panel
-            menuPanel.classList.remove('active');
+            if (menuPanel) menuPanel.classList.remove('active');
 
             // Open exercise panel
-            exercisePanel.classList.add('active');
+            if (exercisePanel) exercisePanel.classList.add('active');
 
             // Scroll to the matching category
             setTimeout(() => {
@@ -366,30 +366,38 @@ function setupEventListeners() {
         });
     });
 
-    // Menu Panel
-    menuButton.addEventListener('click', () => {
-        hapticFeedback('light');
-        menuPanel.classList.add('active');
-    });
-    closeMenuPanelButton.addEventListener('click', () => {
-        hapticFeedback('light');
-        menuPanel.classList.remove('active');
-    });
+    // Menu Panel (optional - may not exist in simplified nav)
+    if (menuButton && menuPanel) {
+        menuButton.addEventListener('click', () => {
+            hapticFeedback('light');
+            menuPanel.classList.add('active');
+        });
+    }
+    if (closeMenuPanelButton && menuPanel) {
+        closeMenuPanelButton.addEventListener('click', () => {
+            hapticFeedback('light');
+            menuPanel.classList.remove('active');
+        });
+    }
 
-    // Menu options
-    clearChatButton.addEventListener('click', handleClearChat);
-    privacyInfoButton.addEventListener('click', handlePrivacyInfo);
+    // Menu options (optional)
+    if (clearChatButton) clearChatButton.addEventListener('click', handleClearChat);
+    if (privacyInfoButton) privacyInfoButton.addEventListener('click', handlePrivacyInfo);
 
     // Slide panels
-    openImaginePanelButton.addEventListener('click', () => {
-        menuPanel.classList.remove('active');
-        imaginePanel.classList.add('active');
-    });
+    if (openImaginePanelButton) {
+        openImaginePanelButton.addEventListener('click', () => {
+            if (menuPanel) menuPanel.classList.remove('active');
+            imaginePanel.classList.add('active');
+        });
+    }
 
-    openExercisePanelButton.addEventListener('click', () => {
-        menuPanel.classList.remove('active');
-        exercisePanel.classList.add('active');
-    });
+    if (openExercisePanelButton) {
+        openExercisePanelButton.addEventListener('click', () => {
+            if (menuPanel) menuPanel.classList.remove('active');
+            exercisePanel.classList.add('active');
+        });
+    }
 
     closeImaginePanelButton.addEventListener('click', () => {
         imaginePanel.classList.remove('active');
@@ -949,13 +957,13 @@ function handleClearChat() {
         chatMessages.innerHTML = '';
         showWelcomeMessage();
         saveChatHistory();
-        menuPanel.classList.remove('active');
+        if (menuPanel) menuPanel.classList.remove('active');
         focusInput();
     });
 }
 
 function handlePrivacyInfo() {
-    menuPanel.classList.remove('active');
+    if (menuPanel) menuPanel.classList.remove('active');
 
     const privacyInfo = `**Privacy & Safety:**
 

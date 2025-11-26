@@ -478,17 +478,9 @@
 </head>
 <body>
     <header class="header">
-        <a href="/" class="back-btn">← Home</a>
+        <a href="/app.html" class="back-btn">← Back</a>
         <h1 class="header-title">Choice</h1>
-        <div class="header-actions">
-            <button class="icon-button" id="menu-button" aria-label="Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                </svg>
-            </button>
-        </div>
+        <div class="header-actions"></div>
     </header>
 
     <div class="container">
@@ -773,32 +765,38 @@
 
         console.log('Choice tracker initialized');
 
-        // Unified Menu System
+        // Unified Menu System (optional - menu may not exist)
         const menuButton = document.getElementById('menu-button');
         const menuPanel = document.getElementById('menu-panel');
         const closeMenuPanel = document.getElementById('close-menu-panel');
 
-        menuButton.addEventListener('click', () => {
-            menuPanel.classList.add('active');
-        });
+        if (menuButton && menuPanel) {
+            menuButton.addEventListener('click', () => {
+                menuPanel.classList.add('active');
+            });
+        }
 
-        closeMenuPanel.addEventListener('click', () => {
-            menuPanel.classList.remove('active');
-        });
+        if (closeMenuPanel && menuPanel) {
+            closeMenuPanel.addEventListener('click', () => {
+                menuPanel.classList.remove('active');
+            });
+        }
 
         // Close on escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && menuPanel) {
                 menuPanel.classList.remove('active');
             }
         });
 
         // Close when clicking backdrop
-        menuPanel.addEventListener('click', (e) => {
-            if (e.target === menuPanel) {
-                menuPanel.classList.remove('active');
-            }
-        });
+        if (menuPanel) {
+            menuPanel.addEventListener('click', (e) => {
+                if (e.target === menuPanel) {
+                    menuPanel.classList.remove('active');
+                }
+            });
+        }
     </script>
 </body>
 </html>
