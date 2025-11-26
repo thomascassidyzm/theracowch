@@ -307,6 +307,37 @@ function handleHashNavigation() {
         exercisePanel.classList.add('active');
         // Clear hash to avoid re-triggering
         history.replaceState(null, null, ' ');
+    } else if (hash.startsWith('exercise-')) {
+        // Open specific interactive exercise
+        const exerciseType = hash.replace('exercise-', '');
+        setTimeout(() => {
+            openInteractiveExercise(exerciseType);
+        }, 300);
+        history.replaceState(null, null, ' ');
+    }
+}
+
+// Open a specific interactive exercise by type
+function openInteractiveExercise(type) {
+    switch(type) {
+        case 'breathing':
+            if (breathingModal) breathingModal.classList.add('active');
+            break;
+        case 'grounding':
+            if (groundingModal) groundingModal.classList.add('active');
+            break;
+        case 'pmr':
+            if (pmrModal) pmrModal.classList.add('active');
+            break;
+        case 'ladder':
+            if (ladderModal) ladderModal.classList.add('active');
+            break;
+        case 'social':
+            if (socialModal) socialModal.classList.add('active');
+            break;
+        case 'weather':
+            if (weatherModal) weatherModal.classList.add('active');
+            break;
     }
 }
 

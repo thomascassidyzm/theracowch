@@ -635,6 +635,14 @@
             border-color: var(--accent-primary);
         }
 
+        .exercise-card.interactive {
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .exercise-card.interactive h4 {
+            color: var(--accent-primary);
+        }
+
         .exercise-card-header {
             display: flex;
             align-items: flex-start;
@@ -1425,8 +1433,8 @@
                 color: '#7EA88B',
                 description: 'Mindfulness helps you step out of autopilot and into the present moment. These exercises help calm your nervous system and anchor you in the here and now.',
                 exercises: [
-                    { title: 'Box Breathing', description: '4-4-4-4 breathing to calm your nervous system', duration: '4 min', prompt: 'Can you guide me through box breathing?' },
-                    { title: '5-4-3-2-1 Grounding', description: 'Use your senses to anchor in the present', duration: '3 min', prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?' },
+                    { title: 'Box Breathing', description: '4-4-4-4 breathing to calm your nervous system', duration: '4 min', interactive: 'breathing', prompt: 'Can you guide me through box breathing?' },
+                    { title: '5-4-3-2-1 Grounding', description: 'Use your senses to anchor in the present', duration: '3 min', interactive: 'grounding', prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?' },
                     { title: 'Give Your Brain a Breather', description: 'A 2-minute mindfulness reset', duration: '2 min', prompt: 'Can you guide me through a 2-minute mind unclutter exercise? I need to step out of constant thinking and just notice.' }
                 ]
             },
@@ -1460,7 +1468,7 @@
                 color: '#6B8E9F',
                 description: 'We\'re social creatures, and connection matters for wellbeing. These exercises help you notice your interaction patterns and take small steps toward meaningful connection.',
                 exercises: [
-                    { title: 'How Connected Was Today?', description: 'Build awareness of your daily interaction levels', duration: '2 min', prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.' },
+                    { title: 'How Connected Was Today?', description: 'Build awareness of your daily interaction levels', duration: '2 min', interactive: 'social', prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.' },
                     { title: 'Who Did I See This Week?', description: 'Spot patterns in how often you connect', prompt: "Can you help me with the connection tracker? I want to reflect on who I've connected with this week." },
                     { title: 'A Small Step Away From Isolation', description: 'Break isolation with one tiny, achievable action', prompt: 'Can you guide me through the one-step outward challenge? I want to take a small step toward connection today.' }
                 ]
@@ -1487,7 +1495,8 @@
                     { title: 'What\'s Protecting You... and Limiting You?', description: 'Identify behaviours that block growth', prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.' },
                     { title: 'Grow Without Overwhelm', description: 'Try something 10% more challenging', prompt: 'Can you guide me through the 10% stretch exercise? I want to gently push my comfort zone without overwhelming myself.' },
                     { title: 'Investigate Instead of Assuming', description: 'Replace anxious predictions with curiosity', prompt: "Can you help me be a curious detective? I have a situation where I'm assuming the worst and want to gather real evidence instead." },
-                    { title: 'Explore Your Inner Landscape', description: 'Check in with your internal state without judgment', duration: '3 min', prompt: "Can you guide me through an inner weather report? I want to explore what's happening inside me right now." }
+                    { title: 'Uncertainty Ladder', description: 'Build tolerance for uncertainty in gradual steps', interactive: 'ladder', prompt: 'Can you help me with the uncertainty ladder? I want to practice tolerating uncertainty in small, manageable steps.' },
+                    { title: 'Inner Weather Report', description: 'Check in with your internal state without judgment', duration: '3 min', interactive: 'weather', prompt: "Can you guide me through an inner weather report? I want to explore what's happening inside me right now." }
                 ]
             }
         };
@@ -1519,10 +1528,12 @@
                     <p>${domain.description}</p>
                 </div>
                 <div class="exercise-list">
-                    ${domain.exercises.map(ex => `
-                        <div class="exercise-card" data-prompt="${ex.prompt.replace(/"/g, '&quot;')}">
+                    ${domain.exercises.map((ex, i) => `
+                        <div class="exercise-card ${ex.interactive ? 'interactive' : ''}"
+                             data-prompt="${ex.prompt.replace(/"/g, '&quot;')}"
+                             data-interactive="${ex.interactive || ''}">
                             <div class="exercise-card-header">
-                                <h4>${ex.title}</h4>
+                                <h4>${ex.interactive ? '▶ ' : ''}${ex.title}</h4>
                                 ${ex.duration ? `<span class="exercise-duration">${ex.duration}</span>` : ''}
                             </div>
                             <p>${ex.description}</p>
@@ -1537,8 +1548,16 @@
             // Add click handlers for exercise cards
             domainPanelContent.querySelectorAll('.exercise-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    const prompt = card.dataset.prompt;
-                    triggerChatWithPrompt(prompt);
+                    const interactive = card.dataset.interactive;
+                    if (interactive) {
+                        // Open interactive exercise in chat.html
+                        closeDomainPanel();
+                        window.location.href = `/chat.html#exercise-${interactive}`;
+                    } else {
+                        // Send prompt to chat
+                        const prompt = card.dataset.prompt;
+                        triggerChatWithPrompt(prompt);
+                    }
                 });
             });
 
