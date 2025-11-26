@@ -1,12 +1,14 @@
-const CACHE_NAME = 'cowch-wellness-v8';
+const CACHE_NAME = 'cowch-wellness-v9';
 const urlsToCache = [
   '/',
+  '/app.html',
   '/index.html',
   '/manifest.json',
   '/offline.html',
-  '/assets/theracowch_main_image.jpg',
-  'https://unpkg.com/vue@3/dist/vue.global.prod.js',
-  'https://cdn.tailwindcss.com'
+  '/notice.html',
+  '/choice.html',
+  '/values.html',
+  '/assets/theracowch_main_image.jpg'
 ];
 
 // Install event - cache resources
