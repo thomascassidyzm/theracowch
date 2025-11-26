@@ -93,6 +93,7 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -112,6 +113,30 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
+}
+
+/* Touch Optimization for Buttons and Interactive Elements */
+button,
+.send-button,
+.menu-toggle,
+.quick-prompt-btn,
+.panel-back-btn,
+.clear-chat-btn,
+[role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+/* Allow Text Selection in Message Content */
+.message-content,
+.message-text,
+.chat-input {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 /* Header - Glassmorphism */
@@ -232,6 +257,7 @@ body {
     font-size: 1.05rem;
     animation: messageSlideIn 0.3s ease-out;
     box-shadow: var(--shadow);
+    will-change: transform, opacity;
 }
 
 @keyframes messageSlideIn {
@@ -508,6 +534,7 @@ body {
     overflow-y: auto;
     box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.5);
     animation: modalSlideIn 0.3s ease-out;
+    will-change: transform;
 }
 
 @keyframes modalSlideIn {
@@ -883,10 +910,21 @@ body {
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    will-change: transform;
 }
 
 .slide-panel.active {
     right: 0;
+}
+
+/* Specific Panel Types - Touch Behavior */
+.menu-panel,
+.imagine-panel,
+.exercise-panel {
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .slide-panel-header {
@@ -1153,6 +1191,7 @@ body {
     color: white;
     font-size: 3rem;
     transition: transform 4s cubic-bezier(0.45, 0, 0.55, 1), font-size 4s cubic-bezier(0.45, 0, 0.55, 1);
+    will-change: transform, font-size;
 }
 
 .breathing-circle.inhale {

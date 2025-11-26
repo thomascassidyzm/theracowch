@@ -1,8 +1,9 @@
-const CACHE_NAME = 'cowch-wellness-v6';
+const CACHE_NAME = 'cowch-wellness-v7';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/offline.html',
   '/assets/theracowch_main_image.jpg',
   'https://unpkg.com/vue@3/dist/vue.global.prod.js',
   'https://cdn.tailwindcss.com'
@@ -21,6 +22,47 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
+  // Handle API calls with network-first strategy
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Clone and cache successful API responses
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Return cached response if network fails
+          return caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Return a fallback JSON response for chat API
+            return new Response(JSON.stringify({
+              response: "I'm currently offline, but I'm still here for you. Please check your connection and try again. 🐄",
+              offline: true
+            }), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  // For navigation requests (HTML pages), serve offline.html as fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  // For all other requests, use cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

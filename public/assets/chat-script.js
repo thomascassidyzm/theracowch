@@ -85,6 +85,33 @@ let isTyping = false;
 let currentPrompt = null;
 
 // ================================
+// Haptic Feedback
+// ================================
+
+// Haptic feedback utility for native feel
+function hapticFeedback(type = 'light') {
+  if (!navigator.vibrate) return;
+
+  switch(type) {
+    case 'light':
+      navigator.vibrate(10);
+      break;
+    case 'medium':
+      navigator.vibrate(20);
+      break;
+    case 'heavy':
+      navigator.vibrate(30);
+      break;
+    case 'success':
+      navigator.vibrate([10, 50, 20]);
+      break;
+    case 'error':
+      navigator.vibrate([30, 50, 30, 50, 30]);
+      break;
+  }
+}
+
+// ================================
 // Initialize
 // ================================
 
@@ -99,6 +126,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Handle hash navigation (e.g., #privacy, #exercises)
     handleHashNavigation();
+
+    // Add swipe-to-dismiss to modals
+    addSwipeToDismiss(breathingModal, () => {
+        stopBreathing();
+        breathingModal.classList.remove('active');
+    });
+    addSwipeToDismiss(groundingModal, () => {
+        stopGrounding();
+        groundingModal.classList.remove('active');
+    });
+    addSwipeToDismiss(pmrModal, () => {
+        stopPMR();
+        pmrModal.classList.remove('active');
+    });
 
     focusInput();
 });
@@ -138,6 +179,7 @@ function setupEventListeners() {
     const quickPromptButtons = document.querySelectorAll('.quick-prompt-btn');
     quickPromptButtons.forEach(btn => {
         btn.addEventListener('click', () => {
+            hapticFeedback('light');
             const prompt = btn.dataset.prompt;
             chatInput.value = prompt;
             handleSendMessage();
@@ -145,8 +187,14 @@ function setupEventListeners() {
     });
 
     // Menu Panel
-    menuButton.addEventListener('click', () => menuPanel.classList.add('active'));
-    closeMenuPanelButton.addEventListener('click', () => menuPanel.classList.remove('active'));
+    menuButton.addEventListener('click', () => {
+        hapticFeedback('light');
+        menuPanel.classList.add('active');
+    });
+    closeMenuPanelButton.addEventListener('click', () => {
+        hapticFeedback('light');
+        menuPanel.classList.remove('active');
+    });
 
     // Menu options
     clearChatButton.addEventListener('click', handleClearChat);
@@ -269,6 +317,9 @@ async function handleSendMessage() {
     const message = chatInput.value.trim();
 
     if (!message || isTyping) return;
+
+    // Haptic feedback for send action
+    hapticFeedback('light');
 
     // Hide quick prompts after first message
     const quickPrompts = document.getElementById('quick-prompts');
@@ -699,7 +750,9 @@ function showWelcomeMessage() {
 // ================================
 
 function handleClearChat() {
+    hapticFeedback('medium');
     showConfirm('Are you sure you want to clear this conversation? This cannot be undone.', () => {
+        hapticFeedback('medium');
         conversationHistory = [];
         chatMessages.innerHTML = '';
         showWelcomeMessage();
@@ -1227,6 +1280,7 @@ const BREATHING_PHASES = [
 ];
 
 function startBreathingExercise() {
+    hapticFeedback('success');
     startBreathingButton.textContent = 'Pause';
     startBreathingButton.removeEventListener('click', startBreathingExercise);
     startBreathingButton.addEventListener('click', pauseBreathing);
@@ -1310,6 +1364,7 @@ const GROUNDING_PHASES = [
 ];
 
 function startGroundingExercise() {
+    hapticFeedback('success');
     groundingPhase = 0;
     groundingChecks = 0;
     showGroundingPhase();
@@ -1426,6 +1481,7 @@ const PMR_SEQUENCE = [
 ];
 
 function startPMRExercise() {
+    hapticFeedback('success');
     pmrPhase = 0;
     startPmrButton.textContent = 'Next';
     startPmrButton.removeEventListener('click', startPMRExercise);
@@ -1488,6 +1544,131 @@ function stopPMR() {
     startPmrButton.textContent = 'Start';
     startPmrButton.removeEventListener('click', advancePMR);
     startPmrButton.addEventListener('click', startPMRExercise);
+}
+
+// ================================
+// Swipe-to-Dismiss for Modals
+// ================================
+
+// Swipe down to dismiss modal
+function addSwipeToDismiss(modalElement, closeCallback) {
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
+
+  modalElement.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    isDragging = true;
+  }, { passive: true });
+
+  modalElement.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+
+    if (deltaY > 0) {
+      modalElement.style.transform = `translateY(${deltaY}px)`;
+      modalElement.style.opacity = Math.max(0.5, 1 - deltaY / 300);
+    }
+  }, { passive: true });
+
+  modalElement.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const deltaY = currentY - startY;
+    if (deltaY > 100) {
+      hapticFeedback('light');
+      closeCallback();
+    }
+
+    modalElement.style.transform = '';
+    modalElement.style.opacity = '';
+  }, { passive: true });
+}
+
+// ================================
+// PWA Install Prompt
+// ================================
+
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  // Check if already installed or dismissed
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (localStorage.getItem('installBannerDismissed')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.innerHTML = `
+    <div style="
+      position: fixed;
+      bottom: 100px;
+      left: 1rem;
+      right: 1rem;
+      background: rgba(45, 40, 35, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    ">
+      <span style="font-size: 2rem;">🐄</span>
+      <div style="flex: 1;">
+        <div style="color: #F5F0EA; font-weight: 600; margin-bottom: 0.25rem;">Install Cowch</div>
+        <div style="color: rgba(245,240,234,0.6); font-size: 0.875rem;">Add to home screen for the best experience</div>
+      </div>
+      <button id="install-btn" style="
+        background: #E88A6A;
+        color: #1C1714;
+        border: none;
+        padding: 0.625rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        touch-action: manipulation;
+      ">Install</button>
+      <button id="dismiss-install" style="
+        background: transparent;
+        border: none;
+        color: rgba(245,240,234,0.5);
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0.5rem;
+      ">×</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    hapticFeedback('medium');
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        hapticFeedback('success');
+      }
+      deferredPrompt = null;
+    }
+    banner.remove();
+  });
+
+  document.getElementById('dismiss-install').addEventListener('click', () => {
+    hapticFeedback('light');
+    localStorage.setItem('installBannerDismissed', 'true');
+    banner.remove();
+  });
 }
 
 // Debug info
