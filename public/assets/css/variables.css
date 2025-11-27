@@ -43,6 +43,15 @@
     --accent-hover: #F29D7E;
     --accent-glow: rgba(232, 138, 106, 0.25);
 
+    /* IMAGINE Domain Colors */
+    --color-self: #E88A6A;
+    --color-mind: #7EA88B;
+    --color-accept: #B8860B;
+    --color-thanks: #DDA0DD;
+    --color-connect: #6B8E9F;
+    --color-play: #F4A460;
+    --color-explore: #8FBC8F;
+
     /* Glassmorphism */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-bg-strong: rgba(255, 255, 255, 0.08);
