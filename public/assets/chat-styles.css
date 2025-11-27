@@ -849,7 +849,7 @@ button,
     }
 
     body {
-        max-width: 430px;
+        max-width: 500px;
         margin: 0 auto;
         box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
         border-left: 1px solid var(--glass-border);
@@ -858,32 +858,33 @@ button,
     }
 
     .header {
-        max-width: 430px;
+        max-width: 500px;
     }
 
     .tab-bar {
-        max-width: 430px;
+        max-width: 500px;
         left: 50%;
         transform: translateX(-50%);
     }
 
     .chat-input-container {
-        max-width: 430px;
+        max-width: 500px;
         left: 50%;
         transform: translateX(-50%);
     }
 
     .quick-prompts {
-        max-width: 430px;
+        max-width: 500px;
         left: 50%;
         transform: translateX(-50%);
     }
 
     .slide-panel {
-        max-width: 430px;
+        max-width: 500px;
         left: 50%;
         right: auto;
-        transform: translateX(50%);
+        /* Hide off-screen to the right */
+        transform: translateX(100%);
     }
 
     .slide-panel.active {
@@ -891,7 +892,7 @@ button,
     }
 
     .exercise-modal {
-        max-width: 430px;
+        max-width: 500px;
         left: 50%;
         right: auto;
         transform: translateX(-50%);

@@ -1376,7 +1376,7 @@
             }
 
             .app-container {
-                max-width: 430px;
+                max-width: 500px;
                 margin: 0 auto;
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
                 border-left: 1px solid var(--glass-border);
@@ -1385,22 +1385,23 @@
             }
 
             .tab-bar {
-                max-width: 430px;
+                max-width: 500px;
                 left: 50%;
                 transform: translateX(-50%);
             }
 
             .chat-input-area {
-                max-width: 430px;
+                max-width: 500px;
                 left: 50%;
                 transform: translateX(-50%);
             }
 
             .domain-panel {
-                max-width: 430px;
+                max-width: 500px;
                 left: 50%;
                 right: auto;
-                transform: translateX(50%);
+                /* Hide off-screen to the right */
+                transform: translateX(100%);
             }
 
             .domain-panel.active {
@@ -1408,7 +1409,7 @@
             }
 
             .ios-install-prompt {
-                max-width: 430px;
+                max-width: 500px;
                 left: 50%;
                 transform: translateX(-50%);
             }
