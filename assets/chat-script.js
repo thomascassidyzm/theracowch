@@ -46,6 +46,13 @@ const talkAboutBreathingButton = document.getElementById('talk-about-breathing')
 const breathingCircle = document.getElementById('breathing-circle');
 const breathingInstruction = document.getElementById('breathing-instruction');
 
+// Other exercise modals
+const groundingModal = document.getElementById('grounding-modal');
+const pmrModal = document.getElementById('pmr-modal');
+const ladderModal = document.getElementById('ladder-modal');
+const socialModal = document.getElementById('social-modal');
+const weatherModal = document.getElementById('weather-modal');
+
 // On-Demand Prompts
 const promptButton = document.getElementById('prompt-button');
 const promptBanner = document.getElementById('prompt-banner');
@@ -80,6 +87,9 @@ window.addEventListener('DOMContentLoaded', () => {
         quickPromptsContainer.style.display = 'none';
         document.body.classList.add('prompts-hidden');
     }
+
+    // Check for exercise hash in URL (e.g., from app.html)
+    handleExerciseHash();
 });
 
 // ================================
@@ -116,8 +126,19 @@ function setupEventListeners() {
     });
 
     // Menu options
-    clearChatButton.addEventListener('click', handleClearChat);
-    privacyInfoButton.addEventListener('click', handlePrivacyInfo);
+    if (clearChatButton) clearChatButton.addEventListener('click', handleClearChat);
+    if (privacyInfoButton) privacyInfoButton.addEventListener('click', handlePrivacyInfo);
+
+    // New Chat button in header
+    const newChatBtn = document.getElementById('new-chat-btn');
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            conversationHistory = [];
+            chatMessages.innerHTML = '';
+            showWelcomeMessage();
+            saveChatHistory();
+        });
+    }
 
     // Slide panels
     openImaginePanelButton.addEventListener('click', () => {
@@ -160,12 +181,56 @@ function setupEventListeners() {
         }
     });
 
+    // Close buttons for other exercise modals
+    const closeGroundingBtn = document.getElementById('close-grounding');
+    const closePmrBtn = document.getElementById('close-pmr');
+    const closeLadderBtn = document.getElementById('close-ladder');
+    const closeSocialBtn = document.getElementById('close-social');
+    const closeWeatherBtn = document.getElementById('close-weather');
+
+    if (closeGroundingBtn) {
+        closeGroundingBtn.addEventListener('click', () => groundingModal?.classList.remove('active'));
+    }
+    if (closePmrBtn) {
+        closePmrBtn.addEventListener('click', () => pmrModal?.classList.remove('active'));
+    }
+    if (closeLadderBtn) {
+        closeLadderBtn.addEventListener('click', () => ladderModal?.classList.remove('active'));
+    }
+    if (closeSocialBtn) {
+        closeSocialBtn.addEventListener('click', () => socialModal?.classList.remove('active'));
+    }
+    if (closeWeatherBtn) {
+        closeWeatherBtn.addEventListener('click', () => weatherModal?.classList.remove('active'));
+    }
+
+    // Close modals on backdrop click for all exercise modals
+    [groundingModal, pmrModal, ladderModal, socialModal, weatherModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+    });
+
     // Escape key closes panels and modals
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (breathingModal.classList.contains('active')) {
                 stopBreathing();
                 breathingModal.classList.remove('active');
+            } else if (groundingModal?.classList.contains('active')) {
+                groundingModal.classList.remove('active');
+            } else if (pmrModal?.classList.contains('active')) {
+                pmrModal.classList.remove('active');
+            } else if (ladderModal?.classList.contains('active')) {
+                ladderModal.classList.remove('active');
+            } else if (socialModal?.classList.contains('active')) {
+                socialModal.classList.remove('active');
+            } else if (weatherModal?.classList.contains('active')) {
+                weatherModal.classList.remove('active');
             } else if (imaginePanel.classList.contains('active')) {
                 imaginePanel.classList.remove('active');
             } else if (exercisePanel.classList.contains('active')) {
@@ -905,6 +970,42 @@ function stopBreathing() {
     startBreathingButton.removeEventListener('click', resumeBreathing);
     startBreathingButton.addEventListener('click', startBreathingExercise);
 }
+
+// ================================
+// Hash-based Exercise Opening
+// ================================
+
+function handleExerciseHash() {
+    const hash = window.location.hash;
+    if (!hash || !hash.startsWith('#exercise-')) return;
+
+    const exerciseType = hash.replace('#exercise-', '');
+    console.log('Opening exercise from hash:', exerciseType);
+
+    // Map exercise types to their modals
+    const exerciseModals = {
+        'breathing': breathingModal,
+        'grounding': groundingModal,
+        'pmr': pmrModal,
+        'ladder': ladderModal,
+        'social': socialModal,
+        'weather': weatherModal
+    };
+
+    const modal = exerciseModals[exerciseType];
+    if (modal) {
+        // Small delay to ensure page is ready
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 300);
+
+        // Clear the hash so refreshing doesn't reopen
+        history.replaceState(null, '', window.location.pathname);
+    }
+}
+
+// Also listen for hash changes (in case user navigates back)
+window.addEventListener('hashchange', handleExerciseHash);
 
 // Debug info
 console.log('Cowch Chat initialized');
