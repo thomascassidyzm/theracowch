@@ -261,7 +261,7 @@ function setupDomainPanel() {
                 if (interactive) {
                     // Open interactive exercise in chat.html
                     closeDomainPanel();
-                    window.location.href = `chat.html#exercise-${interactive}`;
+                    window.location.href = `/chat.html#exercise-${interactive}`;
                 } else {
                     // Send prompt to chat
                     const prompt = card.dataset.prompt;
