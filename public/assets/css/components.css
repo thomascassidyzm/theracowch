@@ -274,6 +274,65 @@
     font-size: 1.5rem;
 }
 
+.header-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.header-btn:hover {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+}
+
+.header-btn:active {
+    transform: scale(0.95);
+}
+
+.header-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ============================================
+   Menu Options
+   ============================================ */
+
+.menu-option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+
+.menu-option:hover {
+    background: var(--glass-bg);
+    color: var(--accent-primary);
+}
+
+.menu-option:active {
+    transform: scale(0.98);
+}
+
 /* ============================================
    Modal / Overlay
    ============================================ */

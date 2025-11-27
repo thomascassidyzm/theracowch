@@ -538,6 +538,33 @@ function setupClearHistory() {
     });
 }
 
+// ============================================
+// Settings Buttons
+// ============================================
+
+function setupSettingsButtons() {
+    // Privacy button - navigate to chat with privacy info
+    const privacyBtn = document.getElementById('privacy-btn');
+    if (privacyBtn) {
+        privacyBtn.addEventListener('click', () => {
+            window.location.href = '/chat.html#privacy';
+        });
+    }
+
+    // About button - ask Mandy about herself
+    const aboutBtn = document.getElementById('about-btn');
+    if (aboutBtn) {
+        aboutBtn.addEventListener('click', () => {
+            switchTab('chat');
+            setTimeout(() => {
+                chatInput.value = "Tell me about yourself, Mandy. What's the IMAGINE framework and how can you help me?";
+                chatInput.dispatchEvent(new Event('input'));
+                sendMessage();
+            }, 300);
+        });
+    }
+}
+
 function clearConversation() {
     localStorage.removeItem(STORAGE_KEY);
     conversationHistory = [];
@@ -677,6 +704,7 @@ function init() {
     setupChat();
     setupQuickCheckin();
     setupClearHistory();
+    setupSettingsButtons();
     loadChatHistory();
     updateImagineTracker();
     setupIOSInstallPrompt();

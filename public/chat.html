@@ -72,10 +72,34 @@
 
     <!-- Header -->
     <header class="header">
-        <div class="header-spacer"></div>
+        <button class="header-btn" id="menu-button" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
         <h1 class="header-title">🐄 Mandy</h1>
         <button class="new-chat-btn" id="new-chat-btn" aria-label="New Chat">New Chat</button>
     </header>
+
+    <!-- Menu Panel -->
+    <div class="slide-panel" id="menu-panel">
+        <div class="slide-panel-header">
+            <button class="slide-panel-back" id="close-menu-panel" aria-label="Close menu">← Close</button>
+            <h2>Menu</h2>
+        </div>
+        <div class="slide-panel-content">
+            <a href="/app.html#home" class="menu-option">🏠 Home</a>
+            <button class="menu-option" id="open-imagine-panel">🧭 IMAGINE Framework</button>
+            <button class="menu-option" id="open-exercise-panel">💪 Exercise Library</button>
+            <a href="/notice.html" class="menu-option">✨ Notice</a>
+            <a href="/choice.html" class="menu-option">🌳 Choice</a>
+            <a href="/values.html" class="menu-option">🎯 Values</a>
+            <button class="menu-option" id="privacy-info">🔒 Privacy & Safety</button>
+            <button class="menu-option" id="clear-chat">🗑️ Clear Chat History</button>
+        </div>
+    </div>
 
     <!-- On-Demand Prompt Banner (hidden by default) -->
     <div class="prompt-banner hidden" id="prompt-banner">
