@@ -1017,6 +1017,178 @@
             clip: rect(0, 0, 0, 0);
             border: 0;
         }
+
+        /* ============================================
+           iOS Install Prompt
+           ============================================ */
+
+        .ios-install-prompt {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .ios-install-prompt.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ios-install-card {
+            background: var(--bg-elevated);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .ios-install-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: var(--glass-bg);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ios-install-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .ios-install-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .ios-install-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .ios-install-steps {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ios-install-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ios-step-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--glass-strong);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .ios-step-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--accent-primary);
+        }
+
+        .ios-step-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .ios-step-number {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        .ios-install-step .ios-step-icon {
+            position: relative;
+        }
+
+        .ios-install-arrow {
+            position: absolute;
+            bottom: calc(100% + 1rem);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .ios-install-arrow svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--accent-primary);
+            stroke-width: 3;
+        }
+
+        .ios-install-arrow span {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .ios-install-later {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        .ios-install-later:hover {
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
@@ -1026,6 +1198,45 @@
             <span>🐄</span>
         </div>
         <p class="onboarding-text" id="onboarding-text">Take a breath...</p>
+    </div>
+
+    <!-- iOS Install Prompt -->
+    <div class="ios-install-prompt" id="ios-install-prompt">
+        <div class="ios-install-arrow">
+            <span>Tap here first</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
+        <div class="ios-install-card">
+            <button class="ios-install-close" id="ios-install-close">×</button>
+            <div class="ios-install-icon">🐄</div>
+            <h2 class="ios-install-title">Add Cowch to Home Screen</h2>
+            <p class="ios-install-subtitle">Get the full experience - no browser bars, works offline, always one tap away.</p>
+
+            <div class="ios-install-steps">
+                <div class="ios-install-step">
+                    <div class="ios-step-icon">
+                        <span class="ios-step-number">1</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                    </div>
+                    <span class="ios-step-label">Tap Share</span>
+                </div>
+                <div class="ios-install-step">
+                    <div class="ios-step-icon">
+                        <span class="ios-step-number">2</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </div>
+                    <span class="ios-step-label">Add to Home</span>
+                </div>
+            </div>
+
+            <button class="ios-install-later" id="ios-install-later">Maybe later</button>
+        </div>
     </div>
 
     <!-- Main App Container -->
@@ -1856,6 +2067,90 @@
         });
 
         // ============================================
+        // iOS Install Prompt
+        // ============================================
+
+        function isIOSSafari() {
+            const ua = window.navigator.userAgent;
+            const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+            const webkit = !!ua.match(/WebKit/i);
+            const notChrome = !ua.match(/CriOS/i);
+            const notFirefox = !ua.match(/FxiOS/i);
+            return iOS && webkit && notChrome && notFirefox;
+        }
+
+        function isInStandaloneMode() {
+            return window.navigator.standalone === true ||
+                   window.matchMedia('(display-mode: standalone)').matches;
+        }
+
+        function showIOSInstallPrompt() {
+            const prompt = document.getElementById('ios-install-prompt');
+            if (prompt) {
+                prompt.classList.add('active');
+            }
+        }
+
+        function hideIOSInstallPrompt() {
+            const prompt = document.getElementById('ios-install-prompt');
+            if (prompt) {
+                prompt.classList.remove('active');
+            }
+        }
+
+        function setupIOSInstallPrompt() {
+            // Only show on iOS Safari, not already in PWA mode
+            if (!isIOSSafari() || isInStandaloneMode()) {
+                return;
+            }
+
+            const dismissedKey = 'cowch-ios-install-dismissed';
+            const dismissedTime = localStorage.getItem(dismissedKey);
+
+            // If dismissed less than 3 days ago, don't show
+            if (dismissedTime) {
+                const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
+                if (daysSinceDismissed < 3) {
+                    return;
+                }
+            }
+
+            // Show prompt after a short delay (let them see the app first)
+            setTimeout(() => {
+                showIOSInstallPrompt();
+            }, 2000);
+
+            // Close button
+            const closeBtn = document.getElementById('ios-install-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    hideIOSInstallPrompt();
+                    localStorage.setItem(dismissedKey, Date.now().toString());
+                });
+            }
+
+            // Maybe later button
+            const laterBtn = document.getElementById('ios-install-later');
+            if (laterBtn) {
+                laterBtn.addEventListener('click', () => {
+                    hideIOSInstallPrompt();
+                    localStorage.setItem(dismissedKey, Date.now().toString());
+                });
+            }
+
+            // Click outside to dismiss
+            const prompt = document.getElementById('ios-install-prompt');
+            if (prompt) {
+                prompt.addEventListener('click', (e) => {
+                    if (e.target === prompt) {
+                        hideIOSInstallPrompt();
+                        localStorage.setItem(dismissedKey, Date.now().toString());
+                    }
+                });
+            }
+        }
+
+        // ============================================
         // Initialize
         // ============================================
 
@@ -1866,6 +2161,9 @@
 
             // Update IMAGINE tracker from localStorage
             updateImagineTracker();
+
+            // Show iOS install prompt if applicable
+            setupIOSInstallPrompt();
         }
 
         function updateImagineTracker() {
