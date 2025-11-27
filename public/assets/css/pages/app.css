@@ -1030,31 +1030,3 @@
     padding: var(--space-sm);
 }
 
-/* ============================================
-   Desktop Responsive
-   ============================================ */
-
-@media (min-width: 768px) {
-    .domain-panel {
-        max-width: 500px;
-        left: 50%;
-        right: auto;
-        transform: translateX(100%);
-    }
-
-    .domain-panel.active {
-        transform: translateX(-50%);
-    }
-
-    .chat-input-area {
-        max-width: 500px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .ios-install-prompt {
-        max-width: 500px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-}

@@ -693,42 +693,6 @@ body {
 }
 
 /* ============================================
-   Desktop Responsive
-   ============================================ */
-
-@media (min-width: 768px) {
-    .chat-input-container {
-        max-width: 500px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .quick-prompts {
-        max-width: 500px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .slide-panel {
-        max-width: 500px;
-        left: 50%;
-        right: auto;
-        transform: translateX(100%);
-    }
-
-    .slide-panel.active {
-        transform: translateX(-50%);
-    }
-
-    .exercise-modal {
-        max-width: 500px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-    }
-}
-
-/* ============================================
    Mobile Adjustments
    ============================================ */
 
