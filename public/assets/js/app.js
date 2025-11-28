@@ -210,6 +210,17 @@ const IMAGINE_DOMAINS = {
     }
 };
 
+// Domain to page URL mapping
+const DOMAIN_PAGES = {
+    self: '/imagine/self.html',
+    mind: '/imagine/mindfulness.html',
+    accept: '/imagine/acceptance.html',
+    thanks: '/imagine/gratitude.html',
+    connect: '/imagine/interactions.html',
+    play: '/imagine/nurturing.html',
+    explore: '/imagine/exploring.html'
+};
+
 function setupDomainPanel() {
     const domainPanel = document.getElementById('domain-panel');
     const domainPanelBack = document.getElementById('domain-panel-back');
@@ -217,11 +228,39 @@ function setupDomainPanel() {
     const domainPanelSubtitle = document.getElementById('domain-panel-subtitle');
     const domainPanelContent = document.getElementById('domain-panel-content');
 
-    // Open domain panel when clicking a domain card
+    // Navigate to section page when clicking a domain card
     document.querySelectorAll('.domain-card').forEach(card => {
         card.addEventListener('click', () => {
             const domainKey = card.dataset.domain;
-            openDomainPanel(domainKey);
+            const pageUrl = DOMAIN_PAGES[domainKey];
+            if (pageUrl) {
+                window.location.href = pageUrl;
+            } else {
+                // Fallback to panel for unmapped domains
+                openDomainPanel(domainKey);
+            }
+        });
+    });
+
+    // Also handle IMAGINE mini letters on home tab
+    document.querySelectorAll('.imagine-mini-letter').forEach(letter => {
+        letter.addEventListener('click', () => {
+            const domainKey = letter.dataset.domain;
+            // Map mini letter data-domain to actual domain keys
+            const domainMap = {
+                'I': 'self',
+                'M': 'mind',
+                'A': 'accept',
+                'G': 'thanks',
+                'I2': 'connect',
+                'N': 'play',
+                'E': 'explore'
+            };
+            const actualDomain = domainMap[domainKey] || domainKey;
+            const pageUrl = DOMAIN_PAGES[actualDomain];
+            if (pageUrl) {
+                window.location.href = pageUrl;
+            }
         });
     });
 
