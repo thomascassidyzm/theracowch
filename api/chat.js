@@ -104,7 +104,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, conversationHistory, currentPattern, sessionPhase } = req.body;
+    const { message, history, conversationHistory, currentPattern, sessionPhase } = req.body;
+
+    // Support both 'history' (new frontend) and 'conversationHistory' (legacy)
+    const chatHistory = history || conversationHistory || [];
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -155,13 +158,15 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
     ];
 
     // Add conversation history (last 6 messages to prevent context overflow)
-    if (conversationHistory && conversationHistory.length > 0) {
-      const recentHistory = conversationHistory.slice(-6);
+    if (chatHistory && chatHistory.length > 0) {
+      const recentHistory = chatHistory.slice(-6);
       recentHistory.forEach(msg => {
-        if (msg.sender === 'user') {
-          messages.push({ role: 'user', content: msg.text });
-        } else if (msg.sender === 'ai_mandy') {
-          messages.push({ role: 'assistant', content: msg.text });
+        // Support both formats: {role, content} (new) and {sender, text} (legacy)
+        const role = msg.role || (msg.sender === 'user' ? 'user' : 'assistant');
+        const content = msg.content || msg.text;
+
+        if (role === 'user' || role === 'assistant') {
+          messages.push({ role, content });
         }
       });
     }
