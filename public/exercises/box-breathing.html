@@ -259,6 +259,79 @@
                     drop-shadow(0 0 60px rgba(224, 120, 80, 0.15));
         }
 
+        /* Inner breathing shape - mimics lungs filling/emptying */
+        .breath-shape {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%) scale(0.4);
+            background: radial-gradient(ellipse at center,
+                rgba(255, 120, 80, 0.3) 0%,
+                rgba(255, 100, 60, 0.15) 50%,
+                transparent 70%
+            );
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.3s ease;
+            pointer-events: none;
+        }
+
+        /* Expanded state - full lungs */
+        .breath-shape.expanded {
+            transform: translate(-50%, -50%) scale(1);
+            background: radial-gradient(ellipse at center,
+                rgba(255, 100, 50, 0.5) 0%,
+                rgba(255, 80, 40, 0.3) 40%,
+                rgba(255, 60, 30, 0.1) 70%,
+                transparent 85%
+            );
+        }
+
+        /* Contracted state - empty lungs */
+        .breath-shape.contracted {
+            transform: translate(-50%, -50%) scale(0.4);
+            background: radial-gradient(ellipse at center,
+                rgba(180, 140, 120, 0.2) 0%,
+                rgba(160, 120, 100, 0.1) 50%,
+                transparent 70%
+            );
+        }
+
+        /* Hold states - add subtle pulse */
+        .breath-shape.hold-full {
+            transform: translate(-50%, -50%) scale(1);
+            animation: breathPulse 1.5s ease-in-out infinite;
+        }
+
+        .breath-shape.hold-empty {
+            transform: translate(-50%, -50%) scale(0.4);
+            animation: breathPulseSmall 1.5s ease-in-out infinite;
+        }
+
+        @keyframes breathPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 0.85;
+            }
+        }
+
+        @keyframes breathPulseSmall {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0.4);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(0.45);
+                opacity: 0.7;
+            }
+        }
+
         /* Glow effect on the leading edge */
         .box-glow {
             position: absolute;
@@ -598,6 +671,8 @@
                     <!-- Animated progress - draws clockwise from top-left -->
                     <rect class="box-progress" id="boxProgress" x="8" y="8" width="244" height="244" rx="24"/>
                 </svg>
+                <!-- Inner breathing shape - the "lungs" -->
+                <div class="breath-shape" id="breathShape"></div>
                 <!-- Labels on each side -->
                 <div class="box-labels">
                     <span class="box-label top" id="labelTop">Inhale</span>
@@ -681,6 +756,7 @@
         const stopBtn = document.getElementById('stopBtn');
         const restartBtn = document.getElementById('restartBtn');
         const boxProgress = document.getElementById('boxProgress');
+        const breathShape = document.getElementById('breathShape');
         const phaseIndicator = document.getElementById('phaseIndicator');
         const phaseInstruction = document.getElementById('phaseInstruction');
         const elapsedTime = document.getElementById('elapsedTime');
@@ -688,6 +764,7 @@
         const cyclesCount = document.getElementById('cyclesCount');
         const announcer = document.getElementById('announcer');
         const boxLabels = document.querySelectorAll('.box-label');
+        const breathContainer = document.querySelector('.breathing-container');
 
         // Color intensity: much more dramatic range
         const COLOR_PALE = { r: 180, g: 140, b: 120, a: 0.4 };     // Very soft, translucent
@@ -798,58 +875,40 @@
             const currentLength = progress * SIDE_LENGTH;
             const totalDrawn = completedLength + currentLength;
 
-            const container = document.querySelector('.breathing-container');
             let color;
 
-            // Different behavior for breathing vs hold phases
-            if (state.currentPhase === 0 || state.currentPhase === 2) {
-                // BREATHING PHASES: solid line draws along perimeter
-                container.classList.remove('throbbing');
-                boxProgress.style.strokeDasharray = `${BOX_PERIMETER}`;
-                boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
+            // Solid line always - just draw around the perimeter
+            boxProgress.style.strokeDasharray = `${BOX_PERIMETER}`;
+            boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
 
-                if (state.currentPhase === 0) {
-                    // Inhale: pale → intense
-                    color = interpolateColor(COLOR_PALE, COLOR_INTENSE, progress);
-                } else {
-                    // Exhale: intense → pale
-                    color = interpolateColor(COLOR_INTENSE, COLOR_PALE, progress);
-                }
+            // Update breath shape and colors based on phase
+            breathShape.className = 'breath-shape'; // Reset classes
+
+            if (state.currentPhase === 0) {
+                // INHALE: expand inner shape, pale → intense color, no throb
+                breathShape.classList.add('expanded');
+                breathContainer.classList.remove('throbbing');
+                color = interpolateColor(COLOR_PALE, COLOR_INTENSE, progress);
+
+            } else if (state.currentPhase === 1) {
+                // HOLD FULL: shape stays expanded + pulses, container throbs, intense color
+                breathShape.classList.add('hold-full');
+                breathContainer.classList.add('throbbing');
+                color = `rgba(255, 100, 50, 1.0)`;
+
+            } else if (state.currentPhase === 2) {
+                // EXHALE: contract inner shape, intense → pale color, no throb
+                breathShape.classList.add('contracted');
+                breathContainer.classList.remove('throbbing');
+                color = interpolateColor(COLOR_INTENSE, COLOR_PALE, progress);
+
             } else {
-                // HOLD PHASES: dots pulse around the drawn portion, container throbs
-                container.classList.add('throbbing');
-
-                // Calculate how much path has been drawn (all completed sides)
-                const drawnLength = (state.currentPhase === 1) ? SIDE_LENGTH : SIDE_LENGTH * 3;
-
-                // Dots traveling along the drawn path
-                const dotSize = (state.currentPhase === 1) ? 12 : 6;  // Bigger dots for full hold
-                const gapSize = (state.currentPhase === 1) ? 18 : 24; // Tighter for full, spacier for empty
-                const dotPattern = dotSize + gapSize;
-
-                // Animate dots moving - faster for full hold
-                const speed = (state.currentPhase === 1) ? 150 : 80;
-                const dotTravel = (progress * speed) % dotPattern;
-
-                // Use dasharray to show dots, then hide the rest
-                boxProgress.style.strokeDasharray = `${dotSize} ${gapSize}`;
-                boxProgress.style.strokeDashoffset = dotTravel;
-
-                // Clip to only show drawn portion using a mask trick:
-                // We draw the full dotted pattern but only show drawnLength worth
-                // Actually simpler: just set the dasharray to repeat then clip with offset
-                const hiddenPortion = BOX_PERIMETER - drawnLength;
-                boxProgress.style.strokeDasharray = `0 ${hiddenPortion} ${dotSize} ${gapSize}`;
-                boxProgress.style.strokeDashoffset = dotTravel - hiddenPortion;
-
-                if (state.currentPhase === 1) {
-                    // Hold full: intense color
-                    color = `rgba(255, 100, 50, 1.0)`;
-                } else {
-                    // Hold empty: pale color
-                    color = `rgba(180, 140, 120, 0.5)`;
-                }
+                // HOLD EMPTY: shape stays contracted + pulses, container throbs, pale color
+                breathShape.classList.add('hold-empty');
+                breathContainer.classList.add('throbbing');
+                color = `rgba(180, 140, 120, 0.6)`;
             }
+
             boxProgress.style.stroke = color;
 
             if (progress >= 1) {
@@ -959,8 +1018,10 @@
             state.cycles = 0;
             pauseBtn.textContent = 'Pause';
             boxProgress.style.strokeDashoffset = BOX_PERIMETER;
-            boxProgress.style.stroke = `rgb(${COLOR_PALE.r}, ${COLOR_PALE.g}, ${COLOR_PALE.b})`;
+            boxProgress.style.stroke = `rgba(${COLOR_PALE.r}, ${COLOR_PALE.g}, ${COLOR_PALE.b}, ${COLOR_PALE.a})`;
             boxLabels.forEach(label => label.classList.remove('active'));
+            breathShape.className = 'breath-shape contracted';
+            breathContainer.classList.remove('throbbing');
         }
 
         // Screen reader announcements
