@@ -368,6 +368,49 @@
             position: absolute;
             pointer-events: none;
         }
+    
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2a2320;
+            border-top: 3px solid #3a3533;
+            padding: 0.75rem 1rem;
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: #9a8f85;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            padding: 0.5rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: #D4896A;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
     </style>
 </head>
 <body>
@@ -951,5 +994,25 @@
             }
         }, 1000);
     </script>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/app.html" class="nav-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/app.html#imagine" class="nav-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <span>IMAGINE</span>
+        </a>
+        <a href="/chat.html" class="nav-item">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Chat</span>
+        </a>
+        <a href="/app.html#you" class="nav-item">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>You</span>
+        </a>
+    </nav>
 </body>
 </html>
