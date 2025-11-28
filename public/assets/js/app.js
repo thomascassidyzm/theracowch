@@ -37,9 +37,9 @@ function checkOnboarding() {
     setTimeout(() => {
         onboarding.innerHTML = `
             <div class="onboarding-welcome">
-                <h1>Hi, I'm Mandy</h1>
-                <p>I'm here whenever you need - no judgment, just support. This is your space to explore, reflect, and grow at your own pace.</p>
-                <button class="onboarding-btn" id="onboarding-start">Let's begin</button>
+                <h1>Hi, I'm <span>Mandy</span></h1>
+                <p>I'm here whenever you need — no judgment, just support. This is your space to explore, reflect, and grow at your own pace.</p>
+                <button class="onboarding-btn" id="onboarding-start">Let's Begin</button>
             </div>
         `;
 
