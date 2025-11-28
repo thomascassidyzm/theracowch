@@ -12,17 +12,17 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-family: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #1a1512;
             color: #F5F0E8;
-            overflow: hidden;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding-bottom: 80px;
         }
 
-        /* Ambient background particles */
+        /* Ambient background */
         .ambient-bg {
             position: fixed;
             top: 0;
@@ -31,22 +31,24 @@
             height: 100%;
             overflow: hidden;
             z-index: 0;
+            pointer-events: none;
         }
 
-        .particle {
+        .ambient-glow {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(212, 137, 106, 0.15);
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
-            animation: float 20s infinite ease-in-out;
+            background: radial-gradient(circle, rgba(212, 137, 106, 0.08) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ambientPulse 8s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            50% { transform: translate(var(--tx), var(--ty)) scale(1.5); }
+        @keyframes ambientPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
         }
 
         /* Main container */
@@ -55,7 +57,7 @@
             z-index: 1;
             text-align: center;
             width: 100%;
-            max-width: 800px;
+            max-width: 500px;
             padding: 2rem;
         }
 
@@ -70,21 +72,31 @@
         }
 
         .intro-screen h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
             font-weight: 900;
             letter-spacing: -2px;
             margin-bottom: 1rem;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #F5F0E8;
+            position: relative;
+            display: inline-block;
+        }
+
+        .intro-screen h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: #D4896A;
+            border-radius: 3px;
+            transform: rotate(-1deg);
         }
 
         .intro-screen p {
-            font-size: 1.25rem;
-            color: #F5F0E8;
-            opacity: 0.8;
+            font-size: 1.1rem;
+            color: #b0a499;
             margin-bottom: 3rem;
             line-height: 1.6;
         }
@@ -98,8 +110,9 @@
         }
 
         .duration-btn {
-            background: transparent;
-            border: 3px solid #D4896A;
+            background: #2a2320;
+            border: 3px solid #3a3533;
+            border-radius: 16px;
             color: #F5F0E8;
             padding: 1rem 2rem;
             font-size: 1rem;
@@ -107,41 +120,37 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
         }
 
         .duration-btn:hover {
             transform: translateY(-4px);
-            border-color: #7EA88B;
-            box-shadow: 0 10px 30px rgba(212, 137, 106, 0.3);
+            border-color: #D4896A;
+            box-shadow: 6px 6px 0 0 rgba(212, 137, 106, 0.2);
         }
 
         .duration-btn.active {
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            border-color: transparent;
+            background: #D4896A;
+            border-color: #C47A5D;
+            color: #1a1512;
         }
 
         .begin-btn {
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            border: none;
+            background: #D4896A;
+            border: 4px solid #C47A5D;
+            border-radius: 20px;
             color: #1a1512;
-            padding: 1.5rem 4rem;
-            font-size: 1.5rem;
+            padding: 1.25rem 3.5rem;
+            font-size: 1.3rem;
             font-weight: 900;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 40px rgba(212, 137, 106, 0.4);
+            box-shadow: 6px 6px 0 0 #2a2320;
         }
 
         .begin-btn:hover {
-            transform: translateY(-6px) scale(1.05);
-            box-shadow: 0 15px 50px rgba(212, 137, 106, 0.6);
-        }
-
-        .begin-btn:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(-4px) rotate(-1deg);
+            box-shadow: 10px 10px 0 0 rgba(212, 137, 106, 0.3);
         }
 
         /* Breathing screen */
@@ -154,14 +163,16 @@
             display: block;
         }
 
+        /* Stats bar */
         .stats-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 3rem;
-            padding: 1rem 2rem;
-            background: rgba(245, 240, 232, 0.05);
-            border: 2px solid rgba(212, 137, 106, 0.2);
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: #2a2320;
+            border: 3px solid #3a3533;
+            border-radius: 16px;
         }
 
         .stat {
@@ -169,40 +180,40 @@
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.6;
-            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            color: #9a8f85;
+            margin-bottom: 0.25rem;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #D4896A;
         }
 
-        /* Breathing circle */
+        /* Breathing circle container */
         .breathing-container {
             position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto 3rem;
-            aspect-ratio: 1;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 2rem;
         }
 
+        /* The breathing circle - scales based on phase */
         .breathing-circle {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            width: 300px;
-            height: 300px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 137, 106, 0.4) 0%, rgba(126, 168, 139, 0.4) 100%);
+            background: linear-gradient(135deg, #D4896A 0%, #E39B7F 100%);
             box-shadow:
                 0 0 60px rgba(212, 137, 106, 0.4),
-                inset 0 0 60px rgba(126, 168, 139, 0.2);
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) scale(0.6);
             transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -210,62 +221,71 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        .breathing-circle.exhale {
-            transform: translate(-50%, -50%) scale(0.5);
+        .breathing-circle.hold-full {
+            transform: translate(-50%, -50%) scale(1);
+            transition: none;
         }
 
-        /* Rotating border */
-        .circle-border {
+        .breathing-circle.exhale {
+            transform: translate(-50%, -50%) scale(0.6);
+        }
+
+        .breathing-circle.hold-empty {
+            transform: translate(-50%, -50%) scale(0.6);
+            transition: none;
+        }
+
+        /* Outer ring */
+        .outer-ring {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 320px;
-            height: 320px;
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: #D4896A;
-            border-right-color: #7EA88B;
-            animation: rotate 8s linear infinite;
-            opacity: 0.6;
-        }
-
-        @keyframes rotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            border: 3px solid rgba(212, 137, 106, 0.2);
         }
 
         /* Phase indicator */
         .phase-indicator {
-            font-size: 3rem;
+            font-size: clamp(2rem, 6vw, 2.5rem);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: pulse 2s ease-in-out infinite;
+            letter-spacing: 3px;
+            margin-bottom: 1.5rem;
+            color: #D4896A;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        /* Progress bar instead of countdown */
+        .progress-container {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto 1.5rem;
         }
 
-        .phase-timer {
-            font-size: 5rem;
-            font-weight: 900;
-            color: #F5F0E8;
-            margin-bottom: 2rem;
-            font-variant-numeric: tabular-nums;
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #2a2320;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #3a3533;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #D4896A, #E39B7F);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
         }
 
         .phase-instruction {
-            font-size: 1.25rem;
-            opacity: 0.8;
-            margin-bottom: 3rem;
+            font-size: 1rem;
+            color: #9a8f85;
+            margin-bottom: 2.5rem;
+            min-height: 1.5em;
         }
 
         /* Controls */
@@ -277,22 +297,22 @@
         }
 
         .control-btn {
-            background: transparent;
-            border: 3px solid #D4896A;
+            background: #2a2320;
+            border: 3px solid #3a3533;
+            border-radius: 16px;
             color: #F5F0E8;
-            padding: 1rem 2rem;
-            font-size: 1rem;
+            padding: 0.875rem 1.75rem;
+            font-size: 0.9rem;
             font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 120px;
+            min-width: 110px;
         }
 
         .control-btn:hover {
-            transform: translateY(-4px);
-            background: rgba(212, 137, 106, 0.1);
-            box-shadow: 0 10px 30px rgba(212, 137, 106, 0.3);
+            transform: translateY(-3px);
+            border-color: #D4896A;
         }
 
         .control-btn.pause {
@@ -300,8 +320,8 @@
         }
 
         .control-btn.stop {
-            border-color: rgba(212, 137, 106, 0.5);
-            color: rgba(245, 240, 232, 0.6);
+            border-color: #5a5350;
+            color: #9a8f85;
         }
 
         /* Completion screen */
@@ -315,23 +335,27 @@
         }
 
         .completion-screen h2 {
-            font-size: 3rem;
+            font-size: clamp(2rem, 6vw, 2.5rem);
             font-weight: 900;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 0.5rem;
+            color: #F5F0E8;
+        }
+
+        .completion-screen > p {
+            color: #9a8f85;
+            margin-bottom: 2rem;
         }
 
         .session-stats {
-            background: rgba(245, 240, 232, 0.05);
-            border: 2px solid rgba(212, 137, 106, 0.2);
-            padding: 2rem;
-            margin: 2rem 0;
+            background: #2a2320;
+            border: 3px solid #3a3533;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 0 auto 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 400px;
         }
 
         .session-stat {
@@ -339,35 +363,36 @@
         }
 
         .session-stat-value {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 900;
             color: #D4896A;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .session-stat-label {
-            font-size: 0.875rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.6;
+            letter-spacing: 1px;
+            color: #9a8f85;
         }
 
         .restart-btn {
-            background: linear-gradient(135deg, #D4896A 0%, #7EA88B 100%);
-            border: none;
+            background: #D4896A;
+            border: 4px solid #C47A5D;
+            border-radius: 20px;
             color: #1a1512;
-            padding: 1.25rem 3rem;
-            font-size: 1.25rem;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
             font-weight: 900;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 40px rgba(212, 137, 106, 0.4);
+            box-shadow: 6px 6px 0 0 #2a2320;
         }
 
         .restart-btn:hover {
-            transform: translateY(-6px) scale(1.05);
-            box-shadow: 0 15px 50px rgba(212, 137, 106, 0.6);
+            transform: translateY(-4px) rotate(-1deg);
+            box-shadow: 10px 10px 0 0 rgba(212, 137, 106, 0.3);
         }
 
         /* Accessibility */
@@ -383,41 +408,11 @@
             border-width: 0;
         }
 
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .intro-screen h1 {
-                font-size: 2.5rem;
-            }
-
-            .phase-indicator {
-                font-size: 2rem;
-            }
-
-            .phase-timer {
-                font-size: 3.5rem;
-            }
-
-            .breathing-circle {
-                width: 200px;
-                height: 200px;
-            }
-
-            .circle-border {
-                width: 220px;
-                height: 220px;
-            }
-
-            .stats-bar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
         /* Hidden class */
         .hidden {
             display: none !important;
         }
-    
+
         /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
@@ -460,11 +455,39 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .breathing-container {
+                width: 240px;
+                height: 240px;
+            }
+
+            .breathing-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .outer-ring {
+                width: 220px;
+                height: 220px;
+            }
+
+            .stats-bar {
+                padding: 0.75rem 1rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Ambient background -->
-    <div class="ambient-bg" id="ambientBg"></div>
+    <div class="ambient-bg">
+        <div class="ambient-glow"></div>
+    </div>
 
     <!-- Screen reader announcements -->
     <div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -473,7 +496,7 @@
         <!-- Intro Screen -->
         <div class="intro-screen" id="introScreen">
             <h1>Box Breathing</h1>
-            <p>A powerful technique to reduce stress and improve focus.<br>Breathe in for 4, hold for 4, breathe out for 4, hold for 4.</p>
+            <p>A powerful technique to reduce stress and improve focus. Breathe in, hold, breathe out, hold — each for 4 seconds.</p>
 
             <div class="duration-options">
                 <button class="duration-btn" data-duration="120">2 Min</button>
@@ -502,13 +525,19 @@
             </div>
 
             <div class="breathing-container">
-                <div class="circle-border"></div>
+                <div class="outer-ring"></div>
                 <div class="breathing-circle" id="breathingCircle"></div>
             </div>
 
             <div class="phase-indicator" id="phaseIndicator">INHALE</div>
-            <div class="phase-timer" id="phaseTimer">4</div>
-            <div class="phase-instruction" id="phaseInstruction">Breathe in slowly through your nose</div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="phase-instruction" id="phaseInstruction">Breathe in slowly</div>
 
             <div class="controls">
                 <button class="control-btn pause" id="pauseBtn">Pause</button>
@@ -518,8 +547,8 @@
 
         <!-- Completion Screen -->
         <div class="completion-screen" id="completionScreen">
-            <h2>Session Complete</h2>
-            <p>Excellent work. You've completed your breathing practice.</p>
+            <h2>Well Done</h2>
+            <p>You've completed your breathing practice.</p>
 
             <div class="session-stats">
                 <div class="session-stat">
@@ -527,39 +556,42 @@
                     <div class="session-stat-label">Duration</div>
                 </div>
                 <div class="session-stat">
-                    <div class="session-stat-value" id="finalCycles">25</div>
+                    <div class="session-stat-value" id="finalCycles">0</div>
                     <div class="session-stat-label">Cycles</div>
                 </div>
                 <div class="session-stat">
                     <div class="session-stat-value" id="totalSessions">1</div>
-                    <div class="session-stat-label">Total Sessions</div>
+                    <div class="session-stat-label">All Time</div>
                 </div>
             </div>
 
-            <button class="restart-btn" id="restartBtn">Start New Session</button>
+            <button class="restart-btn" id="restartBtn">Again</button>
         </div>
     </div>
 
     <script>
-        // State management
+        // Configuration
+        const PHASE_DURATION = 4000; // 4 seconds per phase
+
+        // Phases: inhale grows, hold stays big, exhale shrinks, hold stays small
+        const phases = [
+            { name: 'INHALE', instruction: 'Breathe in slowly', circleClass: 'inhale' },
+            { name: 'HOLD', instruction: 'Hold gently', circleClass: 'hold-full' },
+            { name: 'EXHALE', instruction: 'Breathe out slowly', circleClass: 'exhale' },
+            { name: 'HOLD', instruction: 'Hold gently', circleClass: 'hold-empty' }
+        ];
+
+        // State
         const state = {
-            selectedDuration: 300, // seconds
-            startTime: null,
+            selectedDuration: 300,
             elapsedSeconds: 0,
             isPaused: false,
             currentPhase: 0,
-            phaseTimer: 4,
             cycles: 0,
-            intervalId: null,
-            phaseIntervalId: null
+            mainIntervalId: null,
+            phaseStartTime: null,
+            animationFrameId: null
         };
-
-        const phases = [
-            { name: 'INHALE', instruction: 'Breathe in slowly through your nose', duration: 4, class: 'inhale' },
-            { name: 'HOLD', instruction: 'Hold your breath gently', duration: 4, class: 'hold' },
-            { name: 'EXHALE', instruction: 'Breathe out slowly through your mouth', duration: 4, class: 'exhale' },
-            { name: 'HOLD', instruction: 'Hold your breath gently', duration: 4, class: 'hold' }
-        ];
 
         // DOM elements
         const introScreen = document.getElementById('introScreen');
@@ -572,29 +604,12 @@
         const restartBtn = document.getElementById('restartBtn');
         const breathingCircle = document.getElementById('breathingCircle');
         const phaseIndicator = document.getElementById('phaseIndicator');
-        const phaseTimer = document.getElementById('phaseTimer');
         const phaseInstruction = document.getElementById('phaseInstruction');
+        const progressFill = document.getElementById('progressFill');
         const elapsedTime = document.getElementById('elapsedTime');
         const remainingTime = document.getElementById('remainingTime');
         const cyclesCount = document.getElementById('cyclesCount');
         const announcer = document.getElementById('announcer');
-
-        // Initialize ambient particles
-        function createParticles() {
-            const ambientBg = document.getElementById('ambientBg');
-            const particleCount = 30;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
-                particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}px`);
-                particle.style.animationDelay = `${Math.random() * 20}s`;
-                ambientBg.appendChild(particle);
-            }
-        }
 
         // Duration selection
         durationBtns.forEach(btn => {
@@ -642,16 +657,17 @@
 
         // Start breathing session
         function startBreathing() {
-            state.startTime = Date.now();
             state.elapsedSeconds = 0;
             state.currentPhase = 0;
             state.cycles = 0;
             state.isPaused = false;
 
+            updateRemainingTime();
             updatePhase();
-            startPhaseTimer();
+            startPhaseAnimation();
 
-            state.intervalId = setInterval(() => {
+            // Main timer for overall session
+            state.mainIntervalId = setInterval(() => {
                 if (!state.isPaused) {
                     state.elapsedSeconds++;
                     updateStats();
@@ -664,88 +680,99 @@
             }, 1000);
         }
 
-        // Pause breathing
-        function pauseBreathing() {
-            state.isPaused = true;
-            clearInterval(state.phaseIntervalId);
+        // Start the phase animation loop
+        function startPhaseAnimation() {
+            state.phaseStartTime = performance.now();
+            animateProgress();
         }
 
-        // Resume breathing
-        function resumeBreathing() {
-            state.isPaused = false;
-            startPhaseTimer();
-        }
+        // Animate the progress bar smoothly
+        function animateProgress() {
+            if (state.isPaused) {
+                state.animationFrameId = requestAnimationFrame(animateProgress);
+                return;
+            }
 
-        // Stop breathing
-        function stopBreathing() {
-            clearInterval(state.intervalId);
-            clearInterval(state.phaseIntervalId);
-            breathingScreen.classList.remove('active');
-        }
+            const now = performance.now();
+            const elapsed = now - state.phaseStartTime;
+            const progress = Math.min(elapsed / PHASE_DURATION, 1);
 
-        // Phase timer
-        function startPhaseTimer() {
-            const currentPhaseData = phases[state.currentPhase];
-            state.phaseTimer = currentPhaseData.duration;
+            // Update progress bar
+            progressFill.style.width = `${progress * 100}%`;
 
-            state.phaseIntervalId = setInterval(() => {
-                if (!state.isPaused) {
-                    state.phaseTimer--;
-                    phaseTimer.textContent = state.phaseTimer;
-
-                    if (state.phaseTimer <= 0) {
-                        nextPhase();
-                    }
-                }
-            }, 1000);
+            if (progress >= 1) {
+                // Move to next phase
+                nextPhase();
+            } else {
+                state.animationFrameId = requestAnimationFrame(animateProgress);
+            }
         }
 
         // Move to next phase
         function nextPhase() {
-            clearInterval(state.phaseIntervalId);
             state.currentPhase = (state.currentPhase + 1) % phases.length;
 
+            // Count a cycle when we complete all 4 phases
             if (state.currentPhase === 0) {
                 state.cycles++;
                 cyclesCount.textContent = state.cycles;
             }
 
             updatePhase();
-            startPhaseTimer();
+            state.phaseStartTime = performance.now();
+            progressFill.style.width = '0%';
+            state.animationFrameId = requestAnimationFrame(animateProgress);
         }
 
         // Update phase UI
         function updatePhase() {
-            const currentPhaseData = phases[state.currentPhase];
+            const phase = phases[state.currentPhase];
 
-            phaseIndicator.textContent = currentPhaseData.name;
-            phaseInstruction.textContent = currentPhaseData.instruction;
-            phaseTimer.textContent = currentPhaseData.duration;
+            phaseIndicator.textContent = phase.name;
+            phaseInstruction.textContent = phase.instruction;
 
-            // Update circle animation
-            breathingCircle.className = 'breathing-circle';
-            if (currentPhaseData.class === 'inhale') {
-                setTimeout(() => breathingCircle.classList.add('inhale'), 50);
-            } else if (currentPhaseData.class === 'exhale') {
-                setTimeout(() => breathingCircle.classList.add('exhale'), 50);
-            }
+            // Update circle class for size animation
+            breathingCircle.className = 'breathing-circle ' + phase.circleClass;
 
             // Haptic feedback
             if (navigator.vibrate) {
-                navigator.vibrate(50);
+                navigator.vibrate(30);
             }
 
-            // Screen reader announcement
-            announce(currentPhaseData.name);
+            // Screen reader
+            announce(phase.name);
+        }
+
+        // Pause
+        function pauseBreathing() {
+            state.isPaused = true;
+            state.pausedAt = performance.now();
+        }
+
+        // Resume
+        function resumeBreathing() {
+            // Adjust phase start time to account for pause duration
+            const pauseDuration = performance.now() - state.pausedAt;
+            state.phaseStartTime += pauseDuration;
+            state.isPaused = false;
+        }
+
+        // Stop
+        function stopBreathing() {
+            clearInterval(state.mainIntervalId);
+            cancelAnimationFrame(state.animationFrameId);
+            breathingScreen.classList.remove('active');
         }
 
         // Update stats
         function updateStats() {
-            const elapsed = formatTime(state.elapsedSeconds);
-            const remaining = formatTime(state.selectedDuration - state.elapsedSeconds);
+            elapsedTime.textContent = formatTime(state.elapsedSeconds);
+            updateRemainingTime();
+        }
 
-            elapsedTime.textContent = elapsed;
-            remainingTime.textContent = remaining;
+        function updateRemainingTime() {
+            const remaining = Math.max(0, state.selectedDuration - state.elapsedSeconds);
+            remainingTime.textContent = formatTime(remaining);
         }
 
         // Format time
@@ -772,13 +799,13 @@
 
         // Reset state
         function resetState() {
-            state.selectedDuration = 300;
             state.elapsedSeconds = 0;
             state.isPaused = false;
             state.currentPhase = 0;
-            state.phaseTimer = 4;
             state.cycles = 0;
             pauseBtn.textContent = 'Pause';
+            progressFill.style.width = '0%';
+            breathingCircle.className = 'breathing-circle';
         }
 
         // Screen reader announcements
@@ -786,13 +813,10 @@
             announcer.textContent = message;
         }
 
-        // Initialize
-        createParticles();
-
-        // Load total sessions from localStorage
-        const totalSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0);
-        if (totalSessions > 0) {
-            document.getElementById('totalSessions').textContent = totalSessions;
+        // Load total sessions on page load
+        const savedSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0);
+        if (savedSessions > 0) {
+            document.getElementById('totalSessions').textContent = savedSessions;
         }
     </script>
 
