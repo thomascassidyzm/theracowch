@@ -208,6 +208,28 @@
             box-shadow:
                 0 8px 32px rgba(0, 0, 0, 0.3),
                 inset 0 0 60px rgba(212, 137, 106, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Throb animation for hold phases */
+        .breathing-container.throbbing {
+            animation: throb 1s ease-in-out infinite;
+        }
+
+        @keyframes throb {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.3),
+                    inset 0 0 60px rgba(255, 100, 50, 0.1);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow:
+                    0 12px 48px rgba(0, 0, 0, 0.4),
+                    inset 0 0 80px rgba(255, 100, 50, 0.2),
+                    0 0 40px rgba(255, 100, 50, 0.15);
+            }
         }
 
         /* The box SVG */
@@ -667,15 +689,16 @@
         const announcer = document.getElementById('announcer');
         const boxLabels = document.querySelectorAll('.box-label');
 
-        // Color intensity: pale to intense coral
-        const COLOR_PALE = { r: 240, g: 196, b: 176 };      // #F0C4B0 - soft pale
-        const COLOR_INTENSE = { r: 224, g: 120, b: 80 };    // #E07850 - rich intense
+        // Color intensity: much more dramatic range
+        const COLOR_PALE = { r: 180, g: 140, b: 120, a: 0.4 };     // Very soft, translucent
+        const COLOR_INTENSE = { r: 255, g: 100, b: 50, a: 1.0 };   // Vivid, full opacity
 
         function interpolateColor(from, to, progress) {
             const r = Math.round(from.r + (to.r - from.r) * progress);
             const g = Math.round(from.g + (to.g - from.g) * progress);
             const b = Math.round(from.b + (to.b - from.b) * progress);
-            return `rgb(${r}, ${g}, ${b})`;
+            const a = (from.a + (to.a - from.a) * progress).toFixed(2);
+            return `rgba(${r}, ${g}, ${b}, ${a})`;
         }
 
         // Duration selection
@@ -775,27 +798,57 @@
             const currentLength = progress * SIDE_LENGTH;
             const totalDrawn = completedLength + currentLength;
 
-            // strokeDashoffset: BOX_PERIMETER = nothing drawn, 0 = fully drawn
-            boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
-
-            // Color intensity based on phase:
-            // Phase 0 (Inhale): pale → intense
-            // Phase 1 (Hold full): stay intense
-            // Phase 2 (Exhale): intense → pale
-            // Phase 3 (Hold empty): stay pale
+            const container = document.querySelector('.breathing-container');
             let color;
-            if (state.currentPhase === 0) {
-                // Inhale: pale to intense
-                color = interpolateColor(COLOR_PALE, COLOR_INTENSE, progress);
-            } else if (state.currentPhase === 1) {
-                // Hold full: stay intense
-                color = interpolateColor(COLOR_INTENSE, COLOR_INTENSE, 1);
-            } else if (state.currentPhase === 2) {
-                // Exhale: intense to pale
-                color = interpolateColor(COLOR_INTENSE, COLOR_PALE, progress);
+
+            // Different behavior for breathing vs hold phases
+            if (state.currentPhase === 0 || state.currentPhase === 2) {
+                // BREATHING PHASES: solid line draws along perimeter
+                container.classList.remove('throbbing');
+                boxProgress.style.strokeDasharray = `${BOX_PERIMETER}`;
+                boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
+
+                if (state.currentPhase === 0) {
+                    // Inhale: pale → intense
+                    color = interpolateColor(COLOR_PALE, COLOR_INTENSE, progress);
+                } else {
+                    // Exhale: intense → pale
+                    color = interpolateColor(COLOR_INTENSE, COLOR_PALE, progress);
+                }
             } else {
-                // Hold empty: stay pale
-                color = interpolateColor(COLOR_PALE, COLOR_PALE, 1);
+                // HOLD PHASES: dots pulse around the drawn portion, container throbs
+                container.classList.add('throbbing');
+
+                // Calculate how much path has been drawn (all completed sides)
+                const drawnLength = (state.currentPhase === 1) ? SIDE_LENGTH : SIDE_LENGTH * 3;
+
+                // Dots traveling along the drawn path
+                const dotSize = (state.currentPhase === 1) ? 12 : 6;  // Bigger dots for full hold
+                const gapSize = (state.currentPhase === 1) ? 18 : 24; // Tighter for full, spacier for empty
+                const dotPattern = dotSize + gapSize;
+
+                // Animate dots moving - faster for full hold
+                const speed = (state.currentPhase === 1) ? 150 : 80;
+                const dotTravel = (progress * speed) % dotPattern;
+
+                // Use dasharray to show dots, then hide the rest
+                boxProgress.style.strokeDasharray = `${dotSize} ${gapSize}`;
+                boxProgress.style.strokeDashoffset = dotTravel;
+
+                // Clip to only show drawn portion using a mask trick:
+                // We draw the full dotted pattern but only show drawnLength worth
+                // Actually simpler: just set the dasharray to repeat then clip with offset
+                const hiddenPortion = BOX_PERIMETER - drawnLength;
+                boxProgress.style.strokeDasharray = `0 ${hiddenPortion} ${dotSize} ${gapSize}`;
+                boxProgress.style.strokeDashoffset = dotTravel - hiddenPortion;
+
+                if (state.currentPhase === 1) {
+                    // Hold full: intense color
+                    color = `rgba(255, 100, 50, 1.0)`;
+                } else {
+                    // Hold empty: pale color
+                    color = `rgba(180, 140, 120, 0.5)`;
+                }
             }
             boxProgress.style.stroke = color;
 
