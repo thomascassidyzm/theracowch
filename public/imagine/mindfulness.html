@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M - Mindfulness | Cowch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background-color: #1a1512;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #2d2825;
+            color: #7EA88B;
+            text-decoration: none;
+            padding: 12px 24px;
+            border: 5px solid #7EA88B;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 24px;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: #7EA88B;
+            color: #1a1512;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #7EA88B;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .giant-letter {
+            font-size: 120px;
+            font-weight: 900;
+            color: #7EA88B;
+            line-height: 1;
+        }
+
+        .title-text h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #7EA88B;
+        }
+
+        .title-text p {
+            font-size: 18px;
+            color: #ccc;
+            margin-top: 8px;
+        }
+
+        /* Section Intro */
+        .section-intro {
+            background: #2d2825;
+            border: 5px solid #7EA88B;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .section-intro p {
+            font-size: 18px;
+            color: #e0e0e0;
+            line-height: 1.8;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            background: #2d2825;
+            border: 5px solid #7EA88B;
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .streak-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .streak-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: #7EA88B;
+        }
+
+        .streak-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ccc;
+        }
+
+        /* Exercise Cards */
+        .exercises-grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .exercise-card {
+            background: #2d2825;
+            border: 5px solid #7EA88B;
+            border-radius: 24px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .exercise-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0px #7EA88B;
+        }
+
+        .exercise-card.completed {
+            border-color: #4a6b52;
+            opacity: 0.85;
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .exercise-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #7EA88B;
+            margin-bottom: 8px;
+        }
+
+        .completion-badge {
+            background: #7EA88B;
+            color: #1a1512;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            display: none;
+        }
+
+        .exercise-card.completed .completion-badge {
+            display: block;
+        }
+
+        .exercise-description {
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .exercise-steps {
+            background: #1a1512;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .exercise-steps h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #7EA88B;
+            margin-bottom: 12px;
+        }
+
+        .exercise-steps ol,
+        .exercise-steps ul {
+            margin-left: 24px;
+            color: #e0e0e0;
+        }
+
+        .exercise-steps li {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .exercise-steps strong {
+            color: #7EA88B;
+        }
+
+        .action-button {
+            background: #7EA88B;
+            color: #1a1512;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 20px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .action-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #1a1512;
+        }
+
+        .action-button.completed {
+            background: #4a6b52;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #2d2825;
+            border: 5px solid #7EA88B;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #7EA88B;
+        }
+
+        .close-button {
+            background: #1a1512;
+            color: #7EA88B;
+            border: 3px solid #7EA88B;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-button:hover {
+            background: #7EA88B;
+            color: #1a1512;
+        }
+
+        .modal-body {
+            color: #e0e0e0;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .modal-body h4 {
+            color: #7EA88B;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 24px 0 12px 0;
+        }
+
+        .modal-body p {
+            margin-bottom: 16px;
+        }
+
+        .modal-body ul,
+        .modal-body ol {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .breathing-guide {
+            background: #1a1512;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border: 5px solid #7EA88B;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #7EA88B;
+            transition: all 4s ease-in-out;
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.5);
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(1);
+        }
+
+        .breathing-instruction {
+            font-size: 20px;
+            font-weight: 700;
+            color: #7EA88B;
+            margin-bottom: 12px;
+        }
+
+        .breathing-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .breathing-controls button {
+            background: #7EA88B;
+            color: #1a1512;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .breathing-controls button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #7EA88B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .giant-letter {
+                font-size: 80px;
+            }
+
+            .title-text h1 {
+                font-size: 36px;
+            }
+
+            .title-text p {
+                font-size: 16px;
+            }
+
+            .exercise-title {
+                font-size: 24px;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .giant-letter {
+                font-size: 60px;
+            }
+
+            .title-text h1 {
+                font-size: 28px;
+            }
+
+            .streak-number {
+                font-size: 36px;
+            }
+
+            .breathing-circle {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="../app.html#imagine" class="back-button">← Back to IMAGINE</a>
+            <div class="title-section">
+                <div class="giant-letter">M</div>
+                <div class="title-text">
+                    <h1>Mindfulness</h1>
+                    <p>Ground yourself in the present moment</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-intro">
+            <p>Mindfulness practices help you stay present and grounded, reducing anxiety by anchoring you in the here and now. These exercises use your senses, breath, and body awareness to break the cycle of worry and bring calm to your mind.</p>
+        </div>
+
+        <div class="progress-indicator">
+            <div class="streak-info">
+                <div class="streak-number" id="streakNumber">0</div>
+                <div class="streak-label">practices completed today</div>
+            </div>
+        </div>
+
+        <div class="exercises-grid">
+            <!-- 5 Senses Grounding -->
+            <div class="exercise-card" id="card-5senses">
+                <div class="exercise-header">
+                    <div>
+                        <h3 class="exercise-title">5 Senses Grounding</h3>
+                    </div>
+                    <div class="completion-badge">Completed</div>
+                </div>
+                <p class="exercise-description">
+                    The "Sensational Vacation" technique uses your five senses to anchor you in the present moment and prevent worry from taking over. This exercise is perfect when you feel anxious or overwhelmed.
+                </p>
+                <div class="exercise-steps">
+                    <h4>How it works:</h4>
+                    <ul>
+                        <li><strong>See</strong> 5 things around you</li>
+                        <li><strong>Hear</strong> 4 sounds in your environment</li>
+                        <li><strong>Feel</strong> 3 textures or sensations</li>
+                        <li><strong>Smell</strong> 2 different scents</li>
+                        <li><strong>Taste</strong> 1 thing (or notice current taste)</li>
+                    </ul>
+                </div>
+                <button class="action-button" onclick="openExercise('5senses')">Start Exercise</button>
+            </div>
+
+            <!-- Body Scan / PMR -->
+            <div class="exercise-card" id="card-bodyscan">
+                <div class="exercise-header">
+                    <div>
+                        <h3 class="exercise-title">Body Scan / PMR</h3>
+                    </div>
+                    <div class="completion-badge">Completed</div>
+                </div>
+                <p class="exercise-description">
+                    Progressive Muscle Relaxation (PMR) involves tensing and releasing muscle groups throughout your body. This practice helps release physical tension and brings awareness to where you hold stress.
+                </p>
+                <div class="exercise-steps">
+                    <h4>Benefits:</h4>
+                    <ul>
+                        <li>Release physical tension from anxiety</li>
+                        <li>Develop body awareness</li>
+                        <li>Promote deep relaxation</li>
+                        <li>Improve sleep quality</li>
+                    </ul>
+                </div>
+                <button class="action-button" onclick="openExercise('bodyscan')">Start Exercise</button>
+            </div>
+
+            <!-- Present Moment Anchoring -->
+            <div class="exercise-card" id="card-breathing">
+                <div class="exercise-header">
+                    <div>
+                        <h3 class="exercise-title">Present Moment Anchoring</h3>
+                    </div>
+                    <div class="completion-badge">Completed</div>
+                </div>
+                <p class="exercise-description">
+                    Breathing exercises are powerful anchors to the present moment. Your breath is always with you and can quickly calm your nervous system when anxiety strikes.
+                </p>
+                <div class="exercise-steps">
+                    <h4>Techniques included:</h4>
+                    <ul>
+                        <li><strong>4-7-8 Breathing</strong> - Calming rhythm</li>
+                        <li><strong>Box Breathing</strong> - Equal counts</li>
+                        <li><strong>Belly Breathing</strong> - Deep diaphragmatic</li>
+                    </ul>
+                </div>
+                <button class="action-button" onclick="openExercise('breathing')">Start Exercise</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="exerciseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <button class="close-button" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Exercise content
+        const exercises = {
+            '5senses': {
+                title: '5 Senses Grounding',
+                content: `
+                    <p>This exercise helps you break free from anxious thoughts by engaging all five senses. Take your time with each step.</p>
+
+                    <h4>Step 1: See 5 Things</h4>
+                    <p>Look around and identify 5 things you can see. Really notice them - their colors, shapes, textures. Say them out loud or in your mind:</p>
+                    <ul>
+                        <li>I see the lamp on the table</li>
+                        <li>I see the tree outside the window</li>
+                        <li>I see my blue mug</li>
+                        <li>I see the pattern on the rug</li>
+                        <li>I see the door handle</li>
+                    </ul>
+
+                    <h4>Step 2: Hear 4 Things</h4>
+                    <p>Close your eyes if it helps. Listen carefully and identify 4 sounds:</p>
+                    <ul>
+                        <li>The hum of the refrigerator</li>
+                        <li>Birds chirping outside</li>
+                        <li>My own breathing</li>
+                        <li>Traffic in the distance</li>
+                    </ul>
+
+                    <h4>Step 3: Feel 3 Things</h4>
+                    <p>Notice 3 physical sensations or textures you can feel:</p>
+                    <ul>
+                        <li>The chair supporting my back</li>
+                        <li>The smooth surface of my phone</li>
+                        <li>The temperature of the air on my skin</li>
+                    </ul>
+
+                    <h4>Step 4: Smell 2 Things</h4>
+                    <p>Identify 2 scents. If you can't smell much, move around or recall pleasant scents:</p>
+                    <ul>
+                        <li>The coffee on my desk</li>
+                        <li>The fresh air from the window</li>
+                    </ul>
+
+                    <h4>Step 5: Taste 1 Thing</h4>
+                    <p>Notice what you can taste right now, or take a sip of water or tea. Really focus on the sensation.</p>
+
+                    <p style="margin-top: 24px; padding: 16px; background: #1a1512; border-radius: 12px;">
+                        <strong style="color: #7EA88B;">Remember:</strong> This exercise pulls you out of your worried mind and into your body and surroundings. The more you practice, the more effective it becomes.
+                    </p>
+
+                    <button class="action-button" onclick="completeExercise('5senses')" style="margin-top: 24px;">Mark as Completed</button>
+                `
+            },
+            'bodyscan': {
+                title: 'Body Scan / PMR',
+                content: `
+                    <p>Progressive Muscle Relaxation involves systematically tensing and releasing muscle groups. Find a comfortable position, either sitting or lying down.</p>
+
+                    <h4>Preparation</h4>
+                    <p>Take 3 deep breaths. With each exhale, let your body settle more deeply into relaxation.</p>
+
+                    <h4>Step-by-Step Guide</h4>
+                    <p>For each muscle group: tense for 5 seconds, then release for 10 seconds. Notice the difference between tension and relaxation.</p>
+
+                    <ol>
+                        <li><strong>Feet:</strong> Curl your toes tightly. Hold... Release. Feel the tension drain away.</li>
+                        <li><strong>Calves:</strong> Point your toes toward your face. Hold... Release.</li>
+                        <li><strong>Thighs:</strong> Squeeze your thigh muscles tight. Hold... Release.</li>
+                        <li><strong>Glutes:</strong> Clench your buttocks. Hold... Release.</li>
+                        <li><strong>Stomach:</strong> Tighten your abdominal muscles. Hold... Release.</li>
+                        <li><strong>Chest:</strong> Take a deep breath and hold it while tensing your chest. Hold... Release and exhale.</li>
+                        <li><strong>Hands:</strong> Make tight fists. Hold... Release. Let your fingers gently unfurl.</li>
+                        <li><strong>Arms:</strong> Tense your biceps and forearms. Hold... Release.</li>
+                        <li><strong>Shoulders:</strong> Raise your shoulders to your ears. Hold... Release and let them drop.</li>
+                        <li><strong>Neck:</strong> Gently press your head back. Hold... Release.</li>
+                        <li><strong>Face:</strong> Scrunch all your facial muscles. Hold... Release. Let your jaw hang loose.</li>
+                    </ol>
+
+                    <h4>Full Body Scan</h4>
+                    <p>Now scan through your entire body from feet to head. Notice any remaining tension. Breathe into those areas and let them soften.</p>
+
+                    <p style="margin-top: 24px; padding: 16px; background: #1a1512; border-radius: 12px;">
+                        <strong style="color: #7EA88B;">Tip:</strong> Practice this before bed to improve sleep, or anytime you notice physical tension from anxiety.
+                    </p>
+
+                    <button class="action-button" onclick="completeExercise('bodyscan')" style="margin-top: 24px;">Mark as Completed</button>
+                `
+            },
+            'breathing': {
+                title: 'Present Moment Anchoring',
+                content: `
+                    <p>Your breath is the most accessible tool for calming anxiety. These techniques activate your parasympathetic nervous system, signaling safety to your body.</p>
+
+                    <h4>4-7-8 Breathing (Most Calming)</h4>
+                    <p>This technique is excellent for quickly reducing anxiety:</p>
+                    <ol>
+                        <li>Exhale completely through your mouth</li>
+                        <li>Inhale quietly through your nose for 4 counts</li>
+                        <li>Hold your breath for 7 counts</li>
+                        <li>Exhale completely through your mouth for 8 counts</li>
+                        <li>Repeat 4 times</li>
+                    </ol>
+
+                    <h4>Box Breathing (Equal Balance)</h4>
+                    <p>Used by Navy SEALs for stress management:</p>
+                    <ol>
+                        <li>Inhale for 4 counts</li>
+                        <li>Hold for 4 counts</li>
+                        <li>Exhale for 4 counts</li>
+                        <li>Hold for 4 counts</li>
+                        <li>Repeat for 5-10 cycles</li>
+                    </ol>
+
+                    <h4>Belly Breathing (Deep Grounding)</h4>
+                    <p>Activates the diaphragm for deeper relaxation:</p>
+                    <ol>
+                        <li>Place one hand on your chest, one on your belly</li>
+                        <li>Breathe in slowly through your nose, expanding your belly (not chest)</li>
+                        <li>Feel your hand rise with your belly</li>
+                        <li>Exhale slowly through your mouth, belly falling</li>
+                        <li>Continue for 5-10 minutes</li>
+                    </ol>
+
+                    <div class="breathing-guide">
+                        <div class="breathing-circle" id="breathingCircle">Breathe</div>
+                        <div class="breathing-instruction" id="breathingInstruction">Click start to begin</div>
+                        <div class="breathing-controls">
+                            <button onclick="startBreathing()">Start</button>
+                            <button onclick="stopBreathing()">Stop</button>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 24px; padding: 16px; background: #1a1512; border-radius: 12px;">
+                        <strong style="color: #7EA88B;">Practice tip:</strong> Use these techniques preventatively, not just during panic. Regular practice makes them more effective when you need them most.
+                    </p>
+
+                    <button class="action-button" onclick="completeExercise('breathing')" style="margin-top: 24px;">Mark as Completed</button>
+                `
+            }
+        };
+
+        // Breathing animation variables
+        let breathingInterval = null;
+        let breathingPhase = 'inhale';
+
+        function startBreathing() {
+            const circle = document.getElementById('breathingCircle');
+            const instruction = document.getElementById('breathingInstruction');
+
+            if (breathingInterval) return; // Already running
+
+            // Start with inhale
+            breathingPhase = 'inhale';
+            circle.classList.add('inhale');
+            instruction.textContent = 'Breathe in...';
+
+            breathingInterval = setInterval(() => {
+                if (breathingPhase === 'inhale') {
+                    breathingPhase = 'exhale';
+                    circle.classList.remove('inhale');
+                    circle.classList.add('exhale');
+                    instruction.textContent = 'Breathe out...';
+                } else {
+                    breathingPhase = 'inhale';
+                    circle.classList.remove('exhale');
+                    circle.classList.add('inhale');
+                    instruction.textContent = 'Breathe in...';
+                }
+            }, 4000); // 4 seconds per phase
+        }
+
+        function stopBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+            }
+            const circle = document.getElementById('breathingCircle');
+            const instruction = document.getElementById('breathingInstruction');
+            circle.classList.remove('inhale', 'exhale');
+            instruction.textContent = 'Click start to begin';
+        }
+
+        // Local storage key
+        const STORAGE_KEY = 'cowch_mindfulness_completions';
+
+        // Get today's date string
+        function getTodayString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        // Load completions from localStorage
+        function loadCompletions() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return {};
+        }
+
+        // Save completions to localStorage
+        function saveCompletions(completions) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(completions));
+        }
+
+        // Get today's completions
+        function getTodayCompletions() {
+            const completions = loadCompletions();
+            const today = getTodayString();
+            return completions[today] || [];
+        }
+
+        // Update UI based on completions
+        function updateUI() {
+            const todayCompletions = getTodayCompletions();
+            const streakNumber = document.getElementById('streakNumber');
+            streakNumber.textContent = todayCompletions.length;
+
+            // Update cards
+            todayCompletions.forEach(exerciseId => {
+                const card = document.getElementById(`card-${exerciseId}`);
+                if (card) {
+                    card.classList.add('completed');
+                    const button = card.querySelector('.action-button');
+                    if (button) {
+                        button.textContent = 'Completed Today';
+                        button.classList.add('completed');
+                    }
+                }
+            });
+        }
+
+        // Open exercise modal
+        function openExercise(exerciseId) {
+            const exercise = exercises[exerciseId];
+            if (!exercise) return;
+
+            const modal = document.getElementById('exerciseModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = exercise.title;
+            modalBody.innerHTML = exercise.content;
+            modal.classList.add('active');
+
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('exerciseModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+
+            // Stop breathing animation if running
+            stopBreathing();
+        }
+
+        // Complete exercise
+        function completeExercise(exerciseId) {
+            const completions = loadCompletions();
+            const today = getTodayString();
+
+            if (!completions[today]) {
+                completions[today] = [];
+            }
+
+            if (!completions[today].includes(exerciseId)) {
+                completions[today].push(exerciseId);
+                saveCompletions(completions);
+                updateUI();
+            }
+
+            closeModal();
+        }
+
+        // Close modal on outside click
+        document.getElementById('exerciseModal').addEventListener('click', (e) => {
+            if (e.target.id === 'exerciseModal') {
+                closeModal();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+        });
+    </script>
+</body>
+</html>

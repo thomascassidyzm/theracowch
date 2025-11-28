@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G - Gratitude | IMAGINE | cowch.app</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background-color: #1a1512;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            background: #2d2825;
+            color: #B794C4;
+            border: 4px solid #B794C4;
+            padding: 12px 24px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 #B794C4;
+            transition: all 0.1s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 #B794C4;
+        }
+
+        .back-btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 #B794C4;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .giant-letter {
+            font-size: 120px;
+            font-weight: 900;
+            color: #B794C4;
+            line-height: 1;
+            text-shadow: 8px 8px 0 rgba(183, 148, 196, 0.3);
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-top: -10px;
+        }
+
+        /* Intro */
+        .intro {
+            background: #2d2825;
+            border: 4px solid #B794C4;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 8px 8px 0 rgba(183, 148, 196, 0.4);
+        }
+
+        .intro p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        /* Exercise Cards */
+        .exercise-card {
+            background: #2d2825;
+            border: 4px solid #B794C4;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 8px 8px 0 rgba(183, 148, 196, 0.4);
+        }
+
+        .exercise-card h2 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #B794C4;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .exercise-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        /* Small Wins */
+        .win-input {
+            width: 100%;
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            color: #ffffff;
+            padding: 15px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .win-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(183, 148, 196, 0.3);
+        }
+
+        .steps {
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .steps ol {
+            margin-left: 20px;
+        }
+
+        .steps li {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .steps li strong {
+            color: #B794C4;
+        }
+
+        .btn {
+            background: #B794C4;
+            color: #1a1512;
+            border: 4px solid #B794C4;
+            padding: 15px 30px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.1s;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            background: #B794C4;
+            color: #1a1512;
+            padding: 15px;
+            margin-top: 15px;
+            border: 3px solid #B794C4;
+            font-weight: 700;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Gratitude Journal */
+        .journal-entries {
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            padding: 20px;
+            margin-bottom: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .journal-entry {
+            background: #2d2825;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #B794C4;
+        }
+
+        .journal-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .journal-entry-date {
+            font-size: 12px;
+            color: #B794C4;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .journal-entry-text {
+            font-size: 14px;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+
+        .no-entries {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .journal-input {
+            width: 100%;
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            color: #ffffff;
+            padding: 15px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .journal-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(183, 148, 196, 0.3);
+        }
+
+        /* Daily Exercise */
+        .exercise-timer {
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-display {
+            font-size: 72px;
+            font-weight: 900;
+            color: #B794C4;
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .exercise-prompt {
+            font-size: 20px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+            min-height: 60px;
+            font-weight: 600;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            background: #B794C4;
+            color: #1a1512;
+            border: 4px solid #B794C4;
+            padding: 15px 30px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+
+        .timer-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .timer-btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .timer-btn.secondary {
+            background: #2d2825;
+            color: #B794C4;
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            background: #2d2825;
+            border: 4px solid #B794C4;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 8px 8px 0 rgba(183, 148, 196, 0.4);
+        }
+
+        .progress-section h3 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #B794C4;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: #1a1512;
+            border: 3px solid #B794C4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 900;
+            color: #B794C4;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #e0e0e0;
+            text-transform: uppercase;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .giant-letter {
+                font-size: 80px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .exercise-card h2 {
+                font-size: 24px;
+            }
+
+            .timer-display {
+                font-size: 48px;
+            }
+
+            .timer-controls {
+                flex-direction: column;
+            }
+
+            .timer-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="../imagine.html" class="back-btn">← BACK</a>
+            <div class="header-content">
+                <div class="giant-letter">G</div>
+                <h1 class="section-title">Gratitude</h1>
+            </div>
+        </div>
+
+        <!-- Intro -->
+        <div class="intro">
+            <p>Gratitude isn't about toxic positivity or ignoring the hard stuff. It's about training your brain to notice the good alongside the bad. These practices help build calm, self-appreciation, and resilience—one small moment at a time.</p>
+        </div>
+
+        <!-- Small Wins Celebration -->
+        <div class="exercise-card">
+            <h2>Small Wins Celebration</h2>
+            <p>Acknowledge one small win from today. It doesn't have to be huge—just something you did that moved you forward.</p>
+
+            <div class="steps">
+                <ol>
+                    <li><strong>Pause:</strong> Stop what you're doing</li>
+                    <li><strong>Reflect:</strong> What's one small thing you did today?</li>
+                    <li><strong>Acknowledge:</strong> Write it down below</li>
+                    <li><strong>Feel:</strong> Notice how it feels to recognize this</li>
+                    <li><strong>Lock it in:</strong> Take a breath and let it sink in</li>
+                </ol>
+            </div>
+
+            <textarea id="winInput" class="win-input" placeholder="I made progress today by..."></textarea>
+            <button id="winBtn" class="btn">Celebrate This Win</button>
+            <div id="winSuccess" class="success-message">
+                Win celebrated! You're making progress. 🎉
+            </div>
+        </div>
+
+        <!-- Gratitude Journal -->
+        <div class="exercise-card">
+            <h2>Gratitude Journal</h2>
+            <p>Create a collection of things that make you happy. Read this when you need a boost or reminder of the good in your life.</p>
+
+            <div class="journal-entries" id="journalEntries">
+                <div class="no-entries">No entries yet. Start by writing something you're grateful for.</div>
+            </div>
+
+            <textarea id="journalInput" class="journal-input" placeholder="Today I'm grateful for..."></textarea>
+            <button id="journalBtn" class="btn">Add to Journal</button>
+            <div id="journalSuccess" class="success-message">
+                Entry added to your gratitude journal!
+            </div>
+        </div>
+
+        <!-- Daily Gratitude Exercise -->
+        <div class="exercise-card">
+            <h2>Daily Gratitude Exercise</h2>
+            <p>A quick 30-60 second guided practice to build calm and self-appreciation. Just press start and follow along.</p>
+
+            <div class="exercise-timer">
+                <div class="timer-display" id="timerDisplay">0:00</div>
+                <div class="exercise-prompt" id="exercisePrompt">Ready when you are.</div>
+                <div class="timer-controls">
+                    <button id="startBtn" class="timer-btn">Start Exercise</button>
+                    <button id="resetBtn" class="timer-btn secondary" style="display: none;">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-section">
+            <h3>Your Gratitude Practice</h3>
+            <div class="progress-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="winsCount">0</div>
+                    <div class="stat-label">Wins Celebrated</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="journalCount">0</div>
+                    <div class="stat-label">Journal Entries</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="exerciseCount">0</div>
+                    <div class="stat-label">Exercises Completed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage keys
+        const STORAGE_KEYS = {
+            wins: 'gratitude_wins_count',
+            journal: 'gratitude_journal_entries',
+            exercises: 'gratitude_exercises_count'
+        };
+
+        // Initialize progress stats
+        function loadProgress() {
+            document.getElementById('winsCount').textContent = localStorage.getItem(STORAGE_KEYS.wins) || 0;
+            document.getElementById('exerciseCount').textContent = localStorage.getItem(STORAGE_KEYS.exercises) || 0;
+            loadJournalEntries();
+        }
+
+        // Small Wins Celebration
+        document.getElementById('winBtn').addEventListener('click', function() {
+            const input = document.getElementById('winInput');
+            const success = document.getElementById('winSuccess');
+
+            if (input.value.trim()) {
+                // Increment count
+                const count = parseInt(localStorage.getItem(STORAGE_KEYS.wins) || 0) + 1;
+                localStorage.setItem(STORAGE_KEYS.wins, count);
+                document.getElementById('winsCount').textContent = count;
+
+                // Show success
+                success.classList.add('show');
+                input.value = '';
+
+                // Hide success after 3 seconds
+                setTimeout(() => {
+                    success.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // Gratitude Journal
+        function loadJournalEntries() {
+            const entries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
+            const container = document.getElementById('journalEntries');
+
+            document.getElementById('journalCount').textContent = entries.length;
+
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="no-entries">No entries yet. Start by writing something you\'re grateful for.</div>';
+                return;
+            }
+
+            // Show most recent entries first
+            container.innerHTML = entries.reverse().map(entry => `
+                <div class="journal-entry">
+                    <div class="journal-entry-date">${new Date(entry.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })}</div>
+                    <div class="journal-entry-text">${escapeHtml(entry.text)}</div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('journalBtn').addEventListener('click', function() {
+            const input = document.getElementById('journalInput');
+            const success = document.getElementById('journalSuccess');
+
+            if (input.value.trim()) {
+                // Get existing entries
+                const entries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
+
+                // Add new entry
+                entries.push({
+                    date: new Date().toISOString(),
+                    text: input.value.trim()
+                });
+
+                // Save
+                localStorage.setItem(STORAGE_KEYS.journal, JSON.stringify(entries));
+
+                // Reload display
+                loadJournalEntries();
+
+                // Show success
+                success.classList.add('show');
+                input.value = '';
+
+                // Hide success after 3 seconds
+                setTimeout(() => {
+                    success.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // Daily Gratitude Exercise
+        const exercisePrompts = [
+            { time: 0, text: "Take a deep breath in... and out..." },
+            { time: 5, text: "Think of one thing you're grateful for today..." },
+            { time: 15, text: "Picture it clearly in your mind..." },
+            { time: 25, text: "Notice how it makes you feel..." },
+            { time: 35, text: "Think of something you appreciate about yourself..." },
+            { time: 45, text: "Let that appreciation sink in..." },
+            { time: 55, text: "Take one more deep breath..." },
+            { time: 60, text: "Exercise complete. Well done!" }
+        ];
+
+        let timerInterval = null;
+        let currentTime = 0;
+        let exerciseRunning = false;
+
+        function updateTimer() {
+            const display = document.getElementById('timerDisplay');
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updatePrompt() {
+            const prompt = document.getElementById('exercisePrompt');
+            // Find the most recent prompt that should be showing
+            for (let i = exercisePrompts.length - 1; i >= 0; i--) {
+                if (currentTime >= exercisePrompts[i].time) {
+                    prompt.textContent = exercisePrompts[i].text;
+                    break;
+                }
+            }
+        }
+
+        function startExercise() {
+            exerciseRunning = true;
+            currentTime = 0;
+            updateTimer();
+            updatePrompt();
+
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'inline-block';
+
+            timerInterval = setInterval(() => {
+                currentTime++;
+                updateTimer();
+                updatePrompt();
+
+                if (currentTime >= 60) {
+                    stopExercise(true);
+                }
+            }, 1000);
+        }
+
+        function stopExercise(completed = false) {
+            clearInterval(timerInterval);
+            exerciseRunning = false;
+
+            if (completed) {
+                // Increment exercise count
+                const count = parseInt(localStorage.getItem(STORAGE_KEYS.exercises) || 0) + 1;
+                localStorage.setItem(STORAGE_KEYS.exercises, count);
+                document.getElementById('exerciseCount').textContent = count;
+            }
+
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'none';
+
+            currentTime = 0;
+            updateTimer();
+            document.getElementById('exercisePrompt').textContent = completed ?
+                "Exercise complete. Well done!" : "Ready when you are.";
+        }
+
+        document.getElementById('startBtn').addEventListener('click', startExercise);
+        document.getElementById('resetBtn').addEventListener('click', () => stopExercise(false));
+
+        // Load progress on page load
+        loadProgress();
+    </script>
+</body>
+</html>

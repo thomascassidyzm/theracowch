@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I - Interactions | IMAGINE | cowch.app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background-color: #1a1512;
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 40px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2d2825;
+            color: #6B9AAF;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #6B9AAF;
+            box-shadow: 8px 8px 0 rgba(107, 154, 175, 0.3);
+            transition: all 0.2s;
+            margin-bottom: 30px;
+        }
+
+        .back-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 rgba(107, 154, 175, 0.3);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .giant-letter {
+            font-size: 120px;
+            font-weight: 900;
+            color: #6B9AAF;
+            line-height: 1;
+            text-shadow: 6px 6px 0 rgba(107, 154, 175, 0.3);
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .section-intro {
+            background: #2d2825;
+            padding: 30px;
+            border: 5px solid #6B9AAF;
+            box-shadow: 12px 12px 0 rgba(107, 154, 175, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .section-intro p {
+            font-size: 18px;
+            color: #e0e0e0;
+        }
+
+        /* Exercise Cards */
+        .exercise-card {
+            background: #2d2825;
+            padding: 35px;
+            border: 5px solid #6B9AAF;
+            box-shadow: 12px 12px 0 rgba(107, 154, 175, 0.2);
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .exercise-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 16px 16px 0 rgba(107, 154, 175, 0.3);
+        }
+
+        .exercise-card h2 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #6B9AAF;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .exercise-description {
+            font-size: 16px;
+            color: #c0c0c0;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        /* Connection Web Visualization */
+        .connection-web-container {
+            margin: 25px 0;
+            padding: 40px 20px;
+            background: #1a1512;
+            border: 3px solid #6B9AAF;
+        }
+
+        .circles-diagram {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 4px solid #6B9AAF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #6B9AAF;
+            text-align: center;
+        }
+
+        .circle.inner {
+            width: 30%;
+            height: 30%;
+            top: 35%;
+            left: 35%;
+            background: rgba(107, 154, 175, 0.3);
+            border-width: 5px;
+        }
+
+        .circle.middle {
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+            background: rgba(107, 154, 175, 0.15);
+        }
+
+        .circle.outer {
+            width: 90%;
+            height: 90%;
+            top: 5%;
+            left: 5%;
+            background: rgba(107, 154, 175, 0.05);
+        }
+
+        .web-legend {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .legend-item {
+            padding: 15px;
+            background: #2d2825;
+            border-left: 6px solid #6B9AAF;
+        }
+
+        .legend-item strong {
+            color: #6B9AAF;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Daily Check-in Prompt */
+        .checkin-prompt {
+            background: #1a1512;
+            padding: 25px;
+            border: 3px solid #6B9AAF;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .checkin-prompt p {
+            font-size: 20px;
+            font-weight: 700;
+            color: #6B9AAF;
+            margin-bottom: 15px;
+        }
+
+        .checkin-suggestions {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .suggestion-item {
+            padding: 15px;
+            background: #2d2825;
+            border: 3px solid #6B9AAF;
+            font-size: 15px;
+            color: #e0e0e0;
+        }
+
+        /* Comfort Zone Ladder */
+        .ladder {
+            display: grid;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .ladder-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #1a1512;
+            border: 3px solid #6B9AAF;
+            transition: all 0.2s;
+        }
+
+        .ladder-step:hover {
+            background: rgba(107, 154, 175, 0.1);
+            transform: translateX(5px);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #6B9AAF;
+            color: #1a1512;
+            font-size: 24px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #6B9AAF;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: #c0c0c0;
+            font-size: 14px;
+        }
+
+        /* Difficult Conversations Script */
+        .script-template {
+            background: #1a1512;
+            padding: 30px;
+            border: 3px solid #6B9AAF;
+            margin: 25px 0;
+        }
+
+        .script-line {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #2d2825;
+            border-left: 6px solid #6B9AAF;
+        }
+
+        .script-label {
+            font-weight: 900;
+            color: #6B9AAF;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .script-input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1512;
+            border: 3px solid #6B9AAF;
+            color: #fff;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .script-input:focus {
+            box-shadow: 0 0 0 3px rgba(107, 154, 175, 0.3);
+        }
+
+        .script-preview {
+            margin-top: 25px;
+            padding: 25px;
+            background: #2d2825;
+            border: 4px solid #6B9AAF;
+            box-shadow: 8px 8px 0 rgba(107, 154, 175, 0.2);
+        }
+
+        .script-preview h3 {
+            color: #6B9AAF;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .script-preview p {
+            color: #e0e0e0;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            margin-top: 50px;
+            padding: 30px;
+            background: #2d2825;
+            border: 5px solid #6B9AAF;
+            box-shadow: 12px 12px 0 rgba(107, 154, 175, 0.2);
+            text-align: center;
+        }
+
+        .progress-section h3 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #6B9AAF;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #1a1512;
+            border: 4px solid #6B9AAF;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #6B9AAF;
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(107, 154, 175, 0.5);
+        }
+
+        .progress-text {
+            margin-top: 15px;
+            color: #c0c0c0;
+            font-size: 14px;
+        }
+
+        /* Interactive Elements */
+        .action-button {
+            padding: 15px 30px;
+            background: #6B9AAF;
+            color: #1a1512;
+            font-weight: 900;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Gabarito', sans-serif;
+            text-transform: uppercase;
+            box-shadow: 6px 6px 0 rgba(107, 154, 175, 0.3);
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .action-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 rgba(107, 154, 175, 0.3);
+        }
+
+        .action-button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 1px 1px 0 rgba(107, 154, 175, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .giant-letter {
+                font-size: 80px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .exercise-card h2 {
+                font-size: 24px;
+            }
+
+            .header-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="../imagine.html" class="back-button">← Back to IMAGINE</a>
+            <div class="header-title">
+                <div class="giant-letter">I</div>
+                <h1>Interactions</h1>
+            </div>
+        </header>
+
+        <div class="section-intro">
+            <p>Explore and strengthen your social connections. These tools help you map your relationships, practice social skills, and navigate difficult conversations with confidence and clarity.</p>
+        </div>
+
+        <!-- Exercise 1: Connection Web -->
+        <div class="exercise-card">
+            <h2>Connection Web</h2>
+            <p class="exercise-description">
+                Visualize your relationships as concentric circles. Understanding who's in your inner, middle, and outer circles helps you set appropriate boundaries and invest energy wisely.
+            </p>
+
+            <div class="connection-web-container">
+                <div class="circles-diagram">
+                    <div class="circle outer">Outer Circle</div>
+                    <div class="circle middle">Middle Circle</div>
+                    <div class="circle inner">Inner Circle</div>
+                </div>
+
+                <div class="web-legend">
+                    <div class="legend-item">
+                        <strong>Inner Circle: Closest Support</strong>
+                        People you can be fully vulnerable with. They energize and support you unconditionally. You can call them at 3am.
+                    </div>
+                    <div class="legend-item">
+                        <strong>Middle Circle: Regular Connections</strong>
+                        Friends, colleagues, and family you see regularly. Mostly positive interactions, though not deep vulnerability.
+                    </div>
+                    <div class="legend-item">
+                        <strong>Outer Circle: Acquaintances</strong>
+                        Casual contacts, work associates, distant friends. Pleasant but limited emotional investment.
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 25px; color: #c0c0c0; font-size: 15px;">
+                <strong style="color: #6B9AAF;">Reflect:</strong> Who belongs in each circle? Are there people who drain you that you're treating as inner circle? Are there supportive people you're keeping at arm's length?
+            </p>
+        </div>
+
+        <!-- Exercise 2: Daily Connection Check-in -->
+        <div class="exercise-card">
+            <h2>Daily Connection Check-in</h2>
+            <p class="exercise-description">
+                Combat isolation with small, meaningful gestures. One kind message a day can strengthen bonds and remind you that you're not alone.
+            </p>
+
+            <div class="checkin-prompt">
+                <p>Who could you reach out to today?</p>
+            </div>
+
+            <div class="checkin-suggestions">
+                <div class="suggestion-item">
+                    <strong style="color: #6B9AAF;">Text a friend:</strong> "Hey, been thinking about you. How are you doing?"
+                </div>
+                <div class="suggestion-item">
+                    <strong style="color: #6B9AAF;">Send appreciation:</strong> "I really appreciated when you [specific thing]. Thank you."
+                </div>
+                <div class="suggestion-item">
+                    <strong style="color: #6B9AAF;">Share something small:</strong> "Saw this and thought of you [photo/meme/article]"
+                </div>
+                <div class="suggestion-item">
+                    <strong style="color: #6B9AAF;">Check in:</strong> "I know things have been hard. Just wanted you to know I'm here."
+                </div>
+                <div class="suggestion-item">
+                    <strong style="color: #6B9AAF;">Make plans:</strong> "Want to grab coffee/go for a walk this week?"
+                </div>
+            </div>
+
+            <p style="margin-top: 20px; color: #c0c0c0; font-size: 15px;">
+                Remember: The message doesn't have to be perfect. Reaching out is what matters.
+            </p>
+        </div>
+
+        <!-- Exercise 3: Comfort Zone Ladder -->
+        <div class="exercise-card">
+            <h2>Comfort Zone Ladder</h2>
+            <p class="exercise-description">
+                Social anxiety lessens with gradual exposure. Start with small steps and work your way up. Celebrate each rung you climb.
+            </p>
+
+            <div class="ladder">
+                <div class="ladder-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Make Eye Contact</div>
+                        <div class="step-description">Notice people around you. Make brief, friendly eye contact with someone in passing.</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Smile</div>
+                        <div class="step-description">Add a small smile when you make eye contact. It's a low-stakes social gesture.</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Say Hello</div>
+                        <div class="step-description">Greet someone you see regularly - a neighbor, cashier, coworker. Just "Hey" or "Good morning."</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Make Small Talk</div>
+                        <div class="step-description">Add one comment or observation: "Nice weather today" or "Busy morning, huh?"</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Ask a Question</div>
+                        <div class="step-description">Ask something simple: "How's your day going?" or "Have you tried [thing]?"</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Have a Brief Conversation</div>
+                        <div class="step-description">Let the exchange go beyond one question. Share something about yourself when relevant.</div>
+                    </div>
+                </div>
+
+                <div class="ladder-step">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <div class="step-title">Initiate Plans</div>
+                        <div class="step-description">Suggest a specific activity: "Want to get lunch sometime?" or "There's a thing happening - interested?"</div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 20px; color: #c0c0c0; font-size: 15px;">
+                <strong style="color: #6B9AAF;">Remember:</strong> You don't have to climb the whole ladder today. Pick the step that feels challenging but doable. Practice it until it feels easier, then move up.
+            </p>
+        </div>
+
+        <!-- Exercise 4: Difficult Conversations -->
+        <div class="exercise-card">
+            <h2>Difficult Conversations</h2>
+            <p class="exercise-description">
+                Use this assertive communication template to express your needs clearly without aggression or avoidance. Structure helps when emotions run high.
+            </p>
+
+            <div class="script-template">
+                <div class="script-line">
+                    <div class="script-label">I feel...</div>
+                    <input type="text" class="script-input" id="feeling" placeholder="(name the emotion: hurt, frustrated, overwhelmed, dismissed)">
+                </div>
+
+                <div class="script-line">
+                    <div class="script-label">When...</div>
+                    <input type="text" class="script-input" id="when" placeholder="(describe the specific behavior, not the person: 'when plans change last minute' not 'when you're flaky')">
+                </div>
+
+                <div class="script-line">
+                    <div class="script-label">Because...</div>
+                    <input type="text" class="script-input" id="because" placeholder="(explain the impact: 'it makes me feel like my time isn't valued')">
+                </div>
+
+                <div class="script-line">
+                    <div class="script-label">I would appreciate...</div>
+                    <input type="text" class="script-input" id="appreciate" placeholder="(make a clear request: 'if you could let me know earlier when things change')">
+                </div>
+
+                <div class="script-preview">
+                    <h3>Your Script Preview:</h3>
+                    <p id="preview-text">Fill in the fields above to see your full assertive statement...</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; padding: 20px; background: #1a1512; border: 3px solid #6B9AAF;">
+                <strong style="color: #6B9AAF; display: block; margin-bottom: 10px;">Tips for Delivery:</strong>
+                <ul style="color: #c0c0c0; padding-left: 20px; line-height: 1.8;">
+                    <li>Pick the right time - not during an argument or when rushed</li>
+                    <li>Use "I" statements, not "You" accusations</li>
+                    <li>Stay specific - don't bring up old issues</li>
+                    <li>Listen to their response without interrupting</li>
+                    <li>Be prepared to compromise, but hold your boundary</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-section">
+            <h3>Your Interaction Practice Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                Complete exercises to track your progress. Every small step counts.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Difficult Conversations Script Builder
+        const feeling = document.getElementById('feeling');
+        const when = document.getElementById('when');
+        const because = document.getElementById('because');
+        const appreciate = document.getElementById('appreciate');
+        const previewText = document.getElementById('preview-text');
+
+        function updatePreview() {
+            const feelingVal = feeling.value.trim();
+            const whenVal = when.value.trim();
+            const becauseVal = because.value.trim();
+            const appreciateVal = appreciate.value.trim();
+
+            if (feelingVal || whenVal || becauseVal || appreciateVal) {
+                let script = '';
+                if (feelingVal) script += `I feel ${feelingVal}`;
+                if (whenVal) script += ` when ${whenVal}`;
+                if (becauseVal) script += ` because ${becauseVal}`;
+                if (appreciateVal) script += `. I would appreciate ${appreciateVal}`;
+
+                if (!script.endsWith('.')) script += '.';
+
+                previewText.textContent = script;
+            } else {
+                previewText.textContent = 'Fill in the fields above to see your full assertive statement...';
+            }
+        }
+
+        feeling.addEventListener('input', updatePreview);
+        when.addEventListener('input', updatePreview);
+        because.addEventListener('input', updatePreview);
+        appreciate.addEventListener('input', updatePreview);
+
+        // Simple Progress Tracking (localStorage)
+        function updateProgress() {
+            const exercises = [
+                'connectionWeb',
+                'dailyCheckin',
+                'comfortLadder',
+                'difficultConvo'
+            ];
+
+            let completed = 0;
+            exercises.forEach(ex => {
+                if (localStorage.getItem(`interactions_${ex}`)) {
+                    completed++;
+                }
+            });
+
+            const percentage = (completed / exercises.length) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        // Mark exercises as interacted with
+        document.querySelector('.connection-web-container').addEventListener('click', () => {
+            localStorage.setItem('interactions_connectionWeb', 'true');
+            updateProgress();
+        });
+
+        document.querySelector('.checkin-suggestions').addEventListener('click', () => {
+            localStorage.setItem('interactions_dailyCheckin', 'true');
+            updateProgress();
+        });
+
+        document.querySelector('.ladder').addEventListener('click', () => {
+            localStorage.setItem('interactions_comfortLadder', 'true');
+            updateProgress();
+        });
+
+        document.querySelector('.script-template').addEventListener('input', () => {
+            localStorage.setItem('interactions_difficultConvo', 'true');
+            updateProgress();
+        });
+
+        // Initialize progress on load
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A - Acceptance | cowch.app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Dark warm palette */
+            --bg-primary: #1a1512;
+            --bg-secondary: #2a2320;
+            --bg-card: #2d2825;
+            --bg-card-hover: #3a3533;
+
+            /* Gold accent for acceptance */
+            --accent: #C9A857;
+            --accent-dark: #B89847;
+            --accent-light: #D4B567;
+
+            /* Text colors */
+            --text-primary: #F5F0E8;
+            --text-secondary: #FFF8F0;
+            --text-muted: #b0a499;
+
+            /* Borders */
+            --border-warm: #8a7a6a;
+
+            /* Brutalism design tokens */
+            --border-thicc: 5px;
+            --border-medium: 3px;
+            --radius-chunky: 32px;
+            --radius-medium: 24px;
+            --radius-small: 16px;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.01) 2px,
+                    rgba(255, 255, 255, 0.01) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .back-btn {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 12px 24px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+        }
+
+        .back-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--accent);
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .giant-letter {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+            text-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        /* Section Intro */
+        .section-intro {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--accent);
+            border-radius: var(--radius-chunky);
+            padding: 32px;
+            margin-bottom: 40px;
+            position: relative;
+            animation: slideUp 0.7s ease-out 0.1s both;
+        }
+
+        .section-intro h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .section-intro p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Exercise Cards */
+        .exercises {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .exercise-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: 32px;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: slideUp 0.7s ease-out both;
+        }
+
+        .exercise-card:nth-child(1) { animation-delay: 0.2s; }
+        .exercise-card:nth-child(2) { animation-delay: 0.3s; }
+        .exercise-card:nth-child(3) { animation-delay: 0.4s; }
+        .exercise-card:nth-child(4) { animation-delay: 0.5s; }
+
+        .exercise-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 8px 8px 0 0 var(--accent);
+        }
+
+        .exercise-number {
+            position: absolute;
+            top: -16px;
+            left: 32px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-size: 1.5rem;
+            font-weight: 900;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: var(--border-medium) solid var(--bg-primary);
+            box-shadow: 0 0 0 var(--border-medium) var(--accent);
+        }
+
+        .exercise-card h3 {
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .exercise-card p {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .exercise-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .exercise-subtitle {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .exercise-list li {
+            padding-left: 32px;
+            margin-bottom: 12px;
+            position: relative;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .exercise-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        .heal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .heal-item {
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 20px;
+        }
+
+        .heal-letter {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .heal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .heal-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .exercise-box {
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--accent);
+            border-radius: var(--radius-medium);
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .exercise-box-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .emphasis {
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+
+        .quote-box {
+            background: var(--bg-secondary);
+            border-left: 6px solid var(--accent);
+            padding: 20px 24px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--accent);
+            border-radius: var(--radius-chunky);
+            padding: 32px;
+            text-align: center;
+            animation: slideUp 0.7s ease-out 0.6s both;
+        }
+
+        .progress-label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        .streak-display {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 12px;
+            text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .streak-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .section-intro,
+            .exercise-card,
+            .progress-section {
+                padding: 24px;
+            }
+
+            .heal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/app.html#imagine" class="back-btn">← Back</a>
+            <div class="header-content">
+                <div class="giant-letter">A</div>
+                <h1 class="header-title">Acceptance</h1>
+            </div>
+        </header>
+
+        <!-- Section Intro -->
+        <section class="section-intro">
+            <h2>Embracing Your Current State</h2>
+            <p>Acceptance doesn't mean approval or giving up. It means letting go of the extra suffering that comes from resisting reality. When we accept what is, we free ourselves to move forward with clarity and peace.</p>
+        </section>
+
+        <!-- Exercise Cards -->
+        <div class="exercises">
+            <!-- Exercise 1: Basic Acceptance -->
+            <article class="exercise-card">
+                <div class="exercise-number">1</div>
+                <h3>Basic Acceptance</h3>
+                <p>The foundation of all acceptance practice is simple but powerful: acknowledge what is real right now, without fighting it.</p>
+
+                <div class="exercise-box">
+                    <div class="exercise-box-title">Try This Now:</div>
+                    <ul class="exercise-list">
+                        <li>Take a slow, deep breath</li>
+                        <li>Say to yourself: <span class="emphasis">"This is reality right now"</span></li>
+                        <li>Notice what happens in your body as you stop resisting</li>
+                    </ul>
+                </div>
+
+                <div class="quote-box">
+                    "Acceptance is not approval. It's letting go of extra suffering by acknowledging what is."
+                </div>
+
+                <p>Think of situations you resist instead of accepting. What would accepting (not approving, just acknowledging) allow you to feel or do?</p>
+            </article>
+
+            <!-- Exercise 2: Thought Unhooking -->
+            <article class="exercise-card">
+                <div class="exercise-number">2</div>
+                <h3>Thought Unhooking</h3>
+                <p>Imagine your thoughts as leaves floating down a stream. Some drift by quickly, others linger, but <span class="emphasis">none of them need to hook you</span>.</p>
+
+                <p class="exercise-subtitle">The Reality:</p>
+                <ul class="exercise-list">
+                    <li>We have about <span class="emphasis">6,000 distinct thoughts per day</span></li>
+                    <li>Most are repetitive or fleeting</li>
+                    <li>Only a small fraction are directly useful</li>
+                    <li><span class="emphasis">Thoughts are NOT facts</span></li>
+                </ul>
+
+                <div class="exercise-box">
+                    <div class="exercise-box-title">Practice Right Now:</div>
+                    <p><strong>1. Identify:</strong> What thought is bothering you right now?</p>
+                    <p><strong>2. Write it down:</strong> Capture that negative thought exactly as it appears.</p>
+                    <p><strong>3. Reframe it:</strong> Challenge it with a more balanced perspective.</p>
+
+                    <p style="margin-top: 20px;"><strong>Example:</strong></p>
+                    <p><em>Original:</em> "Once people know me, they won't like me."</p>
+                    <p><em>Reframe:</em> "No one is perfect. Not everyone dislikes me. Some people appreciate who I am."</p>
+                </div>
+
+                <p style="margin-top: 20px;">Don't believe every thought that crosses your mind. Most are based on fear, not truth.</p>
+            </article>
+
+            <!-- Exercise 3: HEAL Framework -->
+            <article class="exercise-card">
+                <div class="exercise-number">3</div>
+                <h3>HEAL Framework</h3>
+                <p>Self-compassion calms your mind and body. MRI studies show that self-criticism activates your brain's threat system, while compassion activates safety and care areas. Being gentle isn't indulgent—it's proven stress reduction.</p>
+
+                <div class="heal-grid">
+                    <div class="heal-item">
+                        <div class="heal-letter">H</div>
+                        <div class="heal-title">Helpful?</div>
+                        <div class="heal-description">Is this negative thought actually helpful? Usually no. When we realize this, we can let go instead of focusing on it. What we focus on becomes our reality.</div>
+                    </div>
+
+                    <div class="heal-item">
+                        <div class="heal-letter">E</div>
+                        <div class="heal-title">Evidence?</div>
+                        <div class="heal-description">Where's the evidence for or against this thought? Most negative thoughts have little actual evidence. We personalize and mind-read without facts.</div>
+                    </div>
+
+                    <div class="heal-item">
+                        <div class="heal-letter">A</div>
+                        <div class="heal-title">Alternative?</div>
+                        <div class="heal-description">What can you tell yourself to feel better? Reframe the situation. Maybe that colleague isn't annoyed—they're just having a bad day.</div>
+                    </div>
+
+                    <div class="heal-item">
+                        <div class="heal-letter">L</div>
+                        <div class="heal-title">Loved one?</div>
+                        <div class="heal-description">What would you say to a loved one in this situation? You wouldn't tell them they're wrong or a loser. You'd be supportive and encouraging. Talk to yourself this way.</div>
+                    </div>
+                </div>
+
+                <div class="quote-box" style="margin-top: 24px;">
+                    "Self-compassion calms your body. Self-criticism triggers your threat system."
+                </div>
+            </article>
+
+            <!-- Exercise 4: Radical Acceptance -->
+            <article class="exercise-card">
+                <div class="exercise-number">4</div>
+                <h3>Radical Acceptance</h3>
+                <p>Sometimes we hold on to situations we can't change—a relationship that's over, a job we lost, circumstances beyond our control. The self-pity and "why me?" dialogue only prolongs our suffering.</p>
+
+                <p class="exercise-subtitle">Ask yourself: What am I resisting?</p>
+
+                <div class="exercise-box">
+                    <div class="exercise-box-title">Exercise 1: Softening Into Reality</div>
+                    <ul class="exercise-list">
+                        <li><strong>Notice the struggle:</strong> Bring to mind an unfair, painful, or uncontrollable situation</li>
+                        <li><strong>Name reality:</strong> Silently say, "This is what's happening right now"</li>
+                        <li><strong>Drop the fight:</strong> Instead of "It shouldn't be this way," soften into acceptance</li>
+                        <li><strong>Acceptance statement:</strong> "I may not like it, but this is the reality I face"</li>
+                        <li><strong>Breathe into it:</strong> Take a slow breath and imagine making space around the pain</li>
+                        <li><strong>Shift toward peace:</strong> Remind yourself that accepting doesn't mean approving</li>
+                        <li><strong>Freedom message:</strong> "I'm freeing myself from extra suffering"</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-box">
+                    <div class="exercise-box-title">Exercise 2: Reaffirmation Practice</div>
+                    <ul class="exercise-list">
+                        <li><strong>Settle and breathe:</strong> Sit comfortably, close your eyes, take slow breaths</li>
+                        <li><strong>Recall struggle:</strong> Think of recent resistance or holding on</li>
+                        <li><strong>Whisper acceptance:</strong> "I don't have to fight this. I can let go."</li>
+                        <li><strong>Reaffirm benefits:</strong>
+                            <ul style="margin-top: 8px; margin-left: 20px; list-style: circle;">
+                                <li>Acceptance helps me move forward</li>
+                                <li>Letting go brings peace</li>
+                                <li>When I accept, I feel lighter, calmer, centered</li>
+                                <li>Letting go of the uncontrollable helps me find contentment</li>
+                            </ul>
+                        </li>
+                        <li><strong>Rest in calm:</strong> Place a hand on your heart, notice the warmth, sit quietly</li>
+                    </ul>
+                </div>
+
+                <div class="quote-box" style="margin-top: 24px;">
+                    "Let go of what you can't control. You have power over your thoughts and behaviors—that's where your true power lives."
+                </div>
+            </article>
+        </div>
+
+        <!-- Progress Indicator -->
+        <section class="progress-section">
+            <div class="progress-label">Your Acceptance Streak</div>
+            <div class="streak-display" id="streak-number">5</div>
+            <div class="streak-text">days of practice</div>
+        </section>
+    </div>
+
+    <script>
+        // Load streak from localStorage
+        const STORAGE_KEY = 'cowch_imagine_progress';
+
+        function loadStreak() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const progress = JSON.parse(stored);
+                    if (progress.acceptance_streak !== undefined) {
+                        document.getElementById('streak-number').textContent = progress.acceptance_streak;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not load streak data');
+            }
+        }
+
+        // Initialize
+        loadStreak();
+        console.log('Acceptance section initialized');
+    </script>
+</body>
+</html>

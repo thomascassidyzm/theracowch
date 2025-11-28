@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E - Exploring | IMAGINE | Cowch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: #1a1512;
+            color: #e8e6e3;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #2d2825;
+            color: #e8e6e3;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.2s;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .back-button:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 #000;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .giant-letter {
+            font-size: 8rem;
+            font-weight: 900;
+            color: #8FBC8F;
+            line-height: 1;
+            text-shadow: 6px 6px 0 #000;
+        }
+
+        .title-text h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #8FBC8F;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .title-text p {
+            font-size: 1.25rem;
+            color: #a8a6a3;
+            font-weight: 500;
+        }
+
+        /* Section Intro */
+        .section-intro {
+            background: #2d2825;
+            padding: 2rem;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            margin-bottom: 3rem;
+        }
+
+        .section-intro h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #8FBC8F;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .section-intro p {
+            font-size: 1.125rem;
+            color: #c8c6c3;
+            margin-bottom: 1rem;
+        }
+
+        .section-intro p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Exercise Cards Grid */
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .exercise-card {
+            background: #2d2825;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            padding: 2rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .exercise-card:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 6px 6px 0 #000;
+        }
+
+        .exercise-card:active {
+            transform: translate(8px, 8px);
+            box-shadow: 0 0 0 #000;
+        }
+
+        .exercise-icon {
+            width: 60px;
+            height: 60px;
+            background: #8FBC8F;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0 #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #8FBC8F;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .exercise-card p {
+            font-size: 1rem;
+            color: #a8a6a3;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-features {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .exercise-features li {
+            font-size: 0.95rem;
+            color: #c8c6c3;
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-features li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #8FBC8F;
+            font-weight: 700;
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            background: #2d2825;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .progress-section h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #8FBC8F;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-container {
+            background: #1a1512;
+            height: 40px;
+            border: 4px solid #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #8FBC8F;
+            border-right: 4px solid #000;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+        }
+
+        .progress-text {
+            font-weight: 800;
+            color: #000;
+            font-size: 1rem;
+        }
+
+        .progress-label {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #a8a6a3;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .giant-letter {
+                font-size: 5rem;
+            }
+
+            .title-text h1 {
+                font-size: 2rem;
+            }
+
+            .title-text p {
+                font-size: 1rem;
+            }
+
+            .title-section {
+                gap: 1rem;
+            }
+
+            .exercises-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-intro h2 {
+                font-size: 1.5rem;
+            }
+
+            .section-intro p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="../imagine.html" class="back-button">
+                <span>←</span>
+                <span>Back to IMAGINE</span>
+            </a>
+
+            <div class="title-section">
+                <div class="giant-letter">E</div>
+                <div class="title-text">
+                    <h1>Exploring</h1>
+                    <p>Understanding Your Inner Landscape</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Intro -->
+        <div class="section-intro">
+            <h2>Understanding Thoughts & Behaviors</h2>
+            <p>Exploration is about discovering the patterns, beliefs, and behaviors that shape your anxiety. This isn't about judgment—it's about curiosity and understanding.</p>
+            <p>Through these exercises, you'll map your inner world: what you value, what triggers you, how your thoughts work, and the safety behaviors that might be holding you back.</p>
+            <p>Each tool gives you a different lens to understand yourself better.</p>
+        </div>
+
+        <!-- Exercise Cards -->
+        <div class="exercises-grid">
+            <!-- Values Compass -->
+            <div class="exercise-card" onclick="location.href='./exercises/values-compass.html'">
+                <div class="exercise-icon">🧭</div>
+                <h3>Values Compass</h3>
+                <p>Discover what truly matters to you and check if your life aligns with your values.</p>
+                <ul class="exercise-features">
+                    <li>Identify your core values</li>
+                    <li>Rate alignment in life areas</li>
+                    <li>Set meaningful goals</li>
+                    <li>Build a life that fits you</li>
+                </ul>
+            </div>
+
+            <!-- Trigger Mapping -->
+            <div class="exercise-card" onclick="location.href='./exercises/trigger-mapping.html'">
+                <div class="exercise-icon">🗺️</div>
+                <h3>Trigger Mapping</h3>
+                <p>Map the situations and patterns that activate your anxiety response.</p>
+                <ul class="exercise-features">
+                    <li>Identify anxiety triggers</li>
+                    <li>Track physical responses</li>
+                    <li>Spot recurring patterns</li>
+                    <li>Develop coping strategies</li>
+                </ul>
+            </div>
+
+            <!-- Thought Record -->
+            <div class="exercise-card" onclick="location.href='./exercises/thought-record.html'">
+                <div class="exercise-icon">📝</div>
+                <h3>Thought Record</h3>
+                <p>Use CBT techniques to examine and reframe anxious thoughts.</p>
+                <ul class="exercise-features">
+                    <li>Track situation and thoughts</li>
+                    <li>Identify emotions and intensity</li>
+                    <li>Examine evidence for and against</li>
+                    <li>Develop balanced perspectives</li>
+                </ul>
+            </div>
+
+            <!-- Safety Behaviors -->
+            <div class="exercise-card" onclick="location.href='./exercises/safety-behaviors.html'">
+                <div class="exercise-icon">🛡️</div>
+                <h3>Safety Behaviors</h3>
+                <p>Recognize and reduce the subtle behaviors that maintain anxiety.</p>
+                <ul class="exercise-features">
+                    <li>Identify safety behaviors</li>
+                    <li>Understand avoidance patterns</li>
+                    <li>Plan gradual reduction</li>
+                    <li>Build true confidence</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-section">
+            <h3>Your Exploration Progress</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 0%;">
+                    <span class="progress-text">0/4</span>
+                </div>
+            </div>
+            <p class="progress-label">Complete exercises to track your exploration journey</p>
+        </div>
+    </div>
+
+    <script>
+        // Load progress from localStorage
+        function updateProgress() {
+            const exercises = ['values-compass', 'trigger-mapping', 'thought-record', 'safety-behaviors'];
+            let completed = 0;
+
+            exercises.forEach(exercise => {
+                const data = localStorage.getItem(`cowch_exploring_${exercise}`);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (parsed && Object.keys(parsed).length > 0) {
+                            completed++;
+                        }
+                    } catch (e) {
+                        // Invalid data, skip
+                    }
+                }
+            });
+
+            const percentage = (completed / exercises.length) * 100;
+            const progressBar = document.querySelector('.progress-bar');
+            const progressText = document.querySelector('.progress-text');
+
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `${completed}/${exercises.length}`;
+        }
+
+        // Update progress on page load
+        updateProgress();
+
+        // Listen for storage changes (when returning from exercise pages)
+        window.addEventListener('storage', updateProgress);
+        window.addEventListener('focus', updateProgress);
+    </script>
+</body>
+</html>

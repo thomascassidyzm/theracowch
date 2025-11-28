@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>I - Self-Care | Cowch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding: max(var(--space-lg), env(safe-area-inset-top)) var(--space-lg) max(var(--space-2xl), env(safe-area-inset-bottom));
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .header {
+            margin-bottom: var(--space-2xl);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--coral);
+            border-radius: var(--radius-medium);
+            padding: var(--space-md) var(--space-lg);
+            color: var(--coral);
+            text-decoration: none;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-base);
+            transition: all var(--transition-brutal);
+            margin-bottom: var(--space-xl);
+        }
+
+        .back-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--coral);
+        }
+
+        .section-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .giant-letter {
+            font-size: var(--font-size-giant);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+            line-height: 1;
+            text-shadow: 4px 4px 0 var(--bg-card);
+        }
+
+        .title-text {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-black);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .section-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-normal);
+        }
+
+        /* Intro Section */
+        .intro {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--coral);
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            animation: slideUp 0.7s ease-out 0.1s both;
+        }
+
+        .intro p {
+            font-size: var(--font-size-lg);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--coral);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+            text-align: center;
+            animation: slideUp 0.7s ease-out 0.2s both;
+        }
+
+        .streak-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .streak-number {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+            margin-bottom: var(--space-xs);
+        }
+
+        .streak-text {
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+        }
+
+        /* Exercise Cards */
+        .exercises-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+        }
+
+        .exercise-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            transition: all var(--transition-brutal);
+            animation: slideUp 0.7s ease-out both;
+        }
+
+        .exercise-card:nth-child(1) { animation-delay: 0.3s; }
+        .exercise-card:nth-child(2) { animation-delay: 0.4s; }
+        .exercise-card:nth-child(3) { animation-delay: 0.5s; }
+
+        .exercise-card.completed {
+            border-color: var(--coral);
+        }
+
+        .exercise-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 0 var(--coral);
+            border-color: var(--coral);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-lg);
+        }
+
+        .exercise-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-black);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .exercise-description {
+            font-size: var(--font-size-base);
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .completion-badge {
+            background: var(--coral);
+            color: var(--bg-primary);
+            border-radius: var(--radius-full);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-lg);
+            flex-shrink: 0;
+            opacity: 0.3;
+            transition: all var(--transition-normal);
+        }
+
+        .exercise-card.completed .completion-badge {
+            opacity: 1;
+            animation: pulse 0.5s ease;
+        }
+
+        /* Exercise Content */
+        .exercise-content {
+            margin-bottom: var(--space-lg);
+        }
+
+        .rating-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .rating-label {
+            display: block;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .rating-scale {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .rating-button {
+            flex: 1;
+            min-width: 50px;
+            height: 50px;
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            color: var(--text-primary);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-family: var(--font-body);
+        }
+
+        .rating-button:hover {
+            border-color: var(--coral);
+            transform: translateY(-2px);
+        }
+
+        .rating-button.selected {
+            background: var(--coral);
+            color: var(--bg-primary);
+            border-color: var(--coral);
+            transform: scale(1.1);
+        }
+
+        .suggestions-box {
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-lg);
+            margin-top: var(--space-md);
+        }
+
+        .suggestions-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: var(--coral);
+            margin-bottom: var(--space-md);
+        }
+
+        .suggestion-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .suggestion-tag {
+            background: var(--bg-card);
+            border: var(--border-thin) solid var(--coral);
+            border-radius: var(--radius-xs);
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--font-size-sm);
+            color: var(--coral);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            font-family: var(--font-body);
+            resize: vertical;
+            transition: all var(--transition-normal);
+            margin-top: var(--space-md);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--coral);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .reflection-prompt {
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .prompt-text {
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-sm);
+        }
+
+        .prompt-highlight {
+            color: var(--coral);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .list-input-container {
+            margin-bottom: var(--space-lg);
+        }
+
+        .list-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .list-icon {
+            font-size: var(--font-size-2xl);
+        }
+
+        .list-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+        }
+
+        .list-item input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            font-family: var(--font-body);
+        }
+
+        .list-item input:focus {
+            outline: none;
+        }
+
+        .list-item input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .remove-item {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: var(--font-size-lg);
+            padding: var(--space-xs);
+            transition: color var(--transition-fast);
+        }
+
+        .remove-item:hover {
+            color: var(--coral);
+        }
+
+        .add-item-button {
+            background: var(--bg-primary);
+            border: var(--border-medium) dashed var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+            color: var(--text-muted);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            width: 100%;
+            font-family: var(--font-body);
+        }
+
+        .add-item-button:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+        }
+
+        .balance-indicator {
+            background: var(--bg-primary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-lg);
+            text-align: center;
+        }
+
+        .balance-text {
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .balance-score {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-medium);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+            font-family: var(--font-body);
+            border: var(--border-thicc) solid;
+        }
+
+        .btn-primary {
+            background: var(--coral);
+            color: var(--bg-primary);
+            border-color: var(--coral);
+        }
+
+        .btn-primary:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--coral-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--coral);
+            border-color: var(--coral);
+        }
+
+        .btn-secondary:hover {
+            background: var(--coral);
+            color: var(--bg-primary);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--border-warm);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/app.html#imagine" class="back-button">
+                <span>←</span>
+                <span>Back to IMAGINE</span>
+            </a>
+
+            <div class="section-title-wrapper">
+                <div class="giant-letter">I</div>
+                <div class="title-text">
+                    <h1 class="section-title">Me, Myself & I</h1>
+                    <p class="section-subtitle">Self-Care & Personal Wellness</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Intro -->
+        <section class="intro">
+            <p>Self-care isn't selfish — it's essential. This section helps you check in with yourself, set healthy boundaries, and balance your energy. Take time to nurture the most important person in your life: you.</p>
+        </section>
+
+        <!-- Progress Indicator -->
+        <section class="progress-indicator">
+            <div class="streak-label">Self-Care Streak</div>
+            <div class="streak-number" id="streakNumber">0</div>
+            <div class="streak-text">days in a row</div>
+        </section>
+
+        <!-- Exercise Cards -->
+        <div class="exercises-grid">
+            <!-- Wellness Check-in -->
+            <article class="exercise-card" id="wellness-card">
+                <div class="exercise-header">
+                    <div>
+                        <h2 class="exercise-title">Wellness Check-in</h2>
+                        <p class="exercise-description">How are you really doing? Rate different areas of your wellbeing.</p>
+                    </div>
+                    <div class="completion-badge">✓</div>
+                </div>
+
+                <div class="exercise-content">
+                    <div class="rating-group">
+                        <label class="rating-label">How's your mood today? (1 = very low, 10 = very contented)</label>
+                        <div class="rating-scale" id="mood-rating">
+                            <button class="rating-button" data-value="1">1</button>
+                            <button class="rating-button" data-value="2">2</button>
+                            <button class="rating-button" data-value="3">3</button>
+                            <button class="rating-button" data-value="4">4</button>
+                            <button class="rating-button" data-value="5">5</button>
+                            <button class="rating-button" data-value="6">6</button>
+                            <button class="rating-button" data-value="7">7</button>
+                            <button class="rating-button" data-value="8">8</button>
+                            <button class="rating-button" data-value="9">9</button>
+                            <button class="rating-button" data-value="10">10</button>
+                        </div>
+                        <div class="suggestions-box hidden" id="mood-suggestions">
+                            <div class="suggestions-title">Try one of these to lift your mood by just one point:</div>
+                            <div class="suggestion-tags">
+                                <span class="suggestion-tag">Go for a walk</span>
+                                <span class="suggestion-tag">Listen to happy music</span>
+                                <span class="suggestion-tag">Call a friend</span>
+                                <span class="suggestion-tag">Play with a pet</span>
+                                <span class="suggestion-tag">Think of something that makes you smile</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">How satisfied are you with your exercise routine?</label>
+                        <div class="rating-scale" id="exercise-rating">
+                            <button class="rating-button" data-value="1">1</button>
+                            <button class="rating-button" data-value="2">2</button>
+                            <button class="rating-button" data-value="3">3</button>
+                            <button class="rating-button" data-value="4">4</button>
+                            <button class="rating-button" data-value="5">5</button>
+                            <button class="rating-button" data-value="6">6</button>
+                            <button class="rating-button" data-value="7">7</button>
+                            <button class="rating-button" data-value="8">8</button>
+                            <button class="rating-button" data-value="9">9</button>
+                            <button class="rating-button" data-value="10">10</button>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">How satisfied are you with your eating habits?</label>
+                        <div class="rating-scale" id="diet-rating">
+                            <button class="rating-button" data-value="1">1</button>
+                            <button class="rating-button" data-value="2">2</button>
+                            <button class="rating-button" data-value="3">3</button>
+                            <button class="rating-button" data-value="4">4</button>
+                            <button class="rating-button" data-value="5">5</button>
+                            <button class="rating-button" data-value="6">6</button>
+                            <button class="rating-button" data-value="7">7</button>
+                            <button class="rating-button" data-value="8">8</button>
+                            <button class="rating-button" data-value="9">9</button>
+                            <button class="rating-button" data-value="10">10</button>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">How satisfied are you with your appearance & self-care?</label>
+                        <div class="rating-scale" id="appearance-rating">
+                            <button class="rating-button" data-value="1">1</button>
+                            <button class="rating-button" data-value="2">2</button>
+                            <button class="rating-button" data-value="3">3</button>
+                            <button class="rating-button" data-value="4">4</button>
+                            <button class="rating-button" data-value="5">5</button>
+                            <button class="rating-button" data-value="6">6</button>
+                            <button class="rating-button" data-value="7">7</button>
+                            <button class="rating-button" data-value="8">8</button>
+                            <button class="rating-button" data-value="9">9</button>
+                            <button class="rating-button" data-value="10">10</button>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">What can you do to improve in areas where you scored low?</label>
+                        <textarea id="improvement-notes" placeholder="Write your thoughts here..."></textarea>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearWellness()">Clear</button>
+                    <button class="btn btn-primary" onclick="saveWellness()">Save Check-in</button>
+                </div>
+            </article>
+
+            <!-- Boundary Setting -->
+            <article class="exercise-card" id="boundary-card">
+                <div class="exercise-header">
+                    <div>
+                        <h2 class="exercise-title">Boundary Setting</h2>
+                        <p class="exercise-description">Healthy boundaries improve self-confidence and relationships. Practice saying no.</p>
+                    </div>
+                    <div class="completion-badge">✓</div>
+                </div>
+
+                <div class="exercise-content">
+                    <div class="reflection-prompt">
+                        <p class="prompt-text">
+                            <span class="prompt-highlight">Reflect:</span> Can you think of people in your life who have overstepped your boundaries? Remember, self-care comes first — always.
+                        </p>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">Who has overstepped your boundaries recently?</label>
+                        <textarea id="boundary-people" placeholder="Write about the situation..."></textarea>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">Practice saying no: What boundary do you need to set?</label>
+                        <textarea id="boundary-practice" placeholder="I need to say no to..."></textarea>
+                    </div>
+
+                    <div class="rating-group">
+                        <label class="rating-label">How will you communicate this boundary bravely and assertively?</label>
+                        <textarea id="boundary-communication" placeholder="I will say..."></textarea>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearBoundary()">Clear</button>
+                    <button class="btn btn-primary" onclick="saveBoundary()">Save Boundary Work</button>
+                </div>
+            </article>
+
+            <!-- Energy Audit -->
+            <article class="exercise-card" id="energy-card">
+                <div class="exercise-header">
+                    <div>
+                        <h2 class="exercise-title">Energy Audit</h2>
+                        <p class="exercise-description">What brings you energy and what drains it? Aim for more positive than negative.</p>
+                    </div>
+                    <div class="completion-badge">✓</div>
+                </div>
+
+                <div class="exercise-content">
+                    <div class="list-input-container">
+                        <div class="list-title">
+                            <span class="list-icon">☀️</span>
+                            <span>Positive Energy (things that lift you up)</span>
+                        </div>
+                        <div class="list-items" id="positive-list">
+                            <div class="list-item">
+                                <input type="text" placeholder="e.g., Good friends, mentors, sleep, fun activities, music...">
+                                <button class="remove-item" onclick="removeItem(this)">×</button>
+                            </div>
+                        </div>
+                        <button class="add-item-button" onclick="addPositiveItem()">+ Add Positive Energy Source</button>
+                    </div>
+
+                    <div class="list-input-container">
+                        <div class="list-title">
+                            <span class="list-icon">⚡</span>
+                            <span>Negative Energy (things that drain you)</span>
+                        </div>
+                        <div class="list-items" id="negative-list">
+                            <div class="list-item">
+                                <input type="text" placeholder="e.g., Toxic people, stressful job, lack of sleep, passivity...">
+                                <button class="remove-item" onclick="removeItem(this)">×</button>
+                            </div>
+                        </div>
+                        <button class="add-item-button" onclick="addNegativeItem()">+ Add Energy Drainer</button>
+                    </div>
+
+                    <div class="balance-indicator">
+                        <div class="balance-text">Your Energy Balance</div>
+                        <div class="balance-score" id="energy-balance">0</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearEnergy()">Clear</button>
+                    <button class="btn btn-primary" onclick="saveEnergy()">Save Energy Audit</button>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // State Management & LocalStorage
+        // ============================================
+
+        const STORAGE_KEYS = {
+            WELLNESS: 'cowch_wellness_checkin',
+            BOUNDARY: 'cowch_boundary_setting',
+            ENERGY: 'cowch_energy_audit',
+            STREAK: 'cowch_self_care_streak',
+            LAST_COMPLETION: 'cowch_last_self_care_completion'
+        };
+
+        // ============================================
+        // Rating Scale Handlers
+        // ============================================
+
+        function setupRatingScales() {
+            const ratingGroups = ['mood-rating', 'exercise-rating', 'diet-rating', 'appearance-rating'];
+
+            ratingGroups.forEach(groupId => {
+                const group = document.getElementById(groupId);
+                const buttons = group.querySelectorAll('.rating-button');
+
+                buttons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        // Clear previous selection
+                        buttons.forEach(btn => btn.classList.remove('selected'));
+                        // Select current
+                        button.classList.add('selected');
+
+                        // Show mood improvement suggestions if mood is below 6
+                        if (groupId === 'mood-rating' && parseInt(button.dataset.value) < 6) {
+                            document.getElementById('mood-suggestions').classList.remove('hidden');
+                        } else if (groupId === 'mood-rating') {
+                            document.getElementById('mood-suggestions').classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        }
+
+        // ============================================
+        // Wellness Check-in Functions
+        // ============================================
+
+        function saveWellness() {
+            const moodBtn = document.querySelector('#mood-rating .rating-button.selected');
+            const exerciseBtn = document.querySelector('#exercise-rating .rating-button.selected');
+            const dietBtn = document.querySelector('#diet-rating .rating-button.selected');
+            const appearanceBtn = document.querySelector('#appearance-rating .rating-button.selected');
+            const improvementNotes = document.getElementById('improvement-notes').value;
+
+            if (!moodBtn || !exerciseBtn || !dietBtn || !appearanceBtn) {
+                alert('Please complete all ratings before saving.');
+                return;
+            }
+
+            const wellnessData = {
+                mood: parseInt(moodBtn.dataset.value),
+                exercise: parseInt(exerciseBtn.dataset.value),
+                diet: parseInt(dietBtn.dataset.value),
+                appearance: parseInt(appearanceBtn.dataset.value),
+                improvementNotes: improvementNotes,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEYS.WELLNESS, JSON.stringify(wellnessData));
+            document.getElementById('wellness-card').classList.add('completed');
+            updateStreak();
+
+            alert('Wellness check-in saved! Great job taking care of yourself.');
+        }
+
+        function clearWellness() {
+            document.querySelectorAll('#wellness-card .rating-button.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('improvement-notes').value = '';
+            document.getElementById('mood-suggestions').classList.add('hidden');
+        }
+
+        function loadWellness() {
+            const saved = localStorage.getItem(STORAGE_KEYS.WELLNESS);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('wellness-card').classList.add('completed');
+
+                // Restore ratings
+                if (data.mood) {
+                    const moodBtn = document.querySelector(`#mood-rating .rating-button[data-value="${data.mood}"]`);
+                    if (moodBtn) moodBtn.classList.add('selected');
+                }
+                if (data.exercise) {
+                    const exerciseBtn = document.querySelector(`#exercise-rating .rating-button[data-value="${data.exercise}"]`);
+                    if (exerciseBtn) exerciseBtn.classList.add('selected');
+                }
+                if (data.diet) {
+                    const dietBtn = document.querySelector(`#diet-rating .rating-button[data-value="${data.diet}"]`);
+                    if (dietBtn) dietBtn.classList.add('selected');
+                }
+                if (data.appearance) {
+                    const appearanceBtn = document.querySelector(`#appearance-rating .rating-button[data-value="${data.appearance}"]`);
+                    if (appearanceBtn) appearanceBtn.classList.add('selected');
+                }
+
+                if (data.improvementNotes) {
+                    document.getElementById('improvement-notes').value = data.improvementNotes;
+                }
+            }
+        }
+
+        // ============================================
+        // Boundary Setting Functions
+        // ============================================
+
+        function saveBoundary() {
+            const people = document.getElementById('boundary-people').value;
+            const practice = document.getElementById('boundary-practice').value;
+            const communication = document.getElementById('boundary-communication').value;
+
+            if (!people && !practice && !communication) {
+                alert('Please fill in at least one reflection before saving.');
+                return;
+            }
+
+            const boundaryData = {
+                people: people,
+                practice: practice,
+                communication: communication,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEYS.BOUNDARY, JSON.stringify(boundaryData));
+            document.getElementById('boundary-card').classList.add('completed');
+            updateStreak();
+
+            alert('Boundary work saved! Remember: self-care comes first, always.');
+        }
+
+        function clearBoundary() {
+            document.getElementById('boundary-people').value = '';
+            document.getElementById('boundary-practice').value = '';
+            document.getElementById('boundary-communication').value = '';
+        }
+
+        function loadBoundary() {
+            const saved = localStorage.getItem(STORAGE_KEYS.BOUNDARY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('boundary-card').classList.add('completed');
+
+                if (data.people) document.getElementById('boundary-people').value = data.people;
+                if (data.practice) document.getElementById('boundary-practice').value = data.practice;
+                if (data.communication) document.getElementById('boundary-communication').value = data.communication;
+            }
+        }
+
+        // ============================================
+        // Energy Audit Functions
+        // ============================================
+
+        function addPositiveItem() {
+            const list = document.getElementById('positive-list');
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = `
+                <input type="text" placeholder="What brings you positive energy?">
+                <button class="remove-item" onclick="removeItem(this)">×</button>
+            `;
+            list.appendChild(item);
+            updateEnergyBalance();
+        }
+
+        function addNegativeItem() {
+            const list = document.getElementById('negative-list');
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = `
+                <input type="text" placeholder="What drains your energy?">
+                <button class="remove-item" onclick="removeItem(this)">×</button>
+            `;
+            list.appendChild(item);
+            updateEnergyBalance();
+        }
+
+        function removeItem(button) {
+            button.parentElement.remove();
+            updateEnergyBalance();
+        }
+
+        function updateEnergyBalance() {
+            const positiveItems = document.querySelectorAll('#positive-list .list-item input');
+            const negativeItems = document.querySelectorAll('#negative-list .list-item input');
+
+            let positiveCount = 0;
+            let negativeCount = 0;
+
+            positiveItems.forEach(input => {
+                if (input.value.trim()) positiveCount++;
+            });
+
+            negativeItems.forEach(input => {
+                if (input.value.trim()) negativeCount++;
+            });
+
+            const balance = positiveCount - negativeCount;
+            const balanceEl = document.getElementById('energy-balance');
+            balanceEl.textContent = balance > 0 ? `+${balance}` : balance;
+        }
+
+        function saveEnergy() {
+            const positiveItems = [];
+            const negativeItems = [];
+
+            document.querySelectorAll('#positive-list .list-item input').forEach(input => {
+                if (input.value.trim()) positiveItems.push(input.value.trim());
+            });
+
+            document.querySelectorAll('#negative-list .list-item input').forEach(input => {
+                if (input.value.trim()) negativeItems.push(input.value.trim());
+            });
+
+            if (positiveItems.length === 0 && negativeItems.length === 0) {
+                alert('Please add at least one energy source or drainer before saving.');
+                return;
+            }
+
+            const energyData = {
+                positive: positiveItems,
+                negative: negativeItems,
+                balance: positiveItems.length - negativeItems.length,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEYS.ENERGY, JSON.stringify(energyData));
+            document.getElementById('energy-card').classList.add('completed');
+            updateStreak();
+
+            alert('Energy audit saved! Keep focusing on more positive than negative energy.');
+        }
+
+        function clearEnergy() {
+            document.getElementById('positive-list').innerHTML = `
+                <div class="list-item">
+                    <input type="text" placeholder="e.g., Good friends, mentors, sleep, fun activities, music...">
+                    <button class="remove-item" onclick="removeItem(this)">×</button>
+                </div>
+            `;
+            document.getElementById('negative-list').innerHTML = `
+                <div class="list-item">
+                    <input type="text" placeholder="e.g., Toxic people, stressful job, lack of sleep, passivity...">
+                    <button class="remove-item" onclick="removeItem(this)">×</button>
+                </div>
+            `;
+            updateEnergyBalance();
+        }
+
+        function loadEnergy() {
+            const saved = localStorage.getItem(STORAGE_KEYS.ENERGY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('energy-card').classList.add('completed');
+
+                // Clear default items
+                document.getElementById('positive-list').innerHTML = '';
+                document.getElementById('negative-list').innerHTML = '';
+
+                // Load positive items
+                if (data.positive && data.positive.length > 0) {
+                    data.positive.forEach(text => {
+                        const list = document.getElementById('positive-list');
+                        const item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = `
+                            <input type="text" value="${text}">
+                            <button class="remove-item" onclick="removeItem(this)">×</button>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    addPositiveItem();
+                }
+
+                // Load negative items
+                if (data.negative && data.negative.length > 0) {
+                    data.negative.forEach(text => {
+                        const list = document.getElementById('negative-list');
+                        const item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = `
+                            <input type="text" value="${text}">
+                            <button class="remove-item" onclick="removeItem(this)">×</button>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    addNegativeItem();
+                }
+
+                updateEnergyBalance();
+            }
+        }
+
+        // ============================================
+        // Streak Tracking
+        // ============================================
+
+        function updateStreak() {
+            const lastCompletion = localStorage.getItem(STORAGE_KEYS.LAST_COMPLETION);
+            const today = new Date().toDateString();
+
+            let currentStreak = parseInt(localStorage.getItem(STORAGE_KEYS.STREAK) || '0');
+
+            if (lastCompletion) {
+                const lastDate = new Date(lastCompletion).toDateString();
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+                if (lastDate === today) {
+                    // Already completed today, don't update
+                } else if (lastDate === yesterday) {
+                    // Consecutive day
+                    currentStreak++;
+                    localStorage.setItem(STORAGE_KEYS.STREAK, currentStreak.toString());
+                    localStorage.setItem(STORAGE_KEYS.LAST_COMPLETION, new Date().toISOString());
+                } else {
+                    // Streak broken, reset to 1
+                    currentStreak = 1;
+                    localStorage.setItem(STORAGE_KEYS.STREAK, '1');
+                    localStorage.setItem(STORAGE_KEYS.LAST_COMPLETION, new Date().toISOString());
+                }
+            } else {
+                // First completion ever
+                currentStreak = 1;
+                localStorage.setItem(STORAGE_KEYS.STREAK, '1');
+                localStorage.setItem(STORAGE_KEYS.LAST_COMPLETION, new Date().toISOString());
+            }
+
+            document.getElementById('streakNumber').textContent = currentStreak;
+        }
+
+        function loadStreak() {
+            const streak = parseInt(localStorage.getItem(STORAGE_KEYS.STREAK) || '0');
+            document.getElementById('streakNumber').textContent = streak;
+        }
+
+        // ============================================
+        // Initialization
+        // ============================================
+
+        function init() {
+            setupRatingScales();
+            loadWellness();
+            loadBoundary();
+            loadEnergy();
+            loadStreak();
+
+            // Add event listeners for energy balance
+            document.addEventListener('input', (e) => {
+                if (e.target.matches('#positive-list input') || e.target.matches('#negative-list input')) {
+                    updateEnergyBalance();
+                }
+            });
+        }
+
+        // Run initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

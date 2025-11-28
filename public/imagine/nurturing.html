@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N - Nurturing | Cowch.app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background-color: #1a1512;
+            color: #ffffff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #2d2825;
+            color: #E8A86A;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #E8A86A;
+            box-shadow: 6px 6px 0 #E8A86A;
+            margin-bottom: 20px;
+            transition: all 0.1s;
+        }
+
+        .back-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 #E8A86A;
+        }
+
+        .back-button:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 #E8A86A;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .giant-letter {
+            font-size: 120px;
+            font-weight: 900;
+            color: #E8A86A;
+            line-height: 1;
+            text-shadow: 6px 6px 0 rgba(232, 168, 106, 0.3);
+        }
+
+        .title-text h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #E8A86A;
+            margin-bottom: 8px;
+        }
+
+        .title-text p {
+            font-size: 18px;
+            color: #cccccc;
+        }
+
+        /* Section Intro */
+        .intro {
+            background: #2d2825;
+            padding: 30px;
+            border: 5px solid #E8A86A;
+            box-shadow: 8px 8px 0 rgba(232, 168, 106, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .intro h2 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #E8A86A;
+            margin-bottom: 16px;
+        }
+
+        .intro p {
+            font-size: 18px;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+        }
+
+        /* Exercise Cards */
+        .exercise-card {
+            background: #2d2825;
+            border: 5px solid #E8A86A;
+            box-shadow: 8px 8px 0 rgba(232, 168, 106, 0.3);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .exercise-card h3 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #E8A86A;
+            margin-bottom: 12px;
+        }
+
+        .exercise-card p {
+            font-size: 16px;
+            color: #cccccc;
+            margin-bottom: 20px;
+        }
+
+        /* Fun Prompt Generator */
+        .prompt-display {
+            background: #1a1512;
+            border: 4px solid #E8A86A;
+            padding: 24px;
+            margin-bottom: 20px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .prompt-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #E8A86A;
+        }
+
+        .button {
+            background: #E8A86A;
+            color: #1a1512;
+            padding: 14px 28px;
+            border: none;
+            font-family: 'Gabarito', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.1s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .button:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .button.secondary {
+            background: #2d2825;
+            color: #E8A86A;
+            border: 3px solid #E8A86A;
+        }
+
+        .button.small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* Badge Display */
+        .badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .badge {
+            background: #1a1512;
+            border: 3px solid #E8A86A;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #E8A86A;
+        }
+
+        .badge.locked {
+            border-color: #4a4440;
+            color: #4a4440;
+        }
+
+        /* Diary Entry */
+        .diary-entry {
+            background: #1a1512;
+            border: 4px solid #E8A86A;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .diary-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .diary-date {
+            font-weight: 700;
+            color: #E8A86A;
+        }
+
+        .diary-content {
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #1a1512;
+            border: 4px solid #E8A86A;
+            color: #ffffff;
+            padding: 16px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #E8A86A;
+            box-shadow: 0 0 0 3px rgba(232, 168, 106, 0.2);
+        }
+
+        /* Inner Child Prompts */
+        .prompt-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .prompt-item {
+            background: #1a1512;
+            border: 3px solid #E8A86A;
+            padding: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-item:hover {
+            transform: translateX(4px);
+            border-color: #E8A86A;
+        }
+
+        .prompt-item.completed {
+            border-color: #4a4440;
+            opacity: 0.6;
+        }
+
+        .prompt-item-text {
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+
+        .checkmark {
+            color: #E8A86A;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        /* Creative Expression */
+        .hobby-selector {
+            margin-bottom: 20px;
+        }
+
+        .hobby-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hobby-option {
+            background: #1a1512;
+            border: 3px solid #4a4440;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-weight: 700;
+            color: #cccccc;
+        }
+
+        .hobby-option:hover {
+            border-color: #E8A86A;
+            transform: scale(1.05);
+        }
+
+        .hobby-option.selected {
+            border-color: #E8A86A;
+            background: #E8A86A;
+            color: #1a1512;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"] {
+            width: 100%;
+            background: #1a1512;
+            border: 4px solid #E8A86A;
+            color: #ffffff;
+            padding: 14px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus,
+        input[type="datetime-local"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232, 168, 106, 0.2);
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            background: #2d2825;
+            border: 5px solid #E8A86A;
+            box-shadow: 8px 8px 0 rgba(232, 168, 106, 0.3);
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .progress-section h3 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #E8A86A;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            background: #1a1512;
+            border: 4px solid #E8A86A;
+            height: 40px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #E8A86A;
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #1a1512;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: #1a1512;
+            border: 3px solid #E8A86A;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 900;
+            color: #E8A86A;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #cccccc;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .giant-letter {
+                font-size: 80px;
+            }
+
+            .title-text h1 {
+                font-size: 36px;
+            }
+
+            .intro h2 {
+                font-size: 24px;
+            }
+
+            .exercise-card h3 {
+                font-size: 22px;
+            }
+
+            .hobby-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="/imagine" class="back-button">&larr; Back to IMAGINE</a>
+            <div class="title-section">
+                <div class="giant-letter">N</div>
+                <div class="title-text">
+                    <h1>Nurturing</h1>
+                    <p>Fun, Playfulness, and Joy</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Intro -->
+        <div class="intro">
+            <h2>Rediscover Play</h2>
+            <p>Nurturing yourself means making time for fun, creativity, and play. It's about reconnecting with your inner child and bringing more joy into your daily life.</p>
+            <p>These exercises help you explore playfulness, celebrate fun moments, and create space for activities that light you up.</p>
+        </div>
+
+        <!-- Exercise 1: Fun Prompt Generator -->
+        <div class="exercise-card">
+            <h3>Fun Prompt Generator</h3>
+            <p>Get random playful suggestions to add spontaneity to your day. Complete prompts to earn badges!</p>
+
+            <div class="prompt-display">
+                <div class="prompt-text" id="currentPrompt">Click "Get New Prompt" to start!</div>
+            </div>
+
+            <button class="button" onclick="generatePrompt()">Get New Prompt</button>
+            <button class="button secondary" onclick="completePrompt()">I Did It!</button>
+
+            <div class="badges">
+                <div class="badge" id="badge1">First Steps (1)</div>
+                <div class="badge locked" id="badge5">Playful (5)</div>
+                <div class="badge locked" id="badge10">Joyful (10)</div>
+                <div class="badge locked" id="badge25">Champion (25)</div>
+            </div>
+        </div>
+
+        <!-- Exercise 2: Playfulness Diary -->
+        <div class="exercise-card">
+            <h3>Playfulness Diary</h3>
+            <p>Log your fun moments and track how playfulness shows up in your life.</p>
+
+            <textarea id="diaryInput" placeholder="What fun did you have today? What made you smile or laugh?"></textarea>
+            <button class="button" onclick="saveDiaryEntry()">Save Entry</button>
+
+            <div id="diaryEntries"></div>
+        </div>
+
+        <!-- Exercise 3: Inner Child Work -->
+        <div class="exercise-card">
+            <h3>Inner Child Work</h3>
+            <p>Explore these prompts to reconnect with your playful, creative inner child. No pressure, no judgment.</p>
+
+            <ul class="prompt-list" id="innerChildPrompts">
+                <li class="prompt-item" onclick="togglePrompt(this, 0)">
+                    <span class="prompt-item-text">What was your favorite childhood game or activity?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 1)">
+                    <span class="prompt-item-text">What would 8-year-old you want to do this weekend?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 2)">
+                    <span class="prompt-item-text">What silly thing makes you laugh every time?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 3)">
+                    <span class="prompt-item-text">When was the last time you played just for fun?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 4)">
+                    <span class="prompt-item-text">What creative activity did you love as a child?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 5)">
+                    <span class="prompt-item-text">What would you do if you had a whole day with no responsibilities?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 6)">
+                    <span class="prompt-item-text">What's something playful you've been wanting to try?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 7)">
+                    <span class="prompt-item-text">How do you feel when you allow yourself to be playful?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 8)">
+                    <span class="prompt-item-text">What permission does your inner child need from you?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+                <li class="prompt-item" onclick="togglePrompt(this, 9)">
+                    <span class="prompt-item-text">What small act of play can you do today?</span>
+                    <span class="checkmark" style="display: none;">✓</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Exercise 4: Creative Expression -->
+        <div class="exercise-card">
+            <h3>Creative Expression</h3>
+            <p>Choose a hobby or creative activity, schedule time for it, and track your achievements.</p>
+
+            <div class="hobby-selector">
+                <p style="font-weight: 700; margin-bottom: 12px;">Choose Your Creative Activity:</p>
+                <div class="hobby-grid">
+                    <div class="hobby-option" onclick="selectHobby(this, 'Drawing')">Drawing</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Music')">Music</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Writing')">Writing</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Dancing')">Dancing</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Crafts')">Crafts</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Photography')">Photography</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Cooking')">Cooking</div>
+                    <div class="hobby-option" onclick="selectHobby(this, 'Gardening')">Gardening</div>
+                </div>
+                <input type="text" id="customHobby" placeholder="Or enter your own activity...">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="font-weight: 700; margin-bottom: 12px;">Schedule Your Creative Time:</p>
+                <input type="datetime-local" id="scheduleTime">
+                <button class="button" onclick="scheduleCreativeTime()">Schedule It</button>
+            </div>
+
+            <div id="scheduledActivities"></div>
+
+            <div style="margin-top: 20px;">
+                <p style="font-weight: 700; margin-bottom: 12px;">Log an Achievement:</p>
+                <textarea id="achievementInput" placeholder="What did you create or accomplish?"></textarea>
+                <button class="button" onclick="logAchievement()">Save Achievement</button>
+            </div>
+
+            <div id="achievements"></div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-section">
+            <h3>Your Nurturing Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;">
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="promptsCompleted">0</div>
+                    <div class="stat-label">Prompts Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="diaryEntries">0</div>
+                    <div class="stat-label">Diary Entries</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="innerChildCompleted">0</div>
+                    <div class="stat-label">Inner Child Prompts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="creativeSessions">0</div>
+                    <div class="stat-label">Creative Sessions</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fun Prompt Generator
+        const funPrompts = [
+            "Do a silly dance for 30 seconds",
+            "Tell someone your worst joke",
+            "Balance an object on your head for 1 minute",
+            "Make funny faces in the mirror",
+            "Skip instead of walk for the next 5 minutes",
+            "Sing your next sentence instead of speaking it",
+            "Draw with your non-dominant hand",
+            "Have a conversation with your pet (or a plant)",
+            "Build something with random objects nearby",
+            "Do 10 jumping jacks while making sound effects",
+            "Wear mismatched socks and own it",
+            "Make up a silly word and use it 5 times today",
+            "Blow bubbles (real or pretend)",
+            "Do your best superhero pose",
+            "Laugh out loud for no reason for 20 seconds",
+            "Rearrange something in your space just for fun",
+            "Make animal sounds when you see an animal",
+            "Put on your favorite song and move however you want",
+            "Create a silly nickname for yourself",
+            "Play with a toy or game from your childhood"
+        ];
+
+        let currentPromptIndex = -1;
+        let promptsCompletedCount = 0;
+
+        function generatePrompt() {
+            currentPromptIndex = Math.floor(Math.random() * funPrompts.length);
+            document.getElementById('currentPrompt').textContent = funPrompts[currentPromptIndex];
+        }
+
+        function completePrompt() {
+            if (currentPromptIndex === -1) {
+                alert('Generate a prompt first!');
+                return;
+            }
+            promptsCompletedCount++;
+            localStorage.setItem('promptsCompleted', promptsCompletedCount);
+            document.getElementById('promptsCompleted').textContent = promptsCompletedCount;
+
+            // Update badges
+            if (promptsCompletedCount >= 1) {
+                document.getElementById('badge1').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 5) {
+                document.getElementById('badge5').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 10) {
+                document.getElementById('badge10').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 25) {
+                document.getElementById('badge25').classList.remove('locked');
+            }
+
+            updateProgress();
+            alert('Awesome! Keep playing!');
+            generatePrompt();
+        }
+
+        // Playfulness Diary
+        function saveDiaryEntry() {
+            const input = document.getElementById('diaryInput');
+            const content = input.value.trim();
+
+            if (!content) {
+                alert('Write something first!');
+                return;
+            }
+
+            const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            const entry = {
+                date: new Date().toLocaleDateString(),
+                content: content
+            };
+            entries.unshift(entry);
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+            input.value = '';
+            loadDiaryEntries();
+            updateProgress();
+        }
+
+        function loadDiaryEntries() {
+            const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            const container = document.getElementById('diaryEntries');
+
+            document.getElementById('diaryEntries').textContent = entries.length;
+
+            if (entries.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = entries.slice(0, 5).map(entry => `
+                <div class="diary-entry">
+                    <div class="diary-entry-header">
+                        <span class="diary-date">${entry.date}</span>
+                    </div>
+                    <div class="diary-content">${entry.content}</div>
+                </div>
+            `).join('');
+        }
+
+        // Inner Child Work
+        function togglePrompt(element, index) {
+            const checkmark = element.querySelector('.checkmark');
+            const completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
+
+            if (completed.includes(index)) {
+                completed.splice(completed.indexOf(index), 1);
+                element.classList.remove('completed');
+                checkmark.style.display = 'none';
+            } else {
+                completed.push(index);
+                element.classList.add('completed');
+                checkmark.style.display = 'block';
+            }
+
+            localStorage.setItem('innerChildCompleted', JSON.stringify(completed));
+            document.getElementById('innerChildCompleted').textContent = completed.length;
+            updateProgress();
+        }
+
+        function loadInnerChildProgress() {
+            const completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
+            const prompts = document.querySelectorAll('#innerChildPrompts .prompt-item');
+
+            completed.forEach(index => {
+                if (prompts[index]) {
+                    prompts[index].classList.add('completed');
+                    prompts[index].querySelector('.checkmark').style.display = 'block';
+                }
+            });
+
+            document.getElementById('innerChildCompleted').textContent = completed.length;
+        }
+
+        // Creative Expression
+        let selectedHobby = '';
+
+        function selectHobby(element, hobby) {
+            document.querySelectorAll('.hobby-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedHobby = hobby;
+            document.getElementById('customHobby').value = '';
+        }
+
+        function scheduleCreativeTime() {
+            const customHobby = document.getElementById('customHobby').value.trim();
+            const hobby = customHobby || selectedHobby;
+            const timeInput = document.getElementById('scheduleTime');
+            const time = timeInput.value;
+
+            if (!hobby) {
+                alert('Choose or enter an activity first!');
+                return;
+            }
+
+            if (!time) {
+                alert('Select a time!');
+                return;
+            }
+
+            const scheduled = JSON.parse(localStorage.getItem('scheduledActivities') || '[]');
+            scheduled.push({ hobby, time });
+            localStorage.setItem('scheduledActivities', JSON.stringify(scheduled));
+
+            timeInput.value = '';
+            document.getElementById('customHobby').value = '';
+            selectedHobby = '';
+            document.querySelectorAll('.hobby-option').forEach(el => el.classList.remove('selected'));
+
+            loadScheduledActivities();
+            updateProgress();
+        }
+
+        function loadScheduledActivities() {
+            const scheduled = JSON.parse(localStorage.getItem('scheduledActivities') || '[]');
+            const container = document.getElementById('scheduledActivities');
+
+            if (scheduled.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const now = new Date();
+            const upcoming = scheduled.filter(s => new Date(s.time) > now);
+
+            if (upcoming.length === 0) {
+                container.innerHTML = '<p style="color: #cccccc; margin-top: 15px;">No upcoming sessions scheduled.</p>';
+                return;
+            }
+
+            container.innerHTML = '<div style="margin-top: 20px;"><p style="font-weight: 700; margin-bottom: 12px;">Upcoming Sessions:</p>' +
+                upcoming.slice(0, 3).map(s => `
+                    <div class="diary-entry">
+                        <div class="diary-entry-header">
+                            <span class="diary-date">${s.hobby}</span>
+                            <span style="color: #cccccc;">${new Date(s.time).toLocaleString()}</span>
+                        </div>
+                    </div>
+                `).join('') + '</div>';
+        }
+
+        function logAchievement() {
+            const input = document.getElementById('achievementInput');
+            const content = input.value.trim();
+
+            if (!content) {
+                alert('Write about your achievement first!');
+                return;
+            }
+
+            const achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+            achievements.unshift({
+                date: new Date().toLocaleDateString(),
+                content: content
+            });
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+
+            input.value = '';
+            loadAchievements();
+
+            const sessionsCount = parseInt(document.getElementById('creativeSessions').textContent) + 1;
+            document.getElementById('creativeSessions').textContent = sessionsCount;
+            localStorage.setItem('creativeSessions', sessionsCount);
+
+            updateProgress();
+        }
+
+        function loadAchievements() {
+            const achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+            const container = document.getElementById('achievements');
+
+            if (achievements.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = '<div style="margin-top: 20px;"><p style="font-weight: 700; margin-bottom: 12px;">Your Achievements:</p>' +
+                achievements.slice(0, 5).map(a => `
+                    <div class="diary-entry">
+                        <div class="diary-entry-header">
+                            <span class="diary-date">${a.date}</span>
+                        </div>
+                        <div class="diary-content">${a.content}</div>
+                    </div>
+                `).join('') + '</div>';
+        }
+
+        // Progress Tracking
+        function updateProgress() {
+            const prompts = promptsCompletedCount;
+            const diary = JSON.parse(localStorage.getItem('diaryEntries') || '[]').length;
+            const innerChild = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]').length;
+            const creative = parseInt(localStorage.getItem('creativeSessions') || '0');
+
+            const total = prompts + diary + innerChild + creative;
+            const maxPoints = 50; // Arbitrary max for progress bar
+            const percentage = Math.min((total / maxPoints) * 100, 100);
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = Math.round(percentage) + '%';
+        }
+
+        // Initialize
+        function init() {
+            promptsCompletedCount = parseInt(localStorage.getItem('promptsCompleted') || '0');
+            document.getElementById('promptsCompleted').textContent = promptsCompletedCount;
+
+            // Update badges
+            if (promptsCompletedCount >= 1) {
+                document.getElementById('badge1').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 5) {
+                document.getElementById('badge5').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 10) {
+                document.getElementById('badge10').classList.remove('locked');
+            }
+            if (promptsCompletedCount >= 25) {
+                document.getElementById('badge25').classList.remove('locked');
+            }
+
+            loadDiaryEntries();
+            loadInnerChildProgress();
+            loadScheduledActivities();
+            loadAchievements();
+
+            const creativeSessions = parseInt(localStorage.getItem('creativeSessions') || '0');
+            document.getElementById('creativeSessions').textContent = creativeSessions;
+
+            updateProgress();
+        }
+
+        init();
+    </script>
+</body>
+</html>
