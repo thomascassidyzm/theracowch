@@ -104,10 +104,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, history, conversationHistory, currentPattern, sessionPhase } = req.body;
-
-    // Support both 'history' (new frontend) and 'conversationHistory' (legacy)
-    const chatHistory = history || conversationHistory || [];
+    const { message, history, currentPattern, sessionPhase } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -157,16 +154,11 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
       { role: 'system', content: systemPrompt }
     ];
 
-    // Add conversation history (last 6 messages to prevent context overflow)
-    if (chatHistory && chatHistory.length > 0) {
-      const recentHistory = chatHistory.slice(-6);
-      recentHistory.forEach(msg => {
-        // Support both formats: {role, content} (new) and {sender, text} (legacy)
-        const role = msg.role || (msg.sender === 'user' ? 'user' : 'assistant');
-        const content = msg.content || msg.text;
-
-        if (role === 'user' || role === 'assistant') {
-          messages.push({ role, content });
+    // Add conversation history (last 6 messages for context)
+    if (history && history.length > 0) {
+      history.slice(-6).forEach(msg => {
+        if (msg.role && msg.content) {
+          messages.push({ role: msg.role, content: msg.content });
         }
       });
     }
