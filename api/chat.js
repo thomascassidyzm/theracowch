@@ -104,7 +104,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, history, currentPattern, sessionPhase } = req.body;
+    const { message, profile, recentMessages, history, currentPattern, sessionPhase } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -112,10 +112,46 @@ export default async function handler(req, res) {
 
     // Get IMAGINE framework prompts from URL (with caching)
     const imagineFrameworkPrompts = await getImagineFrameworkPrompts();
-    
+
     // Build system prompt with fetched training data
     let systemPrompt = imagineFrameworkPrompts;
-    
+
+    // Add compressed therapy profile context (if available)
+    if (profile && Object.keys(profile).length > 0) {
+      systemPrompt += `\n\n--- CLIENT CONTEXT (from previous sessions) ---`;
+      if (profile.sessionCount) {
+        systemPrompt += `\nSessions: ${profile.sessionCount}`;
+      }
+      if (profile.patterns) {
+        systemPrompt += `\nPatterns noticed: ${profile.patterns}`;
+      }
+      if (profile.activeThemes) {
+        systemPrompt += `\nCurrently working on: ${profile.activeThemes}`;
+      }
+      if (profile.insights) {
+        systemPrompt += `\nKey insights: ${profile.insights}`;
+      }
+      if (profile.strengths) {
+        systemPrompt += `\nStrengths: ${profile.strengths}`;
+      }
+      if (profile.respondsTo) {
+        systemPrompt += `\nResponds well to: ${profile.respondsTo}`;
+      }
+      if (profile.lastSession) {
+        systemPrompt += `\nLast session: ${profile.lastSession}`;
+      }
+      if (profile.imagine) {
+        const activeImagine = Object.entries(profile.imagine)
+          .filter(([k, v]) => v > 0)
+          .map(([k, v]) => `${k}:${v}`)
+          .join(', ');
+        if (activeImagine) {
+          systemPrompt += `\nIMAGINE engagement: ${activeImagine}`;
+        }
+      }
+      systemPrompt += `\n--- END CLIENT CONTEXT ---`;
+    }
+
     // Add current session context
     if (currentPattern) {
       systemPrompt += `\n\nCurrent wellness focus: ${currentPattern}`;
@@ -154,9 +190,11 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
       { role: 'system', content: systemPrompt }
     ];
 
-    // Add conversation history (last 6 messages for context)
-    if (history && history.length > 0) {
-      history.slice(-6).forEach(msg => {
+    // Add recent messages for immediate context
+    // Prefer recentMessages (from profile system, 2-3 messages) over full history
+    const contextMessages = recentMessages || (history ? history.slice(-3) : []);
+    if (contextMessages && contextMessages.length > 0) {
+      contextMessages.forEach(msg => {
         if (msg.role && msg.content) {
           messages.push({ role: msg.role, content: msg.content });
         }

@@ -531,6 +531,11 @@ async function handleSendMessage() {
     addMessage(message, 'user');
     conversationHistory.push({ role: 'user', content: message });
 
+    // Track in therapy profile (for compression)
+    if (window.TherapyProfile) {
+        window.TherapyProfile.addToHistory({ role: 'user', content: message });
+    }
+
     // Clear input
     chatInput.value = '';
     focusInput();
@@ -550,16 +555,25 @@ async function handleSendMessage() {
     showTypingIndicator();
 
     try {
+        // Build API context from therapy profile (compressed) or fall back to raw history
+        let apiBody = { message };
+
+        if (window.TherapyProfile) {
+            const context = window.TherapyProfile.buildAPIContext();
+            apiBody.profile = context.profile;
+            apiBody.recentMessages = context.recentMessages;
+        } else {
+            // Fallback to raw history
+            apiBody.history = conversationHistory.slice(-3);
+        }
+
         // Call API
         const response = await fetch(API_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                message: message,
-                history: conversationHistory.slice(-MAX_HISTORY_MESSAGES)
-            })
+            body: JSON.stringify(apiBody)
         });
 
         if (!response.ok) {
@@ -577,6 +591,22 @@ async function handleSendMessage() {
         // Add Mandy's response with typing effect
         await addMessageWithTypingEffect(data.response, 'mandy', quickReplies);
         conversationHistory.push({ role: 'assistant', content: data.response });
+
+        // Track assistant response in therapy profile
+        if (window.TherapyProfile) {
+            window.TherapyProfile.addToHistory({ role: 'assistant', content: data.response });
+
+            // Check if we need to compress the profile
+            if (window.TherapyProfile.needsCompression()) {
+                const history = window.TherapyProfile.getFullHistory();
+                const profile = window.TherapyProfile.getProfile();
+                const recentMessages = history.slice(-profile.messagesSinceCompression);
+                // Compress in background (don't block UI)
+                window.TherapyProfile.compressProfile(recentMessages).catch(e => {
+                    console.warn('Profile compression deferred:', e);
+                });
+            }
+        }
 
         // Save history
         saveChatHistory();
