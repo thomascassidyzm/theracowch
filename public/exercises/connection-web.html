@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Web - cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #1a1512;
+            color: #e8e3df;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #3a3533;
+            background: #1a1512;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #D4896A;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #8a7a6a;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #canvas.dragging {
+            cursor: grabbing;
+        }
+
+        .controls {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .btn {
+            background: #D4896A;
+            color: #1a1512;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid #D4896A;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: #D4896A;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #8a7a6a;
+            border-color: #3a3533;
+            font-size: 0.85rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .btn-secondary:hover {
+            color: #e8e3df;
+            border-color: #8a7a6a;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 21, 18, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: #242019;
+            border: 2px solid #3a3533;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal h2 {
+            color: #D4896A;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #8a7a6a;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: #1a1512;
+            border: 2px solid #3a3533;
+            color: #e8e3df;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #D4896A;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 0.75rem;
+            background: #1a1512;
+            border: 2px solid #3a3533;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-transform: none;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            border-color: #D4896A;
+            background: rgba(212, 137, 106, 0.1);
+        }
+
+        .radio-option.supportive input[type="radio"]:checked + label {
+            border-color: #7EA88B;
+            background: rgba(126, 168, 139, 0.1);
+        }
+
+        .radio-option.draining input[type="radio"]:checked + label {
+            border-color: #C47A5D;
+            background: rgba(196, 122, 93, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .insights {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            max-width: 400px;
+            background: rgba(36, 32, 25, 0.95);
+            border: 2px solid #3a3533;
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .insights.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .insights h3 {
+            color: #D4896A;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            margin-bottom: 0.75rem;
+            color: #8a7a6a;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .stat {
+            color: #D4896A;
+            font-weight: 600;
+        }
+
+        .legend {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(36, 32, 25, 0.95);
+            border: 2px solid #3a3533;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-title {
+            color: #D4896A;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #8a7a6a;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+        }
+
+        .empty-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .empty-state h2 {
+            color: #D4896A;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            color: #8a7a6a;
+            line-height: 1.6;
+        }
+
+        .person-tooltip {
+            position: absolute;
+            background: #242019;
+            border: 2px solid #3a3533;
+            padding: 1rem;
+            pointer-events: none;
+            display: none;
+            z-index: 500;
+            min-width: 200px;
+        }
+
+        .person-tooltip.active {
+            display: block;
+        }
+
+        .person-tooltip h4 {
+            color: #D4896A;
+            margin-bottom: 0.5rem;
+        }
+
+        .person-tooltip p {
+            color: #8a7a6a;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .delete-btn {
+            margin-top: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 2px solid #C47A5D;
+            color: #C47A5D;
+            cursor: pointer;
+            font-size: 0.85rem;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .delete-btn:hover {
+            background: rgba(196, 122, 93, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .controls {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .legend, .insights {
+                left: 1rem;
+                right: 1rem;
+                max-width: none;
+            }
+
+            .modal {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Connection Web</h1>
+        <p class="subtitle">Map your social connections and understand your support network</p>
+    </header>
+
+    <div class="container">
+        <canvas id="canvas"></canvas>
+
+        <div class="empty-state" id="emptyState">
+            <h2>Your Connection Web</h2>
+            <p>Start by adding the people in your life. Watch your support network come alive as you map out your connections.</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">Energy Types</div>
+            <div class="legend-item">
+                <div class="legend-color" style="color: #7EA88B;"></div>
+                <span>Supportive</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="color: #8a7a6a;"></div>
+                <span>Neutral</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="color: #C47A5D;"></div>
+                <span>Draining</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="addBtn">+ Add Connection</button>
+            <button class="btn btn-secondary" id="insightsBtn">View Insights</button>
+        </div>
+
+        <div class="insights" id="insights">
+            <h3>Your Network Insights</h3>
+            <div id="insightContent"></div>
+        </div>
+
+        <div class="person-tooltip" id="tooltip">
+            <h4 id="tooltipName"></h4>
+            <p id="tooltipRelation"></p>
+            <p id="tooltipCircle"></p>
+            <button class="delete-btn" id="deleteBtn">Remove Connection</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitle">Add Connection</h2>
+            <form id="connectionForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" required placeholder="Enter their name">
+                </div>
+
+                <div class="form-group">
+                    <label for="relationship">Relationship</label>
+                    <input type="text" id="relationship" required placeholder="e.g., Friend, Partner, Colleague">
+                </div>
+
+                <div class="form-group">
+                    <label>Circle</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="inner" name="circle" value="inner" checked>
+                            <label for="inner">Inner<br><small>Closest support</small></label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="middle" name="circle" value="middle">
+                            <label for="middle">Middle<br><small>Regular connections</small></label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="outer" name="circle" value="outer">
+                            <label for="outer">Outer<br><small>Acquaintances</small></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Energy</label>
+                    <div class="radio-group">
+                        <div class="radio-option supportive">
+                            <input type="radio" id="supportive" name="energy" value="supportive" checked>
+                            <label for="supportive">Supportive<br><small>Lifts you up</small></label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="neutral" name="energy" value="neutral">
+                            <label for="neutral">Neutral<br><small>Balanced</small></label>
+                        </div>
+                        <div class="radio-option draining">
+                            <input type="radio" id="draining" name="energy" value="draining">
+                            <label for="draining">Draining<br><small>Takes energy</small></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn">Add Person</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const addBtn = document.getElementById('addBtn');
+        const insightsBtn = document.getElementById('insightsBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const connectionForm = document.getElementById('connectionForm');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const emptyState = document.getElementById('emptyState');
+        const insights = document.getElementById('insights');
+        const tooltip = document.getElementById('tooltip');
+        const deleteBtn = document.getElementById('deleteBtn');
+
+        let connections = [];
+        let selectedPerson = null;
+        let draggedPerson = null;
+        let centerX, centerY;
+        let animationFrame;
+
+        const COLORS = {
+            bg: '#1a1512',
+            ring: '#3a3533',
+            center: '#D4896A',
+            supportive: '#7EA88B',
+            neutral: '#8a7a6a',
+            draining: '#C47A5D',
+            line: 'rgba(232, 227, 223, 0.2)'
+        };
+
+        const RINGS = {
+            inner: { radius: 0.2, label: 'Inner Circle' },
+            middle: { radius: 0.4, label: 'Middle Circle' },
+            outer: { radius: 0.6, label: 'Outer Circle' }
+        };
+
+        // Initialize
+        function init() {
+            resizeCanvas();
+            loadConnections();
+            render();
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                render();
+            });
+
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+
+            // Touch events
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+        }
+
+        function loadConnections() {
+            const saved = localStorage.getItem('cowch_connections');
+            if (saved) {
+                connections = JSON.parse(saved);
+                updateEmptyState();
+            }
+        }
+
+        function saveConnections() {
+            localStorage.setItem('cowch_connections', JSON.stringify(connections));
+        }
+
+        function updateEmptyState() {
+            emptyState.style.display = connections.length === 0 ? 'block' : 'none';
+        }
+
+        // Rendering
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+
+            // Draw rings
+            Object.values(RINGS).forEach(ring => {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, maxRadius * ring.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = COLORS.ring;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // Draw connections (lines)
+            connections.forEach(person => {
+                if (!person.x || !person.y) return;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(person.x, person.y);
+                ctx.strokeStyle = COLORS.line;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // Draw people
+            connections.forEach(person => {
+                if (!person.x || !person.y) {
+                    // Initial position - random angle on their ring
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = maxRadius * RINGS[person.circle].radius;
+                    person.x = centerX + Math.cos(angle) * radius;
+                    person.y = centerY + Math.sin(angle) * radius;
+                    person.targetX = person.x;
+                    person.targetY = person.y;
+                }
+
+                // Smooth animation
+                if (!person.targetX) person.targetX = person.x;
+                if (!person.targetY) person.targetY = person.y;
+
+                person.x += (person.targetX - person.x) * 0.1;
+                person.y += (person.targetY - person.y) * 0.1;
+
+                const color = COLORS[person.energy];
+                const size = person === draggedPerson ? 14 : 12;
+
+                // Glow effect
+                const gradient = ctx.createRadialGradient(person.x, person.y, 0, person.x, person.y, size * 2);
+                gradient.addColorStop(0, color + '40');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(person.x - size * 2, person.y - size * 2, size * 4, size * 4);
+
+                // Circle
+                ctx.beginPath();
+                ctx.arc(person.x, person.y, size, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = COLORS.bg;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Name label
+                ctx.fillStyle = '#e8e3df';
+                ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(person.name, person.x, person.y + size + 6);
+            });
+
+            // Draw center (you)
+            const centerSize = 16;
+            const centerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, centerSize * 2);
+            centerGradient.addColorStop(0, COLORS.center + '60');
+            centerGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = centerGradient;
+            ctx.fillRect(centerX - centerSize * 2, centerY - centerSize * 2, centerSize * 4, centerSize * 4);
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, centerSize, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.center;
+            ctx.fill();
+            ctx.strokeStyle = COLORS.bg;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#1a1512';
+            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('YOU', centerX, centerY);
+
+            animationFrame = requestAnimationFrame(render);
+        }
+
+        // Interaction
+        function getPersonAtPoint(x, y) {
+            return connections.find(person => {
+                const dx = person.x - x;
+                const dy = person.y - y;
+                return Math.sqrt(dx * dx + dy * dy) < 12;
+            });
+        }
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const person = getPersonAtPoint(x, y);
+            if (person) {
+                draggedPerson = person;
+                canvas.style.cursor = 'grabbing';
+                hideTooltip();
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (draggedPerson) {
+                draggedPerson.targetX = x;
+                draggedPerson.targetY = y;
+
+                // Determine which circle they're in
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+
+                if (distance < maxRadius * 0.3) {
+                    draggedPerson.circle = 'inner';
+                } else if (distance < maxRadius * 0.5) {
+                    draggedPerson.circle = 'middle';
+                } else {
+                    draggedPerson.circle = 'outer';
+                }
+            } else {
+                const person = getPersonAtPoint(x, y);
+                if (person) {
+                    canvas.style.cursor = 'pointer';
+                } else {
+                    canvas.style.cursor = 'grab';
+                }
+            }
+        }
+
+        function handleMouseUp(e) {
+            if (draggedPerson) {
+                saveConnections();
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Show tooltip if not dragged far
+                const dx = draggedPerson.x - x;
+                const dy = draggedPerson.y - y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 5) {
+                    showTooltip(draggedPerson, e.clientX, e.clientY);
+                }
+            }
+
+            draggedPerson = null;
+            canvas.style.cursor = 'grab';
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            const person = getPersonAtPoint(x, y);
+            if (person) {
+                draggedPerson = person;
+                hideTooltip();
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!draggedPerson) return;
+
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            draggedPerson.targetX = x;
+            draggedPerson.targetY = y;
+
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+
+            if (distance < maxRadius * 0.3) {
+                draggedPerson.circle = 'inner';
+            } else if (distance < maxRadius * 0.5) {
+                draggedPerson.circle = 'middle';
+            } else {
+                draggedPerson.circle = 'outer';
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (draggedPerson) {
+                saveConnections();
+
+                const touch = e.changedTouches[0];
+                showTooltip(draggedPerson, touch.clientX, touch.clientY);
+            }
+            draggedPerson = null;
+        }
+
+        function showTooltip(person, x, y) {
+            selectedPerson = person;
+            document.getElementById('tooltipName').textContent = person.name;
+            document.getElementById('tooltipRelation').textContent = person.relationship;
+            document.getElementById('tooltipCircle').textContent = RINGS[person.circle].label + ' - ' +
+                person.energy.charAt(0).toUpperCase() + person.energy.slice(1);
+
+            tooltip.style.left = x + 10 + 'px';
+            tooltip.style.top = y + 10 + 'px';
+            tooltip.classList.add('active');
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('active');
+            selectedPerson = null;
+        }
+
+        // Modal
+        addBtn.addEventListener('click', () => {
+            connectionForm.reset();
+            document.getElementById('modalTitle').textContent = 'Add Connection';
+            modalOverlay.classList.add('active');
+            setTimeout(() => document.getElementById('name').focus(), 100);
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        connectionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(connectionForm);
+            const person = {
+                id: Date.now(),
+                name: formData.get('name'),
+                relationship: document.getElementById('relationship').value,
+                circle: formData.get('circle'),
+                energy: formData.get('energy')
+            };
+
+            connections.push(person);
+            saveConnections();
+            updateEmptyState();
+
+            modalOverlay.classList.remove('active');
+
+            // Animate in
+            setTimeout(() => {
+                const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = maxRadius * RINGS[person.circle].radius;
+                person.targetX = centerX + Math.cos(angle) * radius;
+                person.targetY = centerY + Math.sin(angle) * radius;
+            }, 50);
+        });
+
+        deleteBtn.addEventListener('click', () => {
+            if (selectedPerson) {
+                connections = connections.filter(p => p.id !== selectedPerson.id);
+                saveConnections();
+                updateEmptyState();
+                hideTooltip();
+            }
+        });
+
+        // Insights
+        insightsBtn.addEventListener('click', () => {
+            const isActive = insights.classList.contains('active');
+            insights.classList.toggle('active');
+
+            if (!isActive) {
+                updateInsights();
+            }
+        });
+
+        function updateInsights() {
+            const total = connections.length;
+            const supportive = connections.filter(p => p.energy === 'supportive').length;
+            const neutral = connections.filter(p => p.energy === 'neutral').length;
+            const draining = connections.filter(p => p.energy === 'draining').length;
+
+            const inner = connections.filter(p => p.circle === 'inner').length;
+            const middle = connections.filter(p => p.circle === 'middle').length;
+            const outer = connections.filter(p => p.circle === 'outer').length;
+
+            const content = document.getElementById('insightContent');
+
+            if (total === 0) {
+                content.innerHTML = '<div class="insight-item">Add some connections to see insights about your network.</div>';
+                return;
+            }
+
+            let html = `
+                <div class="insight-item">
+                    You have <span class="stat">${total}</span> connection${total !== 1 ? 's' : ''} in your network.
+                </div>
+            `;
+
+            if (supportive > 0) {
+                html += `
+                    <div class="insight-item">
+                        <span class="stat">${supportive}</span> ${supportive === 1 ? 'person lifts' : 'people lift'} you up.
+                        ${supportive > draining ? 'Your network is mostly supportive!' : ''}
+                    </div>
+                `;
+            }
+
+            if (draining > 0) {
+                const percentage = Math.round((draining / total) * 100);
+                html += `
+                    <div class="insight-item">
+                        <span class="stat">${draining}</span> ${draining === 1 ? 'connection' : 'connections'} drain your energy (${percentage}%).
+                        ${percentage > 30 ? 'Consider setting boundaries with draining connections.' : ''}
+                    </div>
+                `;
+            }
+
+            if (inner > 0) {
+                html += `
+                    <div class="insight-item">
+                        Your inner circle has <span class="stat">${inner}</span> ${inner === 1 ? 'person' : 'people'}.
+                        ${inner < 3 ? 'A small, tight-knit group.' : 'A strong support system.'}
+                    </div>
+                `;
+            }
+
+            const supportiveInner = connections.filter(p => p.circle === 'inner' && p.energy === 'supportive').length;
+            if (supportiveInner > 0) {
+                html += `
+                    <div class="insight-item">
+                        You have <span class="stat">${supportiveInner}</span> supportive ${supportiveInner === 1 ? 'person' : 'people'}
+                        in your inner circle. These are your core supporters.
+                    </div>
+                `;
+            }
+
+            if (total > 5) {
+                html += `
+                    <div class="insight-item">
+                        Reflection: Who in your network do you want to connect with more? Who brings out the best in you?
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        // Click outside tooltip to close
+        document.addEventListener('click', (e) => {
+            if (!tooltip.contains(e.target) && !canvas.contains(e.target)) {
+                hideTooltip();
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

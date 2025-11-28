@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Weather - Mood Check-In | cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-base: #1a1512;
+            --text-primary: #f5f3f0;
+            --text-secondary: #a39d95;
+            --accent: #ff6b35;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--dark-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Sky Background */
+        .sky-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .sky-container.sunny {
+            background: linear-gradient(180deg, #ffd89b 0%, #19547b 100%);
+        }
+
+        .sky-container.partly-cloudy {
+            background: linear-gradient(180deg, #a8c0ff 0%, #3f2b96 100%);
+        }
+
+        .sky-container.cloudy {
+            background: linear-gradient(180deg, #bdc3c7 0%, #2c3e50 100%);
+        }
+
+        .sky-container.rainy {
+            background: linear-gradient(180deg, #4c669f 0%, #192f5d 100%);
+        }
+
+        .sky-container.stormy {
+            background: linear-gradient(180deg, #3a1c71 0%, #0f0c29 100%);
+        }
+
+        .sky-container.foggy {
+            background: linear-gradient(180deg, #e0e0e0 0%, #4a5568 100%);
+        }
+
+        .sky-container.rainbow {
+            background: linear-gradient(180deg, #ff9a9e 0%, #fad0c4 20%, #ffecd2 40%, #fcb69f 60%, #a1c4fd 80%, #c2e9fb 100%);
+        }
+
+        .sky-container.default {
+            background: var(--dark-base);
+        }
+
+        /* Weather Effects */
+        .weather-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        /* Sun rays */
+        .sun-ray {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            top: 20%;
+            left: 50%;
+            transform-origin: left center;
+            animation: rotate-ray 20s linear infinite;
+        }
+
+        @keyframes rotate-ray {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Rain drops */
+        .rain-drop {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.5));
+            animation: fall-rain 1s linear infinite;
+        }
+
+        @keyframes fall-rain {
+            from {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100vh);
+                opacity: 0.3;
+            }
+        }
+
+        /* Lightning */
+        .lightning {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            opacity: 0;
+            animation: flash 4s ease-in-out infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            2% { opacity: 0.9; }
+            3% { opacity: 0; }
+            5% { opacity: 0.8; }
+            6% { opacity: 0; }
+        }
+
+        /* Fog */
+        .fog {
+            position: absolute;
+            width: 150%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><filter id="noise"><feTurbulence baseFrequency="0.02" numOctaves="3"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.3"/></svg>');
+            animation: drift-fog 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift-fog {
+            from { transform: translateX(-20%); }
+            to { transform: translateX(0%); }
+        }
+
+        /* Cloud particles */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 100px;
+            animation: drift-cloud linear infinite;
+        }
+
+        @keyframes drift-cloud {
+            from { transform: translateX(-200px); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Weather Grid */
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        .weather-option {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .weather-option:hover::before {
+            opacity: 1;
+        }
+
+        .weather-option:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-option.selected {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.2);
+            transform: scale(1.1);
+        }
+
+        .weather-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .weather-option:nth-child(2) .weather-icon { animation-delay: 0.2s; }
+        .weather-option:nth-child(3) .weather-icon { animation-delay: 0.4s; }
+        .weather-option:nth-child(4) .weather-icon { animation-delay: 0.6s; }
+        .weather-option:nth-child(5) .weather-icon { animation-delay: 0.8s; }
+        .weather-option:nth-child(6) .weather-icon { animation-delay: 1s; }
+        .weather-option:nth-child(7) .weather-icon { animation-delay: 1.2s; }
+
+        .weather-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .weather-description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Note Section */
+        .note-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .note-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .note-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .note-section textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .note-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .note-section textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: #ff5722;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Stats */
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .stats-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+
+        .stats-highlight {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* History View */
+        .history-view {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .history-view.visible {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .history-view h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .history-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .history-entry {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .history-entry:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateX(8px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-weather {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .history-icon {
+            font-size: 1.5rem;
+        }
+
+        .history-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .history-note {
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px;
+            font-size: 1.125rem;
+        }
+
+        .pattern-insight {
+            background: rgba(255, 107, 53, 0.2);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            font-size: 1.125rem;
+            line-height: 1.6;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .pattern-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--accent);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .success-message.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .weather-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Accessibility */
+        .weather-option:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 4px;
+        }
+
+        .btn:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 4px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sky Background -->
+    <div class="sky-container default" id="skyContainer">
+        <div class="weather-effects" id="weatherEffects"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage" role="alert">
+            Check-in saved! Your inner weather has been recorded.
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1>Inner Weather</h1>
+            <p class="subtitle">How's your inner weather today?</p>
+        </header>
+
+        <!-- Main View -->
+        <div id="mainView">
+            <!-- Weather Grid -->
+            <div class="weather-grid" role="radiogroup" aria-label="Select your inner weather">
+                <div class="weather-option" data-weather="sunny" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">☀️</span>
+                    <div class="weather-name">Sunny</div>
+                    <div class="weather-description">Feeling good, energized, positive</div>
+                </div>
+                <div class="weather-option" data-weather="partly-cloudy" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">🌤️</span>
+                    <div class="weather-name">Partly Cloudy</div>
+                    <div class="weather-description">Okay, some concerns but managing</div>
+                </div>
+                <div class="weather-option" data-weather="cloudy" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">☁️</span>
+                    <div class="weather-name">Cloudy</div>
+                    <div class="weather-description">Low energy, disconnected, flat</div>
+                </div>
+                <div class="weather-option" data-weather="rainy" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">🌧️</span>
+                    <div class="weather-name">Rainy</div>
+                    <div class="weather-description">Sad, tearful, grief</div>
+                </div>
+                <div class="weather-option" data-weather="stormy" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">⛈️</span>
+                    <div class="weather-name">Stormy</div>
+                    <div class="weather-description">Angry, frustrated, turbulent</div>
+                </div>
+                <div class="weather-option" data-weather="foggy" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">🌫️</span>
+                    <div class="weather-name">Foggy</div>
+                    <div class="weather-description">Confused, uncertain, lost</div>
+                </div>
+                <div class="weather-option" data-weather="rainbow" tabindex="0" role="radio" aria-checked="false">
+                    <span class="weather-icon" aria-hidden="true">🌈</span>
+                    <div class="weather-name">Rainbow</div>
+                    <div class="weather-description">Hopeful after difficulty</div>
+                </div>
+            </div>
+
+            <!-- Note Section -->
+            <div class="note-section" id="noteSection">
+                <label for="weatherNote">Would you like to add a note? (optional)</label>
+                <textarea
+                    id="weatherNote"
+                    placeholder="What's contributing to your inner weather today?"
+                    aria-label="Add an optional note about your mood"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button class="btn btn-primary hidden" id="saveBtn" aria-label="Save your weather check-in">
+                    Save Check-In
+                </button>
+                <button class="btn btn-secondary" id="viewHistoryBtn" aria-label="View your weather history">
+                    View History
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats" id="stats">
+                <div class="stats-content">
+                    Select your weather to begin tracking your inner climate.
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div class="history-view" id="historyView">
+            <h2>Your Weather History</h2>
+            <div id="patternInsight"></div>
+            <div class="history-timeline" id="historyTimeline">
+                <div class="no-history">No check-ins yet. Start by selecting your inner weather above!</div>
+            </div>
+            <div class="button-group" style="margin-top: 32px;">
+                <button class="btn btn-secondary" id="backBtn" aria-label="Back to weather check-in">
+                    Back to Check-In
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Weather configurations
+        const weatherConfig = {
+            sunny: {
+                icon: '☀️',
+                name: 'Sunny',
+                description: 'Feeling good, energized, positive',
+                effects: 'sunRays'
+            },
+            'partly-cloudy': {
+                icon: '🌤️',
+                name: 'Partly Cloudy',
+                description: 'Okay, some concerns but managing',
+                effects: 'clouds'
+            },
+            cloudy: {
+                icon: '☁️',
+                name: 'Cloudy',
+                description: 'Low energy, disconnected, flat',
+                effects: 'clouds'
+            },
+            rainy: {
+                icon: '🌧️',
+                name: 'Rainy',
+                description: 'Sad, tearful, grief',
+                effects: 'rain'
+            },
+            stormy: {
+                icon: '⛈️',
+                name: 'Stormy',
+                description: 'Angry, frustrated, turbulent',
+                effects: 'lightning'
+            },
+            foggy: {
+                icon: '🌫️',
+                name: 'Foggy',
+                description: 'Confused, uncertain, lost',
+                effects: 'fog'
+            },
+            rainbow: {
+                icon: '🌈',
+                name: 'Rainbow',
+                description: 'Hopeful after difficulty',
+                effects: 'none'
+            }
+        };
+
+        // State
+        let selectedWeather = null;
+        let weatherHistory = [];
+
+        // DOM Elements
+        const skyContainer = document.getElementById('skyContainer');
+        const weatherEffects = document.getElementById('weatherEffects');
+        const noteSection = document.getElementById('noteSection');
+        const weatherNote = document.getElementById('weatherNote');
+        const saveBtn = document.getElementById('saveBtn');
+        const viewHistoryBtn = document.getElementById('viewHistoryBtn');
+        const backBtn = document.getElementById('backBtn');
+        const stats = document.getElementById('stats');
+        const mainView = document.getElementById('mainView');
+        const historyView = document.getElementById('historyView');
+        const historyTimeline = document.getElementById('historyTimeline');
+        const patternInsight = document.getElementById('patternInsight');
+        const successMessage = document.getElementById('successMessage');
+        const weatherOptions = document.querySelectorAll('.weather-option');
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('innerWeatherHistory');
+            if (saved) {
+                weatherHistory = JSON.parse(saved);
+                updateStats();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('innerWeatherHistory', JSON.stringify(weatherHistory));
+        }
+
+        // Weather effects generators
+        function clearEffects() {
+            weatherEffects.innerHTML = '';
+        }
+
+        function createSunRays() {
+            clearEffects();
+            for (let i = 0; i < 12; i++) {
+                const ray = document.createElement('div');
+                ray.className = 'sun-ray';
+                ray.style.transform = `rotate(${i * 30}deg)`;
+                ray.style.animationDelay = `${i * 0.1}s`;
+                weatherEffects.appendChild(ray);
+            }
+        }
+
+        function createRain() {
+            clearEffects();
+            for (let i = 0; i < 100; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop particle';
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.animationDelay = `${Math.random() * 2}s`;
+                drop.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
+                weatherEffects.appendChild(drop);
+            }
+        }
+
+        function createLightning() {
+            clearEffects();
+            createRain(); // Rain with lightning
+            const lightning = document.createElement('div');
+            lightning.className = 'lightning';
+            weatherEffects.appendChild(lightning);
+        }
+
+        function createFog() {
+            clearEffects();
+            const fog1 = document.createElement('div');
+            fog1.className = 'fog';
+            fog1.style.animationDuration = '20s';
+            weatherEffects.appendChild(fog1);
+
+            const fog2 = document.createElement('div');
+            fog2.className = 'fog';
+            fog2.style.animationDuration = '25s';
+            fog2.style.animationDelay = '5s';
+            fog2.style.opacity = '0.2';
+            weatherEffects.appendChild(fog2);
+        }
+
+        function createClouds() {
+            clearEffects();
+            for (let i = 0; i < 8; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud particle';
+                cloud.style.width = `${100 + Math.random() * 100}px`;
+                cloud.style.height = `${40 + Math.random() * 30}px`;
+                cloud.style.top = `${Math.random() * 60}%`;
+                cloud.style.animationDuration = `${20 + Math.random() * 20}s`;
+                cloud.style.animationDelay = `${Math.random() * 10}s`;
+                weatherEffects.appendChild(cloud);
+            }
+        }
+
+        // Apply weather effects
+        function applyWeatherEffects(weather) {
+            const config = weatherConfig[weather];
+            if (!config) return;
+
+            // Update sky background
+            skyContainer.className = `sky-container ${weather}`;
+
+            // Create weather effects
+            switch (config.effects) {
+                case 'sunRays':
+                    createSunRays();
+                    break;
+                case 'rain':
+                    createRain();
+                    break;
+                case 'lightning':
+                    createLightning();
+                    break;
+                case 'fog':
+                    createFog();
+                    break;
+                case 'clouds':
+                    createClouds();
+                    break;
+                default:
+                    clearEffects();
+            }
+        }
+
+        // Handle weather selection
+        function selectWeather(weatherType) {
+            selectedWeather = weatherType;
+
+            // Update UI
+            weatherOptions.forEach(option => {
+                option.classList.remove('selected');
+                option.setAttribute('aria-checked', 'false');
+            });
+
+            const selectedOption = document.querySelector(`[data-weather="${weatherType}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                selectedOption.setAttribute('aria-checked', 'true');
+            }
+
+            // Show note section and save button
+            noteSection.classList.add('visible');
+            saveBtn.classList.remove('hidden');
+
+            // Apply weather effects
+            applyWeatherEffects(weatherType);
+        }
+
+        // Save check-in
+        function saveCheckIn() {
+            if (!selectedWeather) return;
+
+            const entry = {
+                weather: selectedWeather,
+                note: weatherNote.value.trim(),
+                timestamp: Date.now(),
+                date: new Date().toLocaleString()
+            };
+
+            weatherHistory.unshift(entry);
+            saveData();
+            updateStats();
+
+            // Show success message
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+
+            // Reset form
+            weatherOptions.forEach(option => {
+                option.classList.remove('selected');
+                option.setAttribute('aria-checked', 'false');
+            });
+            weatherNote.value = '';
+            noteSection.classList.remove('visible');
+            saveBtn.classList.add('hidden');
+            selectedWeather = null;
+
+            // Reset to default sky after a moment
+            setTimeout(() => {
+                skyContainer.className = 'sky-container default';
+                clearEffects();
+            }, 2000);
+        }
+
+        // Update stats
+        function updateStats() {
+            if (weatherHistory.length === 0) {
+                stats.innerHTML = '<div class="stats-content">Select your weather to begin tracking your inner climate.</div>';
+                return;
+            }
+
+            const today = new Date().toDateString();
+            const thisWeek = weatherHistory.filter(entry => {
+                const entryDate = new Date(entry.timestamp);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return entryDate >= weekAgo;
+            }).length;
+
+            const totalCheckins = weatherHistory.length;
+
+            stats.innerHTML = `
+                <div class="stats-content">
+                    You've checked in <span class="stats-highlight">${thisWeek}</span> time${thisWeek !== 1 ? 's' : ''} this week.
+                    <br>
+                    Total check-ins: <span class="stats-highlight">${totalCheckins}</span>
+                </div>
+            `;
+        }
+
+        // Show history view
+        function showHistory() {
+            mainView.style.display = 'none';
+            historyView.classList.add('visible');
+
+            if (weatherHistory.length === 0) {
+                historyTimeline.innerHTML = '<div class="no-history">No check-ins yet. Start by selecting your inner weather above!</div>';
+                patternInsight.innerHTML = '';
+                return;
+            }
+
+            // Detect patterns
+            const insight = detectPatterns();
+            if (insight) {
+                patternInsight.innerHTML = insight;
+            } else {
+                patternInsight.innerHTML = '';
+            }
+
+            // Render history timeline
+            historyTimeline.innerHTML = weatherHistory.map(entry => {
+                const config = weatherConfig[entry.weather];
+                return `
+                    <div class="history-entry">
+                        <div class="history-header">
+                            <div class="history-weather">
+                                <span class="history-icon">${config.icon}</span>
+                                <span>${config.name}</span>
+                            </div>
+                            <div class="history-date">${entry.date}</div>
+                        </div>
+                        ${entry.note ? `<div class="history-note">"${entry.note}"</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Detect patterns in weather history
+        function detectPatterns() {
+            if (weatherHistory.length < 3) return null;
+
+            const recent = weatherHistory.slice(0, 7);
+
+            // Check for consecutive same weather
+            if (recent.length >= 3) {
+                const lastWeather = recent[0].weather;
+                let consecutive = 1;
+
+                for (let i = 1; i < recent.length && consecutive < 3; i++) {
+                    if (recent[i].weather === lastWeather) {
+                        consecutive++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (consecutive >= 3) {
+                    const config = weatherConfig[lastWeather];
+                    return `
+                        <div class="pattern-insight">
+                            <span class="pattern-icon">${config.icon}</span>
+                            You've had <strong>${consecutive} ${config.name}</strong> days in a row!
+                            ${getPatternMessage(lastWeather, consecutive)}
+                        </div>
+                    `;
+                }
+            }
+
+            // Check for improvement trend
+            const positiveWeathers = ['sunny', 'rainbow', 'partly-cloudy'];
+            const recentPositive = recent.slice(0, 3).filter(e => positiveWeathers.includes(e.weather)).length;
+
+            if (recentPositive === 3) {
+                return `
+                    <div class="pattern-insight">
+                        <span class="pattern-icon">✨</span>
+                        Your inner weather has been <strong>brightening up</strong> lately! Keep noticing what's working.
+                    </div>
+                `;
+            }
+
+            // Check for variety
+            const uniqueWeathers = new Set(recent.map(e => e.weather));
+            if (uniqueWeathers.size >= 5 && recent.length >= 7) {
+                return `
+                    <div class="pattern-insight">
+                        <span class="pattern-icon">🌍</span>
+                        You're experiencing a <strong>full range of weather</strong> this week. That's completely normal.
+                    </div>
+                `;
+            }
+
+            return null;
+        }
+
+        // Get contextual message for pattern
+        function getPatternMessage(weather, count) {
+            const messages = {
+                sunny: "That's wonderful! What's been contributing to this positive streak?",
+                'partly-cloudy': "You're maintaining steady ground. Keep checking in.",
+                cloudy: "This is a quiet period. Consider what small thing might help.",
+                rainy: "Remember that sadness is temporary, even when it doesn't feel like it.",
+                stormy: "Notice if there's something that needs your attention or expression.",
+                foggy: "When clarity feels distant, small steps still count.",
+                rainbow: "Hope is showing up for you. Beautiful to see."
+            };
+            return messages[weather] || "Keep tracking your patterns.";
+        }
+
+        // Show main view
+        function showMain() {
+            mainView.style.display = 'block';
+            historyView.classList.remove('visible');
+        }
+
+        // Event listeners
+        weatherOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectWeather(option.dataset.weather);
+            });
+
+            option.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectWeather(option.dataset.weather);
+                }
+            });
+        });
+
+        saveBtn.addEventListener('click', saveCheckIn);
+        viewHistoryBtn.addEventListener('click', showHistory);
+        backBtn.addEventListener('click', showMain);
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>

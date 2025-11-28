@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Scan & PMR - cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1512;
+            color: #F5F0E8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(126, 168, 139, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(212, 137, 106, 0.05) 0%, transparent 50%);
+            animation: ambientFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes ambientFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-20px, 30px) scale(1.05); }
+            66% { transform: translate(20px, -30px) scale(0.95); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1400px;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 1fr 600px 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #F5F0E8;
+            opacity: 0.7;
+        }
+
+        /* Left Panel - Instructions */
+        .instructions-panel {
+            padding: 40px;
+            background: rgba(245, 240, 232, 0.03);
+            border: 2px solid rgba(245, 240, 232, 0.1);
+            border-radius: 4px;
+            height: fit-content;
+            position: sticky;
+            top: 40px;
+        }
+
+        .phase-indicator {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #7EA88B;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .instruction-text {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 120px;
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 900;
+            text-align: center;
+            margin: 30px 0;
+            color: #7EA88B;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-display.releasing {
+            color: #D4896A;
+        }
+
+        .breath-guide {
+            text-align: center;
+            font-size: 1.1rem;
+            color: rgba(245, 240, 232, 0.6);
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        /* Center Panel - Body Illustration */
+        .body-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .body-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #bodySvg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 40px rgba(126, 168, 139, 0.2));
+        }
+
+        .body-part {
+            fill: none;
+            stroke: #F5F0E8;
+            stroke-width: 2;
+            opacity: 0.3;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .body-part.active {
+            opacity: 1;
+            stroke: #7EA88B;
+            stroke-width: 3;
+            fill: rgba(126, 168, 139, 0.15);
+            filter: drop-shadow(0 0 20px rgba(126, 168, 139, 0.6));
+            animation: tensePulse 1.5s ease-in-out infinite;
+        }
+
+        .body-part.completed {
+            opacity: 0.8;
+            stroke: #D4896A;
+            stroke-width: 2;
+            fill: rgba(212, 137, 106, 0.1);
+        }
+
+        .body-part.releasing {
+            animation: releaseFlow 2s ease-out infinite;
+        }
+
+        @keyframes tensePulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(126, 168, 139, 0.6));
+            }
+            50% {
+                transform: scale(1.02);
+                filter: drop-shadow(0 0 30px rgba(126, 168, 139, 0.9));
+            }
+        }
+
+        @keyframes releaseFlow {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Right Panel - Progress */
+        .progress-panel {
+            padding: 40px;
+            background: rgba(245, 240, 232, 0.03);
+            border: 2px solid rgba(245, 240, 232, 0.1);
+            border-radius: 4px;
+            height: fit-content;
+            position: sticky;
+            top: 40px;
+        }
+
+        .progress-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .relaxation-meter {
+            margin-bottom: 40px;
+        }
+
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(245, 240, 232, 0.1);
+            border: 2px solid rgba(245, 240, 232, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7EA88B, #D4896A);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .regions-list {
+            list-style: none;
+        }
+
+        .region-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(245, 240, 232, 0.02);
+            border-left: 3px solid rgba(245, 240, 232, 0.2);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .region-item.active {
+            background: rgba(126, 168, 139, 0.1);
+            border-left-color: #7EA88B;
+            transform: translateX(5px);
+        }
+
+        .region-item.completed {
+            background: rgba(212, 137, 106, 0.05);
+            border-left-color: #D4896A;
+            opacity: 0.6;
+        }
+
+        .region-item.completed::after {
+            content: '✓';
+            float: right;
+            color: #D4896A;
+        }
+
+        /* Controls */
+        .controls {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #F5F0E8;
+            background: transparent;
+            color: #F5F0E8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: #F5F0E8;
+            color: #1a1512;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #7EA88B;
+            border-color: #7EA88B;
+            color: #1a1512;
+        }
+
+        .btn-primary:hover {
+            background: #8fb99c;
+            border-color: #8fb99c;
+        }
+
+        .btn-secondary {
+            border-color: #D4896A;
+            color: #D4896A;
+        }
+
+        .btn-secondary:hover {
+            background: #D4896A;
+            color: #1a1512;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1512;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .welcome-content {
+            max-width: 600px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-content h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .welcome-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .welcome-content ul {
+            text-align: left;
+            margin: 30px 0;
+            list-style: none;
+        }
+
+        .welcome-content li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .welcome-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #7EA88B;
+        }
+
+        /* Completion Screen */
+        .completion-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1512;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .completion-screen.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .completion-content {
+            max-width: 700px;
+            text-align: center;
+            padding: 60px;
+            background: rgba(245, 240, 232, 0.03);
+            border: 2px solid rgba(245, 240, 232, 0.1);
+            border-radius: 4px;
+            animation: celebrationPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes celebrationPulse {
+            0%, 100% {
+                box-shadow: 0 0 40px rgba(126, 168, 139, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(126, 168, 139, 0.4);
+            }
+        }
+
+        .completion-content h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .completion-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .stat {
+            padding: 20px;
+            background: rgba(245, 240, 232, 0.05);
+            border: 1px solid rgba(245, 240, 232, 0.1);
+            border-radius: 4px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #7EA88B;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .instructions-panel,
+            .progress-panel {
+                position: relative;
+                top: 0;
+            }
+
+            .header {
+                order: 1;
+            }
+
+            .body-panel {
+                order: 2;
+            }
+
+            .instructions-panel {
+                order: 3;
+            }
+
+            .progress-panel {
+                order: 4;
+            }
+
+            .controls {
+                order: 5;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .instruction-text {
+                font-size: 1.2rem;
+            }
+
+            .timer-display {
+                font-size: 3rem;
+            }
+
+            .completion-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <h1>Body Scan & PMR</h1>
+            <p>A guided progressive muscle relaxation exercise to release tension and cultivate deep relaxation throughout your entire body.</p>
+            <ul>
+                <li>10 body regions from feet to head</li>
+                <li>Tense each area for 5 seconds</li>
+                <li>Release and notice the relaxation</li>
+                <li>Approximately 15 minutes</li>
+            </ul>
+            <p style="margin-top: 30px; opacity: 0.6;">Find a comfortable position. You can sit or lie down.</p>
+            <button class="btn btn-primary" onclick="startSession()">Begin Session</button>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="container">
+        <div class="header">
+            <h1>Body Scan & PMR</h1>
+            <p>Progressive Muscle Relaxation</p>
+        </div>
+
+        <!-- Left Panel: Instructions -->
+        <div class="instructions-panel">
+            <div class="phase-indicator" id="phaseIndicator">PREPARING</div>
+            <div class="instruction-text" id="instructionText">
+                Prepare to begin your body scan journey...
+            </div>
+            <div class="timer-display" id="timerDisplay">--</div>
+            <div class="breath-guide" id="breathGuide"></div>
+        </div>
+
+        <!-- Center Panel: Body Illustration -->
+        <div class="body-panel">
+            <div class="body-container">
+                <svg id="bodySvg" viewBox="0 0 200 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Head & Face -->
+                    <ellipse id="region-9" class="body-part" cx="100" cy="30" rx="25" ry="30"/>
+
+                    <!-- Neck -->
+                    <rect id="region-8" class="body-part" x="90" y="58" width="20" height="20"/>
+
+                    <!-- Shoulders & Upper Arms -->
+                    <path id="region-7-shoulders" class="body-part" d="M 70 78 L 50 85 L 50 120 L 60 118 L 70 100 Z"/>
+                    <path id="region-7-shoulders-r" class="body-part" d="M 130 78 L 150 85 L 150 120 L 140 118 L 130 100 Z"/>
+
+                    <!-- Arms -->
+                    <rect id="region-7-arms-l" class="body-part" x="45" y="120" width="15" height="60" rx="7"/>
+                    <rect id="region-7-arms-r" class="body-part" x="140" y="120" width="15" height="60" rx="7"/>
+
+                    <!-- Hands & Fingers -->
+                    <ellipse id="region-6-l" class="body-part" cx="52" cy="190" rx="10" ry="15"/>
+                    <ellipse id="region-6-r" class="body-part" cx="148" cy="190" rx="10" ry="15"/>
+
+                    <!-- Chest & Upper Back -->
+                    <path id="region-5" class="body-part" d="M 70 78 L 130 78 L 135 120 L 65 120 Z"/>
+
+                    <!-- Stomach & Lower Back -->
+                    <path id="region-4" class="body-part" d="M 65 120 L 135 120 L 130 180 L 70 180 Z"/>
+
+                    <!-- Hips & Pelvis -->
+                    <path id="region-3" class="body-part" d="M 70 180 L 130 180 L 125 220 L 75 220 Z"/>
+
+                    <!-- Thighs & Knees -->
+                    <rect id="region-2-l" class="body-part" x="75" y="220" width="18" height="90" rx="9"/>
+                    <rect id="region-2-r" class="body-part" x="107" y="220" width="18" height="90" rx="9"/>
+
+                    <!-- Calves & Shins -->
+                    <path id="region-1-l" class="body-part" d="M 75 310 L 93 310 L 90 390 L 78 390 Z"/>
+                    <path id="region-1-r" class="body-part" d="M 107 310 L 125 310 L 122 390 L 110 390 Z"/>
+
+                    <!-- Feet & Toes -->
+                    <ellipse id="region-0-l" class="body-part" cx="84" cy="405" rx="12" ry="18"/>
+                    <ellipse id="region-0-r" class="body-part" cx="116" cy="405" rx="12" ry="18"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Right Panel: Progress -->
+        <div class="progress-panel">
+            <div class="progress-title">Progress</div>
+            <div class="relaxation-meter">
+                <div class="meter-label">
+                    <span>Relaxation Depth</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="meterFill"></div>
+                </div>
+            </div>
+
+            <div class="progress-title" style="margin-top: 40px;">Body Regions</div>
+            <ul class="regions-list" id="regionsList"></ul>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn" id="pauseBtn" onclick="togglePause()" disabled>Pause</button>
+            <button class="btn btn-secondary" id="skipBtn" onclick="skipRegion()" disabled>Skip Region</button>
+            <button class="btn" id="restartBtn" onclick="restartSession()">Restart</button>
+        </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div class="completion-screen" id="completionScreen">
+        <div class="completion-content">
+            <h2>Session Complete</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">You've successfully completed your body scan journey.</p>
+
+            <div class="completion-stats">
+                <div class="stat">
+                    <div class="stat-value" id="statDuration">--</div>
+                    <div class="stat-label">Minutes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Regions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+
+            <p style="opacity: 0.7; margin: 30px 0;">Take a moment to notice how your body feels now.</p>
+
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px;">
+                <button class="btn btn-primary" onclick="restartSession()">Practice Again</button>
+                <button class="btn" onclick="window.location.href='/'">Return Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Body regions data
+        const regions = [
+            {
+                name: "Feet & Toes",
+                ids: ["region-0-l", "region-0-r"],
+                tenseInstruction: "Curl your toes downward and tense your feet. Hold this tension...",
+                releaseInstruction: "Release all tension from your feet and toes. Notice the difference between tension and relaxation.",
+                breathGuide: "Breathe naturally"
+            },
+            {
+                name: "Calves & Shins",
+                ids: ["region-1-l", "region-1-r"],
+                tenseInstruction: "Point your toes toward your head and tense your calves. Feel the tension building...",
+                releaseInstruction: "Let go completely. Feel the warmth and relaxation flowing through your lower legs.",
+                breathGuide: "Breathe deeply and slowly"
+            },
+            {
+                name: "Thighs & Knees",
+                ids: ["region-2-l", "region-2-r"],
+                tenseInstruction: "Tighten your thigh muscles by pressing your legs together. Hold firmly...",
+                releaseInstruction: "Release and feel your thighs becoming heavy and relaxed against the surface beneath you.",
+                breathGuide: "Each breath brings more relaxation"
+            },
+            {
+                name: "Hips & Pelvis",
+                ids: ["region-3"],
+                tenseInstruction: "Squeeze your buttocks together tightly. Create strong tension in your hips...",
+                releaseInstruction: "Let go and allow your hips to settle. Notice the release of tension.",
+                breathGuide: "Breathing in calm, breathing out tension"
+            },
+            {
+                name: "Stomach & Lower Back",
+                ids: ["region-4"],
+                tenseInstruction: "Pull your stomach in tightly, as if bracing for impact. Hold this contraction...",
+                releaseInstruction: "Release your stomach completely. Let it soften and relax with each breath.",
+                breathGuide: "Your belly rises and falls naturally"
+            },
+            {
+                name: "Chest & Upper Back",
+                ids: ["region-5"],
+                tenseInstruction: "Take a deep breath and hold it. Tense your chest and pull your shoulders back...",
+                releaseInstruction: "Exhale completely and let your chest and back muscles soften. Feel the openness in your breathing.",
+                breathGuide: "Breathing freely and easily"
+            },
+            {
+                name: "Hands & Fingers",
+                ids: ["region-6-l", "region-6-r"],
+                tenseInstruction: "Make tight fists with both hands. Squeeze firmly and feel the tension...",
+                releaseInstruction: "Open your hands and let your fingers spread naturally. Notice the tingling sensation of release.",
+                breathGuide: "Letting go with each exhale"
+            },
+            {
+                name: "Arms & Shoulders",
+                ids: ["region-7-arms-l", "region-7-arms-r", "region-7-shoulders", "region-7-shoulders-r"],
+                tenseInstruction: "Raise your shoulders toward your ears and tense your arms. Hold tightly...",
+                releaseInstruction: "Drop your shoulders and let your arms become heavy and relaxed. Feel the weight leaving your upper body.",
+                breathGuide: "Shoulders dropping with each breath"
+            },
+            {
+                name: "Neck",
+                ids: ["region-8"],
+                tenseInstruction: "Gently tilt your head back and create tension in your neck. Be gentle but firm...",
+                releaseInstruction: "Return to a neutral position and let all neck tension dissolve. Your head feels light and balanced.",
+                breathGuide: "Breathing softly and smoothly"
+            },
+            {
+                name: "Face & Head",
+                ids: ["region-9"],
+                tenseInstruction: "Scrunch up your entire face. Squeeze your eyes shut, wrinkle your nose, clench your jaw...",
+                releaseInstruction: "Let your face completely relax. Your jaw drops slightly, your forehead smooths, your eyes soften.",
+                breathGuide: "Complete relaxation washing over you"
+            }
+        ];
+
+        // State management
+        let currentRegion = 0;
+        let currentPhase = 'idle'; // idle, tense, release, awareness
+        let isPaused = false;
+        let timer = null;
+        let timeRemaining = 0;
+        let sessionStartTime = null;
+        let totalSessionTime = 0;
+
+        // Initialize
+        function init() {
+            renderRegionsList();
+            loadProgress();
+        }
+
+        function renderRegionsList() {
+            const list = document.getElementById('regionsList');
+            list.innerHTML = regions.map((region, index) =>
+                `<li class="region-item" id="region-list-${index}">${region.name}</li>`
+            ).join('');
+        }
+
+        function startSession() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            sessionStartTime = Date.now();
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('skipBtn').disabled = false;
+
+            setTimeout(() => {
+                startRegion(0);
+            }, 500);
+        }
+
+        function startRegion(index) {
+            if (index >= regions.length) {
+                completeSession();
+                return;
+            }
+
+            currentRegion = index;
+            currentPhase = 'tense';
+
+            // Update UI
+            updateProgress();
+            highlightBodyPart(regions[index].ids, 'active');
+
+            // Update instructions
+            document.getElementById('phaseIndicator').textContent = 'TENSE';
+            document.getElementById('instructionText').textContent = regions[index].tenseInstruction;
+            document.getElementById('breathGuide').textContent = 'Hold your breath or breathe shallowly';
+
+            // Start tension timer (5 seconds)
+            startTimer(5, () => {
+                startReleasePhase();
+            });
+        }
+
+        function startReleasePhase() {
+            currentPhase = 'release';
+
+            // Update body part visualization
+            const currentBodyParts = document.querySelectorAll('.body-part.active');
+            currentBodyParts.forEach(part => {
+                part.classList.add('releasing');
+            });
+
+            // Update instructions
+            document.getElementById('phaseIndicator').textContent = 'RELEASE';
+            document.getElementById('instructionText').textContent = regions[currentRegion].releaseInstruction;
+            document.getElementById('breathGuide').textContent = regions[currentRegion].breathGuide;
+            document.getElementById('timerDisplay').classList.add('releasing');
+
+            // Release timer (10 seconds)
+            startTimer(10, () => {
+                completeRegion();
+            });
+        }
+
+        function completeRegion() {
+            // Mark as completed
+            highlightBodyPart(regions[currentRegion].ids, 'completed');
+
+            const listItem = document.getElementById(`region-list-${currentRegion}`);
+            listItem.classList.remove('active');
+            listItem.classList.add('completed');
+
+            document.getElementById('timerDisplay').classList.remove('releasing');
+
+            // Save progress
+            saveProgress();
+
+            // Move to next region
+            setTimeout(() => {
+                startRegion(currentRegion + 1);
+            }, 1000);
+        }
+
+        function startTimer(seconds, callback) {
+            timeRemaining = seconds;
+            updateTimerDisplay();
+
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(timer);
+                        callback();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timerDisplay').textContent = timeRemaining;
+        }
+
+        function highlightBodyPart(ids, state) {
+            // Clear all active/releasing states first
+            document.querySelectorAll('.body-part').forEach(part => {
+                part.classList.remove('active', 'releasing');
+            });
+
+            // Apply new state
+            ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.remove('active', 'completed', 'releasing');
+                    element.classList.add(state);
+                }
+            });
+        }
+
+        function updateProgress() {
+            const progress = ((currentRegion) / regions.length) * 100;
+            document.getElementById('meterFill').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+
+            // Update list
+            document.querySelectorAll('.region-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (index === currentRegion) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').textContent = isPaused ? 'Resume' : 'Pause';
+
+            if (isPaused) {
+                document.getElementById('phaseIndicator').textContent = 'PAUSED';
+            } else {
+                document.getElementById('phaseIndicator').textContent = currentPhase === 'tense' ? 'TENSE' : 'RELEASE';
+            }
+        }
+
+        function skipRegion() {
+            if (timer) {
+                clearInterval(timer);
+            }
+
+            highlightBodyPart(regions[currentRegion].ids, 'completed');
+
+            const listItem = document.getElementById(`region-list-${currentRegion}`);
+            listItem.classList.remove('active');
+            listItem.classList.add('completed');
+
+            document.getElementById('timerDisplay').classList.remove('releasing');
+
+            setTimeout(() => {
+                startRegion(currentRegion + 1);
+            }, 500);
+        }
+
+        function restartSession() {
+            if (timer) {
+                clearInterval(timer);
+            }
+
+            currentRegion = 0;
+            currentPhase = 'idle';
+            isPaused = false;
+            timeRemaining = 0;
+
+            // Reset UI
+            document.querySelectorAll('.body-part').forEach(part => {
+                part.classList.remove('active', 'completed', 'releasing');
+            });
+
+            document.getElementById('meterFill').style.width = '0%';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('timerDisplay').textContent = '--';
+            document.getElementById('timerDisplay').classList.remove('releasing');
+            document.getElementById('pauseBtn').textContent = 'Pause';
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('skipBtn').disabled = true;
+
+            // Reset list
+            document.querySelectorAll('.region-item').forEach(item => {
+                item.classList.remove('active', 'completed');
+            });
+
+            // Hide completion screen
+            document.getElementById('completionScreen').classList.remove('visible');
+
+            // Show welcome screen
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+
+            // Clear progress
+            localStorage.removeItem('bodyScanProgress');
+        }
+
+        function completeSession() {
+            // Calculate session duration
+            totalSessionTime = Math.round((Date.now() - sessionStartTime) / 1000 / 60);
+
+            // Update completion screen
+            document.getElementById('statDuration').textContent = totalSessionTime;
+
+            // Show completion screen
+            document.getElementById('completionScreen').classList.add('visible');
+
+            // Update meter to 100%
+            document.getElementById('meterFill').style.width = '100%';
+            document.getElementById('progressPercent').textContent = '100%';
+
+            // Disable controls
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('skipBtn').disabled = true;
+
+            // Save completion
+            const completedSessions = parseInt(localStorage.getItem('bodyScanCompletions') || '0');
+            localStorage.setItem('bodyScanCompletions', completedSessions + 1);
+            localStorage.setItem('bodyScanLastCompleted', new Date().toISOString());
+
+            // Clear progress
+            localStorage.removeItem('bodyScanProgress');
+        }
+
+        function saveProgress() {
+            const progress = {
+                currentRegion,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('bodyScanProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('bodyScanProgress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+
+                // Only restore if less than 1 hour old
+                if (Date.now() - progress.timestamp < 3600000) {
+                    // Mark previous regions as completed
+                    for (let i = 0; i < progress.currentRegion; i++) {
+                        highlightBodyPart(regions[i].ids, 'completed');
+                        document.getElementById(`region-list-${i}`).classList.add('completed');
+                    }
+                    updateProgress();
+                }
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !document.getElementById('welcomeScreen').classList.contains('hidden')) {
+                e.preventDefault();
+                if (currentPhase !== 'idle') {
+                    togglePause();
+                }
+            }
+
+            if (e.code === 'ArrowRight' && currentPhase !== 'idle') {
+                e.preventDefault();
+                skipRegion();
+            }
+
+            if (e.code === 'Escape') {
+                e.preventDefault();
+                if (confirm('Are you sure you want to restart the session?')) {
+                    restartSession();
+                }
+            }
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
