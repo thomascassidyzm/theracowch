@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simplified icon for small sizes - bolder, fewer details -->
+
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" ry="14" fill="#1a1512"/>
+
+  <!-- Cow Face - Ultra simplified -->
+  <g transform="translate(32, 36)">
+
+    <!-- Main face -->
+    <ellipse cx="0" cy="0" rx="18" ry="15" fill="#D4896A"/>
+
+    <!-- Snout -->
+    <ellipse cx="0" cy="6" rx="10" ry="7" fill="#F5F0E8"/>
+
+    <!-- Nostrils - just dots -->
+    <circle cx="-4" cy="7" r="2" fill="#1a1512"/>
+    <circle cx="4" cy="7" r="2" fill="#1a1512"/>
+
+    <!-- Eyes - simplified closed arcs -->
+    <g stroke="#1a1512" stroke-width="2.5" stroke-linecap="round" fill="none">
+      <path d="M -9 -4 Q -6 -8 -3 -4"/>
+      <path d="M 3 -4 Q 6 -8 9 -4"/>
+    </g>
+
+    <!-- Ears -->
+    <ellipse cx="-16" cy="-8" rx="6" ry="4" fill="#D4896A" transform="rotate(-30 -16 -8)"/>
+    <ellipse cx="16" cy="-8" rx="6" ry="4" fill="#D4896A" transform="rotate(30 16 -8)"/>
+
+    <!-- Horns - very simple -->
+    <path d="M -11 -14 Q -12 -20 -9 -23" stroke="#F5F0E8" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 11 -14 Q 12 -20 9 -23" stroke="#F5F0E8" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  </g>
+</svg>
