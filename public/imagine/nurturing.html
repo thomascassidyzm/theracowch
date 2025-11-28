@@ -444,24 +444,22 @@
         </div>
 
         <!-- Exercise 1: Fun Prompt Generator -->
-        <div class="exercise-card">
+        <a href="/exercises/fun-prompts.html" class="exercise-card" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
             <h3>Fun Prompt Generator</h3>
             <p>Get random playful suggestions to add spontaneity to your day. Complete prompts to earn badges!</p>
 
             <div class="prompt-display">
-                <div class="prompt-text" id="currentPrompt">Click "Get New Prompt" to start!</div>
+                <div class="prompt-text" id="currentPrompt">Interactive exercise with random fun prompts!</div>
             </div>
 
-            <button class="button" onclick="generatePrompt()">Get New Prompt</button>
-            <button class="button secondary" onclick="completePrompt()">I Did It!</button>
+            <button class="button" onclick="event.preventDefault(); window.location.href='/exercises/fun-prompts.html'">Try Exercise →</button>
 
             <div class="badges">
-                <div class="badge" id="badge1">First Steps (1)</div>
-                <div class="badge locked" id="badge5">Playful (5)</div>
-                <div class="badge locked" id="badge10">Joyful (10)</div>
-                <div class="badge locked" id="badge25">Champion (25)</div>
+                <div class="badge">Earn Badges</div>
+                <div class="badge locked">Unlock Fun</div>
+                <div class="badge locked">Track Progress</div>
             </div>
-        </div>
+        </a>
 
         <!-- Exercise 2: Playfulness Diary -->
         <div class="exercise-card">
