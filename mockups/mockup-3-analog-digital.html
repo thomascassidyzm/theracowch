@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cowch.app - Welcome Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --paper-cream: #FDF9F3;
+            --paper-manila: #F7F2E9;
+            --paper-dark: #EDE6D6;
+            --pencil-grey: #5A5A5A;
+            --pencil-light: #B8B8B8;
+            --watercolor-blue: rgba(158, 193, 207, 0.3);
+            --watercolor-coral: rgba(234, 162, 133, 0.3);
+            --watercolor-sage: rgba(169, 189, 158, 0.3);
+            --watercolor-lavender: rgba(188, 170, 194, 0.35);
+            --ink-dark: #2C2C2C;
+            --accent-blue: #7BA7BC;
+            --accent-coral: #E8A898;
+            --accent-sage: #A9BD9E;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F0E9DA 0%, #FAF5ED 100%);
+            color: var(--pencil-grey);
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px);
+            pointer-events: none;
+            opacity: 0.6;
+            z-index: 1;
+        }
+
+        /* Noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Notebook header with tabs */
+        .notebook-header {
+            background: var(--paper-cream);
+            border-radius: 8px 8px 0 0;
+            padding: 16px 20px 12px;
+            position: relative;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,0.05),
+                inset 0 -1px 0 rgba(0,0,0,0.08);
+        }
+
+        .notebook-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 8px,
+                var(--pencil-light) 8px,
+                var(--pencil-light) 10px
+            );
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tab {
+            background: var(--paper-dark);
+            padding: 6px 14px;
+            border-radius: 4px 4px 0 0;
+            font-family: 'Caveat', cursive;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--pencil-grey);
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.08);
+        }
+
+        .tab.active {
+            background: var(--paper-cream);
+            color: var(--ink-dark);
+        }
+
+        .date-line {
+            border-bottom: 1px solid var(--pencil-light);
+            padding-bottom: 8px;
+            font-family: 'Caveat', cursive;
+            font-size: 18px;
+            color: var(--pencil-grey);
+            font-weight: 500;
+        }
+
+        /* Main content area - notebook page */
+        .notebook-page {
+            background: var(--paper-cream);
+            padding: 24px 20px;
+            min-height: calc(100vh - 120px);
+            box-shadow:
+                0 4px 12px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        /* Hole punch effect */
+        .notebook-page::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 30px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--paper-dark);
+            box-shadow:
+                0 60px 0 var(--paper-dark),
+                0 120px 0 var(--paper-dark),
+                0 180px 0 var(--paper-dark),
+                0 240px 0 var(--paper-dark);
+        }
+
+        /* Greeting section */
+        .greeting {
+            margin-bottom: 24px;
+            padding-left: 20px;
+        }
+
+        .greeting-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .mandy-avatar {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 50%;
+            border: 2px dashed var(--accent-coral);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transform: rotate(-3deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Simple sketched cow */
+        .mandy-avatar::before {
+            content: '🐄';
+            filter: grayscale(0.3) opacity(0.9);
+        }
+
+        .hello-text {
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--ink-dark);
+            line-height: 1;
+            transform: rotate(-1deg);
+        }
+
+        .subtext {
+            font-size: 14px;
+            color: var(--pencil-grey);
+            padding-left: 20px;
+            font-weight: 400;
+        }
+
+        /* Sticky note quote */
+        .sticky-note {
+            background: linear-gradient(135deg, #FFF4A3 0%, #FFEAA7 100%);
+            padding: 16px 18px;
+            margin: 24px 0 28px 20px;
+            border-radius: 2px;
+            transform: rotate(-1.5deg);
+            box-shadow:
+                0 4px 8px rgba(0,0,0,0.12),
+                inset 0 -1px 0 rgba(0,0,0,0.05);
+            position: relative;
+            max-width: 320px;
+        }
+
+        /* Tape effect */
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 30px;
+            width: 50px;
+            height: 20px;
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(0,0,0,0.08);
+            transform: rotate(2deg);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        .quote-text {
+            font-family: 'Caveat', cursive;
+            font-size: 20px;
+            color: var(--ink-dark);
+            line-height: 1.4;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .quote-author {
+            font-size: 12px;
+            color: var(--pencil-grey);
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* Section title */
+        .section-title {
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink-dark);
+            margin: 28px 0 16px 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--watercolor-coral);
+            border-radius: 2px;
+        }
+
+        /* IMAGINE cards - index card style */
+        .imagine-grid {
+            display: grid;
+            gap: 14px;
+            padding-left: 20px;
+            padding-right: 10px;
+        }
+
+        .imagine-card {
+            background: white;
+            padding: 16px;
+            border-radius: 4px;
+            border-left: 3px solid var(--accent-blue);
+            box-shadow:
+                0 2px 6px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .imagine-card:nth-child(1) {
+            border-left-color: var(--accent-coral);
+            transform: rotate(0.5deg);
+        }
+
+        .imagine-card:nth-child(2) {
+            border-left-color: var(--accent-blue);
+            transform: rotate(-0.3deg);
+        }
+
+        .imagine-card:nth-child(3) {
+            border-left-color: var(--accent-sage);
+            transform: rotate(0.4deg);
+        }
+
+        .imagine-card:nth-child(4) {
+            border-left-color: #D4A574;
+            transform: rotate(-0.5deg);
+        }
+
+        .imagine-card:nth-child(5) {
+            border-left-color: #BC9CB4;
+            transform: rotate(0.2deg);
+        }
+
+        .imagine-card:nth-child(6) {
+            border-left-color: #9DBFAF;
+            transform: rotate(-0.4deg);
+        }
+
+        .imagine-card:nth-child(7) {
+            border-left-color: #A89DC9;
+            transform: rotate(0.3deg);
+        }
+
+        .imagine-card:hover {
+            transform: rotate(0deg) translateY(-2px);
+            box-shadow:
+                0 4px 10px rgba(0,0,0,0.12),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .card-initial {
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--ink-dark);
+            line-height: 1;
+            margin-right: 8px;
+        }
+
+        .card-title-group {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink-dark);
+            margin-bottom: 2px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--pencil-grey);
+            font-weight: 400;
+        }
+
+        .card-progress {
+            display: flex;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1.5px solid var(--pencil-light);
+            background: transparent;
+        }
+
+        .progress-dot.filled {
+            background: var(--pencil-grey);
+            border-color: var(--pencil-grey);
+        }
+
+        /* Hand-drawn checkmark */
+        .checkmark {
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+            color: var(--accent-sage);
+            line-height: 1;
+        }
+
+        /* Actions section - stamp style */
+        .actions {
+            margin-top: 32px;
+            padding: 0 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-button {
+            background: white;
+            border: 2px dashed var(--pencil-light);
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-family: 'Caveat', cursive;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ink-dark);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            transform: rotate(-0.5deg);
+        }
+
+        .action-button:hover {
+            background: var(--paper-manila);
+            border-style: solid;
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, var(--accent-coral) 0%, #E8A898 100%);
+            border: none;
+            color: white;
+            transform: rotate(0.5deg);
+        }
+
+        .action-button.primary:hover {
+            transform: rotate(0deg) scale(1.02);
+            background: linear-gradient(135deg, #E8A898 0%, var(--accent-coral) 100%);
+        }
+
+        /* Watercolor accent blobs */
+        .watercolor-blob {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            width: 150px;
+            height: 150px;
+            background: var(--watercolor-blue);
+            top: 100px;
+            right: -30px;
+        }
+
+        .blob-2 {
+            width: 120px;
+            height: 120px;
+            background: var(--watercolor-lavender);
+            bottom: 200px;
+            left: -20px;
+        }
+
+        .blob-3 {
+            width: 100px;
+            height: 100px;
+            background: var(--watercolor-sage);
+            top: 400px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Doodle elements */
+        .doodle {
+            position: absolute;
+            font-family: 'Caveat', cursive;
+            color: var(--pencil-light);
+            font-size: 14px;
+            transform: rotate(-8deg);
+            opacity: 0.5;
+        }
+
+        .doodle-1 {
+            top: 180px;
+            right: 30px;
+        }
+
+        .doodle-2 {
+            bottom: 100px;
+            left: 35px;
+        }
+
+        /* Small pencil sketch line */
+        .sketch-line {
+            position: absolute;
+            height: 1px;
+            background: var(--pencil-light);
+            opacity: 0.3;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+                padding: 40px 20px;
+            }
+
+            .notebook-page {
+                padding: 32px 40px;
+            }
+
+            .greeting {
+                padding-left: 30px;
+            }
+
+            .sticky-note {
+                margin-left: 30px;
+                max-width: 400px;
+            }
+
+            .section-title {
+                margin-left: 30px;
+            }
+
+            .imagine-grid {
+                padding-left: 30px;
+                padding-right: 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .actions {
+                padding: 0 30px 30px;
+                flex-direction: row;
+            }
+
+            .action-button {
+                flex: 1;
+            }
+        }
+
+        /* Simple animations */
+        @keyframes gentleBob {
+            0%, 100% { transform: translateY(0px) rotate(-3deg); }
+            50% { transform: translateY(-2px) rotate(-3deg); }
+        }
+
+        .mandy-avatar {
+            animation: gentleBob 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .imagine-card {
+            animation: fadeIn 0.4s ease-out backwards;
+        }
+
+        .imagine-card:nth-child(1) { animation-delay: 0.05s; }
+        .imagine-card:nth-child(2) { animation-delay: 0.1s; }
+        .imagine-card:nth-child(3) { animation-delay: 0.15s; }
+        .imagine-card:nth-child(4) { animation-delay: 0.2s; }
+        .imagine-card:nth-child(5) { animation-delay: 0.25s; }
+        .imagine-card:nth-child(6) { animation-delay: 0.3s; }
+        .imagine-card:nth-child(7) { animation-delay: 0.35s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Watercolor accent blobs -->
+        <div class="watercolor-blob blob-1"></div>
+        <div class="watercolor-blob blob-2"></div>
+        <div class="watercolor-blob blob-3"></div>
+
+        <!-- Notebook header with tabs -->
+        <div class="notebook-header">
+            <div class="tabs">
+                <div class="tab active">Today</div>
+                <div class="tab">Progress</div>
+                <div class="tab">Insights</div>
+            </div>
+            <div class="date-line">Friday, November 28, 2025</div>
+        </div>
+
+        <!-- Main notebook page -->
+        <div class="notebook-page">
+            <!-- Greeting -->
+            <div class="greeting">
+                <div class="greeting-header">
+                    <div class="mandy-avatar"></div>
+                    <div class="hello-text">Hello!</div>
+                </div>
+                <p class="subtext">Ready to explore your thoughts today?</p>
+            </div>
+
+            <!-- Daily quote sticky note -->
+            <div class="sticky-note">
+                <div class="quote-text">"The only way out is through. Let's walk together."</div>
+                <div class="quote-author">— Mandy</div>
+            </div>
+
+            <!-- Doodles -->
+            <div class="doodle doodle-1">✨</div>
+
+            <!-- IMAGINE Framework Section -->
+            <h2 class="section-title">Your IMAGINE Journey</h2>
+
+            <div class="imagine-grid">
+                <!-- I - Me, Myself & I -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">I</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Me, Myself & I</div>
+                            <div class="card-subtitle">Self-care</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- M - Mindfulness -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">M</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Mindfulness</div>
+                            <div class="card-subtitle">Present moment</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A - Acceptance -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">A</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Acceptance</div>
+                            <div class="card-subtitle">Embrace yourself</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot filled"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- G - Gratitude -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">G</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Gratitude</div>
+                            <div class="card-subtitle">Count blessings</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- I - Interactions -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">I</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Interactions</div>
+                            <div class="card-subtitle">Connections</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- N - Nurturing -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">N</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Nurturing</div>
+                            <div class="card-subtitle">Care & growth</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot filled"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E - Exploring -->
+                <div class="imagine-card">
+                    <div class="card-header">
+                        <span class="card-initial">E</span>
+                        <div class="card-title-group">
+                            <div class="card-title">Exploring</div>
+                            <div class="card-subtitle">Discover more</div>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                            <div class="progress-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doodle -->
+            <div class="doodle doodle-2">💭</div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button class="action-button primary">Start Today's Session</button>
+                <button class="action-button">Browse Insights</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

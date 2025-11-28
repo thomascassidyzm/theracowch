@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cowch.app - Welcome Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream-base: #FAF8F5;
+            --cream-card: #F5F0E8;
+            --terracotta: #C4703D;
+            --sage: #7D9A78;
+            --text-primary: #2B2623;
+            --text-secondary: #6B6460;
+            --text-light: #9B9591;
+            --progress-bg: #E8E3DC;
+            --shadow-soft: 0 2px 16px rgba(43, 38, 35, 0.04);
+            --shadow-subtle: 0 1px 3px rgba(43, 38, 35, 0.06);
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background-color: var(--cream-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        /* Subtle paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(43, 38, 35, 0.03) 2px, rgba(43, 38, 35, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(43, 38, 35, 0.03) 2px, rgba(43, 38, 35, 0.03) 4px);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+        }
+
+        /* Header */
+        header {
+            padding: 32px 0 24px;
+            border-bottom: 1px solid rgba(43, 38, 35, 0.06);
+            margin-bottom: 48px;
+        }
+
+        .wordmark {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wordmark-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--terracotta);
+            border-radius: 50%;
+            margin-left: -4px;
+        }
+
+        /* Greeting Section */
+        .greeting-section {
+            margin-bottom: 56px;
+        }
+
+        .greeting-time {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            letter-spacing: 0.01em;
+        }
+
+        .greeting-main {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        /* Geometric Cow Avatar - Abstract & Sophisticated */
+        .mandy-avatar {
+            width: 64px;
+            height: 64px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-shape {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--terracotta) 0%, #D68A5C 100%);
+            border-radius: 50% 50% 48% 52%;
+            position: relative;
+            animation: gentle-morph 8s ease-in-out infinite;
+        }
+
+        .avatar-spots {
+            position: absolute;
+            inset: 8px;
+            border-radius: inherit;
+            overflow: hidden;
+        }
+
+        .spot {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .spot-1 {
+            width: 12px;
+            height: 12px;
+            top: 15%;
+            left: 20%;
+        }
+
+        .spot-2 {
+            width: 8px;
+            height: 8px;
+            top: 50%;
+            right: 25%;
+        }
+
+        .spot-3 {
+            width: 10px;
+            height: 10px;
+            bottom: 20%;
+            left: 30%;
+        }
+
+        @keyframes gentle-morph {
+            0%, 100% {
+                border-radius: 50% 50% 48% 52%;
+            }
+            50% {
+                border-radius: 52% 48% 50% 50%;
+            }
+        }
+
+        .greeting-text h1 {
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .greeting-subtext {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Daily Quote Card */
+        .quote-card {
+            background: var(--cream-card);
+            padding: 32px 28px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 56px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .quote-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--terracotta), transparent);
+            opacity: 0.4;
+        }
+
+        .quote-card:active {
+            transform: translateY(1px);
+        }
+
+        .quote-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .quote-text {
+            font-size: 17px;
+            line-height: 1.65;
+            color: var(--text-primary);
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .quote-author {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* IMAGINE Framework Section */
+        .imagine-section {
+            margin-bottom: 64px;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .imagine-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .imagine-item {
+            background: var(--cream-card);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .imagine-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+            border-color: rgba(196, 112, 61, 0.1);
+        }
+
+        .imagine-item:active {
+            transform: translateY(0);
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .item-title {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .item-letter {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--terracotta);
+            letter-spacing: -0.02em;
+            min-width: 20px;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .item-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-left: 32px;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: var(--progress-bg);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-left: 32px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--terracotta), var(--sage));
+            border-radius: 2px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-chevron {
+            color: var(--text-light);
+            font-size: 18px;
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+
+        .imagine-item:hover .item-chevron {
+            transform: translateX(2px);
+            color: var(--terracotta);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 32px 0 48px;
+            border-top: 1px solid rgba(43, 38, 35, 0.06);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .action-btn {
+            background: var(--cream-card);
+            border: none;
+            padding: 20px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-subtle);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .action-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Responsive Desktop */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+                padding: 0 32px;
+            }
+
+            header {
+                padding: 40px 0 32px;
+            }
+
+            .greeting-section {
+                margin-bottom: 64px;
+            }
+
+            .greeting-main {
+                gap: 24px;
+            }
+
+            .mandy-avatar {
+                width: 72px;
+                height: 72px;
+            }
+
+            .greeting-text h1 {
+                font-size: 40px;
+            }
+
+            .quote-card {
+                padding: 40px 36px;
+                margin-bottom: 72px;
+            }
+
+            .quote-text {
+                font-size: 19px;
+            }
+
+            .imagine-grid {
+                gap: 14px;
+            }
+
+            .imagine-item {
+                padding: 24px 28px;
+            }
+
+            .actions-grid {
+                gap: 20px;
+            }
+        }
+
+        /* Gentle fade-in on load */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .greeting-section,
+        .quote-card,
+        .imagine-section,
+        .quick-actions {
+            animation: fadeIn 0.6s ease-out backwards;
+        }
+
+        .quote-card {
+            animation-delay: 0.1s;
+        }
+
+        .imagine-section {
+            animation-delay: 0.2s;
+        }
+
+        .quick-actions {
+            animation-delay: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="wordmark">
+                cowch<span class="wordmark-dot"></span>app
+            </div>
+        </header>
+
+        <section class="greeting-section">
+            <div class="greeting-time">Friday, November 28</div>
+            <div class="greeting-main">
+                <div class="mandy-avatar">
+                    <div class="avatar-shape">
+                        <div class="avatar-spots">
+                            <div class="spot spot-1"></div>
+                            <div class="spot spot-2"></div>
+                            <div class="spot spot-3"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="greeting-text">
+                    <h1>Good morning</h1>
+                    <p class="greeting-subtext">Let's check in with yourself today</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="quote-card">
+            <div class="quote-label">Today's Reflection</div>
+            <p class="quote-text">"The curious paradox is that when I accept myself just as I am, then I can change."</p>
+            <div class="quote-author">Carl Rogers</div>
+        </div>
+
+        <section class="imagine-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Framework</h2>
+                <p class="section-subtitle">Seven paths to calm</p>
+            </div>
+
+            <div class="imagine-grid">
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">I</span>
+                            <span class="item-name">Me, Myself & I</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Self-care</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">M</span>
+                            <span class="item-name">Mindfulness</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Present moment awareness</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">A</span>
+                            <span class="item-name">Acceptance</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Embracing what is</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">G</span>
+                            <span class="item-name">Gratitude</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Appreciating the good</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 55%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">I</span>
+                            <span class="item-name">Interactions</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Meaningful connections</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">N</span>
+                            <span class="item-name">Nurturing</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Caring for yourself & others</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 88%"></div>
+                    </div>
+                </div>
+
+                <div class="imagine-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <span class="item-letter">E</span>
+                            <span class="item-name">Exploring</span>
+                        </div>
+                        <span class="item-chevron">→</span>
+                    </div>
+                    <div class="item-subtitle">Discovering new perspectives</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-actions">
+            <div class="actions-grid">
+                <button class="action-btn">
+                    <div class="action-icon">✎</div>
+                    <div class="action-label">Journal</div>
+                </button>
+                <button class="action-btn">
+                    <div class="action-icon">○</div>
+                    <div class="action-label">Breathe</div>
+                </button>
+                <button class="action-btn">
+                    <div class="action-icon">◐</div>
+                    <div class="action-label">Reflect</div>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Gentle progress bar animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 400 + (index * 80));
+            });
+        });
+    </script>
+</body>
+</html>
