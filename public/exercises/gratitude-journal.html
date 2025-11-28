@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gratitude Journal - cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #1a1512;
+            color: #F5F0E8;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-top: 24px;
+        }
+
+        .date-display {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #B794C4;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #9d9389;
+            font-weight: 400;
+        }
+
+        /* Streak Display */
+        .streak-container {
+            background: linear-gradient(135deg, #B794C4 0%, #D4896A 100%);
+            padding: 20px 28px;
+            border-radius: 0;
+            margin-bottom: 32px;
+            border: 3px solid #F5F0E8;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .streak-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            pointer-events: none;
+        }
+
+        .streak-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .streak-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: #1a1512;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .streak-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1512;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Journal Entry Form */
+        .journal-form {
+            margin-bottom: 48px;
+        }
+
+        .prompt-group {
+            margin-bottom: 28px;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .prompt-group:nth-child(1) { animation-delay: 0.1s; }
+        .prompt-group:nth-child(2) { animation-delay: 0.2s; }
+        .prompt-group:nth-child(3) { animation-delay: 0.3s; }
+
+        .prompt-label {
+            display: block;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .prompt-group:nth-child(1) .prompt-label { color: #B794C4; }
+        .prompt-group:nth-child(2) .prompt-label { color: #D4896A; }
+        .prompt-group:nth-child(3) .prompt-label { color: #9dbba6; }
+
+        .prompt-hint {
+            font-size: 13px;
+            color: #7d7469;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .gratitude-input {
+            width: 100%;
+            background: #2d2825;
+            border: 3px solid #3d3835;
+            color: #F5F0E8;
+            padding: 18px 20px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .gratitude-input:focus {
+            outline: none;
+            border-color: #B794C4;
+            background: #332f2b;
+            box-shadow: 0 0 0 4px rgba(183, 148, 196, 0.1);
+        }
+
+        .gratitude-input::placeholder {
+            color: #5d5449;
+        }
+
+        /* Save Button */
+        .save-button-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .save-button {
+            background: linear-gradient(135deg, #B794C4 0%, #D4896A 100%);
+            border: 4px solid #F5F0E8;
+            color: #1a1512;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 20px 60px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .save-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .save-button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .save-button.saving {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* Past Entries */
+        .past-entries {
+            margin-top: 64px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .entries-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .entry-card {
+            background: #2d2825;
+            border: 3px solid #3d3835;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+
+        .entry-card:hover {
+            border-color: #B794C4;
+            transform: translateY(-2px);
+        }
+
+        .entry-date {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #B794C4;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .entry-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .entry-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .entry-marker {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .entry-item:nth-child(1) .entry-marker { background: #B794C4; }
+        .entry-item:nth-child(2) .entry-marker { background: #D4896A; }
+        .entry-item:nth-child(3) .entry-marker { background: #9dbba6; }
+
+        .entry-text {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #e5dfd7;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #7d7469;
+            font-size: 15px;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #B794C4 0%, #D4896A 100%);
+            border: 4px solid #F5F0E8;
+            padding: 32px 48px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .success-message.show {
+            animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .success-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1512;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-subtext {
+            font-size: 14px;
+            color: #1a1512;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #B794C4;
+            position: absolute;
+            animation: confettiFall 3s linear forwards;
+            opacity: 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes successPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .title {
+                font-size: 32px;
+            }
+
+            .streak-number {
+                font-size: 36px;
+            }
+
+            .save-button {
+                width: 100%;
+                padding: 18px 24px;
+            }
+
+            .entry-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="date-display" id="currentDate"></div>
+            <h1 class="title">Gratitude Journal</h1>
+            <p class="subtitle">Take a moment to appreciate the good</p>
+        </div>
+
+        <!-- Streak Display -->
+        <div class="streak-container">
+            <div class="streak-content">
+                <div class="streak-number" id="streakNumber">0</div>
+                <div class="streak-label" id="streakLabel">Start your journey</div>
+            </div>
+        </div>
+
+        <!-- Journal Form -->
+        <form class="journal-form" id="journalForm">
+            <div class="prompt-group">
+                <label class="prompt-label">Today I'm grateful for...</label>
+                <div class="prompt-hint">Something small that brought you joy</div>
+                <textarea
+                    class="gratitude-input"
+                    id="gratitude1"
+                    placeholder="A warm cup of coffee, sunshine through the window, a kind smile..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="prompt-group">
+                <label class="prompt-label">I'm thankful for...</label>
+                <div class="prompt-hint">Someone who made a difference</div>
+                <textarea
+                    class="gratitude-input"
+                    id="gratitude2"
+                    placeholder="A friend who listened, a stranger's kindness, someone's support..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="prompt-group">
+                <label class="prompt-label">I appreciate...</label>
+                <div class="prompt-hint">A moment or experience from today</div>
+                <textarea
+                    class="gratitude-input"
+                    id="gratitude3"
+                    placeholder="A peaceful moment, accomplishing something, learning something new..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="save-button-container">
+                <button type="submit" class="save-button">Save Today's Gratitude</button>
+            </div>
+        </form>
+
+        <!-- Past Entries -->
+        <div class="past-entries">
+            <h2 class="section-title">Your Gratitude Journey</h2>
+            <div class="entries-grid" id="entriesGrid">
+                <div class="empty-state">
+                    Your past entries will appear here. Start journaling to build your gratitude practice.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">✨</div>
+        <div class="success-text">Gratitude Saved!</div>
+        <div class="success-subtext">Keep the momentum going</div>
+    </div>
+
+    <script>
+        // Date formatting
+        function formatDate(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function formatDateShort(date) {
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Initialize
+        const currentDate = new Date();
+        document.getElementById('currentDate').textContent = formatDate(currentDate);
+
+        // Storage helpers
+        function getEntries() {
+            const entries = localStorage.getItem('gratitudeEntries');
+            return entries ? JSON.parse(entries) : {};
+        }
+
+        function saveEntry(date, gratitudes) {
+            const entries = getEntries();
+            entries[date] = {
+                gratitudes,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('gratitudeEntries', JSON.stringify(entries));
+        }
+
+        function getTodayEntry() {
+            const entries = getEntries();
+            const todayKey = getDateKey(currentDate);
+            return entries[todayKey] || null;
+        }
+
+        // Streak calculation
+        function calculateStreak() {
+            const entries = getEntries();
+            const today = new Date();
+            let streak = 0;
+
+            // Check backwards from today
+            for (let i = 0; i < 365; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(today.getDate() - i);
+                const dateKey = getDateKey(checkDate);
+
+                if (entries[dateKey]) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        function updateStreakDisplay() {
+            const streak = calculateStreak();
+            const streakNumber = document.getElementById('streakNumber');
+            const streakLabel = document.getElementById('streakLabel');
+
+            streakNumber.textContent = streak;
+
+            if (streak === 0) {
+                streakLabel.textContent = 'Start your journey';
+            } else if (streak === 1) {
+                streakLabel.textContent = 'Day one complete!';
+            } else {
+                streakLabel.textContent = `${streak} days in a row`;
+            }
+        }
+
+        // Load today's entry if exists
+        function loadTodayEntry() {
+            const todayEntry = getTodayEntry();
+            if (todayEntry) {
+                document.getElementById('gratitude1').value = todayEntry.gratitudes[0] || '';
+                document.getElementById('gratitude2').value = todayEntry.gratitudes[1] || '';
+                document.getElementById('gratitude3').value = todayEntry.gratitudes[2] || '';
+            }
+        }
+
+        // Display past entries
+        function displayPastEntries() {
+            const entries = getEntries();
+            const entriesGrid = document.getElementById('entriesGrid');
+            const todayKey = getDateKey(currentDate);
+
+            // Get entries from last 7 days (excluding today)
+            const pastEntries = [];
+            for (let i = 1; i <= 7; i++) {
+                const date = new Date(currentDate);
+                date.setDate(currentDate.getDate() - i);
+                const dateKey = getDateKey(date);
+
+                if (entries[dateKey]) {
+                    pastEntries.push({
+                        date,
+                        dateKey,
+                        ...entries[dateKey]
+                    });
+                }
+            }
+
+            if (pastEntries.length === 0) {
+                entriesGrid.innerHTML = '<div class="empty-state">Your past entries will appear here. Start journaling to build your gratitude practice.</div>';
+                return;
+            }
+
+            entriesGrid.innerHTML = pastEntries.map((entry, index) => `
+                <div class="entry-card" style="animation-delay: ${index * 0.1}s">
+                    <div class="entry-date">${formatDateShort(entry.date)}</div>
+                    <div class="entry-items">
+                        ${entry.gratitudes.map(text => `
+                            <div class="entry-item">
+                                <div class="entry-marker"></div>
+                                <div class="entry-text">${escapeHtml(text)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Confetti effect
+        function createConfetti() {
+            const colors = ['#B794C4', '#D4896A', '#9dbba6', '#F5F0E8'];
+            const confettiCount = 50;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        // Show success message
+        function showSuccess() {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.add('show');
+            createConfetti();
+
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 2000);
+        }
+
+        // Form submission
+        document.getElementById('journalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const gratitude1 = document.getElementById('gratitude1').value.trim();
+            const gratitude2 = document.getElementById('gratitude2').value.trim();
+            const gratitude3 = document.getElementById('gratitude3').value.trim();
+
+            if (!gratitude1 || !gratitude2 || !gratitude3) {
+                alert('Please fill in all three gratitudes.');
+                return;
+            }
+
+            const todayKey = getDateKey(currentDate);
+            saveEntry(todayKey, [gratitude1, gratitude2, gratitude3]);
+
+            // Animate save button
+            const saveButton = document.querySelector('.save-button');
+            saveButton.classList.add('saving');
+            setTimeout(() => saveButton.classList.remove('saving'), 600);
+
+            // Show success message
+            showSuccess();
+
+            // Update streak and display
+            updateStreakDisplay();
+            displayPastEntries();
+        });
+
+        // Initialize on load
+        updateStreakDisplay();
+        loadTodayEntry();
+        displayPastEntries();
+    </script>
+</body>
+</html>

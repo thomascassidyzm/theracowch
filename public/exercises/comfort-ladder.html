@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comfort Zone Ladder - Cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1512;
+            color: #F5F0E8;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #D4896A;
+            font-weight: 500;
+        }
+
+        .progress-overview {
+            background: rgba(255, 255, 255, 0.03);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-overview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6B9AAF, #D4896A);
+        }
+
+        .progress-bar-container {
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B9AAF, #7EA88B, #D4896A);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+
+        .stat strong {
+            color: #D4896A;
+            font-size: 1.3rem;
+            display: block;
+            font-weight: 900;
+        }
+
+        .ladder-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .ladder-rail {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, #D4896A 0%, #6B9AAF 100%);
+            opacity: 0.3;
+            border-radius: 4px;
+        }
+
+        .ladder-steps {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2rem;
+        }
+
+        .step {
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .step:nth-child(1) { animation-delay: 0.1s; }
+        .step:nth-child(2) { animation-delay: 0.2s; }
+        .step:nth-child(3) { animation-delay: 0.3s; }
+        .step:nth-child(4) { animation-delay: 0.4s; }
+        .step:nth-child(5) { animation-delay: 0.5s; }
+        .step:nth-child(6) { animation-delay: 0.6s; }
+        .step:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .step-content:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .step.completed .step-content {
+            background: rgba(126, 168, 139, 0.15);
+            border-color: #7EA88B;
+        }
+
+        .step.current .step-content {
+            background: rgba(212, 137, 106, 0.15);
+            border-color: #D4896A;
+            box-shadow: 0 0 30px rgba(212, 137, 106, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(212, 137, 106, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(212, 137, 106, 0.5);
+            }
+        }
+
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-number {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+            opacity: 0.3;
+            min-width: 2.5rem;
+        }
+
+        .step.completed .step-number {
+            opacity: 0.6;
+        }
+
+        .step.current .step-number {
+            opacity: 1;
+            color: #D4896A;
+        }
+
+        .step-text-container {
+            flex: 1;
+        }
+
+        .step-input {
+            background: transparent;
+            border: none;
+            color: #F5F0E8;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            padding: 0;
+            font-family: inherit;
+            outline: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .step-input:focus {
+            border-bottom-color: #D4896A;
+        }
+
+        .step-input:disabled {
+            cursor: pointer;
+        }
+
+        .step-checkbox {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step-checkbox:hover {
+            border-color: #7EA88B;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-checkbox {
+            background: #7EA88B;
+            border-color: #7EA88B;
+        }
+
+        .step-checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            color: #1a1512;
+            font-weight: 900;
+            font-size: 1.2rem;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .step.completed .step-checkbox::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .step-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .step-date {
+            color: #7EA88B;
+        }
+
+        .step-quote {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+            font-size: 0.9rem;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .step.current .step-quote,
+        .step.completed .step-quote {
+            opacity: 0.7;
+            max-height: 100px;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .step-content:hover .step-actions {
+            opacity: 1;
+        }
+
+        .btn-small {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #F5F0E8;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-small:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .victory-banner {
+            background: linear-gradient(135deg, #7EA88B, #6B9AAF);
+            border: 3px solid #7EA88B;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            display: none;
+            animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .victory-banner.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .victory-banner h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            color: #1a1512;
+        }
+
+        .victory-banner p {
+            font-size: 1.1rem;
+            color: #1a1512;
+            opacity: 0.8;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            color: #F5F0E8;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #D4896A;
+            border-color: #D4896A;
+            color: #1a1512;
+        }
+
+        .btn-primary:hover {
+            background: #e09977;
+            border-color: #e09977;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #D4896A;
+            position: absolute;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 21, 18, 0.95);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1512;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #F5F0E8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-body p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #F5F0E8;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #D4896A;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .step-content {
+                padding: 1rem;
+            }
+
+            .step-number {
+                font-size: 1.5rem;
+                min-width: 2rem;
+            }
+
+            .step-input {
+                font-size: 1rem;
+            }
+
+            .stats {
+                gap: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            pointer-events: none;
+            z-index: 999;
+            animation: celebrate 1s ease-out forwards;
+        }
+
+        @keyframes celebrate {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Comfort Zone Ladder</h1>
+            <p class="subtitle">One step at a time. You've got this.</p>
+        </header>
+
+        <div class="victory-banner" id="victoryBanner">
+            <h2>You Did It!</h2>
+            <p>You've conquered all 7 steps. You're stronger than you think.</p>
+        </div>
+
+        <div class="progress-overview">
+            <div class="progress-bar-container">
+                <div class="progress-label">Your Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <strong id="completedCount">0</strong>
+                    <span>Steps Completed</span>
+                </div>
+                <div class="stat">
+                    <strong id="progressPercent">0%</strong>
+                    <span>Complete</span>
+                </div>
+                <div class="stat" id="lastCompletedStat" style="display: none;">
+                    <strong id="lastCompleted">—</strong>
+                    <span>Last Completed</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ladder-container">
+            <div class="ladder-rail"></div>
+            <div class="ladder-steps" id="ladderSteps"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="resetProgress()">Reset Progress</button>
+            <button class="btn" onclick="customizeLadder()">Customize Steps</button>
+            <button class="btn btn-primary" onclick="shareLadder()">Share Your Progress</button>
+        </div>
+    </div>
+
+    <!-- Customize Modal -->
+    <div class="modal" id="customizeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Customize Your Ladder</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Edit the steps to match your personal comfort zone challenges.</p>
+                <div id="customizeForm"></div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="saveCustomSteps()">Save Changes</button>
+                <button class="btn" onclick="resetToDefault()">Reset to Default</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultSteps = [
+            {
+                text: "Make eye contact with a stranger",
+                quote: "The journey of a thousand miles begins with a single glance."
+            },
+            {
+                text: "Smile at someone you don't know",
+                quote: "A smile is courage made visible."
+            },
+            {
+                text: "Say 'hello' to a stranger",
+                quote: "Every connection starts with a word."
+            },
+            {
+                text: "Make small talk (weather, etc.)",
+                quote: "Small talk is just practice for big conversations."
+            },
+            {
+                text: "Ask someone a question",
+                quote: "Curiosity is the bridge between strangers and friends."
+            },
+            {
+                text: "Have a 2-minute conversation",
+                quote: "Two minutes of courage can change everything."
+            },
+            {
+                text: "Initiate plans with someone",
+                quote: "You're ready. You've earned this confidence."
+            }
+        ];
+
+        let steps = [];
+        let completions = {};
+
+        function init() {
+            loadData();
+            renderLadder();
+            updateProgress();
+        }
+
+        function loadData() {
+            const savedSteps = localStorage.getItem('comfortLadderSteps');
+            const savedCompletions = localStorage.getItem('comfortLadderCompletions');
+
+            steps = savedSteps ? JSON.parse(savedSteps) : [...defaultSteps];
+            completions = savedCompletions ? JSON.parse(savedCompletions) : {};
+        }
+
+        function saveData() {
+            localStorage.setItem('comfortLadderSteps', JSON.stringify(steps));
+            localStorage.setItem('comfortLadderCompletions', JSON.stringify(completions));
+        }
+
+        function renderLadder() {
+            const container = document.getElementById('ladderSteps');
+            container.innerHTML = '';
+
+            const completedIndices = Object.keys(completions).map(Number);
+            const currentIndex = completedIndices.length < steps.length ? completedIndices.length : -1;
+
+            steps.forEach((step, index) => {
+                const isCompleted = completions[index];
+                const isCurrent = index === currentIndex;
+
+                const stepEl = document.createElement('div');
+                stepEl.className = `step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`;
+                stepEl.innerHTML = `
+                    <div class="step-content" onclick="toggleStep(${index})">
+                        <div class="step-header">
+                            <div class="step-number">${index + 1}</div>
+                            <div class="step-text-container">
+                                <input
+                                    type="text"
+                                    class="step-input"
+                                    value="${step.text}"
+                                    disabled
+                                    onclick="event.stopPropagation(); editStep(${index})"
+                                />
+                            </div>
+                            <div class="step-checkbox"></div>
+                        </div>
+                        ${isCompleted ? `
+                            <div class="step-meta">
+                                <div class="step-date">Completed: ${completions[index]}</div>
+                            </div>
+                        ` : ''}
+                        <div class="step-quote">"${step.quote}"</div>
+                        <div class="step-actions">
+                            <button class="btn-small" onclick="event.stopPropagation(); editStep(${index})">Edit</button>
+                            ${isCompleted ? `<button class="btn-small" onclick="event.stopPropagation(); uncompleteStep(${index})">Undo</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(stepEl);
+            });
+        }
+
+        function toggleStep(index) {
+            const isCompleted = completions[index];
+
+            if (isCompleted) {
+                // Already completed, do nothing (use undo button)
+                return;
+            }
+
+            // Check if previous steps are completed
+            if (index > 0 && !completions[index - 1]) {
+                showCelebration('⚠️');
+                return;
+            }
+
+            // Complete the step
+            const today = new Date().toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            completions[index] = today;
+            saveData();
+
+            showCelebration('🎉');
+            renderLadder();
+            updateProgress();
+
+            // Check if all completed
+            if (Object.keys(completions).length === steps.length) {
+                setTimeout(() => {
+                    document.getElementById('victoryBanner').classList.add('show');
+                    createConfetti();
+                }, 500);
+            }
+        }
+
+        function uncompleteStep(index) {
+            // Remove this completion and all subsequent ones
+            for (let i = index; i < steps.length; i++) {
+                delete completions[i];
+            }
+            saveData();
+            document.getElementById('victoryBanner').classList.remove('show');
+            renderLadder();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const completed = Object.keys(completions).length;
+            const total = steps.length;
+            const percentage = Math.round((completed / total) * 100);
+
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('progressPercent').textContent = `${percentage}%`;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+
+            if (completed > 0) {
+                const lastIndex = Math.max(...Object.keys(completions).map(Number));
+                document.getElementById('lastCompleted').textContent = completions[lastIndex];
+                document.getElementById('lastCompletedStat').style.display = 'block';
+            } else {
+                document.getElementById('lastCompletedStat').style.display = 'none';
+            }
+        }
+
+        function editStep(index) {
+            const input = document.querySelectorAll('.step-input')[steps.length - 1 - index];
+            input.disabled = false;
+            input.focus();
+            input.select();
+
+            input.onblur = () => {
+                steps[index].text = input.value;
+                saveData();
+                input.disabled = true;
+            };
+
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            };
+        }
+
+        function showCelebration(emoji) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            document.body.appendChild(celebration);
+
+            setTimeout(() => {
+                celebration.remove();
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#D4896A', '#7EA88B', '#6B9AAF', '#F5F0E8'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animation = 'confetti-fall 3s ease-out forwards';
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    confetti.style.zIndex = '999';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                completions = {};
+                saveData();
+                document.getElementById('victoryBanner').classList.remove('show');
+                renderLadder();
+                updateProgress();
+            }
+        }
+
+        function customizeLadder() {
+            const form = document.getElementById('customizeForm');
+            form.innerHTML = '';
+
+            steps.forEach((step, index) => {
+                const group = document.createElement('div');
+                group.className = 'form-group';
+                group.innerHTML = `
+                    <label>Step ${index + 1}</label>
+                    <input type="text" id="step-${index}" value="${step.text}" />
+                `;
+                form.appendChild(group);
+            });
+
+            document.getElementById('customizeModal').classList.add('show');
+        }
+
+        function saveCustomSteps() {
+            steps.forEach((step, index) => {
+                const input = document.getElementById(`step-${index}`);
+                if (input && input.value.trim()) {
+                    steps[index].text = input.value.trim();
+                }
+            });
+
+            saveData();
+            closeModal();
+            renderLadder();
+        }
+
+        function resetToDefault() {
+            if (confirm('Reset to default social anxiety steps? Your custom steps will be lost.')) {
+                steps = JSON.parse(JSON.stringify(defaultSteps));
+                completions = {};
+                saveData();
+                closeModal();
+                renderLadder();
+                updateProgress();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('customizeModal').classList.remove('show');
+        }
+
+        function shareLadder() {
+            const completed = Object.keys(completions).length;
+            const total = steps.length;
+            const percentage = Math.round((completed / total) * 100);
+
+            const shareText = `I've completed ${completed}/${total} steps (${percentage}%) on my Comfort Zone Ladder! 🎯\n\nBuilding confidence one step at a time with Cowch.app`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Comfort Zone Ladder Progress',
+                    text: shareText,
+                    url: window.location.href
+                }).catch(() => {
+                    copyToClipboard(shareText);
+                });
+            } else {
+                copyToClipboard(shareText);
+            }
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showCelebration('📋');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Values Compass | cowch.app</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1512;
+            color: #F5F0E8;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 3px solid #F5F0E8;
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: #D4896A;
+            font-weight: 500;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Introduction Screen */
+        .intro-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .intro-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+
+        .intro-content p {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .intro-content ul {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .intro-content li {
+            padding: 1rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.125rem;
+        }
+
+        .intro-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #D4896A;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #F5F0E8;
+            color: #1a1512;
+            border: none;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid #F5F0E8;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: #F5F0E8;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 #D4896A;
+        }
+
+        .btn:active {
+            transform: translate(0, 0);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 3px solid #7EA88B;
+            color: #7EA88B;
+        }
+
+        .btn-secondary:hover {
+            background: #7EA88B;
+            color: #1a1512;
+            box-shadow: 4px 4px 0 #F5F0E8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Rating Screen */
+        .rating-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .progress {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #2a2520;
+            border: 2px solid #F5F0E8;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #7EA88B;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #D4896A;
+        }
+
+        .value-card {
+            background: #2a2520;
+            border: 3px solid #F5F0E8;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .value-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .value-description {
+            color: #D4896A;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .rating-question {
+            margin-bottom: 2rem;
+        }
+
+        .rating-question label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .slider-container {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #1a1512;
+            border: 2px solid #F5F0E8;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #F5F0E8;
+            cursor: pointer;
+            border: 3px solid #D4896A;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #D4896A;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #F5F0E8;
+            cursor: pointer;
+            border: 3px solid #D4896A;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            background: #D4896A;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: #7EA88B;
+            margin-top: 0.5rem;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #D4896A;
+            margin-top: 0.5rem;
+        }
+
+        /* Compass Visualization */
+        .compass-container {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
+        }
+
+        #compass-canvas {
+            width: 100%;
+            max-width: 600px;
+            height: 600px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #2a2520;
+            border: 2px solid #F5F0E8;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #F5F0E8;
+        }
+
+        .legend-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Insights */
+        .insights {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .insight-card {
+            background: #2a2520;
+            border: 3px solid #D4896A;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .insight-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #D4896A;
+            font-weight: 800;
+        }
+
+        .insight-card p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+
+        .gap-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .gap-item {
+            padding: 1rem;
+            background: #1a1512;
+            border-left: 4px solid #D4896A;
+            margin-bottom: 1rem;
+        }
+
+        .gap-item strong {
+            color: #F5F0E8;
+            font-size: 1.125rem;
+        }
+
+        .gap-value {
+            color: #D4896A;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* Reflection */
+        .reflection-area {
+            margin: 2rem 0;
+        }
+
+        .reflection-area textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1.5rem;
+            background: #1a1512;
+            border: 3px solid #F5F0E8;
+            color: #F5F0E8;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .reflection-area textarea:focus {
+            outline: none;
+            border-color: #7EA88B;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: #2a2520;
+            border: 3px solid #F5F0E8;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #7EA88B;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #D4896A;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .value-card {
+                padding: 1.5rem;
+            }
+
+            #compass-canvas {
+                height: 400px;
+            }
+
+            .btn {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #2a2520;
+            border-top: 4px solid #D4896A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Values Compass</h1>
+            <p class="subtitle">Discover what matters most and where to focus your energy</p>
+        </div>
+
+        <!-- Introduction Screen -->
+        <div id="intro-screen" class="screen active">
+            <div class="intro-content">
+                <h2>Navigate Your Life with Clarity</h2>
+                <p>Your values are your internal compass. They guide decisions, shape priorities, and define what a meaningful life looks like for you.</p>
+
+                <p>When your daily life aligns with your deepest values, you feel energized and purposeful. When there's a gap, you might feel stuck, anxious, or unfulfilled.</p>
+
+                <ul>
+                    <li>Rate 10 core life values on what matters to you</li>
+                    <li>Assess how well your current life aligns with each value</li>
+                    <li>Visualize the gaps between importance and reality</li>
+                    <li>Identify where to focus your energy for meaningful change</li>
+                </ul>
+
+                <p><strong>This takes about 10 minutes. Be honest with yourself.</strong></p>
+
+                <div class="button-group">
+                    <button class="btn" onclick="app.startImportance()">Begin</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Importance Rating Screen -->
+        <div id="importance-screen" class="screen">
+            <div class="rating-content">
+                <div class="progress">
+                    <div class="progress-bar">
+                        <div id="importance-progress" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">Step 1/2: Rating Importance</p>
+                </div>
+
+                <div id="importance-cards"></div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="app.startAlignment()">Continue to Step 2</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alignment Rating Screen -->
+        <div id="alignment-screen" class="screen">
+            <div class="rating-content">
+                <div class="progress">
+                    <div class="progress-bar">
+                        <div id="alignment-progress" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">Step 2/2: Rating Current Alignment</p>
+                </div>
+
+                <div id="alignment-cards"></div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="app.showResults()">See My Compass</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <div class="compass-container">
+                <canvas id="compass-canvas"></canvas>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(126, 168, 139, 0.3); border-color: #7EA88B;"></div>
+                    <span class="legend-label">Importance (outer)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(212, 137, 106, 0.3); border-color: #D4896A;"></div>
+                    <span class="legend-label">Current Alignment (inner)</span>
+                </div>
+            </div>
+
+            <div class="insights">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-value" id="avg-importance">-</span>
+                        <span class="stat-label">Avg Importance</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="avg-alignment">-</span>
+                        <span class="stat-label">Avg Alignment</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="overall-gap">-</span>
+                        <span class="stat-label">Overall Gap</span>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <h3>Your Biggest Gaps</h3>
+                    <p>These values matter to you, but your life isn't reflecting them right now. These are your opportunities for meaningful change.</p>
+                    <ul class="gap-list" id="gap-list"></ul>
+                </div>
+
+                <div class="insight-card">
+                    <h3>Reflection: What One Step Could You Take?</h3>
+                    <p>Look at your biggest gap. What's one small, concrete action you could take this week to move toward alignment?</p>
+                    <div class="reflection-area">
+                        <textarea id="reflection" placeholder="Example: If 'Health & Wellbeing' has a big gap, you might write: 'Go for a 15-minute walk after lunch three times this week.'"></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="app.saveReflection()">Save My Reflection</button>
+                    <button class="btn-secondary" onclick="app.reset()">Start Over</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VALUES = [
+            {
+                id: 'family',
+                name: 'Family & Relationships',
+                description: 'Deep connections with loved ones, quality time, nurturing bonds',
+                color: '#E07A5F'
+            },
+            {
+                id: 'career',
+                name: 'Career & Achievement',
+                description: 'Professional success, accomplishment, making an impact through work',
+                color: '#F2CC8F'
+            },
+            {
+                id: 'health',
+                name: 'Health & Wellbeing',
+                description: 'Physical vitality, mental wellness, energy and vitality',
+                color: '#81B29A'
+            },
+            {
+                id: 'learning',
+                name: 'Learning & Growth',
+                description: 'Continuous development, acquiring new skills, intellectual curiosity',
+                color: '#3D5A80'
+            },
+            {
+                id: 'creativity',
+                name: 'Creativity & Expression',
+                description: 'Artistic pursuits, self-expression, bringing ideas to life',
+                color: '#E63946'
+            },
+            {
+                id: 'adventure',
+                name: 'Adventure & Fun',
+                description: 'Novel experiences, playfulness, excitement and spontaneity',
+                color: '#F4A261'
+            },
+            {
+                id: 'security',
+                name: 'Security & Stability',
+                description: 'Financial safety, predictability, comfortable foundation',
+                color: '#2A9D8F'
+            },
+            {
+                id: 'contribution',
+                name: 'Contribution & Service',
+                description: 'Helping others, making a difference, giving back to community',
+                color: '#9D4EDD'
+            },
+            {
+                id: 'freedom',
+                name: 'Freedom & Independence',
+                description: 'Autonomy, flexibility, being your own person',
+                color: '#06FFA5'
+            },
+            {
+                id: 'spirituality',
+                name: 'Spirituality & Meaning',
+                description: 'Connection to something larger, purpose, inner peace',
+                color: '#577590'
+            }
+        ];
+
+        const app = {
+            currentStep: 'intro',
+            ratings: {},
+
+            init() {
+                this.loadData();
+                if (Object.keys(this.ratings).length > 0) {
+                    // Show welcome back message if they have data
+                    const intro = document.querySelector('#intro-screen .intro-content');
+                    intro.innerHTML = `
+                        <h2>Welcome Back</h2>
+                        <p>We found your previous Values Compass session. You can continue where you left off or start fresh.</p>
+                        <div class="button-group">
+                            <button class="btn" onclick="app.showResults()">View My Compass</button>
+                            <button class="btn-secondary" onclick="app.reset(); app.startImportance();">Start Fresh</button>
+                        </div>
+                    `;
+                }
+            },
+
+            startImportance() {
+                this.showScreen('importance-screen');
+                this.renderRatingCards('importance');
+                this.updateProgress('importance');
+            },
+
+            startAlignment() {
+                this.showScreen('alignment-screen');
+                this.renderRatingCards('alignment');
+                this.updateProgress('alignment');
+            },
+
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            renderRatingCards(type) {
+                const container = document.getElementById(`${type}-cards`);
+                const question = type === 'importance'
+                    ? 'How important is this value to you?'
+                    : 'How well is your current life aligned with this value?';
+
+                container.innerHTML = VALUES.map((value, index) => {
+                    const currentRating = this.ratings[value.id]?.[type] || 5;
+                    return `
+                        <div class="value-card">
+                            <h3>${value.name}</h3>
+                            <p class="value-description">${value.description}</p>
+                            <div class="rating-question">
+                                <label>${question}</label>
+                                <div class="slider-container">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="10"
+                                        value="${currentRating}"
+                                        id="${type}-${value.id}"
+                                        onInput="app.updateRating('${value.id}', '${type}', this.value)"
+                                    >
+                                </div>
+                                <div class="slider-labels">
+                                    <span>Not at all</span>
+                                    <span class="slider-value" id="${type}-${value.id}-value">${currentRating}</span>
+                                    <span>Extremely</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            updateRating(valueId, type, rating) {
+                if (!this.ratings[valueId]) {
+                    this.ratings[valueId] = {};
+                }
+                this.ratings[valueId][type] = parseInt(rating);
+
+                // Update display
+                const valueDisplay = document.getElementById(`${type}-${valueId}-value`);
+                if (valueDisplay) {
+                    valueDisplay.textContent = rating;
+                }
+
+                // Update progress
+                this.updateProgress(type);
+
+                // Save to localStorage
+                this.saveData();
+            },
+
+            updateProgress(type) {
+                const rated = VALUES.filter(v => this.ratings[v.id]?.[type]).length;
+                const percentage = (rated / VALUES.length) * 100;
+                document.getElementById(`${type}-progress`).style.width = percentage + '%';
+            },
+
+            showResults() {
+                this.showScreen('results-screen');
+                this.drawCompass();
+                this.calculateInsights();
+            },
+
+            drawCompass() {
+                const canvas = document.getElementById('compass-canvas');
+                const ctx = canvas.getContext('2d');
+                const dpr = window.devicePixelRatio || 1;
+
+                // Set actual size
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const maxRadius = Math.min(rect.width, rect.height) / 2 - 60;
+
+                // Clear canvas
+                ctx.clearRect(0, 0, rect.width, rect.height);
+
+                // Draw background circles
+                ctx.strokeStyle = '#2a2520';
+                ctx.lineWidth = 1;
+                for (let i = 2; i <= 10; i += 2) {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, (maxRadius * i) / 10, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Draw axes
+                const angleStep = (Math.PI * 2) / VALUES.length;
+                VALUES.forEach((value, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const x = centerX + Math.cos(angle) * maxRadius;
+                    const y = centerY + Math.sin(angle) * maxRadius;
+
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = '#2a2520';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+
+                // Draw importance polygon
+                ctx.beginPath();
+                VALUES.forEach((value, i) => {
+                    const importance = this.ratings[value.id]?.importance || 5;
+                    const angle = i * angleStep - Math.PI / 2;
+                    const radius = (maxRadius * importance) / 10;
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(126, 168, 139, 0.2)';
+                ctx.fill();
+                ctx.strokeStyle = '#7EA88B';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw alignment polygon
+                ctx.beginPath();
+                VALUES.forEach((value, i) => {
+                    const alignment = this.ratings[value.id]?.alignment || 5;
+                    const angle = i * angleStep - Math.PI / 2;
+                    const radius = (maxRadius * alignment) / 10;
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(212, 137, 106, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = '#D4896A';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw labels
+                ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                VALUES.forEach((value, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const labelRadius = maxRadius + 30;
+                    const x = centerX + Math.cos(angle) * labelRadius;
+                    const y = centerY + Math.sin(angle) * labelRadius;
+
+                    // Split label into lines
+                    const words = value.name.split(' ');
+                    const lines = [];
+                    let currentLine = words[0];
+
+                    for (let j = 1; j < words.length; j++) {
+                        if ((currentLine + ' ' + words[j]).length < 15) {
+                            currentLine += ' ' + words[j];
+                        } else {
+                            lines.push(currentLine);
+                            currentLine = words[j];
+                        }
+                    }
+                    lines.push(currentLine);
+
+                    ctx.fillStyle = '#F5F0E8';
+                    lines.forEach((line, lineIndex) => {
+                        ctx.fillText(line, x, y + (lineIndex - lines.length/2 + 0.5) * 14);
+                    });
+                });
+
+                // Redraw on window resize
+                window.addEventListener('resize', () => this.drawCompass());
+            },
+
+            calculateInsights() {
+                let totalImportance = 0;
+                let totalAlignment = 0;
+                const gaps = [];
+
+                VALUES.forEach(value => {
+                    const importance = this.ratings[value.id]?.importance || 5;
+                    const alignment = this.ratings[value.id]?.alignment || 5;
+                    const gap = importance - alignment;
+
+                    totalImportance += importance;
+                    totalAlignment += alignment;
+
+                    if (gap > 0) {
+                        gaps.push({ value, gap, importance, alignment });
+                    }
+                });
+
+                const avgImportance = (totalImportance / VALUES.length).toFixed(1);
+                const avgAlignment = (totalAlignment / VALUES.length).toFixed(1);
+                const overallGap = (avgImportance - avgAlignment).toFixed(1);
+
+                document.getElementById('avg-importance').textContent = avgImportance;
+                document.getElementById('avg-alignment').textContent = avgAlignment;
+                document.getElementById('overall-gap').textContent = overallGap;
+
+                // Sort gaps and show top 5
+                gaps.sort((a, b) => b.gap - a.gap);
+                const topGaps = gaps.slice(0, 5);
+
+                const gapList = document.getElementById('gap-list');
+                gapList.innerHTML = topGaps.map(item => `
+                    <li class="gap-item">
+                        <strong>${item.value.name}</strong><br>
+                        Importance: ${item.importance}/10 | Current Alignment: ${item.alignment}/10 |
+                        <span class="gap-value">Gap: ${item.gap.toFixed(1)}</span>
+                    </li>
+                `).join('');
+
+                // Load saved reflection
+                const savedReflection = localStorage.getItem('values_reflection');
+                if (savedReflection) {
+                    document.getElementById('reflection').value = savedReflection;
+                }
+            },
+
+            saveReflection() {
+                const reflection = document.getElementById('reflection').value;
+                localStorage.setItem('values_reflection', reflection);
+
+                // Show confirmation
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Saved!';
+                btn.style.background = '#7EA88B';
+                btn.style.borderColor = '#7EA88B';
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            },
+
+            saveData() {
+                localStorage.setItem('values_compass_data', JSON.stringify(this.ratings));
+            },
+
+            loadData() {
+                const saved = localStorage.getItem('values_compass_data');
+                if (saved) {
+                    this.ratings = JSON.parse(saved);
+                }
+            },
+
+            reset() {
+                if (confirm('Are you sure you want to start over? This will clear all your ratings.')) {
+                    this.ratings = {};
+                    localStorage.removeItem('values_compass_data');
+                    localStorage.removeItem('values_reflection');
+                    location.reload();
+                }
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>

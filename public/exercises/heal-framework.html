@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEAL Framework - Cowch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #1a1512;
+            color: #F5F0E8;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #B8AFA4;
+            font-weight: 400;
+        }
+
+        /* Initial Input */
+        .initial-input {
+            background: #2d2825;
+            border: 3px solid #F5F0E8;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .initial-input h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .initial-input p {
+            color: #B8AFA4;
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            background: #1a1512;
+            border: 2px solid #4a4340;
+            color: #F5F0E8;
+            padding: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #F5F0E8;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: #1a1512;
+            border: 2px solid #4a4340;
+            color: #F5F0E8;
+            padding: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #F5F0E8;
+        }
+
+        /* Buttons */
+        button {
+            background: #F5F0E8;
+            color: #1a1512;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #D4896A;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-secondary {
+            background: transparent;
+            color: #F5F0E8;
+            border: 2px solid #F5F0E8;
+            margin-left: 12px;
+        }
+
+        .button-secondary:hover {
+            background: #2d2825;
+        }
+
+        /* HEAL Cards */
+        .heal-cards {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .heal-card {
+            background: #2d2825;
+            border: 3px solid #4a4340;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .heal-card.locked {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .heal-card.active {
+            border-width: 4px;
+            transform: scale(1.02);
+        }
+
+        .heal-card.completed {
+            border-color: #4a4340;
+        }
+
+        .heal-card.active.helpful { border-color: #D4896A; }
+        .heal-card.active.evidence { border-color: #6B9AAF; }
+        .heal-card.active.alternative { border-color: #7EA88B; }
+        .heal-card.active.lovedone { border-color: #B794C4; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card-letter {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid currentColor;
+        }
+
+        .helpful .card-letter { color: #D4896A; }
+        .evidence .card-letter { color: #6B9AAF; }
+        .alternative .card-letter { color: #7EA88B; }
+        .lovedone .card-letter { color: #B794C4; }
+
+        .card-title h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-title p {
+            color: #B8AFA4;
+            font-size: 0.95rem;
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .heal-card.active .card-content,
+        .heal-card.completed .card-content {
+            max-height: 2000px;
+        }
+
+        .guidance {
+            background: #1a1512;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-left: 4px solid currentColor;
+        }
+
+        .helpful .guidance { border-color: #D4896A; }
+        .evidence .guidance { border-color: #6B9AAF; }
+        .alternative .guidance { border-color: #7EA88B; }
+        .lovedone .guidance { border-color: #B794C4; }
+
+        .guidance p {
+            color: #D4C9BB;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .guidance p:last-child {
+            margin-bottom: 0;
+        }
+
+        .question-group {
+            margin-bottom: 24px;
+        }
+
+        .question-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .question-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .radio-option {
+            flex: 1;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 16px;
+            background: #1a1512;
+            border: 2px solid #4a4340;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            border-color: #F5F0E8;
+            background: #2d2825;
+        }
+
+        .radio-option label:hover {
+            border-color: #B8AFA4;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .status-indicator.completed {
+            background: #7EA88B;
+            color: #1a1512;
+        }
+
+        /* Summary */
+        .summary {
+            background: #2d2825;
+            border: 4px solid #7EA88B;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .summary h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .thought-comparison {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .thought-box {
+            background: #1a1512;
+            padding: 24px;
+            border-left: 4px solid currentColor;
+        }
+
+        .thought-box.original {
+            border-color: #D4896A;
+        }
+
+        .thought-box.reframed {
+            border-color: #7EA88B;
+        }
+
+        .thought-box h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .thought-box p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .insights {
+            background: #1a1512;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .insights h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .insight-item {
+            margin-bottom: 16px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .insight-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+        }
+
+        .insight-item.helpful:before { color: #D4896A; }
+        .insight-item.evidence:before { color: #6B9AAF; }
+        .insight-item.alternative:before { color: #7EA88B; }
+        .insight-item.lovedone:before { color: #B794C4; }
+
+        .insight-item strong {
+            color: currentColor;
+        }
+
+        .encouragement {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #D4896A 0%, #B794C4 100%);
+            color: #1a1512;
+            margin-bottom: 20px;
+        }
+
+        .encouragement p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .summary-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Saved Sessions */
+        .saved-sessions {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 2px solid #4a4340;
+        }
+
+        .saved-sessions h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .session-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .session-item {
+            background: #2d2825;
+            border: 2px solid #4a4340;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .session-item:hover {
+            border-color: #B8AFA4;
+            transform: translateX(4px);
+        }
+
+        .session-date {
+            font-size: 0.85rem;
+            color: #B8AFA4;
+            margin-bottom: 8px;
+        }
+
+        .session-thought {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .session-reframe {
+            font-size: 0.9rem;
+            color: #7EA88B;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .delete-session {
+            margin-top: 12px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            background: transparent;
+            color: #D4896A;
+            border: 2px solid #D4896A;
+        }
+
+        .delete-session:hover {
+            background: #D4896A;
+            color: #1a1512;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .initial-input,
+            .heal-card,
+            .summary {
+                padding: 24px;
+            }
+
+            .card-letter {
+                font-size: 3rem;
+                width: 60px;
+                height: 60px;
+            }
+
+            .card-title h3 {
+                font-size: 1.4rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .summary-actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                margin-left: 0 !important;
+                margin-top: 12px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .heal-card.active {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .fade-in {
+            animation: slideIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HEAL</h1>
+            <p class="subtitle">Reframe your thoughts with evidence and compassion</p>
+        </div>
+
+        <!-- Initial Input -->
+        <div id="initialInput" class="initial-input">
+            <h2>What thought is bothering you?</h2>
+            <p>Write down the thought that's been weighing on you. Be honest and specific. This is a safe space.</p>
+            <textarea id="originalThought" placeholder="Example: I'm terrible at my job and everyone thinks I'm incompetent..."></textarea>
+            <button onclick="startHeal()">Begin HEAL Process</button>
+        </div>
+
+        <!-- HEAL Cards -->
+        <div id="healCards" class="heal-cards hidden">
+            <!-- H - Helpful -->
+            <div id="cardH" class="heal-card helpful locked">
+                <div class="card-header">
+                    <div class="card-letter">H</div>
+                    <div class="card-title">
+                        <h3>Helpful?</h3>
+                        <p>Is this thought serving you?</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="guidance">
+                        <p>Most unhelpful thoughts feel true, but that doesn't mean they're useful. They often keep us stuck in patterns that don't serve our wellbeing.</p>
+                        <p>Let's explore whether this thought is actually helping you move forward.</p>
+                    </div>
+                    <div class="question-group">
+                        <label>Is this thought helpful to you?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="helpfulYes" name="helpful" value="yes">
+                                <label for="helpfulYes">Yes, it helps me</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="helpfulNo" name="helpful" value="no">
+                                <label for="helpfulNo">No, it doesn't help</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-group">
+                        <label>Why or why not? What does this thought do to you?</label>
+                        <textarea id="helpfulReflection" placeholder="Example: It makes me feel anxious and stops me from trying new things at work..."></textarea>
+                    </div>
+                    <button onclick="completeStep('H')">Continue to Evidence</button>
+                </div>
+            </div>
+
+            <!-- E - Evidence -->
+            <div id="cardE" class="heal-card evidence locked">
+                <div class="card-header">
+                    <div class="card-letter">E</div>
+                    <div class="card-title">
+                        <h3>Evidence?</h3>
+                        <p>What does reality actually say?</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="guidance">
+                        <p>Our thoughts often present themselves as facts, but they're not always based in reality. Let's examine the actual evidence.</p>
+                        <p>Be honest and fair with yourself. Look for concrete facts, not feelings disguised as facts.</p>
+                    </div>
+                    <div class="question-group">
+                        <label>What evidence SUPPORTS this thought?</label>
+                        <textarea id="evidenceFor" placeholder="Example: I made a mistake on that report last week..."></textarea>
+                    </div>
+                    <div class="question-group">
+                        <label>What evidence CONTRADICTS this thought?</label>
+                        <textarea id="evidenceAgainst" placeholder="Example: My manager praised my work on three projects this month, and my colleague asked for my help..."></textarea>
+                    </div>
+                    <button onclick="completeStep('E')">Continue to Alternative</button>
+                </div>
+            </div>
+
+            <!-- A - Alternative -->
+            <div id="cardA" class="heal-card alternative locked">
+                <div class="card-header">
+                    <div class="card-letter">A</div>
+                    <div class="card-title">
+                        <h3>Alternative?</h3>
+                        <p>What's a more balanced perspective?</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="guidance">
+                        <p>Looking at all the evidence, what's a more balanced and accurate way to think about this situation?</p>
+                        <p>This isn't about positive thinking or lying to yourself. It's about seeing the whole picture, not just the worst parts.</p>
+                    </div>
+                    <div class="question-group">
+                        <label>What's a more balanced thought?</label>
+                        <textarea id="alternativeThought" placeholder="Example: I made a mistake, but I also do good work. Everyone makes mistakes sometimes, and I'm learning and improving..."></textarea>
+                    </div>
+                    <button onclick="completeStep('A')">Continue to Loved One</button>
+                </div>
+            </div>
+
+            <!-- L - Loved One -->
+            <div id="cardL" class="heal-card lovedone locked">
+                <div class="card-header">
+                    <div class="card-letter">L</div>
+                    <div class="card-title">
+                        <h3>Loved One?</h3>
+                        <p>What would you tell your best friend?</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="guidance">
+                        <p>We're often much kinder to others than we are to ourselves. Imagine your best friend came to you with this exact thought.</p>
+                        <p>What would you say to them? What compassion and wisdom would you offer?</p>
+                    </div>
+                    <div class="question-group">
+                        <label>What would you tell a loved one in this situation?</label>
+                        <textarea id="lovedOneAdvice" placeholder="Example: I'd tell them that one mistake doesn't define their abilities, and that they're being way too hard on themselves..."></textarea>
+                    </div>
+                    <button onclick="completeStep('L')">See Your Reframe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div id="summary" class="summary hidden fade-in">
+            <h2>Your Reframe</h2>
+
+            <div class="thought-comparison">
+                <div class="thought-box original">
+                    <h3>Original Thought</h3>
+                    <p id="summaryOriginal"></p>
+                </div>
+                <div class="thought-box reframed">
+                    <h3>Reframed Thought</h3>
+                    <p id="summaryReframed"></p>
+                </div>
+            </div>
+
+            <div class="insights">
+                <h3>Your Journey Through HEAL</h3>
+                <div class="insight-item helpful">
+                    <strong>Helpful:</strong> <span id="insightHelpful"></span>
+                </div>
+                <div class="insight-item evidence">
+                    <strong>Evidence For:</strong> <span id="insightEvidenceFor"></span>
+                </div>
+                <div class="insight-item evidence">
+                    <strong>Evidence Against:</strong> <span id="insightEvidenceAgainst"></span>
+                </div>
+                <div class="insight-item lovedone">
+                    <strong>Compassionate Perspective:</strong> <span id="insightLovedOne"></span>
+                </div>
+            </div>
+
+            <div class="encouragement">
+                <p>You've just done something powerful. Reframing thoughts takes practice, but each time you do it, you're building a skill that will serve you for life. Come back to this whenever you need it.</p>
+            </div>
+
+            <div class="summary-actions">
+                <button onclick="saveSession()">Save This Reframe</button>
+                <button class="button-secondary" onclick="startOver()">Start Another HEAL</button>
+            </div>
+        </div>
+
+        <!-- Saved Sessions -->
+        <div id="savedSessions" class="saved-sessions hidden">
+            <h2>Your Past Reframes</h2>
+            <div id="sessionList" class="session-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = null;
+        let sessionData = {
+            originalThought: '',
+            helpful: '',
+            helpfulReflection: '',
+            evidenceFor: '',
+            evidenceAgainst: '',
+            alternativeThought: '',
+            lovedOneAdvice: '',
+            timestamp: null
+        };
+
+        // Load saved sessions on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedSessions();
+        });
+
+        function startHeal() {
+            const thought = document.getElementById('originalThought').value.trim();
+
+            if (!thought) {
+                alert('Please write down the thought that\'s bothering you.');
+                return;
+            }
+
+            sessionData.originalThought = thought;
+            sessionData.timestamp = new Date().toISOString();
+
+            // Hide initial input, show HEAL cards
+            document.getElementById('initialInput').classList.add('hidden');
+            document.getElementById('healCards').classList.remove('hidden');
+
+            // Activate first card
+            activateCard('H');
+        }
+
+        function activateCard(letter) {
+            const card = document.getElementById('card' + letter);
+            card.classList.remove('locked');
+            card.classList.add('active');
+            currentStep = letter;
+
+            // Scroll to card
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function completeStep(letter) {
+            // Validate inputs
+            if (letter === 'H') {
+                const helpful = document.querySelector('input[name="helpful"]:checked');
+                const reflection = document.getElementById('helpfulReflection').value.trim();
+
+                if (!helpful || !reflection) {
+                    alert('Please answer both questions before continuing.');
+                    return;
+                }
+
+                sessionData.helpful = helpful.value;
+                sessionData.helpfulReflection = reflection;
+            }
+            else if (letter === 'E') {
+                const evidenceFor = document.getElementById('evidenceFor').value.trim();
+                const evidenceAgainst = document.getElementById('evidenceAgainst').value.trim();
+
+                if (!evidenceFor || !evidenceAgainst) {
+                    alert('Please provide evidence both for and against the thought.');
+                    return;
+                }
+
+                sessionData.evidenceFor = evidenceFor;
+                sessionData.evidenceAgainst = evidenceAgainst;
+            }
+            else if (letter === 'A') {
+                const alternative = document.getElementById('alternativeThought').value.trim();
+
+                if (!alternative) {
+                    alert('Please write a more balanced alternative thought.');
+                    return;
+                }
+
+                sessionData.alternativeThought = alternative;
+            }
+            else if (letter === 'L') {
+                const lovedOne = document.getElementById('lovedOneAdvice').value.trim();
+
+                if (!lovedOne) {
+                    alert('Please write what you would tell a loved one.');
+                    return;
+                }
+
+                sessionData.lovedOneAdvice = lovedOne;
+            }
+
+            // Mark current card as completed
+            const currentCard = document.getElementById('card' + letter);
+            currentCard.classList.remove('active');
+            currentCard.classList.add('completed');
+
+            // Add completed indicator
+            if (!currentCard.querySelector('.status-indicator')) {
+                const indicator = document.createElement('div');
+                indicator.className = 'status-indicator completed';
+                indicator.textContent = 'Completed';
+                currentCard.querySelector('.card-content').insertBefore(
+                    indicator,
+                    currentCard.querySelector('.card-content').firstChild
+                );
+            }
+
+            // Move to next step or show summary
+            const steps = ['H', 'E', 'A', 'L'];
+            const currentIndex = steps.indexOf(letter);
+
+            if (currentIndex < steps.length - 1) {
+                activateCard(steps[currentIndex + 1]);
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            // Populate summary
+            document.getElementById('summaryOriginal').textContent = sessionData.originalThought;
+            document.getElementById('summaryReframed').textContent = sessionData.alternativeThought;
+            document.getElementById('insightHelpful').textContent = sessionData.helpfulReflection;
+            document.getElementById('insightEvidenceFor').textContent = sessionData.evidenceFor;
+            document.getElementById('insightEvidenceAgainst').textContent = sessionData.evidenceAgainst;
+            document.getElementById('insightLovedOne').textContent = sessionData.lovedOneAdvice;
+
+            // Show summary
+            document.getElementById('summary').classList.remove('hidden');
+
+            // Scroll to summary
+            setTimeout(() => {
+                document.getElementById('summary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function saveSession() {
+            // Get existing sessions
+            let sessions = JSON.parse(localStorage.getItem('healSessions') || '[]');
+
+            // Add current session
+            sessions.unshift(sessionData);
+
+            // Keep only last 20 sessions
+            if (sessions.length > 20) {
+                sessions = sessions.slice(0, 20);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('healSessions', JSON.stringify(sessions));
+
+            // Show confirmation
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Saved!';
+            button.style.background = '#7EA88B';
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+
+            // Reload saved sessions
+            loadSavedSessions();
+        }
+
+        function loadSavedSessions() {
+            const sessions = JSON.parse(localStorage.getItem('healSessions') || '[]');
+
+            if (sessions.length === 0) {
+                document.getElementById('savedSessions').classList.add('hidden');
+                return;
+            }
+
+            const sessionList = document.getElementById('sessionList');
+            sessionList.innerHTML = '';
+
+            sessions.forEach((session, index) => {
+                const date = new Date(session.timestamp);
+                const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+
+                const item = document.createElement('div');
+                item.className = 'session-item';
+                item.innerHTML = `
+                    <div class="session-date">${dateStr}</div>
+                    <div class="session-thought">${session.originalThought}</div>
+                    <div class="session-reframe">→ ${session.alternativeThought}</div>
+                    <button class="delete-session" onclick="deleteSession(${index}); event.stopPropagation();">Delete</button>
+                `;
+
+                item.onclick = () => viewSession(session);
+                sessionList.appendChild(item);
+            });
+
+            document.getElementById('savedSessions').classList.remove('hidden');
+        }
+
+        function viewSession(session) {
+            sessionData = { ...session };
+
+            // Populate all fields
+            document.getElementById('originalThought').value = session.originalThought;
+
+            // H card
+            document.querySelector(`input[name="helpful"][value="${session.helpful}"]`).checked = true;
+            document.getElementById('helpfulReflection').value = session.helpfulReflection;
+
+            // E card
+            document.getElementById('evidenceFor').value = session.evidenceFor;
+            document.getElementById('evidenceAgainst').value = session.evidenceAgainst;
+
+            // A card
+            document.getElementById('alternativeThought').value = session.alternativeThought;
+
+            // L card
+            document.getElementById('lovedOneAdvice').value = session.lovedOneAdvice;
+
+            // Show all cards as completed
+            document.getElementById('initialInput').classList.add('hidden');
+            document.getElementById('healCards').classList.remove('hidden');
+
+            ['H', 'E', 'A', 'L'].forEach(letter => {
+                const card = document.getElementById('card' + letter);
+                card.classList.remove('locked', 'active');
+                card.classList.add('completed');
+
+                // Add completed indicator if not present
+                if (!card.querySelector('.status-indicator')) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'status-indicator completed';
+                    indicator.textContent = 'Completed';
+                    card.querySelector('.card-content').insertBefore(
+                        indicator,
+                        card.querySelector('.card-content').firstChild
+                    );
+                }
+            });
+
+            // Show summary
+            showSummary();
+        }
+
+        function deleteSession(index) {
+            if (!confirm('Are you sure you want to delete this reframe?')) {
+                return;
+            }
+
+            let sessions = JSON.parse(localStorage.getItem('healSessions') || '[]');
+            sessions.splice(index, 1);
+            localStorage.setItem('healSessions', JSON.stringify(sessions));
+            loadSavedSessions();
+        }
+
+        function startOver() {
+            // Reset session data
+            sessionData = {
+                originalThought: '',
+                helpful: '',
+                helpfulReflection: '',
+                evidenceFor: '',
+                evidenceAgainst: '',
+                alternativeThought: '',
+                lovedOneAdvice: '',
+                timestamp: null
+            };
+
+            // Clear all inputs
+            document.getElementById('originalThought').value = '';
+            document.querySelectorAll('input[name="helpful"]').forEach(radio => radio.checked = false);
+            document.getElementById('helpfulReflection').value = '';
+            document.getElementById('evidenceFor').value = '';
+            document.getElementById('evidenceAgainst').value = '';
+            document.getElementById('alternativeThought').value = '';
+            document.getElementById('lovedOneAdvice').value = '';
+
+            // Reset cards
+            ['H', 'E', 'A', 'L'].forEach(letter => {
+                const card = document.getElementById('card' + letter);
+                card.classList.remove('active', 'completed');
+                card.classList.add('locked');
+
+                // Remove completed indicator
+                const indicator = card.querySelector('.status-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            });
+
+            // Show initial input
+            document.getElementById('initialInput').classList.remove('hidden');
+            document.getElementById('healCards').classList.add('hidden');
+            document.getElementById('summary').classList.add('hidden');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

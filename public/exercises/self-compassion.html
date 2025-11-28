@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Compassion Practice - Cowch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1512;
+            color: #F5F0E8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #D4896A, #E8A86A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #B794C4;
+            font-weight: 500;
+        }
+
+        /* Warmth Meter */
+        .warmth-meter {
+            width: 100%;
+            height: 8px;
+            background: #2a2522;
+            border-radius: 100px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .warmth-meter.visible {
+            opacity: 1;
+        }
+
+        .warmth-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #D4896A, #E8A86A, #B794C4);
+            border-radius: 100px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(232, 168, 106, 0.5);
+        }
+
+        /* Steps */
+        .step {
+            display: none;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        /* Question */
+        .question {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .subtext {
+            font-size: 1.1rem;
+            color: #9a8f85;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Input Areas */
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            background: #2a2522;
+            border: 2px solid #3a3533;
+            color: #F5F0E8;
+            padding: 1.5rem;
+            font-size: 1.1rem;
+            font-family: inherit;
+            border-radius: 12px;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #B794C4;
+            background: #322f2c;
+            box-shadow: 0 0 0 3px rgba(183, 148, 196, 0.1);
+        }
+
+        textarea::placeholder, input[type="text"]::placeholder {
+            color: #6a6460;
+        }
+
+        /* Bubbles */
+        .bubble-container {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .harsh-bubble {
+            background: #3a3533;
+            border: 3px solid #4a4543;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            animation: harshPulse 0.6s ease;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .harsh-bubble::before {
+            content: "😔";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            background: #3a3533;
+            padding: 0 10px;
+        }
+
+        .harsh-bubble p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #c9beb4;
+            font-style: italic;
+        }
+
+        .compassion-bubble {
+            background: linear-gradient(135deg, #D4896A, #E8A86A);
+            padding: 2rem;
+            border-radius: 20px;
+            position: relative;
+            animation: warmGlow 0.8s ease;
+            box-shadow:
+                0 8px 32px rgba(212, 137, 106, 0.3),
+                0 0 60px rgba(232, 168, 106, 0.2);
+        }
+
+        .compassion-bubble::before {
+            content: "💛";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .compassion-bubble p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #1a1512;
+            font-weight: 500;
+        }
+
+        /* Transformation Animation */
+        .bubble-transform {
+            animation: transformBubble 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes transformBubble {
+            0% {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Guidance Prompts */
+        .guidance {
+            background: rgba(183, 148, 196, 0.1);
+            border-left: 4px solid #B794C4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .guidance h3 {
+            font-size: 1.2rem;
+            color: #B794C4;
+            margin-bottom: 1rem;
+        }
+
+        .guidance ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .guidance li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #c9beb4;
+            line-height: 1.6;
+        }
+
+        .guidance li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #B794C4;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #D4896A, #E8A86A);
+            color: #1a1512;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 20px rgba(212, 137, 106, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(212, 137, 106, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #B794C4;
+            color: #B794C4;
+            margin-right: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(183, 148, 196, 0.1);
+            box-shadow: 0 4px 20px rgba(183, 148, 196, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Affirmation Cards */
+        .affirmation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .affirmation-card {
+            background: linear-gradient(135deg, rgba(212, 137, 106, 0.15), rgba(183, 148, 196, 0.15));
+            border: 2px solid rgba(183, 148, 196, 0.3);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease forwards;
+            animation-delay: calc(var(--card-index) * 0.1s);
+            opacity: 0;
+        }
+
+        .affirmation-card:hover {
+            transform: translateY(-5px);
+            border-color: #B794C4;
+            box-shadow: 0 8px 30px rgba(183, 148, 196, 0.3);
+        }
+
+        .affirmation-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .affirmation-card p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #F5F0E8;
+            font-weight: 500;
+        }
+
+        /* Final Message */
+        .final-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(212, 137, 106, 0.1), rgba(183, 148, 196, 0.1));
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+
+        .final-message h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #D4896A, #B794C4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .final-message p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #c9beb4;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Common Humanity Quotes */
+        .humanity-quote {
+            background: rgba(183, 148, 196, 0.05);
+            border: 2px solid rgba(183, 148, 196, 0.2);
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .humanity-quote p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #B794C4;
+        }
+
+        .humanity-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #9a8f85;
+            font-style: normal;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes harshPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.98);
+            }
+        }
+
+        @keyframes warmGlow {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+                box-shadow: 0 0 0 rgba(212, 137, 106, 0);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow:
+                    0 8px 32px rgba(212, 137, 106, 0.3),
+                    0 0 60px rgba(232, 168, 106, 0.2);
+            }
+        }
+
+        /* Saved indicator */
+        .saved-indicator {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #D4896A, #E8A86A);
+            color: #1a1512;
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(212, 137, 106, 0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .saved-indicator.show {
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .question {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-secondary {
+                margin-right: 0;
+            }
+        }
+
+        /* Breathing animation for intro */
+        .breathe {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Talk to Yourself Like a Friend</h1>
+            <p>A self-compassion practice</p>
+        </div>
+
+        <div class="warmth-meter">
+            <div class="warmth-fill" id="warmthFill"></div>
+        </div>
+
+        <!-- Step 1: Introduction -->
+        <div class="step active" id="step1">
+            <div class="question">We're often our own harshest critics.</div>
+            <div class="subtext">
+                But what if you spoke to yourself the way you'd speak to a close friend? Let's practice that together.
+            </div>
+
+            <div class="humanity-quote breathe">
+                <p>"You can search throughout the entire universe for someone who is more deserving of your love and affection than you are yourself, and that person is not to be found anywhere."</p>
+                <cite>— Buddha</cite>
+            </div>
+
+            <div class="button-group">
+                <button class="btn" onclick="nextStep(1)">Begin Practice</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Identify the struggle -->
+        <div class="step" id="step2">
+            <div class="question">What are you being hard on yourself about?</div>
+            <div class="subtext">
+                Maybe it's a mistake you made, something you're struggling with, or a way you think you're not "enough."
+            </div>
+
+            <div class="input-group">
+                <textarea id="struggle" placeholder="I'm being hard on myself about..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(2)">Back</button>
+                <button class="btn" onclick="nextStep(2)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Capture harsh self-talk -->
+        <div class="step" id="step3">
+            <div class="question">What's the harsh thing you're telling yourself?</div>
+            <div class="subtext">
+                Write down that critical inner voice. What does it say? Don't hold back—we're going to transform this.
+            </div>
+
+            <div class="input-group">
+                <textarea id="harshVoice" placeholder="The harsh voice in my head says..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(3)">Back</button>
+                <button class="btn" onclick="nextStep(3)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Show harsh bubble + prompt compassion -->
+        <div class="step" id="step4">
+            <div class="question">Here's what you're telling yourself:</div>
+
+            <div class="bubble-container">
+                <div class="harsh-bubble" id="harshBubble">
+                    <p id="harshText"></p>
+                </div>
+            </div>
+
+            <div class="humanity-quote">
+                <p>Everyone has an inner critic. You're not alone in this struggle.</p>
+            </div>
+
+            <div class="subtext">
+                Now imagine your best friend came to you and said this exact thing about themselves. What would you tell them?
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(4)">Back</button>
+                <button class="btn" onclick="nextStep(4)">Help My Friend</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Guided compassionate response -->
+        <div class="step" id="step5">
+            <div class="question">What would you tell your friend?</div>
+
+            <div class="guidance">
+                <h3>Guide to compassionate response:</h3>
+                <ul>
+                    <li><strong>Acknowledge their feelings:</strong> "I hear how hard this is for you..."</li>
+                    <li><strong>Offer perspective:</strong> "Everyone struggles with this sometimes..."</li>
+                    <li><strong>Give encouragement:</strong> "You're doing the best you can..."</li>
+                    <li><strong>Be specific & kind:</strong> What would genuinely help them feel better?</li>
+                </ul>
+            </div>
+
+            <div class="input-group">
+                <textarea id="compassionVoice" placeholder="I would tell my friend..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(5)">Back</button>
+                <button class="btn" onclick="nextStep(5)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Show transformation -->
+        <div class="step" id="step6">
+            <div class="question">Beautiful. Now watch the transformation:</div>
+
+            <div class="bubble-container">
+                <div class="harsh-bubble">
+                    <p id="harshText2"></p>
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0; font-size: 2rem;">↓</div>
+
+                <div class="compassion-bubble bubble-transform" id="compassionBubble">
+                    <p id="compassionText"></p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(6)">Back</button>
+                <button class="btn" onclick="nextStep(6)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 7: The powerful reframe -->
+        <div class="step" id="step7">
+            <div class="question">Now, here's the most important part:</div>
+
+            <div class="final-message">
+                <h2>Say this to yourself.</h2>
+                <p>Read your compassionate words again, slowly. This time, they're for YOU. You deserve the same kindness you'd give a friend.</p>
+            </div>
+
+            <div class="bubble-container">
+                <div class="compassion-bubble">
+                    <p id="compassionText2"></p>
+                </div>
+            </div>
+
+            <div class="humanity-quote">
+                <p>This is a moment of difficulty. Difficulty is a part of life. May I be kind to myself in this moment. May I give myself the compassion I need.</p>
+                <cite>— Kristin Neff, Self-Compassion researcher</cite>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="prevStep(7)">Back</button>
+                <button class="btn" onclick="nextStep(7)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 8: Closing affirmations -->
+        <div class="step" id="step8">
+            <div class="question">You did something powerful today.</div>
+
+            <div class="final-message">
+                <h2>Remember These Truths</h2>
+                <p>Take these affirmations with you. Come back to them whenever you need.</p>
+            </div>
+
+            <div class="affirmation-grid">
+                <div class="affirmation-card" style="--card-index: 0">
+                    <div class="icon">🌱</div>
+                    <p>I am worthy of compassion, especially from myself</p>
+                </div>
+                <div class="affirmation-card" style="--card-index: 1">
+                    <div class="icon">🤝</div>
+                    <p>My struggles are part of being human</p>
+                </div>
+                <div class="affirmation-card" style="--card-index: 2">
+                    <div class="icon">💛</div>
+                    <p>I can be both imperfect and deserving of love</p>
+                </div>
+                <div class="affirmation-card" style="--card-index: 3">
+                    <div class="icon">🌟</div>
+                    <p>I'm doing the best I can with what I have</p>
+                </div>
+                <div class="affirmation-card" style="--card-index: 4">
+                    <div class="icon">🫂</div>
+                    <p>I deserve the same kindness I give others</p>
+                </div>
+                <div class="affirmation-card" style="--card-index: 5">
+                    <div class="icon">🌈</div>
+                    <p>Growth happens through gentleness, not criticism</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary btn" onclick="saveJourney()">Save My Journey</button>
+                <button class="btn" onclick="restartExercise()">Practice Again</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="saved-indicator" id="savedIndicator">
+        Saved to your heart 💛
+    </div>
+
+    <script>
+        // State management
+        let currentStep = 1;
+        const totalSteps = 8;
+        const userData = {
+            struggle: '',
+            harshVoice: '',
+            compassionVoice: '',
+            timestamp: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateWarmthMeter();
+        });
+
+        // Navigation
+        function nextStep(step) {
+            // Validation
+            if (step === 2) {
+                const struggle = document.getElementById('struggle').value.trim();
+                if (!struggle) {
+                    alert('Please share what you\'re being hard on yourself about.');
+                    return;
+                }
+                userData.struggle = struggle;
+            }
+
+            if (step === 3) {
+                const harshVoice = document.getElementById('harshVoice').value.trim();
+                if (!harshVoice) {
+                    alert('Please write down that harsh inner voice.');
+                    return;
+                }
+                userData.harshVoice = harshVoice;
+                // Show in bubble
+                document.getElementById('harshText').textContent = `"${harshVoice}"`;
+                document.getElementById('harshText2').textContent = `"${harshVoice}"`;
+            }
+
+            if (step === 5) {
+                const compassionVoice = document.getElementById('compassionVoice').value.trim();
+                if (!compassionVoice) {
+                    alert('Please write a compassionate response.');
+                    return;
+                }
+                userData.compassionVoice = compassionVoice;
+                // Show in bubbles
+                document.getElementById('compassionText').textContent = `"${compassionVoice}"`;
+                document.getElementById('compassionText2').textContent = `"${compassionVoice}"`;
+            }
+
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+
+            // Show next step
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // Update warmth meter
+            updateWarmthMeter();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(step) {
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+
+            // Show previous step
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // Update warmth meter
+            updateWarmthMeter();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateWarmthMeter() {
+            const meter = document.querySelector('.warmth-meter');
+            const fill = document.getElementById('warmthFill');
+
+            if (currentStep > 1) {
+                meter.classList.add('visible');
+            }
+
+            const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            fill.style.width = `${percentage}%`;
+        }
+
+        function saveJourney() {
+            userData.timestamp = new Date().toISOString();
+
+            // Get existing journeys
+            let journeys = JSON.parse(localStorage.getItem('selfCompassionJourneys') || '[]');
+
+            // Add new journey
+            journeys.push(userData);
+
+            // Save to localStorage
+            localStorage.setItem('selfCompassionJourneys', JSON.stringify(journeys));
+
+            // Show saved indicator
+            const indicator = document.getElementById('savedIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+
+        function restartExercise() {
+            // Reset state
+            currentStep = 1;
+            userData.struggle = '';
+            userData.harshVoice = '';
+            userData.compassionVoice = '';
+
+            // Clear inputs
+            document.getElementById('struggle').value = '';
+            document.getElementById('harshVoice').value = '';
+            document.getElementById('compassionVoice').value = '';
+
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+
+            // Show first step
+            document.getElementById('step1').classList.add('active');
+
+            // Reset warmth meter
+            updateWarmthMeter();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Enter to continue (only when not in textarea)
+            if (e.key === 'Enter' && !e.target.matches('textarea')) {
+                const continueBtn = document.querySelector(`#step${currentStep} .btn:not(.btn-secondary)`);
+                if (continueBtn && !continueBtn.disabled) {
+                    continueBtn.click();
+                }
+            }
+        });
+
+        // Auto-resize textareas
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
