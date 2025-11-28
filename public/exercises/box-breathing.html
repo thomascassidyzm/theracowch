@@ -193,58 +193,111 @@
             color: #D4896A;
         }
 
-        /* Breathing circle container */
+        /* Breathing box container */
         .breathing-container {
             position: relative;
-            width: 280px;
-            height: 280px;
+            width: 260px;
+            height: 260px;
             margin: 0 auto 2rem;
         }
 
-        /* The breathing circle - scales based on phase */
-        .breathing-circle {
+        /* The box SVG */
+        .breathing-box {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Background box outline */
+        .box-background {
+            fill: none;
+            stroke: #3a3533;
+            stroke-width: 8;
+            rx: 24;
+        }
+
+        /* Animated progress stroke */
+        .box-progress {
+            fill: none;
+            stroke: #D4896A;
+            stroke-width: 8;
+            stroke-linecap: round;
+            /* Total perimeter ~935px */
+            stroke-dasharray: 935;
+            stroke-dashoffset: 935;
+            filter: drop-shadow(0 0 12px rgba(212, 137, 106, 0.6));
+        }
+
+        /* Glow effect on the leading edge */
+        .box-glow {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 180px;
-            height: 180px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #E39B7F 0%, transparent 70%);
             border-radius: 50%;
-            background: linear-gradient(135deg, #D4896A 0%, #E39B7F 100%);
-            box-shadow:
-                0 0 60px rgba(212, 137, 106, 0.4),
-                inset 0 0 40px rgba(255, 255, 255, 0.1);
-            transform: translate(-50%, -50%) scale(0.6);
-            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            opacity: 0.8;
+            filter: blur(4px);
         }
 
-        .breathing-circle.inhale {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .breathing-circle.hold-full {
-            transform: translate(-50%, -50%) scale(1);
-            transition: none;
-        }
-
-        .breathing-circle.exhale {
-            transform: translate(-50%, -50%) scale(0.6);
-        }
-
-        .breathing-circle.hold-empty {
-            transform: translate(-50%, -50%) scale(0.6);
-            transition: none;
-        }
-
-        /* Outer ring */
-        .outer-ring {
+        /* Phase labels on each side */
+        .box-labels {
             position: absolute;
-            top: 50%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .box-label {
+            position: absolute;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #5a5350;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .box-label.active {
+            color: #D4896A;
+            transform: scale(1.1);
+        }
+
+        .box-label.top {
+            top: -28px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            border: 3px solid rgba(212, 137, 106, 0.2);
+            transform: translateX(-50%);
+        }
+        .box-label.top.active {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .box-label.right {
+            right: -45px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+        .box-label.right.active {
+            transform: translateY(-50%) rotate(90deg) scale(1.1);
+        }
+
+        .box-label.bottom {
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .box-label.bottom.active {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .box-label.left {
+            left: -38px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+        .box-label.left.active {
+            transform: translateY(-50%) rotate(-90deg) scale(1.1);
         }
 
         /* Phase indicator */
@@ -459,16 +512,6 @@
         /* Mobile adjustments */
         @media (max-width: 480px) {
             .breathing-container {
-                width: 240px;
-                height: 240px;
-            }
-
-            .breathing-circle {
-                width: 150px;
-                height: 150px;
-            }
-
-            .outer-ring {
                 width: 220px;
                 height: 220px;
             }
@@ -479,6 +522,18 @@
 
             .stat-value {
                 font-size: 1rem;
+            }
+
+            .box-label {
+                font-size: 0.55rem;
+            }
+
+            .box-label.right {
+                right: -40px;
+            }
+
+            .box-label.left {
+                left: -33px;
             }
         }
     </style>
@@ -525,8 +580,20 @@
             </div>
 
             <div class="breathing-container">
-                <div class="outer-ring"></div>
-                <div class="breathing-circle" id="breathingCircle"></div>
+                <!-- The Box -->
+                <svg class="breathing-box" viewBox="0 0 260 260">
+                    <!-- Background box -->
+                    <rect class="box-background" x="8" y="8" width="244" height="244" rx="24"/>
+                    <!-- Animated progress - draws clockwise from top-left -->
+                    <rect class="box-progress" id="boxProgress" x="8" y="8" width="244" height="244" rx="24"/>
+                </svg>
+                <!-- Labels on each side -->
+                <div class="box-labels">
+                    <span class="box-label top" id="labelTop">Inhale</span>
+                    <span class="box-label right" id="labelRight">Hold</span>
+                    <span class="box-label bottom" id="labelBottom">Exhale</span>
+                    <span class="box-label left" id="labelLeft">Hold</span>
+                </div>
             </div>
 
             <div class="phase-indicator" id="phaseIndicator">INHALE</div>
@@ -573,12 +640,18 @@
         // Configuration
         const PHASE_DURATION = 4000; // 4 seconds per phase
 
-        // Phases: inhale grows, hold stays big, exhale shrinks, hold stays small
+        // Box perimeter calculation: rect with rounded corners
+        // Perimeter ≈ 2*(width + height) - 8*rx + 2*π*rx ≈ 2*(244+244) - 8*24 + 2*3.14*24 ≈ 976 - 192 + 150 ≈ 934
+        // Using exact: 4 straight sides + 4 quarter circles = 4*(244-48) + 2*π*24 = 784 + 150.8 ≈ 935
+        const BOX_PERIMETER = 935;
+        const SIDE_LENGTH = BOX_PERIMETER / 4; // ~234 per side
+
+        // Phases: each draws one side of the box clockwise
         const phases = [
-            { name: 'INHALE', instruction: 'Breathe in slowly', circleClass: 'inhale' },
-            { name: 'HOLD', instruction: 'Hold gently', circleClass: 'hold-full' },
-            { name: 'EXHALE', instruction: 'Breathe out slowly', circleClass: 'exhale' },
-            { name: 'HOLD', instruction: 'Hold gently', circleClass: 'hold-empty' }
+            { name: 'INHALE', instruction: 'Breathe in slowly', side: 'top', labelId: 'labelTop' },
+            { name: 'HOLD', instruction: 'Hold gently', side: 'right', labelId: 'labelRight' },
+            { name: 'EXHALE', instruction: 'Breathe out slowly', side: 'bottom', labelId: 'labelBottom' },
+            { name: 'HOLD', instruction: 'Hold gently', side: 'left', labelId: 'labelLeft' }
         ];
 
         // State
@@ -602,7 +675,7 @@
         const pauseBtn = document.getElementById('pauseBtn');
         const stopBtn = document.getElementById('stopBtn');
         const restartBtn = document.getElementById('restartBtn');
-        const breathingCircle = document.getElementById('breathingCircle');
+        const boxProgress = document.getElementById('boxProgress');
         const phaseIndicator = document.getElementById('phaseIndicator');
         const phaseInstruction = document.getElementById('phaseInstruction');
         const progressFill = document.getElementById('progressFill');
@@ -610,6 +683,7 @@
         const remainingTime = document.getElementById('remainingTime');
         const cyclesCount = document.getElementById('cyclesCount');
         const announcer = document.getElementById('announcer');
+        const boxLabels = document.querySelectorAll('.box-label');
 
         // Duration selection
         durationBtns.forEach(btn => {
@@ -662,6 +736,10 @@
             state.cycles = 0;
             state.isPaused = false;
 
+            // Reset box to fully hidden
+            boxProgress.style.strokeDasharray = BOX_PERIMETER;
+            boxProgress.style.strokeDashoffset = BOX_PERIMETER;
+
             updateRemainingTime();
             updatePhase();
             startPhaseAnimation();
@@ -686,7 +764,7 @@
             animateProgress();
         }
 
-        // Animate the progress bar smoothly
+        // Animate the box perimeter drawing
         function animateProgress() {
             if (state.isPaused) {
                 state.animationFrameId = requestAnimationFrame(animateProgress);
@@ -697,7 +775,17 @@
             const elapsed = now - state.phaseStartTime;
             const progress = Math.min(elapsed / PHASE_DURATION, 1);
 
-            // Update progress bar
+            // Calculate how much of the box should be drawn
+            // Each phase draws one side (SIDE_LENGTH)
+            // Total drawn = completed phases + current phase progress
+            const completedLength = state.currentPhase * SIDE_LENGTH;
+            const currentLength = progress * SIDE_LENGTH;
+            const totalDrawn = completedLength + currentLength;
+
+            // strokeDashoffset: BOX_PERIMETER = nothing drawn, 0 = fully drawn
+            boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
+
+            // Update the small progress bar too
             progressFill.style.width = `${progress * 100}%`;
 
             if (progress >= 1) {
@@ -716,6 +804,8 @@
             if (state.currentPhase === 0) {
                 state.cycles++;
                 cyclesCount.textContent = state.cycles;
+                // Reset box for new cycle
+                boxProgress.style.strokeDashoffset = BOX_PERIMETER;
             }
 
             updatePhase();
@@ -731,8 +821,9 @@
             phaseIndicator.textContent = phase.name;
             phaseInstruction.textContent = phase.instruction;
 
-            // Update circle class for size animation
-            breathingCircle.className = 'breathing-circle ' + phase.circleClass;
+            // Update box labels - highlight current side
+            boxLabels.forEach(label => label.classList.remove('active'));
+            document.getElementById(phase.labelId).classList.add('active');
 
             // Haptic feedback
             if (navigator.vibrate) {
@@ -805,7 +896,8 @@
             state.cycles = 0;
             pauseBtn.textContent = 'Pause';
             progressFill.style.width = '0%';
-            breathingCircle.className = 'breathing-circle';
+            boxProgress.style.strokeDashoffset = BOX_PERIMETER;
+            boxLabels.forEach(label => label.classList.remove('active'));
         }
 
         // Screen reader announcements
