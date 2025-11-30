@@ -22,6 +22,10 @@
             --text-muted: #78716C;
             --breath: #E07A5F;
             --breath-glow: rgba(224, 122, 95, 0.4);
+
+            /* Breath shape sizes */
+            --breath-min: 0.35;
+            --breath-max: 0.85;
         }
 
         html, body {
@@ -65,12 +69,41 @@
             height: 100%;
         }
 
+        /* ====== INNER BREATHING SHAPE ====== */
+        .breath-shape {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%) scale(var(--breath-min));
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(224, 122, 95, 0.2) 0%,
+                rgba(224, 122, 95, 0.1) 40%,
+                rgba(224, 122, 95, 0.05) 70%,
+                transparent 100%
+            );
+            border: 2px solid rgba(224, 122, 95, 0.25);
+            border-radius: 24px;
+            transition: transform 0.1s linear, box-shadow 0.3s ease, border-color 0.3s ease;
+            pointer-events: none;
+        }
+
+        .breath-shape.expanded {
+            border-color: rgba(224, 122, 95, 0.4);
+            box-shadow:
+                0 0 60px rgba(224, 122, 95, 0.15),
+                inset 0 0 40px rgba(224, 122, 95, 0.1);
+        }
+
         /* Box edges - each side */
         .box-edge {
             position: absolute;
             background: var(--text-muted);
             opacity: 0.3;
             transition: opacity 0.3s ease, background 0.3s ease;
+            z-index: 2;
         }
 
         .box-edge.active {
@@ -158,6 +191,7 @@
             opacity: 0.4;
             transform: translate(-50%, -50%);
             transition: all 0.3s ease;
+            z-index: 3;
         }
 
         .corner.active {
@@ -185,6 +219,7 @@
             color: var(--text-muted);
             opacity: 0.5;
             transition: all 0.3s ease;
+            z-index: 4;
         }
 
         .side-label.active {
@@ -227,6 +262,7 @@
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
+            z-index: 5;
         }
 
         .phase-word {
@@ -488,6 +524,7 @@
 
         /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
+            .breath-shape,
             .edge-progress,
             .corner,
             .side-label,
@@ -505,6 +542,9 @@
         <!-- THE BOX -->
         <div class="box-wrapper">
             <div class="box" id="box">
+                <!-- Inner breathing shape -->
+                <div class="breath-shape" id="breathShape"></div>
+
                 <!-- Four edges -->
                 <div class="box-edge top" data-phase="0">
                     <div class="edge-progress" id="progress-top"></div>
@@ -585,12 +625,14 @@
     <script>
         // ====== CONFIG ======
         const PHASE_DURATION = 4000; // 4 seconds per phase
+        const BREATH_MIN = 0.35;
+        const BREATH_MAX = 0.85;
 
         const PHASES = [
-            { name: 'IN', edge: 'top', corner: 0 },
-            { name: 'HOLD', edge: 'right', corner: 1 },
-            { name: 'OUT', edge: 'bottom', corner: 2 },
-            { name: 'HOLD', edge: 'left', corner: 3 }
+            { name: 'IN', edge: 'top', corner: 0, breathAction: 'expand' },
+            { name: 'HOLD', edge: 'right', corner: 1, breathAction: 'hold-full' },
+            { name: 'OUT', edge: 'bottom', corner: 2, breathAction: 'contract' },
+            { name: 'HOLD', edge: 'left', corner: 3, breathAction: 'hold-empty' }
         ];
 
         // ====== STATE ======
@@ -604,11 +646,13 @@
             isRunning: false,
             phaseStartTime: null,
             lastTick: null,
-            animationId: null
+            animationId: null,
+            breathScale: BREATH_MIN
         };
 
         // ====== DOM ======
         const box = document.getElementById('box');
+        const breathShape = document.getElementById('breathShape');
         const startInstruction = document.getElementById('startInstruction');
         const phaseWord = document.getElementById('phaseWord');
         const countdownEl = document.getElementById('countdown');
@@ -669,6 +713,18 @@
             announcer.textContent = message;
         }
 
+        function updateBreathShape(scale) {
+            state.breathScale = scale;
+            breathShape.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+            // Add/remove expanded class for glow effect
+            if (scale > (BREATH_MIN + BREATH_MAX) / 2) {
+                breathShape.classList.add('expanded');
+            } else {
+                breathShape.classList.remove('expanded');
+            }
+        }
+
         function startSession() {
             // Reset state
             state.elapsed = 0;
@@ -677,6 +733,7 @@
             state.countdown = 4;
             state.isPaused = false;
             state.isRunning = true;
+            state.breathScale = BREATH_MIN;
 
             // Update UI
             startInstruction.classList.add('hidden');
@@ -685,6 +742,9 @@
             durationSelect.style.opacity = '0.3';
             durationSelect.style.pointerEvents = 'none';
             hint.classList.remove('hidden');
+
+            // Reset breath shape to small
+            updateBreathShape(BREATH_MIN);
 
             // Reset all progress bars
             Object.values(progressBars).forEach(bar => {
@@ -722,8 +782,11 @@
                 const phaseElapsed = now - state.phaseStartTime;
                 const phaseProgress = Math.min(1, phaseElapsed / PHASE_DURATION);
 
-                // Update progress bar
-                updateProgress(phaseProgress);
+                // Update progress bar on edge
+                updateEdgeProgress(phaseProgress);
+
+                // Update breath shape based on current phase
+                updateBreathForPhase(phaseProgress);
 
                 // Update countdown
                 const newCountdown = Math.max(1, 4 - Math.floor(phaseElapsed / 1000));
@@ -743,7 +806,7 @@
             state.animationId = requestAnimationFrame(tick);
         }
 
-        function updateProgress(progress) {
+        function updateEdgeProgress(progress) {
             const phase = PHASES[state.phase];
             const bar = progressBars[phase.edge];
 
@@ -756,6 +819,34 @@
             } else if (phase.edge === 'left') {
                 bar.style.height = (progress * 100) + '%';
             }
+        }
+
+        function updateBreathForPhase(progress) {
+            const phase = PHASES[state.phase];
+            let newScale;
+
+            switch (phase.breathAction) {
+                case 'expand':
+                    // IN: grow from min to max
+                    newScale = BREATH_MIN + (BREATH_MAX - BREATH_MIN) * progress;
+                    break;
+                case 'hold-full':
+                    // HOLD after inhale: stay at max
+                    newScale = BREATH_MAX;
+                    break;
+                case 'contract':
+                    // OUT: shrink from max to min
+                    newScale = BREATH_MAX - (BREATH_MAX - BREATH_MIN) * progress;
+                    break;
+                case 'hold-empty':
+                    // HOLD after exhale: stay at min
+                    newScale = BREATH_MIN;
+                    break;
+                default:
+                    newScale = state.breathScale;
+            }
+
+            updateBreathShape(newScale);
         }
 
         function updatePhase() {
@@ -773,7 +864,7 @@
             sideLabels.forEach(l => l.classList.remove('active'));
             document.querySelector(`.side-label.${phase.edge}`).classList.add('active');
 
-            // Reset all progress bars, then show current
+            // Reset all progress bars
             Object.values(progressBars).forEach(bar => {
                 bar.style.width = '0%';
                 bar.style.height = '0%';
@@ -866,6 +957,9 @@
             durationSelect.style.opacity = '1';
             durationSelect.style.pointerEvents = 'auto';
             hint.classList.add('hidden');
+
+            // Reset breath shape
+            updateBreathShape(BREATH_MIN);
 
             // Reset visual state
             Object.values(edges).forEach(e => e.classList.remove('active'));
