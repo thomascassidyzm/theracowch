@@ -50,7 +50,7 @@
             max-width: 400px;
         }
 
-        /* ====== THE BOX ====== */
+        /* ====== THE BOX AREA ====== */
         .box-area {
             position: relative;
             width: min(280px, 70vw);
@@ -61,30 +61,32 @@
             justify-content: center;
         }
 
-        /* The breathing shape - this IS the box */
-        .breath-box {
+        /* Inner breathing shape - scales up to fill the frame */
+        .breath-fill {
             position: absolute;
             width: 100%;
             height: 100%;
             transform: scale(0.4);
             transition: transform 0.1s linear;
-        }
-
-        /* Subtle fill inside the box */
-        .breath-fill {
-            position: absolute;
-            inset: 4px;
             background: radial-gradient(
                 circle at 30% 30%,
-                rgba(224, 122, 95, 0.12) 0%,
-                rgba(224, 122, 95, 0.05) 50%,
+                rgba(224, 122, 95, 0.15) 0%,
+                rgba(224, 122, 95, 0.08) 50%,
+                rgba(224, 122, 95, 0.03) 80%,
                 transparent 100%
             );
-            border-radius: 16px;
+            border-radius: 12px;
             pointer-events: none;
         }
 
-        /* Edge tracks (the dim background line) */
+        /* Fixed outer frame - always full size */
+        .box-frame {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Edge tracks (the dim background line) - FIXED at full size */
         .edge-track {
             position: absolute;
             background: var(--breath-dim);
@@ -156,6 +158,7 @@
         /* Tick marks - subtle second indicators */
         .tick-marks {
             position: absolute;
+            z-index: 1;
         }
 
         .tick-marks.horizontal {
@@ -194,7 +197,7 @@
         .tick {
             width: 2px;
             height: 100%;
-            background: rgba(12, 10, 9, 0.5);
+            background: rgba(12, 10, 9, 0.6);
         }
 
         .tick-marks.vertical .tick {
@@ -202,7 +205,7 @@
             height: 2px;
         }
 
-        /* Corner dots */
+        /* Corner dots - FIXED at full size */
         .corner {
             position: absolute;
             width: 10px;
@@ -455,7 +458,7 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .breath-box, .corner, .side-label, .phase-word {
+            .breath-fill, .corner, .side-label, .phase-word {
                 transition: none;
             }
         }
@@ -466,13 +469,13 @@
 
     <div class="container">
         <div class="box-area" id="boxArea">
-            <!-- The breathing box - scales up and down -->
-            <div class="breath-box" id="breathBox">
-                <!-- Inner fill -->
-                <div class="breath-fill"></div>
+            <!-- Inner breathing fill - scales -->
+            <div class="breath-fill" id="breathFill"></div>
 
+            <!-- Fixed outer frame with edge timers -->
+            <div class="box-frame">
                 <!-- Edge tracks with progress -->
-                <div class="edge-track top" data-edge="top">
+                <div class="edge-track top">
                     <div class="tick-marks horizontal">
                         <span class="tick"></span>
                         <span class="tick"></span>
@@ -480,7 +483,7 @@
                     </div>
                     <div class="edge-progress" id="progress-top"></div>
                 </div>
-                <div class="edge-track right" data-edge="right">
+                <div class="edge-track right">
                     <div class="tick-marks vertical right">
                         <span class="tick"></span>
                         <span class="tick"></span>
@@ -488,7 +491,7 @@
                     </div>
                     <div class="edge-progress" id="progress-right"></div>
                 </div>
-                <div class="edge-track bottom" data-edge="bottom">
+                <div class="edge-track bottom">
                     <div class="tick-marks horizontal bottom">
                         <span class="tick"></span>
                         <span class="tick"></span>
@@ -496,7 +499,7 @@
                     </div>
                     <div class="edge-progress" id="progress-bottom"></div>
                 </div>
-                <div class="edge-track left" data-edge="left">
+                <div class="edge-track left">
                     <div class="tick-marks vertical left">
                         <span class="tick"></span>
                         <span class="tick"></span>
@@ -593,7 +596,7 @@
 
         // DOM
         const boxArea = document.getElementById('boxArea');
-        const breathBox = document.getElementById('breathBox');
+        const breathFill = document.getElementById('breathFill');
         const startInstruction = document.getElementById('startInstruction');
         const phaseWord = document.getElementById('phaseWord');
         const countdownEl = document.getElementById('countdown');
@@ -646,7 +649,7 @@
 
         function setScale(scale) {
             state.scale = scale;
-            breathBox.style.transform = `scale(${scale})`;
+            breathFill.style.transform = `scale(${scale})`;
         }
 
         function startSession() {
