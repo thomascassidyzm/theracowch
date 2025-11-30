@@ -866,6 +866,745 @@
         }
 
         /* ============================================
+           TOOL PANEL (YOU Tab Tools)
+           ============================================ */
+
+        .tool-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: var(--max-width);
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-primary);
+            z-index: var(--z-modal);
+            transition: right var(--transition-brutal);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-panel.active {
+            right: 0;
+        }
+
+        .tool-panel-header {
+            padding: var(--space-md) var(--space-lg);
+            padding-top: max(var(--space-md), env(safe-area-inset-top));
+            background: var(--bg-secondary);
+            border-bottom: var(--border-medium) solid var(--border-warm);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tool-panel-back {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+        }
+
+        .tool-panel-back:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+            transform: translateX(-4px);
+        }
+
+        .tool-panel-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-black);
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .tool-panel-content {
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+            padding-bottom: calc(var(--tab-bar-height) + var(--space-xl) + env(safe-area-inset-bottom));
+        }
+
+        /* Tool View Toggle */
+        .tool-view-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+        }
+
+        .tool-view-btn {
+            flex: 1;
+            padding: 0.875rem var(--space-md);
+            border: var(--border-medium) solid var(--border-warm);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+        }
+
+        .tool-view-btn:hover:not(.active) {
+            border-color: var(--coral);
+            color: var(--text-primary);
+        }
+
+        .tool-view-btn.active {
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-primary);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        /* Tool Section Intro */
+        .tool-section-intro {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .tool-section-intro h2 {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-black);
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        .tool-section-intro p {
+            font-size: var(--font-size-base);
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Tool Cards */
+        .tool-card-brutalist {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
+        }
+
+        .tool-card-brutalist h3 {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* Tool Prompt Label */
+        .tool-prompt {
+            font-size: var(--font-size-lg);
+            color: var(--coral);
+            margin-bottom: var(--space-md);
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Tool Textarea */
+        .tool-textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all var(--transition-brutal);
+        }
+
+        .tool-textarea:focus {
+            border-color: var(--coral);
+            box-shadow: 4px 4px 0 0 var(--coral-glow);
+        }
+
+        .tool-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Tool Save Button */
+        .tool-save-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--coral);
+            border: var(--border-thicc) solid var(--coral-dark);
+            border-radius: var(--radius-medium);
+            color: var(--bg-primary);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-black);
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+            box-shadow: 6px 6px 0 0 var(--bg-card);
+        }
+
+        .tool-save-btn:hover {
+            transform: translateY(-3px) rotate(-1deg);
+            box-shadow: 8px 8px 0 0 var(--coral-glow);
+        }
+
+        .tool-save-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        .tool-save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        /* Tool Section */
+        .tool-section {
+            display: none;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        /* Empty State */
+        .tool-empty-state {
+            text-align: center;
+            padding: var(--space-2xl) var(--space-md);
+            color: var(--text-muted);
+        }
+
+        .tool-empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--space-md);
+            opacity: 0.4;
+            stroke: var(--coral);
+        }
+
+        .tool-empty-state p {
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* ============================================
+           NOTICE TOOL STYLES
+           ============================================ */
+
+        /* Color Picker */
+        .notice-color-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+        }
+
+        .notice-color-option {
+            aspect-ratio: 1;
+            border-radius: var(--radius-small);
+            border: var(--border-medium) solid transparent;
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+            position: relative;
+        }
+
+        .notice-color-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+        }
+
+        .notice-color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 4px 4px 0 0 var(--coral);
+            transform: translateY(-2px);
+        }
+
+        .notice-color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-weight-black);
+            font-size: 1.25rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Energy Slider */
+        .notice-slider-container {
+            margin-bottom: var(--space-sm);
+        }
+
+        .notice-slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+            text-transform: uppercase;
+        }
+
+        .notice-slider {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--border-warm);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .notice-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-small);
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            cursor: pointer;
+            box-shadow: 3px 3px 0 0 var(--bg-secondary);
+        }
+
+        .notice-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-small);
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            cursor: pointer;
+            box-shadow: 3px 3px 0 0 var(--bg-secondary);
+        }
+
+        /* Timeline Grid */
+        .notice-timeline-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .notice-timeline-header h3 {
+            color: var(--text-primary);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-black);
+            text-transform: uppercase;
+        }
+
+        .notice-timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .notice-day-label {
+            text-align: center;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            padding: var(--space-sm) 0;
+            text-transform: uppercase;
+        }
+
+        .notice-day-cell {
+            aspect-ratio: 1;
+            border-radius: var(--radius-small);
+            border: var(--border-medium) solid var(--border-warm);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notice-day-cell:hover:not(.empty) {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+            border-color: var(--coral);
+        }
+
+        .notice-day-cell.empty {
+            background: var(--bg-secondary);
+            border-color: transparent;
+            cursor: default;
+        }
+
+        .notice-day-cell.today {
+            border-color: var(--coral);
+        }
+
+        .notice-day-cell.has-entry {
+            border-color: var(--text-primary);
+        }
+
+        .notice-day-number {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           CHOICE TOOL STYLES
+           ============================================ */
+
+        /* Tree Container */
+        .choice-tree-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
+        }
+
+        .choice-tree-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .choice-tree-trunk {
+            fill: #5D4A3C;
+        }
+
+        .choice-tree-branch {
+            stroke: #6B5747;
+            stroke-width: 4;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .choice-tree-leaf {
+            fill: #7EA88B;
+            opacity: 0;
+            animation: choiceLeafGrow 0.5s ease-out forwards;
+        }
+
+        @keyframes choiceLeafGrow {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .choice-count-display {
+            text-align: center;
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .choice-count-display strong {
+            color: var(--coral);
+            font-size: var(--font-size-2xl);
+        }
+
+        /* Choice History */
+        .choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .choice-item {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+            transition: all var(--transition-brutal);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+        }
+
+        .choice-item:hover {
+            border-color: var(--coral);
+            transform: translateY(-2px);
+        }
+
+        .choice-date {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+            text-transform: uppercase;
+        }
+
+        .choice-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           VALUES TOOL STYLES
+           ============================================ */
+
+        /* Radar Chart */
+        .values-radar-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto var(--space-xl);
+            aspect-ratio: 1;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
+        }
+
+        .values-radar-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .values-radar-grid {
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .values-radar-axis {
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 2;
+        }
+
+        .values-radar-shape {
+            fill: var(--coral);
+            fill-opacity: 0.35;
+            stroke: var(--coral);
+            stroke-width: 3;
+        }
+
+        .values-label {
+            fill: var(--text-muted);
+            font-size: 11px;
+            font-weight: var(--font-weight-bold);
+            text-anchor: middle;
+            text-transform: uppercase;
+        }
+
+        /* Values List */
+        .values-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .value-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .value-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .value-name {
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .value-score {
+            font-size: var(--font-size-sm);
+            color: var(--coral);
+            font-weight: var(--font-weight-black);
+        }
+
+        .value-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .value-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--coral);
+            cursor: pointer;
+            border: 3px solid var(--bg-primary);
+            box-shadow: 2px 2px 0 0 var(--coral-dark);
+        }
+
+        .value-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--coral);
+            cursor: pointer;
+            border: 3px solid var(--bg-primary);
+            box-shadow: 2px 2px 0 0 var(--coral-dark);
+        }
+
+        .value-slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Values Presets */
+        .values-preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .values-preset-btn {
+            padding: 0.875rem;
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-small);
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            font-family: inherit;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 0 var(--bg-primary);
+            transition: all var(--transition-brutal);
+        }
+
+        .values-preset-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--border-warm);
+        }
+
+        .values-preset-btn.selected {
+            background: var(--coral);
+            color: var(--bg-primary);
+            border-color: var(--coral-dark);
+        }
+
+        /* Values Custom Input */
+        .values-custom-input {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .values-custom-input input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-small);
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            font-weight: var(--font-weight-bold);
+            outline: none;
+        }
+
+        .values-custom-input input:focus {
+            border-color: var(--coral);
+        }
+
+        .values-custom-input input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .values-custom-input button {
+            padding: 0.75rem var(--space-lg);
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            border-radius: var(--radius-small);
+            color: var(--bg-primary);
+            font-weight: var(--font-weight-black);
+            font-family: inherit;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+            transition: all var(--transition-brutal);
+        }
+
+        .values-custom-input button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
+        }
+
+        /* Values Average Display */
+        .values-avg-display {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+        }
+
+        .values-avg-display strong {
+            color: var(--coral);
+            font-weight: var(--font-weight-black);
+            font-size: var(--font-size-xl);
+        }
+
+        /* Mobile Adjustments for Tools */
+        @media (max-width: 480px) {
+            .notice-color-picker {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .choice-tree-container {
+                height: 280px;
+            }
+
+            .values-preset-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-view-btn {
+                font-size: var(--font-size-xs);
+                padding: 0.75rem var(--space-sm);
+            }
+        }
+
+        /* ============================================
            BOTTOM TAB BAR - Brutalist
            ============================================ */
 
@@ -1196,29 +1935,29 @@
                     <div class="tools-section">
                         <h2>Your Tools</h2>
                         <div class="tool-cards">
-                            <a href="/notice.html" class="tool-card">
+                            <button class="tool-card" data-tool="notice">
                                 <span class="tool-card-icon">✨</span>
                                 <div class="tool-card-text">
                                     <strong>Notice</strong>
                                     <span>Gratitude and awareness journal</span>
                                 </div>
-                            </a>
+                            </button>
 
-                            <a href="/choice.html" class="tool-card">
+                            <button class="tool-card" data-tool="choice">
                                 <span class="tool-card-icon">🌳</span>
                                 <div class="tool-card-text">
                                     <strong>Choice</strong>
                                     <span>Track your decisions and agency</span>
                                 </div>
-                            </a>
+                            </button>
 
-                            <a href="/values.html" class="tool-card">
+                            <button class="tool-card" data-tool="values">
                                 <span class="tool-card-icon">🎯</span>
                                 <div class="tool-card-text">
                                     <strong>Values</strong>
                                     <span>Check your alignment</span>
                                 </div>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -1255,6 +1994,247 @@
             </header>
             <div class="domain-panel-content" id="domain-panel-content">
                 <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- NOTICE TOOL PANEL -->
+        <div class="tool-panel" id="notice-panel">
+            <header class="tool-panel-header">
+                <button class="tool-panel-back" id="notice-panel-back">← Back</button>
+                <h1 class="tool-panel-title">Notice</h1>
+                <div style="width: 80px;"></div>
+            </header>
+
+            <div class="tool-panel-content">
+                <div class="tool-view-toggle">
+                    <button class="tool-view-btn active" data-notice-view="today">Today</button>
+                    <button class="tool-view-btn" data-notice-view="timeline">Timeline</button>
+                </div>
+
+                <!-- Notice: Today View -->
+                <div class="tool-section active" id="notice-today-view">
+                    <div class="tool-section-intro">
+                        <h2>What do you notice today?</h2>
+                        <p>No pressure, no judgment. Just notice.</p>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <h3>How does today feel?</h3>
+                        <div class="notice-color-picker" id="notice-color-picker">
+                            <div class="notice-color-option" data-color="#D4896A" style="background: #D4896A;"></div>
+                            <div class="notice-color-option" data-color="#E39B7F" style="background: #E39B7F;"></div>
+                            <div class="notice-color-option" data-color="#C47A5D" style="background: #C47A5D;"></div>
+                            <div class="notice-color-option" data-color="#8a7a6a" style="background: #8a7a6a;"></div>
+                            <div class="notice-color-option" data-color="#b0a499" style="background: #b0a499;"></div>
+                            <div class="notice-color-option" data-color="#78716C" style="background: #78716C;"></div>
+                            <div class="notice-color-option" data-color="#6B9AAF" style="background: #6B9AAF;"></div>
+                            <div class="notice-color-option" data-color="#7EA88B" style="background: #7EA88B;"></div>
+                            <div class="notice-color-option" data-color="#8FBC8F" style="background: #8FBC8F;"></div>
+                            <div class="notice-color-option" data-color="#B794C4" style="background: #B794C4;"></div>
+                            <div class="notice-color-option" data-color="#C9A857" style="background: #C9A857;"></div>
+                            <div class="notice-color-option" data-color="#3a3533" style="background: #3a3533;"></div>
+                        </div>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <h3>Energy level</h3>
+                        <div class="notice-slider-container">
+                            <div class="notice-slider-label">
+                                <span>Low</span>
+                                <span>High</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="50" class="notice-slider" id="notice-energy-slider">
+                        </div>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <div class="tool-prompt" id="notice-daily-prompt">What mattered to me today?</div>
+                        <textarea class="tool-textarea" id="notice-text" placeholder="Write as much or as little as you want..."></textarea>
+                    </div>
+
+                    <button class="tool-save-btn" id="notice-save-btn">Save Notice</button>
+                </div>
+
+                <!-- Notice: Timeline View -->
+                <div class="tool-section" id="notice-timeline-view">
+                    <div class="tool-section-intro">
+                        <h2>Your notices</h2>
+                        <p>Patterns you notice are yours to explore</p>
+                    </div>
+
+                    <div id="notice-timeline-container">
+                        <div class="tool-empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            <p>No notices yet. Start noticing today.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHOICE TOOL PANEL -->
+        <div class="tool-panel" id="choice-panel">
+            <header class="tool-panel-header">
+                <button class="tool-panel-back" id="choice-panel-back">← Back</button>
+                <h1 class="tool-panel-title">Choice</h1>
+                <div style="width: 80px;"></div>
+            </header>
+
+            <div class="tool-panel-content">
+                <div class="tool-view-toggle">
+                    <button class="tool-view-btn active" data-choice-view="today">Today</button>
+                    <button class="tool-view-btn" data-choice-view="tree">My Tree</button>
+                    <button class="tool-view-btn" data-choice-view="history">History</button>
+                </div>
+
+                <!-- Choice: Today View -->
+                <div class="tool-section active" id="choice-today-view">
+                    <div class="tool-section-intro">
+                        <h2>What choice did you notice today?</h2>
+                        <p>Every choice you recognize strengthens your agency</p>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <div class="tool-prompt">I chose to...</div>
+                        <textarea class="tool-textarea" id="choice-text" placeholder="Even small choices matter - what did you choose today that you're noticing?"></textarea>
+                    </div>
+
+                    <button class="tool-save-btn" id="choice-save-btn">Add Choice</button>
+                </div>
+
+                <!-- Choice: Tree View -->
+                <div class="tool-section" id="choice-tree-view">
+                    <div class="tool-section-intro">
+                        <h2>Your Choice Tree</h2>
+                        <p>Each leaf represents a choice you noticed</p>
+                    </div>
+
+                    <div class="choice-tree-container">
+                        <svg class="choice-tree-svg" id="choice-tree-svg" viewBox="0 0 300 400">
+                            <rect class="choice-tree-trunk" x="135" y="250" width="30" height="150" rx="5"/>
+                            <g id="choice-branches"></g>
+                            <g id="choice-leaves"></g>
+                        </svg>
+                    </div>
+
+                    <div class="choice-count-display">
+                        <strong id="choice-count">0</strong> choices noticed
+                    </div>
+                </div>
+
+                <!-- Choice: History View -->
+                <div class="tool-section" id="choice-history-view">
+                    <div class="tool-section-intro">
+                        <h2>Your Choices</h2>
+                        <p>A record of your agency</p>
+                    </div>
+
+                    <div id="choice-list-container">
+                        <div class="tool-empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            <p>No choices tracked yet. Start noticing today.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VALUES TOOL PANEL -->
+        <div class="tool-panel" id="values-panel">
+            <header class="tool-panel-header">
+                <button class="tool-panel-back" id="values-panel-back">← Back</button>
+                <h1 class="tool-panel-title">Values</h1>
+                <div style="width: 80px;"></div>
+            </header>
+
+            <div class="tool-panel-content">
+                <div class="tool-view-toggle">
+                    <button class="tool-view-btn active" data-values-view="today">Today</button>
+                    <button class="tool-view-btn" data-values-view="chart">Chart</button>
+                    <button class="tool-view-btn" data-values-view="setup">Setup</button>
+                </div>
+
+                <!-- Values: Today View -->
+                <div class="tool-section active" id="values-today-view">
+                    <div class="tool-section-intro">
+                        <h2>How aligned were you today?</h2>
+                        <p>Rate how well you honored each value</p>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <div id="values-today-list" class="values-list">
+                            <p class="tool-empty-state" style="padding: 1rem;">
+                                Set up your values first to start tracking
+                            </p>
+                        </div>
+                    </div>
+
+                    <button class="tool-save-btn" id="values-save-btn" style="display: none;">Save Today's Alignment</button>
+                </div>
+
+                <!-- Values: Chart View -->
+                <div class="tool-section" id="values-chart-view">
+                    <div class="tool-section-intro">
+                        <h2>Your Values Alignment</h2>
+                        <p>Visual map of how you're living your values</p>
+                    </div>
+
+                    <div class="values-radar-container">
+                        <svg class="values-radar-svg" id="values-radar-svg" viewBox="0 0 300 300">
+                            <circle class="values-radar-grid" cx="150" cy="150" r="120"/>
+                            <circle class="values-radar-grid" cx="150" cy="150" r="90"/>
+                            <circle class="values-radar-grid" cx="150" cy="150" r="60"/>
+                            <circle class="values-radar-grid" cx="150" cy="150" r="30"/>
+                            <g id="values-axes"></g>
+                            <polygon id="values-data-shape" class="values-radar-shape" points=""/>
+                            <g id="values-labels"></g>
+                        </svg>
+                    </div>
+
+                    <div class="values-avg-display">
+                        Average alignment: <strong id="values-avg-score">0%</strong>
+                    </div>
+                </div>
+
+                <!-- Values: Setup View -->
+                <div class="tool-section" id="values-setup-view">
+                    <div class="tool-section-intro">
+                        <h2>Your Values</h2>
+                        <p>Choose what matters most to you</p>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <h3>Quick select (choose 3-6)</h3>
+                        <div class="values-preset-grid" id="values-preset-grid">
+                            <button class="values-preset-btn" data-value="Connection">Connection</button>
+                            <button class="values-preset-btn" data-value="Creativity">Creativity</button>
+                            <button class="values-preset-btn" data-value="Growth">Growth</button>
+                            <button class="values-preset-btn" data-value="Health">Health</button>
+                            <button class="values-preset-btn" data-value="Honesty">Honesty</button>
+                            <button class="values-preset-btn" data-value="Freedom">Freedom</button>
+                            <button class="values-preset-btn" data-value="Peace">Peace</button>
+                            <button class="values-preset-btn" data-value="Joy">Joy</button>
+                            <button class="values-preset-btn" data-value="Adventure">Adventure</button>
+                            <button class="values-preset-btn" data-value="Kindness">Kindness</button>
+                            <button class="values-preset-btn" data-value="Courage">Courage</button>
+                            <button class="values-preset-btn" data-value="Balance">Balance</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card-brutalist">
+                        <h3>Add your own</h3>
+                        <div class="values-custom-input">
+                            <input type="text" id="values-custom-input" placeholder="Enter a value..." maxlength="20">
+                            <button id="values-add-custom">Add</button>
+                        </div>
+                    </div>
+
+                    <button class="tool-save-btn" id="values-save-values-btn">Save My Values</button>
+                </div>
             </div>
         </div>
 

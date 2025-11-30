@@ -623,6 +623,655 @@ function updateImagineTracker() {
 }
 
 // ============================================
+// YOU TAB TOOLS (Notice, Choice, Values)
+// ============================================
+
+// Storage keys
+const NOTICE_STORAGE_KEY = 'cowch_notices';
+const CHOICE_STORAGE_KEY = 'cowch_choices';
+const VALUES_STORAGE_KEY = 'cowch_values';
+const VALUES_ALIGNMENT_KEY = 'cowch_values_alignment';
+
+// Notice state
+let noticeSelectedColor = null;
+
+// Daily prompts for Notice
+const NOTICE_PROMPTS = [
+    "What mattered to me today?",
+    "What surprised me today?",
+    "Where did I feel most like myself?",
+    "What did I notice today?",
+    "What did I give myself today?"
+];
+
+// Get today's date key
+function getTodayKey() {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+}
+
+// ============================================
+// Tool Panel Management
+// ============================================
+
+function setupToolPanels() {
+    // Tool card buttons open panels
+    document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
+        card.addEventListener('click', () => {
+            const tool = card.dataset.tool;
+            openToolPanel(tool);
+        });
+    });
+
+    // Back buttons close panels
+    document.getElementById('notice-panel-back').addEventListener('click', () => closeToolPanel('notice'));
+    document.getElementById('choice-panel-back').addEventListener('click', () => closeToolPanel('choice'));
+    document.getElementById('values-panel-back').addEventListener('click', () => closeToolPanel('values'));
+}
+
+function openToolPanel(tool) {
+    const panel = document.getElementById(`${tool}-panel`);
+    if (panel) {
+        panel.classList.add('active');
+        // Initialize the tool when opened
+        if (tool === 'notice') initNotice();
+        if (tool === 'choice') initChoice();
+        if (tool === 'values') initValues();
+    }
+}
+
+function closeToolPanel(tool) {
+    const panel = document.getElementById(`${tool}-panel`);
+    if (panel) {
+        panel.classList.remove('active');
+    }
+}
+
+// ============================================
+// NOTICE TOOL
+// ============================================
+
+function initNotice() {
+    // Set daily prompt
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    document.getElementById('notice-daily-prompt').textContent = NOTICE_PROMPTS[dayOfYear % NOTICE_PROMPTS.length];
+
+    // Load today's notice
+    loadTodayNotice();
+
+    // Setup color picker
+    setupNoticeColorPicker();
+
+    // Setup view toggle
+    setupNoticeViewToggle();
+
+    // Setup save button
+    setupNoticeSave();
+}
+
+function setupNoticeColorPicker() {
+    const colorOptions = document.querySelectorAll('.notice-color-option');
+    colorOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            colorOptions.forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            noticeSelectedColor = option.dataset.color;
+        });
+    });
+}
+
+function setupNoticeViewToggle() {
+    document.querySelectorAll('[data-notice-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.noticeView;
+            document.querySelectorAll('[data-notice-view]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('notice-today-view').classList.toggle('active', view === 'today');
+            document.getElementById('notice-timeline-view').classList.toggle('active', view === 'timeline');
+
+            if (view === 'timeline') renderNoticeTimeline();
+        });
+    });
+}
+
+function loadTodayNotice() {
+    const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
+    const today = getTodayKey();
+    const todayNotice = notices[today];
+
+    if (todayNotice) {
+        // Set color
+        if (todayNotice.color) {
+            noticeSelectedColor = todayNotice.color;
+            const colorOption = document.querySelector(`.notice-color-option[data-color="${todayNotice.color}"]`);
+            if (colorOption) {
+                document.querySelectorAll('.notice-color-option').forEach(o => o.classList.remove('selected'));
+                colorOption.classList.add('selected');
+            }
+        }
+        // Set energy
+        if (todayNotice.energy !== undefined) {
+            document.getElementById('notice-energy-slider').value = todayNotice.energy;
+        }
+        // Set text
+        if (todayNotice.text) {
+            document.getElementById('notice-text').value = todayNotice.text;
+        }
+    }
+}
+
+function setupNoticeSave() {
+    document.getElementById('notice-save-btn').addEventListener('click', () => {
+        const energy = document.getElementById('notice-energy-slider').value;
+        const text = document.getElementById('notice-text').value;
+
+        if (!noticeSelectedColor && !text.trim()) return;
+
+        const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
+        const today = getTodayKey();
+
+        notices[today] = {
+            color: noticeSelectedColor,
+            energy: parseInt(energy),
+            text: text.trim(),
+            prompt: document.getElementById('notice-daily-prompt').textContent
+        };
+
+        localStorage.setItem(NOTICE_STORAGE_KEY, JSON.stringify(notices));
+
+        // Feedback
+        const btn = document.getElementById('notice-save-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Saved ✓';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    });
+}
+
+function renderNoticeTimeline() {
+    const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
+    const container = document.getElementById('notice-timeline-container');
+
+    if (Object.keys(notices).length === 0) {
+        container.innerHTML = `
+            <div class="tool-empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <p>No notices yet. Start noticing today.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    const monthName = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    let html = `
+        <div class="notice-timeline-header">
+            <h3>${monthName}</h3>
+        </div>
+        <div class="notice-timeline-grid">
+            <div class="notice-day-label">S</div>
+            <div class="notice-day-label">M</div>
+            <div class="notice-day-label">T</div>
+            <div class="notice-day-label">W</div>
+            <div class="notice-day-label">T</div>
+            <div class="notice-day-label">F</div>
+            <div class="notice-day-label">S</div>
+    `;
+
+    for (let i = 0; i < startingDayOfWeek; i++) {
+        html += '<div class="notice-day-cell empty"></div>';
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const notice = notices[dateKey];
+        const isToday = day === now.getDate();
+
+        if (notice && notice.color) {
+            html += `
+                <div class="notice-day-cell has-entry ${isToday ? 'today' : ''}"
+                     style="background: ${notice.color};"
+                     data-date="${dateKey}">
+                    <div class="notice-day-number" style="color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${day}</div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="notice-day-cell empty ${isToday ? 'today' : ''}">
+                    <div class="notice-day-number">${day}</div>
+                </div>
+            `;
+        }
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Click handlers for entries
+    container.querySelectorAll('.notice-day-cell[data-date]').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const dateKey = cell.dataset.date;
+            const notice = notices[dateKey];
+            if (notice) {
+                const formattedDate = new Date(dateKey + 'T00:00:00').toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                alert(`${formattedDate}\n\n"${notice.prompt}"\n\n${notice.text || '(No text recorded)'}`);
+            }
+        });
+    });
+}
+
+// ============================================
+// CHOICE TOOL
+// ============================================
+
+function initChoice() {
+    setupChoiceViewToggle();
+    setupChoiceSave();
+    renderChoiceTree();
+}
+
+function setupChoiceViewToggle() {
+    document.querySelectorAll('[data-choice-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.choiceView;
+            document.querySelectorAll('[data-choice-view]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('choice-today-view').classList.toggle('active', view === 'today');
+            document.getElementById('choice-tree-view').classList.toggle('active', view === 'tree');
+            document.getElementById('choice-history-view').classList.toggle('active', view === 'history');
+
+            if (view === 'tree') renderChoiceTree();
+            if (view === 'history') renderChoiceHistory();
+        });
+    });
+}
+
+function setupChoiceSave() {
+    document.getElementById('choice-save-btn').addEventListener('click', () => {
+        const text = document.getElementById('choice-text').value.trim();
+        if (!text) return;
+
+        const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+        choices.push({
+            text: text,
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleDateString('en-US', {
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+            })
+        });
+
+        localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(choices));
+        document.getElementById('choice-text').value = '';
+
+        // Feedback
+        const btn = document.getElementById('choice-save-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Added!';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+
+        renderChoiceTree();
+    });
+}
+
+function renderChoiceTree() {
+    const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    const count = choices.length;
+
+    document.getElementById('choice-count').textContent = count;
+
+    const leavesGroup = document.getElementById('choice-leaves');
+    const branchesGroup = document.getElementById('choice-branches');
+    leavesGroup.innerHTML = '';
+    branchesGroup.innerHTML = '';
+
+    // Generate leaf positions
+    const leafPositions = [];
+    for (let i = 0; i < count; i++) {
+        const layer = Math.floor(i / 8);
+        const angle = (i % 8) * (Math.PI / 4) + Math.random() * 0.3;
+        const distance = 40 + layer * 25 + Math.random() * 15;
+        const x = 150 + Math.cos(angle) * distance;
+        const y = 200 - Math.sin(angle) * distance * 0.6;
+        leafPositions.push({ x, y });
+    }
+
+    // Draw leaves
+    leafPositions.forEach((pos, index) => {
+        const leaf = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        leaf.setAttribute('class', 'choice-tree-leaf');
+        leaf.setAttribute('cx', pos.x);
+        leaf.setAttribute('cy', pos.y);
+        leaf.setAttribute('r', '8');
+        leaf.style.animationDelay = `${index * 0.05}s`;
+
+        const colors = ['#9BC4A7', '#7EA88B', '#C9A857'];
+        leaf.style.fill = colors[index % 3];
+        leavesGroup.appendChild(leaf);
+    });
+
+    // Draw branches
+    function addBranch(x1, y1, x2, y2) {
+        const branch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        branch.setAttribute('class', 'choice-tree-branch');
+        branch.setAttribute('x1', x1);
+        branch.setAttribute('y1', y1);
+        branch.setAttribute('x2', x2);
+        branch.setAttribute('y2', y2);
+        branchesGroup.appendChild(branch);
+    }
+
+    if (count > 0) {
+        addBranch(150, 250, 120, 180);
+        addBranch(150, 250, 180, 180);
+    }
+    if (count > 5) {
+        addBranch(120, 180, 90, 140);
+        addBranch(180, 180, 210, 140);
+    }
+    if (count > 10) {
+        addBranch(90, 140, 70, 100);
+        addBranch(210, 140, 230, 100);
+    }
+}
+
+function renderChoiceHistory() {
+    const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    const container = document.getElementById('choice-list-container');
+
+    if (choices.length === 0) {
+        container.innerHTML = `
+            <div class="tool-empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <p>No choices tracked yet. Start noticing today.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = choices
+        .slice()
+        .reverse()
+        .map(choice => `
+            <div class="choice-item">
+                <div class="choice-date">${choice.date}</div>
+                <div class="choice-text">${choice.text}</div>
+            </div>
+        `)
+        .join('');
+
+    container.innerHTML = `<div class="choice-list">${html}</div>`;
+}
+
+// ============================================
+// VALUES TOOL
+// ============================================
+
+function initValues() {
+    setupValuesViewToggle();
+    setupValuesPresets();
+    setupValuesCustomInput();
+    setupValuesSave();
+    renderValuesTodayView();
+}
+
+function setupValuesViewToggle() {
+    document.querySelectorAll('[data-values-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.valuesView;
+            document.querySelectorAll('[data-values-view]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('values-today-view').classList.toggle('active', view === 'today');
+            document.getElementById('values-chart-view').classList.toggle('active', view === 'chart');
+            document.getElementById('values-setup-view').classList.toggle('active', view === 'setup');
+
+            if (view === 'today') renderValuesTodayView();
+            if (view === 'chart') renderValuesChart();
+            if (view === 'setup') loadValuesSetupView();
+        });
+    });
+}
+
+function setupValuesPresets() {
+    document.getElementById('values-preset-grid').addEventListener('click', (e) => {
+        if (e.target.classList.contains('values-preset-btn')) {
+            e.target.classList.toggle('selected');
+        }
+    });
+}
+
+function setupValuesCustomInput() {
+    document.getElementById('values-add-custom').addEventListener('click', () => {
+        const input = document.getElementById('values-custom-input');
+        const value = input.value.trim();
+        if (!value) return;
+
+        const presetContainer = document.getElementById('values-preset-grid');
+        const btn = document.createElement('button');
+        btn.className = 'values-preset-btn selected';
+        btn.dataset.value = value;
+        btn.textContent = value;
+        presetContainer.appendChild(btn);
+        input.value = '';
+    });
+}
+
+function setupValuesSave() {
+    // Save values setup
+    document.getElementById('values-save-values-btn').addEventListener('click', () => {
+        const selectedButtons = document.querySelectorAll('.values-preset-btn.selected');
+        const values = Array.from(selectedButtons).map(btn => btn.dataset.value);
+
+        if (values.length < 3) {
+            alert('Please select at least 3 values');
+            return;
+        }
+        if (values.length > 6) {
+            alert('Please select no more than 6 values');
+            return;
+        }
+
+        localStorage.setItem(VALUES_STORAGE_KEY, JSON.stringify(values));
+
+        // Feedback
+        const btn = document.getElementById('values-save-values-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Values Saved ✓';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+
+        renderValuesTodayView();
+    });
+
+    // Save today's alignment
+    document.getElementById('values-save-btn').addEventListener('click', () => {
+        const values = JSON.parse(localStorage.getItem(VALUES_STORAGE_KEY) || '[]');
+        const alignmentData = JSON.parse(localStorage.getItem(VALUES_ALIGNMENT_KEY) || '{}');
+        const today = getTodayKey();
+
+        const todayScores = {};
+        values.forEach(value => {
+            const slider = document.querySelector(`.value-slider[data-value="${value}"]`);
+            if (slider) {
+                todayScores[value] = parseInt(slider.value);
+            }
+        });
+
+        alignmentData[today] = todayScores;
+        localStorage.setItem(VALUES_ALIGNMENT_KEY, JSON.stringify(alignmentData));
+
+        // Feedback
+        const btn = document.getElementById('values-save-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Saved ✓';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+
+        renderValuesChart();
+    });
+}
+
+function loadValuesSetupView() {
+    const values = JSON.parse(localStorage.getItem(VALUES_STORAGE_KEY) || '[]');
+    const buttons = document.querySelectorAll('.values-preset-btn');
+
+    buttons.forEach(btn => btn.classList.remove('selected'));
+
+    values.forEach(value => {
+        const btn = document.querySelector(`.values-preset-btn[data-value="${value}"]`);
+        if (btn) btn.classList.add('selected');
+    });
+}
+
+function renderValuesTodayView() {
+    const values = JSON.parse(localStorage.getItem(VALUES_STORAGE_KEY) || '[]');
+    const container = document.getElementById('values-today-list');
+    const saveBtn = document.getElementById('values-save-btn');
+
+    if (values.length === 0) {
+        container.innerHTML = `
+            <p class="tool-empty-state" style="padding: 1rem;">
+                Set up your values first to start tracking
+            </p>
+        `;
+        saveBtn.style.display = 'none';
+        return;
+    }
+
+    const alignmentData = JSON.parse(localStorage.getItem(VALUES_ALIGNMENT_KEY) || '{}');
+    const today = getTodayKey();
+    const todayScores = alignmentData[today] || {};
+
+    const html = values.map(value => `
+        <div class="value-item">
+            <div class="value-header">
+                <span class="value-name">${value}</span>
+                <span class="value-score" id="score-${value.replace(/\s+/g, '-')}">
+                    ${todayScores[value] !== undefined ? todayScores[value] + '%' : '50%'}
+                </span>
+            </div>
+            <input
+                type="range"
+                min="0"
+                max="100"
+                value="${todayScores[value] !== undefined ? todayScores[value] : 50}"
+                class="value-slider"
+                data-value="${value}"
+            >
+            <div class="value-slider-labels">
+                <span>Not at all</span>
+                <span>Completely</span>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = html;
+    saveBtn.style.display = 'block';
+
+    // Add slider listeners
+    document.querySelectorAll('.value-slider').forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const value = e.target.dataset.value;
+            const score = e.target.value;
+            const scoreEl = document.getElementById(`score-${value.replace(/\s+/g, '-')}`);
+            if (scoreEl) scoreEl.textContent = score + '%';
+        });
+    });
+}
+
+function renderValuesChart() {
+    const values = JSON.parse(localStorage.getItem(VALUES_STORAGE_KEY) || '[]');
+    const alignmentData = JSON.parse(localStorage.getItem(VALUES_ALIGNMENT_KEY) || '{}');
+    const today = getTodayKey();
+    const todayScores = alignmentData[today] || {};
+
+    if (values.length === 0) return;
+
+    const center = 150;
+    const maxRadius = 120;
+    const angleStep = (2 * Math.PI) / values.length;
+
+    const axesGroup = document.getElementById('values-axes');
+    const labelsGroup = document.getElementById('values-labels');
+    axesGroup.innerHTML = '';
+    labelsGroup.innerHTML = '';
+
+    // Draw axes and labels
+    values.forEach((value, i) => {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = center + Math.cos(angle) * maxRadius;
+        const y = center + Math.sin(angle) * maxRadius;
+
+        // Axis line
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('class', 'values-radar-axis');
+        line.setAttribute('x1', center);
+        line.setAttribute('y1', center);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', y);
+        axesGroup.appendChild(line);
+
+        // Label
+        const labelX = center + Math.cos(angle) * (maxRadius + 20);
+        const labelY = center + Math.sin(angle) * (maxRadius + 20);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'values-label');
+        text.setAttribute('x', labelX);
+        text.setAttribute('y', labelY);
+        text.setAttribute('dominant-baseline', 'middle');
+        text.textContent = value;
+        labelsGroup.appendChild(text);
+    });
+
+    // Draw data shape
+    const points = values.map((value, i) => {
+        const score = todayScores[value] !== undefined ? todayScores[value] : 0;
+        const radius = (score / 100) * maxRadius;
+        const angle = i * angleStep - Math.PI / 2;
+        const x = center + Math.cos(angle) * radius;
+        const y = center + Math.sin(angle) * radius;
+        return `${x},${y}`;
+    }).join(' ');
+
+    document.getElementById('values-data-shape').setAttribute('points', points);
+
+    // Calculate average
+    const scores = Object.values(todayScores);
+    const avg = scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : 0;
+    document.getElementById('values-avg-score').textContent = avg + '%';
+}
+
+// ============================================
 // Initialize
 // ============================================
 
@@ -640,6 +1289,7 @@ function init() {
     updateGreeting();
     setupTabNavigation();
     setupDomainPanel();
+    setupToolPanels();
     setupChat();
     setupQuickCheckin();
     setupClearHistory();
