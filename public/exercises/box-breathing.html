@@ -155,50 +155,12 @@
             height: 0%;
         }
 
-        /* Tick marks - subtle second indicators */
-        .tick-marks {
-            position: absolute;
-            z-index: 1;
-        }
-
-        .tick-marks.horizontal {
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 25%;
-        }
-
-        .tick-marks.horizontal.bottom {
-            top: auto;
-            bottom: 0;
-        }
-
-        .tick-marks.vertical {
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 25% 0;
-        }
-
-        .tick-marks.vertical.left {
-            left: 0;
-        }
-
-        .tick-marks.vertical.right {
-            right: 0;
-        }
-
+        /* Tick marks - subtle second indicators at 25%, 50%, 75% */
         .tick {
-            width: 2px;
-            height: 100%;
+            position: absolute;
             background: rgba(224, 122, 95, 0.15);
             transition: background 0.2s ease, box-shadow 0.2s ease;
+            z-index: 1;
         }
 
         .tick.lit {
@@ -206,10 +168,35 @@
             box-shadow: 0 0 8px var(--breath);
         }
 
-        .tick-marks.vertical .tick {
+        /* Horizontal ticks (top/bottom edges) */
+        .edge-track.top .tick,
+        .edge-track.bottom .tick {
+            width: 2px;
+            height: 100%;
+        }
+
+        .edge-track.top .tick:nth-child(1) { left: 25%; }
+        .edge-track.top .tick:nth-child(2) { left: 50%; }
+        .edge-track.top .tick:nth-child(3) { left: 75%; }
+
+        .edge-track.bottom .tick:nth-child(1) { right: 25%; }
+        .edge-track.bottom .tick:nth-child(2) { right: 50%; }
+        .edge-track.bottom .tick:nth-child(3) { right: 75%; }
+
+        /* Vertical ticks (right/left edges) */
+        .edge-track.right .tick,
+        .edge-track.left .tick {
             width: 100%;
             height: 2px;
         }
+
+        .edge-track.right .tick:nth-child(1) { top: 25%; }
+        .edge-track.right .tick:nth-child(2) { top: 50%; }
+        .edge-track.right .tick:nth-child(3) { top: 75%; }
+
+        .edge-track.left .tick:nth-child(1) { bottom: 25%; }
+        .edge-track.left .tick:nth-child(2) { bottom: 50%; }
+        .edge-track.left .tick:nth-child(3) { bottom: 75%; }
 
         /* Corner dots - FIXED at full size */
         .corner {
@@ -457,37 +444,29 @@
 
             <!-- Fixed outer frame with edge timers -->
             <div class="box-frame">
-                <!-- Edge tracks with progress -->
+                <!-- Edge tracks with progress and ticks -->
                 <div class="edge-track top" data-edge="top">
-                    <div class="tick-marks horizontal">
-                        <span class="tick" data-tick="1"></span>
-                        <span class="tick" data-tick="2"></span>
-                        <span class="tick" data-tick="3"></span>
-                    </div>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
                     <div class="edge-progress" id="progress-top"></div>
                 </div>
                 <div class="edge-track right" data-edge="right">
-                    <div class="tick-marks vertical right">
-                        <span class="tick" data-tick="1"></span>
-                        <span class="tick" data-tick="2"></span>
-                        <span class="tick" data-tick="3"></span>
-                    </div>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
                     <div class="edge-progress" id="progress-right"></div>
                 </div>
                 <div class="edge-track bottom" data-edge="bottom">
-                    <div class="tick-marks horizontal bottom">
-                        <span class="tick" data-tick="1"></span>
-                        <span class="tick" data-tick="2"></span>
-                        <span class="tick" data-tick="3"></span>
-                    </div>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
                     <div class="edge-progress" id="progress-bottom"></div>
                 </div>
                 <div class="edge-track left" data-edge="left">
-                    <div class="tick-marks vertical left">
-                        <span class="tick" data-tick="1"></span>
-                        <span class="tick" data-tick="2"></span>
-                        <span class="tick" data-tick="3"></span>
-                    </div>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
+                    <span class="tick"></span>
                     <div class="edge-progress" id="progress-left"></div>
                 </div>
 
