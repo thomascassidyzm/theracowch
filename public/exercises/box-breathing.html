@@ -17,15 +17,11 @@
 
         :root {
             --bg: #0C0A09;
-            --bg-subtle: #1C1917;
             --text: #E7E5E4;
             --text-muted: #78716C;
             --breath: #E07A5F;
+            --breath-dim: rgba(224, 122, 95, 0.3);
             --breath-glow: rgba(224, 122, 95, 0.4);
-
-            /* Breath shape sizes */
-            --breath-min: 0.35;
-            --breath-max: 0.85;
         }
 
         html, body {
@@ -44,7 +40,6 @@
             min-height: 100dvh;
         }
 
-        /* ====== MAIN CONTAINER ====== */
         .container {
             display: flex;
             flex-direction: column;
@@ -56,170 +51,190 @@
         }
 
         /* ====== THE BOX ====== */
-        .box-wrapper {
+        .box-area {
             position: relative;
             width: min(280px, 70vw);
             height: min(280px, 70vw);
             margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .box {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ====== INNER BREATHING SHAPE ====== */
-        .breath-shape {
+        /* The breathing shape - this IS the box */
+        .breath-box {
             position: absolute;
-            top: 50%;
-            left: 50%;
             width: 100%;
             height: 100%;
-            transform: translate(-50%, -50%) scale(var(--breath-min));
+            transform: scale(0.4);
+            transition: transform 0.1s linear;
+        }
+
+        /* Subtle fill inside the box */
+        .breath-fill {
+            position: absolute;
+            inset: 4px;
             background: radial-gradient(
                 circle at 30% 30%,
-                rgba(224, 122, 95, 0.2) 0%,
-                rgba(224, 122, 95, 0.1) 40%,
-                rgba(224, 122, 95, 0.05) 70%,
+                rgba(224, 122, 95, 0.12) 0%,
+                rgba(224, 122, 95, 0.05) 50%,
                 transparent 100%
             );
-            border: 2px solid rgba(224, 122, 95, 0.25);
-            border-radius: 24px;
-            transition: transform 0.1s linear, box-shadow 0.3s ease, border-color 0.3s ease;
+            border-radius: 16px;
             pointer-events: none;
         }
 
-        .breath-shape.expanded {
-            border-color: rgba(224, 122, 95, 0.4);
-            box-shadow:
-                0 0 60px rgba(224, 122, 95, 0.15),
-                inset 0 0 40px rgba(224, 122, 95, 0.1);
-        }
-
-        /* Box edges - each side */
-        .box-edge {
+        /* Edge tracks (the dim background line) */
+        .edge-track {
             position: absolute;
-            background: var(--text-muted);
-            opacity: 0.3;
-            transition: opacity 0.3s ease, background 0.3s ease;
-            z-index: 2;
+            background: var(--breath-dim);
         }
 
-        .box-edge.active {
-            background: var(--breath);
-            opacity: 1;
-            box-shadow: 0 0 20px var(--breath-glow);
-        }
-
-        /* Top edge (INHALE) */
-        .box-edge.top {
+        .edge-track.top {
             top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             height: 4px;
-            border-radius: 2px;
         }
 
-        /* Right edge (HOLD) */
-        .box-edge.right {
+        .edge-track.right {
             top: 0;
             right: 0;
+            bottom: 0;
             width: 4px;
-            height: 100%;
-            border-radius: 2px;
         }
 
-        /* Bottom edge (EXHALE) */
-        .box-edge.bottom {
+        .edge-track.bottom {
             bottom: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             height: 4px;
-            border-radius: 2px;
         }
 
-        /* Left edge (HOLD) */
-        .box-edge.left {
+        .edge-track.left {
             top: 0;
             left: 0;
+            bottom: 0;
             width: 4px;
-            height: 100%;
-            border-radius: 2px;
         }
 
-        /* Progress indicator on active edge */
+        /* Progress bars (the bright moving line) */
         .edge-progress {
             position: absolute;
             background: var(--breath);
-            border-radius: 2px;
-            box-shadow: 0 0 15px var(--breath), 0 0 30px var(--breath-glow);
-            transition: none;
+            box-shadow: 0 0 12px var(--breath), 0 0 24px var(--breath-glow);
         }
 
-        .box-edge.top .edge-progress {
+        .edge-track.top .edge-progress {
+            top: 0;
+            left: 0;
             height: 100%;
             width: 0%;
+        }
+
+        .edge-track.right .edge-progress {
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 0%;
+        }
+
+        .edge-track.bottom .edge-progress {
+            bottom: 0;
+            right: 0;
+            height: 100%;
+            width: 0%;
+        }
+
+        .edge-track.left .edge-progress {
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+        }
+
+        /* Tick marks - subtle second indicators */
+        .tick-marks {
+            position: absolute;
+        }
+
+        .tick-marks.horizontal {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25%;
+        }
+
+        .tick-marks.horizontal.bottom {
+            top: auto;
+            bottom: 0;
+        }
+
+        .tick-marks.vertical {
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25% 0;
+        }
+
+        .tick-marks.vertical.left {
             left: 0;
         }
 
-        .box-edge.right .edge-progress {
-            width: 100%;
-            height: 0%;
-            top: 0;
-        }
-
-        .box-edge.bottom .edge-progress {
-            height: 100%;
-            width: 0%;
+        .tick-marks.vertical.right {
             right: 0;
         }
 
-        .box-edge.left .edge-progress {
+        .tick {
+            width: 2px;
+            height: 100%;
+            background: rgba(12, 10, 9, 0.5);
+        }
+
+        .tick-marks.vertical .tick {
             width: 100%;
-            height: 0%;
-            bottom: 0;
+            height: 2px;
         }
 
         /* Corner dots */
         .corner {
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background: var(--text-muted);
+            width: 10px;
+            height: 10px;
+            background: var(--breath-dim);
             border-radius: 50%;
-            opacity: 0.4;
             transform: translate(-50%, -50%);
             transition: all 0.3s ease;
-            z-index: 3;
         }
 
         .corner.active {
             background: var(--breath);
-            opacity: 1;
-            box-shadow: 0 0 20px var(--breath);
-            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 16px var(--breath);
+            transform: translate(-50%, -50%) scale(1.2);
         }
 
-        .corner.top-left { top: 0; left: 0; }
-        .corner.top-right { top: 0; right: 0; transform: translate(50%, -50%); }
-        .corner.top-right.active { transform: translate(50%, -50%) scale(1.3); }
-        .corner.bottom-right { bottom: 0; right: 0; transform: translate(50%, 50%); }
-        .corner.bottom-right.active { transform: translate(50%, 50%) scale(1.3); }
-        .corner.bottom-left { bottom: 0; left: 0; transform: translate(-50%, 50%); }
-        .corner.bottom-left.active { transform: translate(-50%, 50%) scale(1.3); }
+        .corner.tl { top: 0; left: 0; }
+        .corner.tr { top: 0; left: 100%; }
+        .corner.br { top: 100%; left: 100%; }
+        .corner.bl { top: 100%; left: 0; }
 
-        /* Side labels */
+        /* Side labels - outside the box area */
         .side-label {
             position: absolute;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: var(--text-muted);
-            opacity: 0.5;
+            opacity: 0.4;
             transition: all 0.3s ease;
-            z-index: 4;
+            pointer-events: none;
         }
 
         .side-label.active {
@@ -227,52 +242,31 @@
             opacity: 1;
         }
 
-        .side-label.top {
-            top: -2rem;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .side-label.right {
-            right: -3rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .side-label.bottom {
-            bottom: -2rem;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .side-label.left {
-            left: -3rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+        .side-label.top { top: -2.5rem; left: 50%; transform: translateX(-50%); }
+        .side-label.right { right: -2.5rem; top: 50%; transform: translateY(-50%); }
+        .side-label.bottom { bottom: -2.5rem; left: 50%; transform: translateX(-50%); }
+        .side-label.left { left: -2.5rem; top: 50%; transform: translateY(-50%); }
 
         /* Center content */
-        .box-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .center-content {
+            position: relative;
+            z-index: 10;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            z-index: 5;
+            gap: 0.25rem;
+            pointer-events: none;
         }
 
         .phase-word {
-            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-size: clamp(2rem, 8vw, 3rem);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             color: var(--text);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
         }
 
         .phase-word.visible {
@@ -280,21 +274,21 @@
         }
 
         .countdown {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--breath);
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
         }
 
-        /* Start state - shows tap instruction */
         .start-instruction {
-            font-size: clamp(1.25rem, 4vw, 1.5rem);
+            font-size: clamp(1rem, 4vw, 1.25rem);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text);
+            pointer-events: auto;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease;
         }
 
         .start-instruction:hover {
@@ -345,15 +339,14 @@
         .hint {
             font-size: 0.8rem;
             color: var(--text-muted);
-            text-transform: lowercase;
         }
 
         .hint.hidden {
             visibility: hidden;
         }
 
-        /* ====== END OVERLAY ====== */
-        .end-overlay {
+        /* ====== OVERLAYS ====== */
+        .overlay {
             position: fixed;
             inset: 0;
             background: var(--bg);
@@ -368,19 +361,23 @@
             z-index: 100;
         }
 
-        .end-overlay.active {
+        .overlay.active {
             opacity: 1;
             visibility: visible;
         }
 
-        .end-message {
+        .pause-overlay {
+            background: rgba(12, 10, 9, 0.95);
+        }
+
+        .overlay-title {
             font-size: clamp(2rem, 6vw, 3rem);
             font-weight: 900;
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
 
-        .end-submessage {
+        .overlay-subtitle {
             font-size: 1rem;
             color: var(--text-muted);
             margin-bottom: 2rem;
@@ -400,113 +397,48 @@
             font-size: 2rem;
             font-weight: 900;
             color: var(--breath);
-            margin-bottom: 0.25rem;
         }
 
         .summary-label {
             font-size: 0.75rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-
-        .end-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .end-btn {
-            background: transparent;
-            border: 3px solid var(--text-muted);
-            border-radius: 16px;
-            font-family: inherit;
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .end-btn.primary {
-            background: var(--breath);
-            border-color: var(--breath);
-            color: var(--bg);
-        }
-
-        .end-btn.secondary {
-            color: var(--text-muted);
-        }
-
-        .end-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .end-btn.primary:hover {
-            box-shadow: 4px 4px 0 0 rgba(224, 122, 95, 0.3);
-        }
-
-        .end-btn.secondary:hover {
-            border-color: var(--text);
-            color: var(--text);
-        }
-
-        /* ====== PAUSE OVERLAY ====== */
-        .pause-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(12, 10, 9, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            z-index: 100;
-        }
-
-        .pause-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .pause-text {
-            font-size: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
             letter-spacing: 0.1em;
-            margin-bottom: 2rem;
         }
 
-        .pause-actions {
+        .overlay-actions {
             display: flex;
             gap: 1rem;
         }
 
-        .pause-btn {
+        .btn {
             background: transparent;
             border: 3px solid var(--text-muted);
             border-radius: 16px;
-            color: var(--text);
             font-family: inherit;
             font-size: 1rem;
             font-weight: 700;
             text-transform: uppercase;
-            padding: 0.75rem 1.5rem;
             cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-muted);
             transition: all 0.3s ease;
         }
 
-        .pause-btn:hover {
+        .btn:hover {
             border-color: var(--text);
+            color: var(--text);
             transform: translateY(-2px);
         }
 
-        .pause-btn.primary {
+        .btn.primary {
             background: var(--breath);
             border-color: var(--breath);
             color: var(--bg);
+        }
+
+        .btn.primary:hover {
+            box-shadow: 4px 4px 0 0 var(--breath-glow);
         }
 
         /* Accessibility */
@@ -522,89 +454,101 @@
             border: 0;
         }
 
-        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
-            .breath-shape,
-            .edge-progress,
-            .corner,
-            .side-label,
-            .box-edge {
+            .breath-box, .corner, .side-label, .phase-word {
                 transition: none;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Screen reader announcements -->
     <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
 
     <div class="container">
-        <!-- THE BOX -->
-        <div class="box-wrapper">
-            <div class="box" id="box">
-                <!-- Inner breathing shape -->
-                <div class="breath-shape" id="breathShape"></div>
+        <div class="box-area" id="boxArea">
+            <!-- The breathing box - scales up and down -->
+            <div class="breath-box" id="breathBox">
+                <!-- Inner fill -->
+                <div class="breath-fill"></div>
 
-                <!-- Four edges -->
-                <div class="box-edge top" data-phase="0">
+                <!-- Edge tracks with progress -->
+                <div class="edge-track top" data-edge="top">
+                    <div class="tick-marks horizontal">
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                    </div>
                     <div class="edge-progress" id="progress-top"></div>
                 </div>
-                <div class="box-edge right" data-phase="1">
+                <div class="edge-track right" data-edge="right">
+                    <div class="tick-marks vertical right">
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                    </div>
                     <div class="edge-progress" id="progress-right"></div>
                 </div>
-                <div class="box-edge bottom" data-phase="2">
+                <div class="edge-track bottom" data-edge="bottom">
+                    <div class="tick-marks horizontal bottom">
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                    </div>
                     <div class="edge-progress" id="progress-bottom"></div>
                 </div>
-                <div class="box-edge left" data-phase="3">
+                <div class="edge-track left" data-edge="left">
+                    <div class="tick-marks vertical left">
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                        <span class="tick"></span>
+                    </div>
                     <div class="edge-progress" id="progress-left"></div>
                 </div>
 
-                <!-- Corner dots -->
-                <div class="corner top-left" data-corner="0"></div>
-                <div class="corner top-right" data-corner="1"></div>
-                <div class="corner bottom-right" data-corner="2"></div>
-                <div class="corner bottom-left" data-corner="3"></div>
+                <!-- Corners -->
+                <div class="corner tl" data-corner="0"></div>
+                <div class="corner tr" data-corner="1"></div>
+                <div class="corner br" data-corner="2"></div>
+                <div class="corner bl" data-corner="3"></div>
+            </div>
 
-                <!-- Side labels -->
-                <span class="side-label top" data-phase="0">IN</span>
-                <span class="side-label right" data-phase="1">HOLD</span>
-                <span class="side-label bottom" data-phase="2">OUT</span>
-                <span class="side-label left" data-phase="3">HOLD</span>
+            <!-- Labels outside box area -->
+            <span class="side-label top">IN</span>
+            <span class="side-label right">HOLD</span>
+            <span class="side-label bottom">OUT</span>
+            <span class="side-label left">HOLD</span>
 
-                <!-- Center -->
-                <div class="box-center">
-                    <span class="start-instruction" id="startInstruction">TAP TO BEGIN</span>
-                    <span class="phase-word" id="phaseWord">IN</span>
-                    <span class="countdown" id="countdown" style="display: none;">4</span>
-                </div>
+            <!-- Center text -->
+            <div class="center-content">
+                <span class="start-instruction" id="startInstruction">TAP TO BEGIN</span>
+                <span class="phase-word" id="phaseWord">IN</span>
+                <span class="countdown" id="countdown" style="display: none;">4</span>
             </div>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
             <div class="duration-select" id="durationSelect">
                 <button class="duration-btn" data-minutes="2">2 min</button>
                 <button class="duration-btn active" data-minutes="5">5 min</button>
                 <button class="duration-btn" data-minutes="10">10 min</button>
             </div>
-            <span class="hint" id="hint">tap box to pause</span>
+            <span class="hint" id="hint">tap to pause</span>
         </div>
     </div>
 
-    <!-- PAUSE OVERLAY -->
-    <div class="pause-overlay" id="pauseOverlay">
-        <span class="pause-text">Paused</span>
-        <div class="pause-actions">
-            <button class="pause-btn" id="endSessionBtn">End</button>
-            <button class="pause-btn primary" id="resumeBtn">Continue</button>
+    <!-- Pause Overlay -->
+    <div class="overlay pause-overlay" id="pauseOverlay">
+        <h2 class="overlay-title">Paused</h2>
+        <div class="overlay-actions">
+            <button class="btn" id="endSessionBtn">End</button>
+            <button class="btn primary" id="resumeBtn">Continue</button>
         </div>
     </div>
 
-    <!-- END OVERLAY -->
-    <div class="end-overlay" id="endOverlay">
-        <h2 class="end-message">Well Done</h2>
-        <p class="end-submessage">Take this calm with you</p>
-
+    <!-- End Overlay -->
+    <div class="overlay" id="endOverlay">
+        <h2 class="overlay-title">Well Done</h2>
+        <p class="overlay-subtitle">Take this calm with you</p>
         <div class="session-summary">
             <div class="summary-item">
                 <div class="summary-value" id="finalMinutes">5</div>
@@ -615,27 +559,24 @@
                 <div class="summary-label">Cycles</div>
             </div>
         </div>
-
-        <div class="end-actions">
-            <button class="end-btn secondary" id="homeBtn">Home</button>
-            <button class="end-btn primary" id="againBtn">Again</button>
+        <div class="overlay-actions">
+            <button class="btn" id="homeBtn">Home</button>
+            <button class="btn primary" id="againBtn">Again</button>
         </div>
     </div>
 
     <script>
-        // ====== CONFIG ======
-        const PHASE_DURATION = 4000; // 4 seconds per phase
-        const BREATH_MIN = 0.35;
-        const BREATH_MAX = 0.85;
+        const PHASE_DURATION = 4000;
+        const SCALE_MIN = 0.4;
+        const SCALE_MAX = 1.0;
 
         const PHASES = [
-            { name: 'IN', edge: 'top', corner: 0, breathAction: 'expand' },
-            { name: 'HOLD', edge: 'right', corner: 1, breathAction: 'hold-full' },
-            { name: 'OUT', edge: 'bottom', corner: 2, breathAction: 'contract' },
-            { name: 'HOLD', edge: 'left', corner: 3, breathAction: 'hold-empty' }
+            { name: 'IN', edge: 'top', corner: 0, action: 'expand' },
+            { name: 'HOLD', edge: 'right', corner: 1, action: 'hold-full' },
+            { name: 'OUT', edge: 'bottom', corner: 2, action: 'contract' },
+            { name: 'HOLD', edge: 'left', corner: 3, action: 'hold-empty' }
         ];
 
-        // ====== STATE ======
         const state = {
             duration: 5 * 60 * 1000,
             elapsed: 0,
@@ -647,12 +588,12 @@
             phaseStartTime: null,
             lastTick: null,
             animationId: null,
-            breathScale: BREATH_MIN
+            scale: SCALE_MIN
         };
 
-        // ====== DOM ======
-        const box = document.getElementById('box');
-        const breathShape = document.getElementById('breathShape');
+        // DOM
+        const boxArea = document.getElementById('boxArea');
+        const breathBox = document.getElementById('breathBox');
         const startInstruction = document.getElementById('startInstruction');
         const phaseWord = document.getElementById('phaseWord');
         const countdownEl = document.getElementById('countdown');
@@ -661,13 +602,6 @@
         const pauseOverlay = document.getElementById('pauseOverlay');
         const endOverlay = document.getElementById('endOverlay');
         const announcer = document.getElementById('announcer');
-
-        const edges = {
-            top: document.querySelector('.box-edge.top'),
-            right: document.querySelector('.box-edge.right'),
-            bottom: document.querySelector('.box-edge.bottom'),
-            left: document.querySelector('.box-edge.left')
-        };
 
         const progressBars = {
             top: document.getElementById('progress-top'),
@@ -689,8 +623,8 @@
             });
         });
 
-        // Box click - start or pause
-        box.addEventListener('click', () => {
+        // Start/pause on box click
+        boxArea.addEventListener('click', () => {
             if (!state.isRunning) {
                 startSession();
             } else if (!state.isPaused) {
@@ -698,44 +632,31 @@
             }
         });
 
-        // Pause overlay buttons
+        // Overlay buttons
         document.getElementById('resumeBtn').addEventListener('click', resumeSession);
         document.getElementById('endSessionBtn').addEventListener('click', endSession);
-
-        // End overlay buttons
         document.getElementById('againBtn').addEventListener('click', resetToStart);
         document.getElementById('homeBtn').addEventListener('click', () => {
             window.location.href = '/app.html#imagine';
         });
 
-        // ====== FUNCTIONS ======
-        function announce(message) {
-            announcer.textContent = message;
+        function announce(msg) {
+            announcer.textContent = msg;
         }
 
-        function updateBreathShape(scale) {
-            state.breathScale = scale;
-            breathShape.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
-            // Add/remove expanded class for glow effect
-            if (scale > (BREATH_MIN + BREATH_MAX) / 2) {
-                breathShape.classList.add('expanded');
-            } else {
-                breathShape.classList.remove('expanded');
-            }
+        function setScale(scale) {
+            state.scale = scale;
+            breathBox.style.transform = `scale(${scale})`;
         }
 
         function startSession() {
-            // Reset state
             state.elapsed = 0;
             state.phase = 0;
             state.cycles = 0;
             state.countdown = 4;
             state.isPaused = false;
             state.isRunning = true;
-            state.breathScale = BREATH_MIN;
 
-            // Update UI
             startInstruction.classList.add('hidden');
             phaseWord.classList.add('visible');
             countdownEl.style.display = 'block';
@@ -743,24 +664,15 @@
             durationSelect.style.pointerEvents = 'none';
             hint.classList.remove('hidden');
 
-            // Reset breath shape to small
-            updateBreathShape(BREATH_MIN);
-
-            // Reset all progress bars
-            Object.values(progressBars).forEach(bar => {
-                bar.style.width = '0%';
-                bar.style.height = '0%';
-            });
-
-            // Set initial phase
+            setScale(SCALE_MIN);
+            resetAllProgress();
             updatePhase();
 
-            // Start the loop
             state.phaseStartTime = performance.now();
             state.lastTick = performance.now();
             tick();
 
-            announce('Breathing session started. Breathe in.');
+            announce('Breathing started. Breathe in.');
         }
 
         function tick() {
@@ -769,34 +681,26 @@
             const now = performance.now();
 
             if (!state.isPaused) {
-                const delta = now - state.lastTick;
-                state.elapsed += delta;
+                state.elapsed += now - state.lastTick;
 
-                // Check if session complete
                 if (state.elapsed >= state.duration) {
                     completeSession();
                     return;
                 }
 
-                // Update phase progress
                 const phaseElapsed = now - state.phaseStartTime;
-                const phaseProgress = Math.min(1, phaseElapsed / PHASE_DURATION);
+                const progress = Math.min(1, phaseElapsed / PHASE_DURATION);
 
-                // Update progress bar on edge
-                updateEdgeProgress(phaseProgress);
+                updateEdgeProgress(progress);
+                updateScale(progress);
 
-                // Update breath shape based on current phase
-                updateBreathForPhase(phaseProgress);
-
-                // Update countdown
                 const newCountdown = Math.max(1, 4 - Math.floor(phaseElapsed / 1000));
                 if (newCountdown !== state.countdown) {
                     state.countdown = newCountdown;
                     countdownEl.textContent = state.countdown;
                 }
 
-                // Check for phase transition
-                if (phaseProgress >= 1) {
+                if (progress >= 1) {
                     nextPhase();
                     state.phaseStartTime = now;
                 }
@@ -807,106 +711,87 @@
         }
 
         function updateEdgeProgress(progress) {
-            const phase = PHASES[state.phase];
-            const bar = progressBars[phase.edge];
+            const edge = PHASES[state.phase].edge;
+            const bar = progressBars[edge];
+            const pct = (progress * 100) + '%';
 
-            if (phase.edge === 'top') {
-                bar.style.width = (progress * 100) + '%';
-            } else if (phase.edge === 'right') {
-                bar.style.height = (progress * 100) + '%';
-            } else if (phase.edge === 'bottom') {
-                bar.style.width = (progress * 100) + '%';
-            } else if (phase.edge === 'left') {
-                bar.style.height = (progress * 100) + '%';
+            if (edge === 'top' || edge === 'bottom') {
+                bar.style.width = pct;
+            } else {
+                bar.style.height = pct;
             }
         }
 
-        function updateBreathForPhase(progress) {
-            const phase = PHASES[state.phase];
+        function updateScale(progress) {
+            const action = PHASES[state.phase].action;
             let newScale;
 
-            switch (phase.breathAction) {
+            switch (action) {
                 case 'expand':
-                    // IN: grow from min to max
-                    newScale = BREATH_MIN + (BREATH_MAX - BREATH_MIN) * progress;
+                    newScale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * progress;
                     break;
                 case 'hold-full':
-                    // HOLD after inhale: stay at max
-                    newScale = BREATH_MAX;
+                    newScale = SCALE_MAX;
                     break;
                 case 'contract':
-                    // OUT: shrink from max to min
-                    newScale = BREATH_MAX - (BREATH_MAX - BREATH_MIN) * progress;
+                    newScale = SCALE_MAX - (SCALE_MAX - SCALE_MIN) * progress;
                     break;
                 case 'hold-empty':
-                    // HOLD after exhale: stay at min
-                    newScale = BREATH_MIN;
+                    newScale = SCALE_MIN;
                     break;
                 default:
-                    newScale = state.breathScale;
+                    newScale = state.scale;
             }
 
-            updateBreathShape(newScale);
+            setScale(newScale);
+        }
+
+        function resetAllProgress() {
+            Object.values(progressBars).forEach(bar => {
+                bar.style.width = '0%';
+                bar.style.height = '0%';
+            });
         }
 
         function updatePhase() {
             const phase = PHASES[state.phase];
 
-            // Update edge highlighting
-            Object.values(edges).forEach(e => e.classList.remove('active'));
-            edges[phase.edge].classList.add('active');
+            // Reset progress bars
+            resetAllProgress();
 
-            // Update corner highlighting
+            // Update corners
             corners.forEach(c => c.classList.remove('active'));
             corners[phase.corner].classList.add('active');
 
-            // Update side labels
+            // Update labels
             sideLabels.forEach(l => l.classList.remove('active'));
             document.querySelector(`.side-label.${phase.edge}`).classList.add('active');
 
-            // Reset all progress bars
-            Object.values(progressBars).forEach(bar => {
-                bar.style.width = '0%';
-                bar.style.height = '0%';
-            });
-
-            // Update center word
+            // Update word
             phaseWord.classList.remove('visible');
             setTimeout(() => {
                 phaseWord.textContent = phase.name;
                 phaseWord.classList.add('visible');
-            }, 150);
+            }, 100);
 
-            // Reset countdown
             state.countdown = 4;
             countdownEl.textContent = '4';
 
-            // Haptic feedback
-            if (navigator.vibrate) {
-                navigator.vibrate(20);
-            }
+            if (navigator.vibrate) navigator.vibrate(15);
 
-            // Announce for screen readers
-            const announceText = phase.name === 'IN' ? 'Breathe in' :
-                                 phase.name === 'OUT' ? 'Breathe out' : 'Hold';
-            announce(announceText);
+            announce(phase.name === 'IN' ? 'Breathe in' : phase.name === 'OUT' ? 'Breathe out' : 'Hold');
         }
 
         function nextPhase() {
             state.phase = (state.phase + 1) % PHASES.length;
-
-            // Count cycle when we return to start
-            if (state.phase === 0) {
-                state.cycles++;
-            }
-
+            if (state.phase === 0) state.cycles++;
             updatePhase();
         }
 
         function pauseSession() {
             state.isPaused = true;
             pauseOverlay.classList.add('active');
-            announce('Session paused');
+            announce('Paused');
         }
 
         function resumeSession() {
@@ -914,7 +799,7 @@
             state.phaseStartTime = performance.now() - ((4 - state.countdown) * 1000);
             state.lastTick = performance.now();
             pauseOverlay.classList.remove('active');
-            announce('Session resumed');
+            announce('Resumed');
         }
 
         function endSession() {
@@ -922,8 +807,7 @@
             cancelAnimationFrame(state.animationId);
             pauseOverlay.classList.remove('active');
 
-            const minutes = Math.round(state.elapsed / 60000);
-            document.getElementById('finalMinutes').textContent = minutes || '<1';
+            document.getElementById('finalMinutes').textContent = Math.round(state.elapsed / 60000) || '<1';
             document.getElementById('finalCycles').textContent = state.cycles;
 
             endOverlay.classList.add('active');
@@ -934,22 +818,19 @@
             state.isRunning = false;
             cancelAnimationFrame(state.animationId);
 
-            const minutes = Math.round(state.elapsed / 60000);
-            document.getElementById('finalMinutes').textContent = minutes;
+            document.getElementById('finalMinutes').textContent = Math.round(state.elapsed / 60000);
             document.getElementById('finalCycles').textContent = state.cycles;
 
-            // Save to localStorage
-            const totalSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0) + 1;
-            localStorage.setItem('boxBreathingSessions', totalSessions);
+            localStorage.setItem('boxBreathingSessions',
+                (parseInt(localStorage.getItem('boxBreathingSessions') || 0) + 1).toString());
 
             endOverlay.classList.add('active');
-            announce('Session complete. Well done.');
+            announce('Complete. Well done.');
         }
 
         function resetToStart() {
             endOverlay.classList.remove('active');
 
-            // Reset UI
             startInstruction.classList.remove('hidden');
             phaseWord.classList.remove('visible');
             phaseWord.textContent = 'IN';
@@ -958,19 +839,11 @@
             durationSelect.style.pointerEvents = 'auto';
             hint.classList.add('hidden');
 
-            // Reset breath shape
-            updateBreathShape(BREATH_MIN);
-
-            // Reset visual state
-            Object.values(edges).forEach(e => e.classList.remove('active'));
-            Object.values(progressBars).forEach(bar => {
-                bar.style.width = '0%';
-                bar.style.height = '0%';
-            });
+            setScale(SCALE_MIN);
+            resetAllProgress();
             corners.forEach(c => c.classList.remove('active'));
             sideLabels.forEach(l => l.classList.remove('active'));
 
-            // Reset state
             state.isRunning = false;
             state.isPaused = false;
             state.phase = 0;
@@ -978,28 +851,19 @@
             state.elapsed = 0;
         }
 
-        // Keyboard support
+        // Keyboard
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
-                if (!state.isRunning) {
-                    startSession();
-                } else if (state.isPaused) {
-                    resumeSession();
-                } else {
-                    pauseSession();
-                }
+                if (!state.isRunning) startSession();
+                else if (state.isPaused) resumeSession();
+                else pauseSession();
             }
             if (e.code === 'Escape' && state.isRunning) {
-                if (state.isPaused) {
-                    endSession();
-                } else {
-                    pauseSession();
-                }
+                state.isPaused ? endSession() : pauseSession();
             }
         });
 
-        // Initialize hint as hidden until session starts
         hint.classList.add('hidden');
     </script>
 </body>
