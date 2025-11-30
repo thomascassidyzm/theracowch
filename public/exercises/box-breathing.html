@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Box Breathing - Cowch.app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Box Breathing - Cowch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,523 +14,411 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #0C0A09;
+            --bg-subtle: #1C1917;
+            --text: #E7E5E4;
+            --text-muted: #78716C;
+            --breath: #E07A5F;
+            --breath-glow: rgba(224, 122, 95, 0.4);
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1512;
-            color: #F5F0E8;
-            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 80px;
+            min-height: 100vh;
+            min-height: 100dvh;
         }
 
-        /* Ambient background */
-        .ambient-bg {
+        /* ====== SCREENS ====== */
+        .screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .ambient-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(212, 137, 106, 0.08) 0%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: ambientPulse 8s ease-in-out infinite;
-        }
-
-        @keyframes ambientPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-        }
-
-        /* Main container */
-        .container {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-            padding: 2rem;
-        }
-
-        /* Intro screen */
-        .intro-screen {
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .intro-screen h1 {
-            font-size: clamp(2.5rem, 8vw, 3.5rem);
-            font-weight: 900;
-            letter-spacing: -2px;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            color: #F5F0E8;
-            position: relative;
-            display: inline-block;
-        }
-
-        .intro-screen h1::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: #D4896A;
-            border-radius: 3px;
-            transform: rotate(-1deg);
-        }
-
-        .intro-screen p {
-            font-size: 1.1rem;
-            color: #b0a499;
-            margin-bottom: 3rem;
-            line-height: 1.6;
-        }
-
-        .duration-options {
+            inset: 0;
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ====== START SCREEN ====== */
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s ease 0.2s forwards;
+        }
+
+        .start-subtitle {
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 3rem;
+            max-width: 320px;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s ease 0.4s forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .duration-select {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.6s forwards;
         }
 
         .duration-btn {
-            background: #2a2320;
-            border: 3px solid #3a3533;
-            border-radius: 16px;
-            color: #F5F0E8;
-            padding: 1rem 2rem;
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            font-family: inherit;
             font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
+            border-radius: 100px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .duration-btn:hover {
-            transform: translateY(-4px);
-            border-color: #D4896A;
-            box-shadow: 6px 6px 0 0 rgba(212, 137, 106, 0.2);
+            border-color: var(--text);
+            color: var(--text);
         }
 
         .duration-btn.active {
-            background: #D4896A;
-            border-color: #C47A5D;
-            color: #1a1512;
+            background: var(--text);
+            border-color: var(--text);
+            color: var(--bg);
         }
 
         .begin-btn {
-            background: #D4896A;
-            border: 4px solid #C47A5D;
+            background: var(--breath);
+            border: 4px solid var(--breath);
             border-radius: 20px;
-            color: #1a1512;
-            padding: 1.25rem 3.5rem;
-            font-size: 1.3rem;
-            font-weight: 900;
+            color: var(--bg);
+            font-family: inherit;
+            font-size: 1.2rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
+            padding: 1rem 2.5rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.8s forwards;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 6px 6px 0 0 #2a2320;
+            box-shadow: 6px 6px 0 0 rgba(224, 122, 95, 0.3);
         }
 
         .begin-btn:hover {
-            transform: translateY(-4px) rotate(-1deg);
-            box-shadow: 10px 10px 0 0 rgba(212, 137, 106, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 8px 8px 0 0 rgba(224, 122, 95, 0.4);
         }
 
-        /* Breathing screen */
+        .begin-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 4px 4px 0 0 rgba(224, 122, 95, 0.3);
+        }
+
+        /* ====== BREATHING SCREEN ====== */
         .breathing-screen {
-            display: none;
-            animation: fadeIn 0.8s ease-out;
+            cursor: pointer;
         }
 
-        .breathing-screen.active {
-            display: block;
-        }
-
-        /* Stats bar */
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 1rem 1.5rem;
-            background: #2a2320;
-            border: 3px solid #3a3533;
-            border-radius: 16px;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #9a8f85;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #D4896A;
-        }
-
-        /* Breathing box container - glassmorphism */
-        .breathing-container {
+        /* The breathing shape */
+        .breath-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 2rem;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 40px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 0 60px rgba(212, 137, 106, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: min(70vw, 70vh, 320px);
+            height: min(70vw, 70vh, 320px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Throb animation for hold phases */
-        .breathing-container.throbbing {
-            animation: throb 1s ease-in-out infinite;
-        }
-
-        @keyframes throb {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow:
-                    0 8px 32px rgba(0, 0, 0, 0.3),
-                    inset 0 0 60px rgba(255, 100, 50, 0.1);
-            }
-            50% {
-                transform: scale(1.02);
-                box-shadow:
-                    0 12px 48px rgba(0, 0, 0, 0.4),
-                    inset 0 0 80px rgba(255, 100, 50, 0.2),
-                    0 0 40px rgba(255, 100, 50, 0.15);
-            }
-        }
-
-        /* The box SVG */
-        .breathing-box {
+        .breath-shape {
             width: 100%;
             height: 100%;
-        }
-
-        /* Background box outline */
-        .box-background {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.08);
-            stroke-width: 14;
-        }
-
-        /* Animated progress stroke */
-        .box-progress {
-            fill: none;
-            stroke: rgb(240, 196, 176); /* Start pale */
-            stroke-width: 14;
-            stroke-linecap: round;
-            /* Total perimeter ~935px */
-            stroke-dasharray: 935;
-            stroke-dashoffset: 935;
-            filter: drop-shadow(0 0 20px rgba(224, 120, 80, 0.6))
-                    drop-shadow(0 0 40px rgba(224, 120, 80, 0.3))
-                    drop-shadow(0 0 60px rgba(224, 120, 80, 0.15));
-        }
-
-        /* Inner breathing shape - mimics lungs filling/emptying */
-        .breath-shape {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            transform: translate(-50%, -50%) scale(0.4);
-            background: radial-gradient(ellipse at center,
-                rgba(255, 120, 80, 0.3) 0%,
-                rgba(255, 100, 60, 0.15) 50%,
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(224, 122, 95, 0.15) 0%,
+                rgba(224, 122, 95, 0.08) 50%,
                 transparent 70%
             );
-            border-radius: 50%;
+            border: 1px solid rgba(224, 122, 95, 0.3);
+            border-radius: 32px;
+            transform: scale(0.6);
             transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1),
-                        background 0.3s ease;
-            pointer-events: none;
+                        box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 4s ease;
+            box-shadow:
+                0 0 60px rgba(224, 122, 95, 0.1),
+                inset 0 0 60px rgba(224, 122, 95, 0.05);
         }
 
-        /* Expanded state - full lungs */
-        .breath-shape.expanded {
-            transform: translate(-50%, -50%) scale(1);
-            background: radial-gradient(ellipse at center,
-                rgba(255, 100, 50, 0.5) 0%,
-                rgba(255, 80, 40, 0.3) 40%,
-                rgba(255, 60, 30, 0.1) 70%,
-                transparent 85%
-            );
+        /* Breath states */
+        .breath-shape.inhale {
+            transform: scale(1);
+            border-color: rgba(224, 122, 95, 0.5);
+            box-shadow:
+                0 0 100px rgba(224, 122, 95, 0.25),
+                0 0 200px rgba(224, 122, 95, 0.1),
+                inset 0 0 80px rgba(224, 122, 95, 0.1);
         }
 
-        /* Contracted state - empty lungs */
-        .breath-shape.contracted {
-            transform: translate(-50%, -50%) scale(0.4);
-            background: radial-gradient(ellipse at center,
-                rgba(180, 140, 120, 0.2) 0%,
-                rgba(160, 120, 100, 0.1) 50%,
-                transparent 70%
-            );
-        }
-
-        /* Hold states - add subtle pulse */
         .breath-shape.hold-full {
-            transform: translate(-50%, -50%) scale(1);
-            animation: breathPulse 1.5s ease-in-out infinite;
+            transform: scale(1);
+            border-color: rgba(224, 122, 95, 0.4);
+            box-shadow:
+                0 0 80px rgba(224, 122, 95, 0.2),
+                inset 0 0 60px rgba(224, 122, 95, 0.08);
+        }
+
+        .breath-shape.exhale {
+            transform: scale(0.6);
+            border-color: rgba(224, 122, 95, 0.2);
+            box-shadow:
+                0 0 40px rgba(224, 122, 95, 0.08),
+                inset 0 0 40px rgba(224, 122, 95, 0.03);
         }
 
         .breath-shape.hold-empty {
-            transform: translate(-50%, -50%) scale(0.4);
-            animation: breathPulseSmall 1.5s ease-in-out infinite;
+            transform: scale(0.6);
+            border-color: rgba(224, 122, 95, 0.2);
+            box-shadow:
+                0 0 40px rgba(224, 122, 95, 0.08),
+                inset 0 0 40px rgba(224, 122, 95, 0.03);
         }
 
-        @keyframes breathPulse {
-            0%, 100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.05);
-                opacity: 0.85;
-            }
-        }
-
-        @keyframes breathPulseSmall {
-            0%, 100% {
-                transform: translate(-50%, -50%) scale(0.4);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(0.45);
-                opacity: 0.7;
-            }
-        }
-
-        /* Glow effect on the leading edge */
-        .box-glow {
+        /* Phase word */
+        .phase-word {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, #E39B7F 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0.8;
-            filter: blur(4px);
-        }
-
-        /* Phase labels on each side */
-        .box-labels {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.5s ease;
             pointer-events: none;
         }
 
-        .box-label {
+        .phase-word.visible {
+            opacity: 1;
+        }
+
+        /* Countdown */
+        .countdown {
             position: absolute;
-            font-size: 0.65rem;
+            bottom: -4rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #5a5350;
-            transition: color 0.3s ease, transform 0.3s ease;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
         }
 
-        .box-label.active {
-            color: #D4896A;
-            transform: scale(1.1);
-        }
-
-        .box-label.top {
-            top: -28px;
+        /* Tap to exit hint */
+        .exit-hint {
+            position: fixed;
+            bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-        }
-        .box-label.top.active {
-            transform: translateX(-50%) scale(1.1);
-        }
-
-        .box-label.right {
-            right: -45px;
-            top: 50%;
-            transform: translateY(-50%) rotate(90deg);
-        }
-        .box-label.right.active {
-            transform: translateY(-50%) rotate(90deg) scale(1.1);
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: lowercase;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
 
-        .box-label.bottom {
-            bottom: -28px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .box-label.bottom.active {
-            transform: translateX(-50%) scale(1.1);
+        .breathing-screen.active .exit-hint {
+            opacity: 1;
+            transition-delay: 3s;
         }
 
-        .box-label.left {
-            left: -38px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-        }
-        .box-label.left.active {
-            transform: translateY(-50%) rotate(-90deg) scale(1.1);
-        }
-
-        /* Phase indicator */
-        .phase-indicator {
-            font-size: clamp(2rem, 6vw, 2.5rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 1.5rem;
-            color: #D4896A;
-        }
-
-
-        .phase-instruction {
-            font-size: 1rem;
-            color: #9a8f85;
-            margin-bottom: 2.5rem;
-            min-height: 1.5em;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .control-btn {
-            background: #2a2320;
-            border: 3px solid #3a3533;
-            border-radius: 16px;
-            color: #F5F0E8;
-            padding: 0.875rem 1.75rem;
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 110px;
-        }
-
-        .control-btn:hover {
-            transform: translateY(-3px);
-            border-color: #D4896A;
-        }
-
-        .control-btn.pause {
-            border-color: #7EA88B;
-        }
-
-        .control-btn.stop {
-            border-color: #5a5350;
-            color: #9a8f85;
-        }
-
-        /* Completion screen */
-        .completion-screen {
-            display: none;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .completion-screen.active {
-            display: block;
-        }
-
-        .completion-screen h2 {
-            font-size: clamp(2rem, 6vw, 2.5rem);
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            color: #F5F0E8;
-        }
-
-        .completion-screen > p {
-            color: #9a8f85;
-            margin-bottom: 2rem;
-        }
-
-        .session-stats {
-            background: #2a2320;
-            border: 3px solid #3a3533;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin: 0 auto 2rem;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            max-width: 400px;
-        }
-
-        .session-stat {
+        /* ====== END SCREEN ====== */
+        .end-screen {
             text-align: center;
         }
 
-        .session-stat-value {
-            font-size: 1.75rem;
+        .end-message {
+            font-size: clamp(2rem, 6vw, 3rem);
             font-weight: 900;
-            color: #D4896A;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s ease 0.2s forwards;
+        }
+
+        .end-submessage {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.4s forwards;
+        }
+
+        .session-summary {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.6s forwards;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            color: var(--breath);
             margin-bottom: 0.25rem;
         }
 
-        .session-stat-label {
-            font-size: 0.7rem;
+        .summary-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #9a8f85;
+            letter-spacing: 0.15em;
         }
 
-        .restart-btn {
-            background: #D4896A;
-            border: 4px solid #C47A5D;
-            border-radius: 20px;
-            color: #1a1512;
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 900;
+        .end-actions {
+            display: flex;
+            gap: 1rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.8s forwards;
+        }
+
+        .end-btn {
+            background: transparent;
+            border: 3px solid var(--text-muted);
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 6px 6px 0 0 #2a2320;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        .restart-btn:hover {
-            transform: translateY(-4px) rotate(-1deg);
-            box-shadow: 10px 10px 0 0 rgba(212, 137, 106, 0.3);
+        .end-btn.primary {
+            background: var(--breath);
+            border-color: var(--breath);
+            color: var(--bg);
+        }
+
+        .end-btn.secondary {
+            color: var(--text-muted);
+        }
+
+        .end-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .end-btn.primary:hover {
+            box-shadow: 4px 4px 0 0 rgba(224, 122, 95, 0.3);
+        }
+
+        .end-btn.secondary:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        /* ====== PAUSE OVERLAY ====== */
+        .pause-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(12, 10, 9, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            z-index: 100;
+        }
+
+        .pause-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pause-text {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        .pause-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .pause-btn {
+            background: transparent;
+            border: 3px solid var(--text-muted);
+            border-radius: 16px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pause-btn:hover {
+            border-color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        .pause-btn.primary {
+            background: var(--breath);
+            border-color: var(--breath);
+            color: var(--bg);
+        }
+
+        .pause-btn.primary:hover {
+            box-shadow: 4px 4px 0 0 rgba(224, 122, 95, 0.3);
         }
 
         /* Accessibility */
@@ -540,520 +431,325 @@
             overflow: hidden;
             clip: rect(0, 0, 0, 0);
             white-space: nowrap;
-            border-width: 0;
+            border: 0;
         }
 
-        /* Hidden class */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #2a2320;
-            border-top: 3px solid #3a3533;
-            padding: 0.75rem 1rem;
-            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            text-decoration: none;
-            color: #9a8f85;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            padding: 0.5rem;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: #D4896A;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* Mobile adjustments */
-        @media (max-width: 480px) {
-            .breathing-container {
-                width: 260px;
-                height: 260px;
-                padding: 15px;
-                border-radius: 32px;
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .breath-shape {
+                transition: none;
             }
 
-            .stats-bar {
-                padding: 0.75rem 1rem;
-            }
-
-            .stat-value {
-                font-size: 1rem;
-            }
-
-            .box-label {
-                font-size: 0.55rem;
-            }
-
-            .box-label.right {
-                right: -38px;
-            }
-
-            .box-label.left {
-                left: -32px;
+            .phase-word {
+                transition: none;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Ambient background -->
-    <div class="ambient-bg">
-        <div class="ambient-glow"></div>
+    <!-- Screen reader announcements -->
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+
+    <!-- START SCREEN -->
+    <div class="screen start-screen active" id="startScreen">
+        <h1 class="start-title">Box Breathing</h1>
+        <p class="start-subtitle">Four counts in. Four counts hold. Four counts out. Four counts hold.</p>
+
+        <div class="duration-select">
+            <button class="duration-btn" data-minutes="2">2 min</button>
+            <button class="duration-btn active" data-minutes="5">5 min</button>
+            <button class="duration-btn" data-minutes="10">10 min</button>
+        </div>
+
+        <button class="begin-btn" id="beginBtn">Begin</button>
     </div>
 
-    <!-- Screen reader announcements -->
-    <div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-
-    <div class="container">
-        <!-- Intro Screen -->
-        <div class="intro-screen" id="introScreen">
-            <h1>Box Breathing</h1>
-            <p>A powerful technique to reduce stress and improve focus. Breathe in, hold, breathe out, hold — each for 4 seconds.</p>
-
-            <div class="duration-options">
-                <button class="duration-btn" data-duration="120">2 Min</button>
-                <button class="duration-btn active" data-duration="300">5 Min</button>
-                <button class="duration-btn" data-duration="600">10 Min</button>
-            </div>
-
-            <button class="begin-btn" id="beginBtn">Begin</button>
+    <!-- BREATHING SCREEN -->
+    <div class="screen breathing-screen" id="breathingScreen">
+        <div class="breath-container">
+            <div class="breath-shape" id="breathShape"></div>
+            <span class="phase-word" id="phaseWord">IN</span>
+            <span class="countdown" id="countdown">4</span>
         </div>
+        <span class="exit-hint">tap anywhere to pause</span>
+    </div>
 
-        <!-- Breathing Screen -->
-        <div class="breathing-screen" id="breathingScreen">
-            <div class="stats-bar">
-                <div class="stat">
-                    <div class="stat-label">Elapsed</div>
-                    <div class="stat-value" id="elapsedTime">0:00</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Cycles</div>
-                    <div class="stat-value" id="cyclesCount">0</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Remaining</div>
-                    <div class="stat-value" id="remainingTime">5:00</div>
-                </div>
+    <!-- PAUSE OVERLAY -->
+    <div class="pause-overlay" id="pauseOverlay">
+        <span class="pause-text">Paused</span>
+        <div class="pause-actions">
+            <button class="pause-btn" id="endSessionBtn">End</button>
+            <button class="pause-btn primary" id="resumeBtn">Continue</button>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="screen end-screen" id="endScreen">
+        <h2 class="end-message">Well Done</h2>
+        <p class="end-submessage">Take this calm with you</p>
+
+        <div class="session-summary">
+            <div class="summary-item">
+                <div class="summary-value" id="finalMinutes">5</div>
+                <div class="summary-label">Minutes</div>
             </div>
-
-            <div class="breathing-container">
-                <!-- The Box -->
-                <svg class="breathing-box" viewBox="0 0 260 260">
-                    <!-- Background box -->
-                    <rect class="box-background" x="8" y="8" width="244" height="244" rx="24"/>
-                    <!-- Animated progress - draws clockwise from top-left -->
-                    <rect class="box-progress" id="boxProgress" x="8" y="8" width="244" height="244" rx="24"/>
-                </svg>
-                <!-- Inner breathing shape - the "lungs" -->
-                <div class="breath-shape" id="breathShape"></div>
-                <!-- Labels on each side -->
-                <div class="box-labels">
-                    <span class="box-label top" id="labelTop">Inhale</span>
-                    <span class="box-label right" id="labelRight">Hold</span>
-                    <span class="box-label bottom" id="labelBottom">Exhale</span>
-                    <span class="box-label left" id="labelLeft">Hold</span>
-                </div>
-            </div>
-
-            <div class="phase-indicator" id="phaseIndicator">INHALE</div>
-
-            <div class="phase-instruction" id="phaseInstruction">Breathe in slowly</div>
-
-            <div class="controls">
-                <button class="control-btn pause" id="pauseBtn">Pause</button>
-                <button class="control-btn stop" id="stopBtn">Stop</button>
+            <div class="summary-item">
+                <div class="summary-value" id="finalCycles">0</div>
+                <div class="summary-label">Cycles</div>
             </div>
         </div>
 
-        <!-- Completion Screen -->
-        <div class="completion-screen" id="completionScreen">
-            <h2>Well Done</h2>
-            <p>You've completed your breathing practice.</p>
-
-            <div class="session-stats">
-                <div class="session-stat">
-                    <div class="session-stat-value" id="finalDuration">5:00</div>
-                    <div class="session-stat-label">Duration</div>
-                </div>
-                <div class="session-stat">
-                    <div class="session-stat-value" id="finalCycles">0</div>
-                    <div class="session-stat-label">Cycles</div>
-                </div>
-                <div class="session-stat">
-                    <div class="session-stat-value" id="totalSessions">1</div>
-                    <div class="session-stat-label">All Time</div>
-                </div>
-            </div>
-
-            <button class="restart-btn" id="restartBtn">Again</button>
+        <div class="end-actions">
+            <button class="end-btn secondary" id="homeBtn">Home</button>
+            <button class="end-btn primary" id="againBtn">Again</button>
         </div>
     </div>
 
     <script>
-        // Configuration
+        // ====== CONFIG ======
         const PHASE_DURATION = 4000; // 4 seconds per phase
 
-        // Box perimeter calculation: rect with rounded corners
-        // Perimeter ≈ 2*(width + height) - 8*rx + 2*π*rx ≈ 2*(244+244) - 8*24 + 2*3.14*24 ≈ 976 - 192 + 150 ≈ 934
-        // Using exact: 4 straight sides + 4 quarter circles = 4*(244-48) + 2*π*24 = 784 + 150.8 ≈ 935
-        const BOX_PERIMETER = 935;
-        const SIDE_LENGTH = BOX_PERIMETER / 4; // ~234 per side
-
-        // Phases: each draws one side of the box clockwise
-        const phases = [
-            { name: 'INHALE', instruction: 'Breathe in slowly', side: 'top', labelId: 'labelTop' },
-            { name: 'HOLD', instruction: 'Hold gently', side: 'right', labelId: 'labelRight' },
-            { name: 'EXHALE', instruction: 'Breathe out slowly', side: 'bottom', labelId: 'labelBottom' },
-            { name: 'HOLD', instruction: 'Hold gently', side: 'left', labelId: 'labelLeft' }
+        const PHASES = [
+            { name: 'IN', class: 'inhale' },
+            { name: 'HOLD', class: 'hold-full' },
+            { name: 'OUT', class: 'exhale' },
+            { name: 'HOLD', class: 'hold-empty' }
         ];
 
-        // State
+        // ====== STATE ======
         const state = {
-            selectedDuration: 300,
-            elapsedSeconds: 0,
-            isPaused: false,
-            currentPhase: 0,
+            duration: 5 * 60 * 1000, // 5 minutes in ms
+            elapsed: 0,
+            phase: 0,
             cycles: 0,
-            mainIntervalId: null,
+            countdown: 4,
+            isPaused: false,
+            isRunning: false,
             phaseStartTime: null,
-            animationFrameId: null
+            lastTick: null,
+            animationId: null
         };
 
-        // DOM elements
-        const introScreen = document.getElementById('introScreen');
+        // ====== DOM ======
+        const startScreen = document.getElementById('startScreen');
         const breathingScreen = document.getElementById('breathingScreen');
-        const completionScreen = document.getElementById('completionScreen');
-        const durationBtns = document.querySelectorAll('.duration-btn');
-        const beginBtn = document.getElementById('beginBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const boxProgress = document.getElementById('boxProgress');
+        const endScreen = document.getElementById('endScreen');
+        const pauseOverlay = document.getElementById('pauseOverlay');
         const breathShape = document.getElementById('breathShape');
-        const phaseIndicator = document.getElementById('phaseIndicator');
-        const phaseInstruction = document.getElementById('phaseInstruction');
-        const elapsedTime = document.getElementById('elapsedTime');
-        const remainingTime = document.getElementById('remainingTime');
-        const cyclesCount = document.getElementById('cyclesCount');
+        const phaseWord = document.getElementById('phaseWord');
+        const countdownEl = document.getElementById('countdown');
         const announcer = document.getElementById('announcer');
-        const boxLabels = document.querySelectorAll('.box-label');
-        const breathContainer = document.querySelector('.breathing-container');
 
-        // Color intensity: much more dramatic range
-        const COLOR_PALE = { r: 180, g: 140, b: 120, a: 0.4 };     // Very soft, translucent
-        const COLOR_INTENSE = { r: 255, g: 100, b: 50, a: 1.0 };   // Vivid, full opacity
-
-        function interpolateColor(from, to, progress) {
-            const r = Math.round(from.r + (to.r - from.r) * progress);
-            const g = Math.round(from.g + (to.g - from.g) * progress);
-            const b = Math.round(from.b + (to.b - from.b) * progress);
-            const a = (from.a + (to.a - from.a) * progress).toFixed(2);
-            return `rgba(${r}, ${g}, ${b}, ${a})`;
-        }
-
-        // Duration selection
-        durationBtns.forEach(btn => {
+        // Duration buttons
+        document.querySelectorAll('.duration-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                durationBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                state.selectedDuration = parseInt(btn.dataset.duration);
+                state.duration = parseInt(btn.dataset.minutes) * 60 * 1000;
             });
         });
 
-        // Begin breathing
-        beginBtn.addEventListener('click', () => {
-            introScreen.classList.add('hidden');
-            breathingScreen.classList.add('active');
-            startBreathing();
-            announce('Breathing session started. Inhale.');
-        });
+        // Begin
+        document.getElementById('beginBtn').addEventListener('click', startSession);
 
-        // Pause/Resume
-        pauseBtn.addEventListener('click', () => {
-            if (state.isPaused) {
-                resumeBreathing();
-                pauseBtn.textContent = 'Pause';
-                announce('Session resumed');
-            } else {
-                pauseBreathing();
-                pauseBtn.textContent = 'Resume';
-                announce('Session paused');
+        // Breathing screen tap to pause
+        breathingScreen.addEventListener('click', () => {
+            if (state.isRunning && !state.isPaused) {
+                pauseSession();
             }
         });
 
-        // Stop
-        stopBtn.addEventListener('click', () => {
-            stopBreathing();
-            showCompletion();
-            announce('Session stopped');
+        // Pause overlay buttons
+        document.getElementById('resumeBtn').addEventListener('click', resumeSession);
+        document.getElementById('endSessionBtn').addEventListener('click', endSession);
+
+        // End screen buttons
+        document.getElementById('againBtn').addEventListener('click', () => {
+            showScreen(startScreen);
         });
 
-        // Restart
-        restartBtn.addEventListener('click', () => {
-            resetState();
-            completionScreen.classList.remove('active');
-            introScreen.classList.remove('hidden');
+        document.getElementById('homeBtn').addEventListener('click', () => {
+            window.location.href = '/app.html#imagine';
         });
 
-        // Start breathing session
-        function startBreathing() {
-            state.elapsedSeconds = 0;
-            state.currentPhase = 0;
-            state.cycles = 0;
-            state.isPaused = false;
-
-            // Reset box to fully hidden
-            boxProgress.style.strokeDasharray = BOX_PERIMETER;
-            boxProgress.style.strokeDashoffset = BOX_PERIMETER;
-
-            updateRemainingTime();
-            updatePhase();
-            startPhaseAnimation();
-
-            // Main timer for overall session
-            state.mainIntervalId = setInterval(() => {
-                if (!state.isPaused) {
-                    state.elapsedSeconds++;
-                    updateStats();
-
-                    if (state.elapsedSeconds >= state.selectedDuration) {
-                        stopBreathing();
-                        showCompletion();
-                    }
-                }
-            }, 1000);
+        // ====== FUNCTIONS ======
+        function showScreen(screen) {
+            [startScreen, breathingScreen, endScreen].forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
         }
 
-        // Start the phase animation loop
-        function startPhaseAnimation() {
-            state.phaseStartTime = performance.now();
-            animateProgress();
-        }
-
-        // Animate the box perimeter drawing
-        function animateProgress() {
-            if (state.isPaused) {
-                state.animationFrameId = requestAnimationFrame(animateProgress);
-                return;
-            }
-
-            const now = performance.now();
-            const elapsed = now - state.phaseStartTime;
-            const progress = Math.min(elapsed / PHASE_DURATION, 1);
-
-            // Calculate how much of the box should be drawn
-            // Each phase draws one side (SIDE_LENGTH)
-            // Total drawn = completed phases + current phase progress
-            const completedLength = state.currentPhase * SIDE_LENGTH;
-            const currentLength = progress * SIDE_LENGTH;
-            const totalDrawn = completedLength + currentLength;
-
-            let color;
-
-            // Solid line always - just draw around the perimeter
-            boxProgress.style.strokeDasharray = `${BOX_PERIMETER}`;
-            boxProgress.style.strokeDashoffset = BOX_PERIMETER - totalDrawn;
-
-            // Update breath shape and colors based on phase
-            breathShape.className = 'breath-shape'; // Reset classes
-
-            if (state.currentPhase === 0) {
-                // INHALE: expand inner shape, pale → intense color, no throb
-                breathShape.classList.add('expanded');
-                breathContainer.classList.remove('throbbing');
-                color = interpolateColor(COLOR_PALE, COLOR_INTENSE, progress);
-
-            } else if (state.currentPhase === 1) {
-                // HOLD FULL: shape stays expanded + pulses, container throbs, intense color
-                breathShape.classList.add('hold-full');
-                breathContainer.classList.add('throbbing');
-                color = `rgba(255, 100, 50, 1.0)`;
-
-            } else if (state.currentPhase === 2) {
-                // EXHALE: contract inner shape, intense → pale color, no throb
-                breathShape.classList.add('contracted');
-                breathContainer.classList.remove('throbbing');
-                color = interpolateColor(COLOR_INTENSE, COLOR_PALE, progress);
-
-            } else {
-                // HOLD EMPTY: shape stays contracted + pulses, container throbs, pale color
-                breathShape.classList.add('hold-empty');
-                breathContainer.classList.add('throbbing');
-                color = `rgba(180, 140, 120, 0.6)`;
-            }
-
-            boxProgress.style.stroke = color;
-
-            if (progress >= 1) {
-                // Move to next phase
-                nextPhase();
-            } else {
-                state.animationFrameId = requestAnimationFrame(animateProgress);
-            }
-        }
-
-        // Move to next phase
-        function nextPhase() {
-            state.currentPhase = (state.currentPhase + 1) % phases.length;
-
-            // Count a cycle when we complete all 4 phases
-            if (state.currentPhase === 0) {
-                state.cycles++;
-                cyclesCount.textContent = state.cycles;
-                // Reset box for new cycle
-                boxProgress.style.strokeDashoffset = BOX_PERIMETER;
-            }
-
-            updatePhase();
-            state.phaseStartTime = performance.now();
-            state.animationFrameId = requestAnimationFrame(animateProgress);
-        }
-
-        // Update phase UI
-        function updatePhase() {
-            const phase = phases[state.currentPhase];
-
-            phaseIndicator.textContent = phase.name;
-            phaseInstruction.textContent = phase.instruction;
-
-            // Update box labels - highlight current side
-            boxLabels.forEach(label => label.classList.remove('active'));
-            document.getElementById(phase.labelId).classList.add('active');
-
-            // Haptic feedback
-            if (navigator.vibrate) {
-                navigator.vibrate(30);
-            }
-
-            // Screen reader
-            announce(phase.name);
-        }
-
-        // Pause
-        function pauseBreathing() {
-            state.isPaused = true;
-            state.pausedAt = performance.now();
-        }
-
-        // Resume
-        function resumeBreathing() {
-            // Adjust phase start time to account for pause duration
-            const pauseDuration = performance.now() - state.pausedAt;
-            state.phaseStartTime += pauseDuration;
-            state.isPaused = false;
-        }
-
-        // Stop
-        function stopBreathing() {
-            clearInterval(state.mainIntervalId);
-            cancelAnimationFrame(state.animationFrameId);
-            breathingScreen.classList.remove('active');
-        }
-
-        // Update stats
-        function updateStats() {
-            elapsedTime.textContent = formatTime(state.elapsedSeconds);
-            updateRemainingTime();
-        }
-
-        function updateRemainingTime() {
-            const remaining = Math.max(0, state.selectedDuration - state.elapsedSeconds);
-            remainingTime.textContent = formatTime(remaining);
-        }
-
-        // Format time
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // Show completion screen
-        function showCompletion() {
-            completionScreen.classList.add('active');
-
-            document.getElementById('finalDuration').textContent = formatTime(state.elapsedSeconds);
-            document.getElementById('finalCycles').textContent = state.cycles;
-
-            // Update localStorage
-            const totalSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0) + 1;
-            localStorage.setItem('boxBreathingSessions', totalSessions);
-            document.getElementById('totalSessions').textContent = totalSessions;
-
-            announce('Session complete. Well done.');
-        }
-
-        // Reset state
-        function resetState() {
-            state.elapsedSeconds = 0;
-            state.isPaused = false;
-            state.currentPhase = 0;
-            state.cycles = 0;
-            pauseBtn.textContent = 'Pause';
-            boxProgress.style.strokeDashoffset = BOX_PERIMETER;
-            boxProgress.style.stroke = `rgba(${COLOR_PALE.r}, ${COLOR_PALE.g}, ${COLOR_PALE.b}, ${COLOR_PALE.a})`;
-            boxLabels.forEach(label => label.classList.remove('active'));
-            breathShape.className = 'breath-shape contracted';
-            breathContainer.classList.remove('throbbing');
-        }
-
-        // Screen reader announcements
         function announce(message) {
             announcer.textContent = message;
         }
 
-        // Load total sessions on page load
-        const savedSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0);
-        if (savedSessions > 0) {
-            document.getElementById('totalSessions').textContent = savedSessions;
-        }
-    </script>
+        function startSession() {
+            // Reset state
+            state.elapsed = 0;
+            state.phase = 0;
+            state.cycles = 0;
+            state.countdown = 4;
+            state.isPaused = false;
+            state.isRunning = true;
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="/app.html" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="/app.html#imagine" class="nav-item">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            <span>IMAGINE</span>
-        </a>
-        <a href="/chat.html" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span>Chat</span>
-        </a>
-        <a href="/app.html#you" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>You</span>
-        </a>
-    </nav>
+            // Show breathing screen
+            showScreen(breathingScreen);
+
+            // Set initial phase
+            updatePhase();
+
+            // Start the loop
+            state.phaseStartTime = performance.now();
+            state.lastTick = performance.now();
+            tick();
+
+            announce('Breathing session started. Breathe in.');
+        }
+
+        function tick() {
+            if (!state.isRunning) return;
+
+            const now = performance.now();
+
+            if (!state.isPaused) {
+                // Update elapsed time
+                const delta = now - state.lastTick;
+                state.elapsed += delta;
+
+                // Check if session complete
+                if (state.elapsed >= state.duration) {
+                    completeSession();
+                    return;
+                }
+
+                // Update phase progress
+                const phaseElapsed = now - state.phaseStartTime;
+                const phaseProgress = phaseElapsed / PHASE_DURATION;
+
+                // Update countdown
+                const newCountdown = Math.max(1, 4 - Math.floor(phaseElapsed / 1000));
+                if (newCountdown !== state.countdown) {
+                    state.countdown = newCountdown;
+                    countdownEl.textContent = state.countdown;
+                }
+
+                // Check for phase transition
+                if (phaseProgress >= 1) {
+                    nextPhase();
+                    state.phaseStartTime = now;
+                }
+            }
+
+            state.lastTick = now;
+            state.animationId = requestAnimationFrame(tick);
+        }
+
+        function updatePhase() {
+            const phase = PHASES[state.phase];
+
+            // Update breath shape
+            breathShape.className = 'breath-shape ' + phase.class;
+
+            // Update word with fade
+            phaseWord.classList.remove('visible');
+            setTimeout(() => {
+                phaseWord.textContent = phase.name;
+                phaseWord.classList.add('visible');
+            }, 200);
+
+            // Reset countdown
+            state.countdown = 4;
+            countdownEl.textContent = '4';
+
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+
+            // Announce for screen readers
+            announce(phase.name === 'in' ? 'Breathe in' :
+                     phase.name === 'out' ? 'Breathe out' : 'Hold');
+        }
+
+        function nextPhase() {
+            state.phase = (state.phase + 1) % PHASES.length;
+
+            // Count cycle when we return to start
+            if (state.phase === 0) {
+                state.cycles++;
+            }
+
+            updatePhase();
+        }
+
+        function pauseSession() {
+            state.isPaused = true;
+            pauseOverlay.classList.add('active');
+            announce('Session paused');
+        }
+
+        function resumeSession() {
+            state.isPaused = false;
+            state.phaseStartTime = performance.now() - ((4 - state.countdown) * 1000);
+            state.lastTick = performance.now();
+            pauseOverlay.classList.remove('active');
+            announce('Session resumed');
+        }
+
+        function endSession() {
+            state.isRunning = false;
+            cancelAnimationFrame(state.animationId);
+            pauseOverlay.classList.remove('active');
+
+            // Show completion
+            const minutes = Math.round(state.elapsed / 60000);
+            document.getElementById('finalMinutes').textContent = minutes || '<1';
+            document.getElementById('finalCycles').textContent = state.cycles;
+
+            showScreen(endScreen);
+            announce('Session ended');
+        }
+
+        function completeSession() {
+            state.isRunning = false;
+            cancelAnimationFrame(state.animationId);
+
+            // Show completion
+            const minutes = Math.round(state.elapsed / 60000);
+            document.getElementById('finalMinutes').textContent = minutes;
+            document.getElementById('finalCycles').textContent = state.cycles;
+
+            // Save to localStorage
+            const totalSessions = parseInt(localStorage.getItem('boxBreathingSessions') || 0) + 1;
+            localStorage.setItem('boxBreathingSessions', totalSessions);
+
+            showScreen(endScreen);
+            announce('Session complete. Well done.');
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (startScreen.classList.contains('active')) {
+                    startSession();
+                } else if (breathingScreen.classList.contains('active')) {
+                    if (state.isPaused) {
+                        resumeSession();
+                    } else {
+                        pauseSession();
+                    }
+                } else if (endScreen.classList.contains('active')) {
+                    showScreen(startScreen);
+                }
+            }
+            if (e.code === 'Escape' && state.isRunning) {
+                if (state.isPaused) {
+                    endSession();
+                } else {
+                    pauseSession();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
