@@ -2,43 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Notice | Cowch</title>
     <meta name="description" content="A simple space to notice what's happening - no judgment, no pressure.">
 
     <!-- Favicon -->
-    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+    <link rel="icon" href="/favicon.svg">
 
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1C1714">
+    <meta name="theme-color" content="#1a1512">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
-
-        /* Warm Dark Theme */
         :root {
-            --bg-primary: #1C1714;
-            --bg-secondary: #26211D;
-            --bg-elevated: #2F2823;
+            /* Colors - matching app.html */
+            --bg-primary: #1a1512;
+            --bg-secondary: #2a2320;
+            --bg-card: #2d2825;
+            --bg-card-hover: #3a3533;
 
-            --text-primary: #F5F0EA;
-            --text-secondary: #C4B5A8;
-            --text-tertiary: #9B8A7A;
+            --coral: #D4896A;
+            --coral-dark: #C47A5D;
+            --coral-light: #E39B7F;
+            --coral-glow: rgba(212, 137, 106, 0.25);
 
-            --accent-primary: #E88A6A;
-            --accent-secondary: #D67856;
-            --accent-hover: #F29D7E;
-            --accent-glow: rgba(232, 138, 106, 0.25);
+            --text-primary: #F5F0E8;
+            --text-secondary: #FFF8F0;
+            --text-muted: #b0a499;
 
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-strong: rgba(255, 255, 255, 0.08);
+            --border-warm: #8a7a6a;
 
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+            /* Brutalist tokens */
+            --border-thicc: 5px;
+            --border-medium: 3px;
+            --radius-chunky: 32px;
+            --radius-medium: 24px;
+            --radius-small: 16px;
         }
 
         * {
@@ -58,168 +63,50 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* Header - Brutalist */
         .header {
-            background: rgba(38, 33, 29, 0.85);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1.25rem 1.5rem;
-            padding-top: max(1.25rem, env(safe-area-inset-top));
+            background: var(--bg-secondary);
+            border-bottom: var(--border-medium) solid var(--border-warm);
+            padding: 1rem 1.5rem;
+            padding-top: max(1rem, env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .back-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--text-muted);
             padding: 0.5rem 1rem;
-            border-radius: 20px;
+            border-radius: var(--radius-small);
             font-size: 0.9rem;
+            font-weight: 700;
             cursor: pointer;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
         }
 
         .back-btn:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
+            border-color: var(--coral);
+            color: var(--coral);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
         .header-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 900;
             color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
         }
 
         .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .icon-button {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .icon-button:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
-
-        /* Unified Slide Panel Menu */
-        .slide-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 400px;
-            max-width: 85vw;
-            height: 100vh;
-            height: 100dvh;
-            background: rgba(38, 33, 29, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-left: 1px solid var(--glass-border);
-            padding-top: max(0, env(safe-area-inset-top));
-            padding-bottom: max(0, env(safe-area-inset-bottom));
-            z-index: 1100;
-            overflow-y: auto;
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
-        }
-
-        .slide-panel.active {
-            right: 0;
-        }
-
-        .slide-panel-header {
-            position: sticky;
-            top: 0;
-            background: rgba(38, 33, 29, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            z-index: 10;
-        }
-
-        .slide-panel-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .slide-panel-back {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .slide-panel-back:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
-        }
-
-        .slide-panel-content {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .menu-option {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 1.25rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .menu-option:hover {
-            background: var(--glass-strong);
-            border-color: var(--accent-primary);
-            transform: translateX(-4px);
-        }
-
-        .menu-option svg {
-            flex-shrink: 0;
-            color: var(--text-secondary);
-        }
-
-        .menu-option span {
-            flex: 1;
+            width: 80px; /* Balance the back button */
         }
 
         /* Main Content */
@@ -232,41 +119,49 @@
             padding-bottom: max(2rem, env(safe-area-inset-bottom));
         }
 
-        /* Toggle View Buttons */
+        /* Toggle View Buttons - Brutalist */
         .view-toggle {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             margin-bottom: 2rem;
-            background: var(--bg-elevated);
-            padding: 0.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
         }
 
         .view-btn {
             flex: 1;
-            padding: 0.75rem;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
+            padding: 0.875rem 1rem;
+            border: var(--border-medium) solid var(--border-warm);
+            background: var(--bg-card);
+            color: var(--text-muted);
             font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 12px;
+            font-weight: 700;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: var(--radius-small);
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover:not(.active) {
+            border-color: var(--coral);
+            color: var(--text-primary);
         }
 
         .view-btn.active {
-            background: var(--accent-primary);
-            color: white;
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-primary);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
-        /* Today's Notice */
-        .today-section {
+        /* Sections */
+        .today-section,
+        .timeline-section {
             display: none;
         }
 
-        .today-section.active {
+        .today-section.active,
+        .timeline-section.active {
             display: block;
         }
 
@@ -277,56 +172,61 @@
 
         .section-intro h2 {
             font-size: 1.75rem;
-            font-weight: 700;
+            font-weight: 900;
             margin-bottom: 0.5rem;
             color: var(--text-primary);
         }
 
         .section-intro p {
             font-size: 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             line-height: 1.6;
         }
 
+        /* Cards - Brutalist */
         .card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
         }
 
         .card h3 {
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
-        /* Color Picker */
+        /* Color Picker - Brutalist */
         .color-picker {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 0.75rem;
-            margin-bottom: 1.5rem;
         }
 
         .color-option {
             aspect-ratio: 1;
-            border-radius: 50%;
-            border: 3px solid transparent;
+            border-radius: var(--radius-small);
+            border: var(--border-medium) solid transparent;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
             position: relative;
         }
 
         .color-option:hover {
-            transform: scale(1.1);
+            transform: translateY(-3px);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
         }
 
         .color-option.selected {
             border-color: var(--text-primary);
-            box-shadow: 0 0 0 4px var(--glass-bg);
+            box-shadow: 4px 4px 0 0 var(--coral);
+            transform: translateY(-2px);
         }
 
         .color-option.selected::after {
@@ -337,28 +237,32 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-            text-shadow: 0 0 4px rgba(0,0,0,0.5);
+            font-weight: 900;
+            font-size: 1.25rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Energy Slider */
+        /* Energy Slider - Brutalist */
         .slider-container {
-            margin-bottom: 2rem;
+            margin-bottom: 0.5rem;
         }
 
         .slider-label {
             display: flex;
             justify-content: space-between;
             font-size: 0.875rem;
-            color: var(--text-tertiary);
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 1rem;
+            text-transform: uppercase;
         }
 
         .slider {
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 12px;
+            border-radius: 6px;
             background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--border-warm);
             outline: none;
             -webkit-appearance: none;
             appearance: none;
@@ -367,178 +271,207 @@
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-small);
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
             cursor: pointer;
-            box-shadow: 0 2px 8px var(--accent-glow);
+            box-shadow: 3px 3px 0 0 var(--bg-secondary);
         }
 
         .slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-small);
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
             cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 8px var(--accent-glow);
+            box-shadow: 3px 3px 0 0 var(--bg-secondary);
         }
 
         /* Prompt */
         .prompt {
             font-size: 1.1rem;
-            color: var(--text-primary);
+            color: var(--coral);
             margin-bottom: 1rem;
-            font-style: italic;
+            font-weight: 700;
         }
 
         textarea {
             width: 100%;
             min-height: 120px;
             background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
             padding: 1rem;
             color: var(--text-primary);
             font-size: 1rem;
             font-family: inherit;
             resize: vertical;
             outline: none;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
         }
 
         textarea:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            border-color: var(--coral);
+            box-shadow: 4px 4px 0 0 var(--coral-glow);
         }
 
         textarea::placeholder {
-            color: var(--text-tertiary);
+            color: var(--text-muted);
         }
 
-        /* Save Button */
+        /* Save Button - Brutalist */
         .save-btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            border-radius: 24px;
-            color: white;
+            padding: 1.25rem;
+            background: var(--coral);
+            border: var(--border-thicc) solid var(--coral-dark);
+            border-radius: var(--radius-medium);
+            color: var(--bg-primary);
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 900;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 4px 12px var(--accent-glow);
+            transition: all 0.2s ease;
+            box-shadow: 6px 6px 0 0 var(--bg-card);
         }
 
         .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px var(--accent-glow);
+            transform: translateY(-3px) rotate(-1deg);
+            box-shadow: 8px 8px 0 0 var(--coral-glow);
         }
 
         .save-btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
         .save-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
-        /* Timeline View */
-        .timeline-section {
-            display: none;
+        /* Timeline Grid - Brutalist */
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
 
-        .timeline-section.active {
-            display: block;
+        .timeline-header h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 900;
+            text-transform: uppercase;
         }
 
         .timeline-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0.5rem;
-            margin-top: 1.5rem;
         }
 
         .day-label {
             text-align: center;
             font-size: 0.75rem;
-            color: var(--text-tertiary);
+            font-weight: 700;
+            color: var(--text-muted);
             padding: 0.5rem 0;
-            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .day-cell {
             aspect-ratio: 1;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-small);
+            border: var(--border-medium) solid var(--border-warm);
+            background: var(--bg-card);
             cursor: pointer;
-            transition: all 0.25s;
-            position: relative;
+            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        .day-cell:hover {
-            transform: scale(1.05);
-            border-color: var(--accent-primary);
+        .day-cell:hover:not(.empty) {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
+            border-color: var(--coral);
         }
 
         .day-cell.empty {
             background: var(--bg-secondary);
+            border-color: transparent;
             cursor: default;
         }
 
         .day-cell.empty:hover {
             transform: none;
-            border-color: var(--glass-border);
+            box-shadow: none;
         }
 
         .day-number {
             font-size: 0.75rem;
-            color: var(--text-tertiary);
-            margin-bottom: 0.25rem;
+            font-weight: 700;
+            color: var(--text-muted);
         }
 
         .day-cell.today {
-            border-color: var(--accent-primary);
-            border-width: 2px;
+            border-color: var(--coral);
+            border-width: var(--border-medium);
+        }
+
+        .day-cell.has-entry {
+            border-color: var(--text-primary);
+        }
+
+        .day-cell.has-entry .day-number {
+            color: var(--text-primary);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .empty-state svg {
             width: 64px;
             height: 64px;
             margin-bottom: 1rem;
-            opacity: 0.3;
+            opacity: 0.4;
+            stroke: var(--coral);
+        }
+
+        .empty-state p {
+            font-weight: 700;
         }
 
         /* Mobile */
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
             .container {
                 padding: 1.5rem 1rem;
             }
 
             .color-picker {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .card {
+                padding: 1.25rem;
             }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <a href="/app.html" class="back-btn">← Back</a>
+        <a href="/app.html#you" class="back-btn">← Back</a>
         <h1 class="header-title">Notice</h1>
         <div class="header-actions"></div>
     </header>
@@ -560,19 +493,19 @@
             <div class="card">
                 <h3>How does today feel?</h3>
                 <div class="color-picker" id="color-picker">
-                    <div class="color-option" data-color="#E88A6A" style="background: #E88A6A;"></div>
-                    <div class="color-option" data-color="#F29D7E" style="background: #F29D7E;"></div>
-                    <div class="color-option" data-color="#D67856" style="background: #D67856;"></div>
-                    <div class="color-option" data-color="#8B7355" style="background: #8B7355;"></div>
-                    <div class="color-option" data-color="#C4B5A8" style="background: #C4B5A8;"></div>
-                    <div class="color-option" data-color="#9B8A7A" style="background: #9B8A7A;"></div>
+                    <div class="color-option" data-color="#D4896A" style="background: #D4896A;"></div>
+                    <div class="color-option" data-color="#E39B7F" style="background: #E39B7F;"></div>
+                    <div class="color-option" data-color="#C47A5D" style="background: #C47A5D;"></div>
+                    <div class="color-option" data-color="#8a7a6a" style="background: #8a7a6a;"></div>
+                    <div class="color-option" data-color="#b0a499" style="background: #b0a499;"></div>
+                    <div class="color-option" data-color="#78716C" style="background: #78716C;"></div>
 
-                    <div class="color-option" data-color="#6B9BA8" style="background: #6B9BA8;"></div>
+                    <div class="color-option" data-color="#6B9AAF" style="background: #6B9AAF;"></div>
                     <div class="color-option" data-color="#7EA88B" style="background: #7EA88B;"></div>
-                    <div class="color-option" data-color="#A8A07E" style="background: #A8A07E;"></div>
-                    <div class="color-option" data-color="#A87E8B" style="background: #A87E8B;"></div>
-                    <div class="color-option" data-color="#8B7EA8" style="background: #8B7EA8;"></div>
-                    <div class="color-option" data-color="#4A4237" style="background: #4A4237;"></div>
+                    <div class="color-option" data-color="#8FBC8F" style="background: #8FBC8F;"></div>
+                    <div class="color-option" data-color="#B794C4" style="background: #B794C4;"></div>
+                    <div class="color-option" data-color="#C9A857" style="background: #C9A857;"></div>
+                    <div class="color-option" data-color="#3a3533" style="background: #3a3533;"></div>
                 </div>
             </div>
 
@@ -592,7 +525,7 @@
                 <textarea id="notice-text" placeholder="Write as much or as little as you want..."></textarea>
             </div>
 
-            <button class="save-btn" id="save-btn">Save this notice</button>
+            <button class="save-btn" id="save-btn">Save Notice</button>
         </div>
 
         <!-- Timeline View -->
@@ -610,70 +543,6 @@
                     <p>No notices yet. Start noticing today.</p>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Unified Menu Panel -->
-    <div class="slide-panel" id="menu-panel">
-        <div class="slide-panel-header">
-            <button class="slide-panel-back" id="close-menu-panel" aria-label="Close menu">
-                ← Back
-            </button>
-            <h2>Menu</h2>
-        </div>
-        <div class="slide-panel-content">
-            <a href="/" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                <span>🏠 Home</span>
-            </a>
-            <a href="/chat.html" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span>💬 Chat with Mandy</span>
-            </a>
-            <a href="/choice.html" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                </svg>
-                <span>🌳 Choice</span>
-            </a>
-            <a href="/values.html" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-                <span>🎯 Values</span>
-            </a>
-            <a href="/app.html#imagine" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-                <span>🧭 IMAGINE Framework</span>
-            </a>
-            <a href="/chat.html#exercises" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-                <span>💪 Exercise Library</span>
-            </a>
-            <a href="/chat.html#privacy" class="menu-option">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                <span>🔒 Privacy & Safety</span>
-            </a>
-            <a href="https://thoughtsonlifeandlove.com" class="menu-option" target="_blank">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
-                </svg>
-                <span>🌐 Mandy's Website</span>
-            </a>
         </div>
     </div>
 
@@ -837,8 +706,8 @@
             const monthName = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
             let html = `
-                <div style="text-align: center; margin-bottom: 1rem;">
-                    <h3 style="color: var(--text-primary); font-size: 1.25rem;">${monthName}</h3>
+                <div class="timeline-header">
+                    <h3>${monthName}</h3>
                 </div>
                 <div class="timeline-grid">
                     <div class="day-label">S</div>
@@ -863,10 +732,10 @@
 
                 if (notice && notice.color) {
                     html += `
-                        <div class="day-cell ${isToday ? 'today' : ''}"
+                        <div class="day-cell has-entry ${isToday ? 'today' : ''}"
                              style="background: ${notice.color};"
                              data-date="${dateKey}">
-                            <div class="day-number">${day}</div>
+                            <div class="day-number" style="color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${day}</div>
                         </div>
                     `;
                 } else {
@@ -893,7 +762,7 @@
             });
         }
 
-        // Show notice detail (simple alert for now)
+        // Show notice detail
         function showNoticeDetail(date, notice) {
             const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                 weekday: 'long',
@@ -913,43 +782,6 @@
             }
 
             alert(message);
-        }
-
-        console.log('Notice initialized');
-
-        // Unified Menu System (optional - menu may not exist)
-        const menuButton = document.getElementById('menu-button');
-        const menuPanel = document.getElementById('menu-panel');
-        const closeMenuPanel = document.getElementById('close-menu-panel');
-
-        // Open menu
-        if (menuButton && menuPanel) {
-            menuButton.addEventListener('click', () => {
-                menuPanel.classList.add('active');
-            });
-        }
-
-        // Close menu
-        if (closeMenuPanel && menuPanel) {
-            closeMenuPanel.addEventListener('click', () => {
-                menuPanel.classList.remove('active');
-            });
-        }
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuPanel) {
-                menuPanel.classList.remove('active');
-            }
-        });
-
-        // Close when clicking backdrop
-        if (menuPanel) {
-            menuPanel.addEventListener('click', (e) => {
-                if (e.target === menuPanel) {
-                    menuPanel.classList.remove('active');
-                }
-            });
         }
     </script>
 </body>

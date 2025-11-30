@@ -2,50 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Choice | Cowch</title>
     <meta name="description" content="Track the choices you notice yourself making - strengthening your sense of agency.">
 
     <!-- Favicon -->
-    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+    <link rel="icon" href="/favicon.svg">
 
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1C1714">
+    <meta name="theme-color" content="#1a1512">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
-
-        /* Warm Dark Theme */
         :root {
-            --bg-primary: #1C1714;
-            --bg-secondary: #26211D;
-            --bg-elevated: #2F2823;
+            /* Colors - matching app.html */
+            --bg-primary: #1a1512;
+            --bg-secondary: #2a2320;
+            --bg-card: #2d2825;
+            --bg-card-hover: #3a3533;
 
-            --text-primary: #F5F0EA;
-            --text-secondary: #C4B5A8;
-            --text-tertiary: #9B8A7A;
+            --coral: #D4896A;
+            --coral-dark: #C47A5D;
+            --coral-light: #E39B7F;
+            --coral-glow: rgba(212, 137, 106, 0.25);
 
-            --accent-primary: #E88A6A;
-            --accent-secondary: #D67856;
-            --accent-hover: #F29D7E;
-            --accent-glow: rgba(232, 138, 106, 0.25);
+            --text-primary: #F5F0E8;
+            --text-secondary: #FFF8F0;
+            --text-muted: #b0a499;
 
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-strong: rgba(255, 255, 255, 0.08);
+            --border-warm: #8a7a6a;
 
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+            /* Brutalist tokens */
+            --border-thicc: 5px;
+            --border-medium: 3px;
+            --radius-chunky: 32px;
+            --radius-medium: 24px;
+            --radius-small: 16px;
 
             /* Nature colors for tree */
             --tree-trunk: #5D4A3C;
             --tree-branch: #6B5747;
             --leaf-green: #7EA88B;
             --leaf-light: #9BC4A7;
-            --leaf-gold: #C4A572;
+            --leaf-gold: #C9A857;
         }
 
         * {
@@ -65,69 +70,50 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* Header - Brutalist */
         .header {
-            background: rgba(38, 33, 29, 0.85);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1.25rem 1.5rem;
-            padding-top: max(1.25rem, env(safe-area-inset-top));
+            background: var(--bg-secondary);
+            border-bottom: var(--border-medium) solid var(--border-warm);
+            padding: 1rem 1.5rem;
+            padding-top: max(1rem, env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .back-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--text-muted);
             padding: 0.5rem 1rem;
-            border-radius: 20px;
+            border-radius: var(--radius-small);
             font-size: 0.9rem;
+            font-weight: 700;
             cursor: pointer;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
         }
 
         .back-btn:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
+            border-color: var(--coral);
+            color: var(--coral);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
         .header-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 900;
             color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
         }
 
         .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .icon-button {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .icon-button:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
-            border-color: var(--accent-primary);
+            width: 80px;
         }
 
         /* Main Content */
@@ -140,33 +126,39 @@
             padding-bottom: max(2rem, env(safe-area-inset-bottom));
         }
 
-        /* View Toggle */
+        /* View Toggle - Brutalist */
         .view-toggle {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 2rem;
-            background: var(--bg-elevated);
-            padding: 0.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
         }
 
         .view-btn {
             flex: 1;
-            padding: 0.75rem;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 12px;
+            padding: 0.875rem 0.5rem;
+            border: var(--border-medium) solid var(--border-warm);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-radius: var(--radius-small);
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover:not(.active) {
+            border-color: var(--coral);
+            color: var(--text-primary);
         }
 
         .view-btn.active {
-            background: var(--accent-primary);
-            color: white;
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-primary);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
         }
 
         /* Sections */
@@ -185,30 +177,107 @@
 
         .section-intro h2 {
             font-size: 1.75rem;
-            font-weight: 700;
+            font-weight: 900;
             margin-bottom: 0.5rem;
             color: var(--text-primary);
         }
 
         .section-intro p {
             font-size: 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             line-height: 1.6;
         }
 
-        /* Tree Visualization */
+        /* Cards - Brutalist */
+        .card {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
+        }
+
+        .prompt {
+            font-size: 1.1rem;
+            color: var(--coral);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            background: var(--bg-secondary);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--coral);
+            box-shadow: 4px 4px 0 0 var(--coral-glow);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Save Button - Brutalist */
+        .save-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--coral);
+            border: var(--border-thicc) solid var(--coral-dark);
+            border-radius: var(--radius-medium);
+            color: var(--bg-primary);
+            font-size: 1.1rem;
+            font-weight: 900;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 6px 6px 0 0 var(--bg-card);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-3px) rotate(-1deg);
+            box-shadow: 8px 8px 0 0 var(--coral-glow);
+        }
+
+        .save-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        /* Tree Container - Brutalist */
         .tree-container {
             position: relative;
             width: 100%;
             height: 400px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            margin-bottom: 2rem;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: flex-end;
             justify-content: center;
             overflow: hidden;
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
         }
 
         .tree-svg {
@@ -222,7 +291,7 @@
 
         .tree-branch {
             stroke: var(--tree-branch);
-            stroke-width: 3;
+            stroke-width: 4;
             fill: none;
             stroke-linecap: round;
         }
@@ -246,93 +315,18 @@
 
         .choice-count {
             text-align: center;
-            margin-top: 1rem;
             font-size: 1.1rem;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
         .choice-count strong {
-            color: var(--accent-primary);
-            font-size: 1.5rem;
+            color: var(--coral);
+            font-size: 1.75rem;
         }
 
-        /* Add Choice Form */
-        .card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
-        }
-
-        .prompt {
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1rem;
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-            outline: none;
-            transition: all 0.25s;
-        }
-
-        textarea:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        textarea::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            border-radius: 24px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px var(--accent-glow);
-        }
-
-        .save-btn:active {
-            transform: translateY(0);
-        }
-
-        .save-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* History View */
+        /* History - Brutalist */
         .choice-list {
             display: flex;
             flex-direction: column;
@@ -340,22 +334,26 @@
         }
 
         .choice-item {
-            background: var(--bg-elevated);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.25s;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 0 var(--bg-secondary);
         }
 
         .choice-item:hover {
-            border-color: var(--accent-primary);
-            transform: translateX(-4px);
+            border-color: var(--coral);
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0 0 var(--bg-secondary);
         }
 
         .choice-date {
-            font-size: 0.875rem;
-            color: var(--text-tertiary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 0.5rem;
+            text-transform: uppercase;
         }
 
         .choice-text {
@@ -363,124 +361,45 @@
             line-height: 1.6;
         }
 
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .empty-state svg {
             width: 64px;
             height: 64px;
             margin-bottom: 1rem;
-            opacity: 0.3;
+            opacity: 0.4;
+            stroke: var(--coral);
         }
 
-        /* Unified Slide Panel Menu */
-        .slide-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 400px;
-            max-width: 85vw;
-            height: 100vh;
-            height: 100dvh;
-            background: rgba(38, 33, 29, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-left: 1px solid var(--glass-border);
-            padding-top: max(0, env(safe-area-inset-top));
-            padding-bottom: max(0, env(safe-area-inset-bottom));
-            z-index: 1100;
-            overflow-y: auto;
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
-        }
-
-        .slide-panel.active {
-            right: 0;
-        }
-
-        .slide-panel-header {
-            position: sticky;
-            top: 0;
-            background: rgba(38, 33, 29, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            z-index: 10;
-        }
-
-        .slide-panel-header h2 {
-            font-size: 1.5rem;
+        .empty-state p {
             font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .slide-panel-back {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .slide-panel-back:hover {
-            background: var(--glass-strong);
-            color: var(--accent-primary);
-        }
-
-        .slide-panel-content {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .menu-option {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 1.25rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .menu-option:hover {
-            background: var(--glass-strong);
-            border-color: var(--accent-primary);
-            transform: translateX(-4px);
         }
 
         /* Mobile */
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
             .container {
                 padding: 1.5rem 1rem;
             }
 
             .tree-container {
-                height: 300px;
+                height: 320px;
+            }
+
+            .view-btn {
+                font-size: 0.75rem;
+                padding: 0.75rem 0.25rem;
             }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <a href="/app.html" class="back-btn">← Back</a>
+        <a href="/app.html#you" class="back-btn">← Back</a>
         <h1 class="header-title">Choice</h1>
         <div class="header-actions"></div>
     </header>
@@ -505,7 +424,7 @@
                 <textarea id="choice-text" placeholder="Even small choices matter - what did you choose today that you're noticing?"></textarea>
             </div>
 
-            <button class="save-btn" id="save-btn">Add this choice</button>
+            <button class="save-btn" id="save-btn">Add Choice</button>
         </div>
 
         <!-- Tree View -->
@@ -519,11 +438,9 @@
                 <svg class="tree-svg" id="tree-svg" viewBox="0 0 300 400">
                     <!-- Trunk -->
                     <rect class="tree-trunk" x="135" y="250" width="30" height="150" rx="5"/>
-
-                    <!-- Branches will be dynamically added -->
+                    <!-- Branches -->
                     <g id="branches"></g>
-
-                    <!-- Leaves will be dynamically added -->
+                    <!-- Leaves -->
                     <g id="leaves"></g>
                 </svg>
             </div>
@@ -551,31 +468,9 @@
         </div>
     </div>
 
-    <!-- Unified Menu Panel -->
-    <div class="slide-panel" id="menu-panel">
-        <div class="slide-panel-header">
-            <button class="slide-panel-back" id="close-menu-panel" aria-label="Close menu">
-                ← Back
-            </button>
-            <h2>Menu</h2>
-        </div>
-        <div class="slide-panel-content">
-            <a href="/" class="menu-option">🏠 Home</a>
-            <a href="/chat.html" class="menu-option">💬 Chat with Mandy</a>
-            <a href="/notice.html" class="menu-option">✨ Notice</a>
-            <a href="/choice.html" class="menu-option">🌳 Choice</a>
-            <a href="/values.html" class="menu-option">🎯 Values</a>
-            <a href="/app.html#imagine" class="menu-option">🧭 IMAGINE Framework</a>
-            <a href="/chat.html#exercises" class="menu-option">💪 Exercise Library</a>
-            <a href="/chat.html#privacy" class="menu-option">🔒 Privacy & Safety</a>
-            <a href="https://thoughtsonlifeandlove.com" class="menu-option" target="_blank">🌐 Mandy's Website</a>
-        </div>
-    </div>
-
     <script>
         const STORAGE_KEY = 'cowch_choices';
 
-        // Load choices from localStorage
         function getChoices() {
             const stored = localStorage.getItem(STORAGE_KEY);
             return stored ? JSON.parse(stored) : [];
@@ -588,7 +483,6 @@
         // Add new choice
         document.getElementById('save-btn').addEventListener('click', () => {
             const text = document.getElementById('choice-text').value.trim();
-
             if (!text) return;
 
             const choices = getChoices();
@@ -604,14 +498,12 @@
             });
 
             saveChoices(choices);
-
-            // Clear input
             document.getElementById('choice-text').value = '';
 
             // Show feedback
             const btn = document.getElementById('save-btn');
             const originalText = btn.textContent;
-            btn.textContent = 'Choice added! 🌱';
+            btn.textContent = 'Added!';
             btn.disabled = true;
 
             setTimeout(() => {
@@ -619,7 +511,6 @@
                 btn.disabled = false;
             }, 2000);
 
-            // Refresh tree and history
             renderTree();
             renderHistory();
         });
@@ -634,7 +525,6 @@
             const leavesGroup = document.getElementById('leaves');
             leavesGroup.innerHTML = '';
 
-            // Generate leaf positions in a natural tree shape
             const leafPositions = generateLeafPositions(count);
 
             leafPositions.forEach((pos, index) => {
@@ -642,10 +532,9 @@
                 leaf.setAttribute('class', 'tree-leaf');
                 leaf.setAttribute('cx', pos.x);
                 leaf.setAttribute('cy', pos.y);
-                leaf.setAttribute('r', '6');
+                leaf.setAttribute('r', '8');
                 leaf.style.animationDelay = `${index * 0.05}s`;
 
-                // Vary leaf colors
                 if (index % 3 === 0) {
                     leaf.style.fill = 'var(--leaf-light)';
                 } else if (index % 3 === 1) {
@@ -662,17 +551,14 @@
             branchesGroup.innerHTML = '';
 
             if (count > 0) {
-                // Main branches
                 addBranch(branchesGroup, 150, 250, 120, 180);
                 addBranch(branchesGroup, 150, 250, 180, 180);
             }
             if (count > 5) {
-                // Secondary branches
                 addBranch(branchesGroup, 120, 180, 90, 140);
                 addBranch(branchesGroup, 180, 180, 210, 140);
             }
             if (count > 10) {
-                // Tertiary branches
                 addBranch(branchesGroup, 90, 140, 70, 100);
                 addBranch(branchesGroup, 210, 140, 230, 100);
             }
@@ -690,19 +576,14 @@
 
         function generateLeafPositions(count) {
             const positions = [];
-            const layers = Math.ceil(count / 8);
-
             for (let i = 0; i < count; i++) {
                 const layer = Math.floor(i / 8);
                 const angle = (i % 8) * (Math.PI / 4) + Math.random() * 0.3;
                 const distance = 40 + layer * 25 + Math.random() * 15;
-
                 const x = 150 + Math.cos(angle) * distance;
                 const y = 200 - Math.sin(angle) * distance * 0.6;
-
                 positions.push({ x, y });
             }
-
             return positions;
         }
 
@@ -738,67 +619,25 @@
         }
 
         // View toggle
-        document.getElementById('btn-today').addEventListener('click', () => {
-            setActiveView('today');
-        });
-
+        document.getElementById('btn-today').addEventListener('click', () => setActiveView('today'));
         document.getElementById('btn-tree').addEventListener('click', () => {
             setActiveView('tree');
             renderTree();
         });
-
         document.getElementById('btn-history').addEventListener('click', () => {
             setActiveView('history');
             renderHistory();
         });
 
         function setActiveView(view) {
-            // Update buttons
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-${view}`).classList.add('active');
-
-            // Update sections
             document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
             document.getElementById(`${view}-view`).classList.add('active');
         }
 
-        // Initialize tree on load
+        // Initialize
         renderTree();
-
-        console.log('Choice tracker initialized');
-
-        // Unified Menu System (optional - menu may not exist)
-        const menuButton = document.getElementById('menu-button');
-        const menuPanel = document.getElementById('menu-panel');
-        const closeMenuPanel = document.getElementById('close-menu-panel');
-
-        if (menuButton && menuPanel) {
-            menuButton.addEventListener('click', () => {
-                menuPanel.classList.add('active');
-            });
-        }
-
-        if (closeMenuPanel && menuPanel) {
-            closeMenuPanel.addEventListener('click', () => {
-                menuPanel.classList.remove('active');
-            });
-        }
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuPanel) {
-                menuPanel.classList.remove('active');
-            }
-        });
-
-        // Close when clicking backdrop
-        if (menuPanel) {
-            menuPanel.addEventListener('click', (e) => {
-                if (e.target === menuPanel) {
-                    menuPanel.classList.remove('active');
-                }
-            });
-        }
     </script>
 </body>
 </html>

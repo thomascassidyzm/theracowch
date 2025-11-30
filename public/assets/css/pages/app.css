@@ -839,12 +839,12 @@
 }
 
 .settings-btn.danger {
-    color: #E57373;
+    color: #d9534f;
 }
 
 .settings-btn.danger:hover {
-    background: rgba(229, 115, 115, 0.1);
-    border-color: rgba(229, 115, 115, 0.3);
+    background: rgba(217, 83, 79, 0.1);
+    border-color: rgba(217, 83, 79, 0.3);
 }
 
 .settings-section-title {
