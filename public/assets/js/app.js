@@ -3,7 +3,6 @@
 // ============================================
 
 const STORAGE_KEY = 'cowch-chat-history';
-const ONBOARDED_KEY = 'cowch-onboarded';
 const API_ENDPOINT = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000/api/chat'
     : '/api/chat';
@@ -13,43 +12,8 @@ let conversationHistory = [];
 let isTyping = false;
 
 // DOM Elements (initialized after DOM ready)
-let onboarding, onboardingText, app, tabBtns, tabPanels;
+let app, tabBtns, tabPanels;
 let chatInput, chatSendBtn, chatMessages, greetingText;
-
-// ============================================
-// Onboarding
-// ============================================
-
-function checkOnboarding() {
-    const hasOnboarded = localStorage.getItem(ONBOARDED_KEY);
-
-    if (hasOnboarded) {
-        onboarding.classList.add('hidden');
-        setTimeout(() => onboarding.remove(), 500);
-        return;
-    }
-
-    // Show breathing animation, then welcome
-    setTimeout(() => {
-        onboardingText.textContent = "I'm here for you...";
-    }, 3000);
-
-    setTimeout(() => {
-        onboarding.innerHTML = `
-            <div class="onboarding-welcome">
-                <h1>Hi, I'm <span>Mandy</span></h1>
-                <p>I'm here whenever you need — no judgment, just support. This is your space to explore, reflect, and grow at your own pace.</p>
-                <button class="onboarding-btn" id="onboarding-start">Let's Begin</button>
-            </div>
-        `;
-
-        document.getElementById('onboarding-start').addEventListener('click', () => {
-            localStorage.setItem(ONBOARDED_KEY, 'true');
-            onboarding.classList.add('hidden');
-            setTimeout(() => onboarding.remove(), 500);
-        });
-    }, 5000);
-}
 
 // ============================================
 // Tab Navigation
@@ -581,7 +545,30 @@ function setupClearHistory() {
 // Settings Buttons
 // ============================================
 
+function isIOSSafari() {
+    const ua = window.navigator.userAgent;
+    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+    const webkit = !!ua.match(/WebKit/i);
+    const notChrome = !ua.match(/CriOS/i);
+    const notFirefox = !ua.match(/FxiOS/i);
+    return iOS && webkit && notChrome && notFirefox;
+}
+
+function isInStandaloneMode() {
+    return window.navigator.standalone === true ||
+           window.matchMedia('(display-mode: standalone)').matches;
+}
+
 function setupSettingsButtons() {
+    // Show install button only on iOS Safari when not already installed
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn && isIOSSafari() && !isInStandaloneMode()) {
+        installBtn.style.display = 'flex';
+        installBtn.addEventListener('click', () => {
+            alert('To add Cowch to your home screen:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"\n\nThen you can access Cowch like any other app!');
+        });
+    }
+
     // Privacy button - navigate to chat with privacy info
     const privacyBtn = document.getElementById('privacy-btn');
     if (privacyBtn) {
@@ -615,90 +602,6 @@ function clearConversation() {
 }
 
 // ============================================
-// iOS Install Prompt
-// ============================================
-
-function isIOSSafari() {
-    const ua = window.navigator.userAgent;
-    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-    const webkit = !!ua.match(/WebKit/i);
-    const notChrome = !ua.match(/CriOS/i);
-    const notFirefox = !ua.match(/FxiOS/i);
-    return iOS && webkit && notChrome && notFirefox;
-}
-
-function isInStandaloneMode() {
-    return window.navigator.standalone === true ||
-           window.matchMedia('(display-mode: standalone)').matches;
-}
-
-function showIOSInstallPrompt() {
-    const prompt = document.getElementById('ios-install-prompt');
-    if (prompt) {
-        prompt.classList.add('active');
-    }
-}
-
-function hideIOSInstallPrompt() {
-    const prompt = document.getElementById('ios-install-prompt');
-    if (prompt) {
-        prompt.classList.remove('active');
-    }
-}
-
-function setupIOSInstallPrompt() {
-    // Only show on iOS Safari, not already in PWA mode
-    if (!isIOSSafari() || isInStandaloneMode()) {
-        return;
-    }
-
-    const dismissedKey = 'cowch-ios-install-dismissed';
-    const dismissedTime = localStorage.getItem(dismissedKey);
-
-    // If dismissed less than 3 days ago, don't show
-    if (dismissedTime) {
-        const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
-        if (daysSinceDismissed < 3) {
-            return;
-        }
-    }
-
-    // Show prompt after a short delay (let them see the app first)
-    setTimeout(() => {
-        showIOSInstallPrompt();
-    }, 2000);
-
-    // Close button
-    const closeBtn = document.getElementById('ios-install-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            hideIOSInstallPrompt();
-            localStorage.setItem(dismissedKey, Date.now().toString());
-        });
-    }
-
-    // Maybe later button
-    const laterBtn = document.getElementById('ios-install-later');
-    if (laterBtn) {
-        laterBtn.addEventListener('click', () => {
-            hideIOSInstallPrompt();
-            localStorage.setItem(dismissedKey, Date.now().toString());
-        });
-    }
-
-    // Click outside to dismiss
-    const prompt = document.getElementById('ios-install-prompt');
-    if (prompt) {
-        prompt.addEventListener('click', (e) => {
-            if (e.target === prompt) {
-                hideIOSInstallPrompt();
-                localStorage.setItem(dismissedKey, Date.now().toString());
-            }
-        });
-    }
-}
-
-// ============================================
 // IMAGINE Tracker
 // ============================================
 
@@ -725,8 +628,6 @@ function updateImagineTracker() {
 
 function init() {
     // Initialize DOM references
-    onboarding = document.getElementById('onboarding');
-    onboardingText = document.getElementById('onboarding-text');
     app = document.getElementById('app');
     tabBtns = document.querySelectorAll('.tab-btn');
     tabPanels = document.querySelectorAll('.tab-panel');
@@ -736,7 +637,6 @@ function init() {
     greetingText = document.getElementById('greeting-text');
 
     // Setup all functionality
-    checkOnboarding();
     updateGreeting();
     setupTabNavigation();
     setupDomainPanel();
@@ -746,7 +646,6 @@ function init() {
     setupSettingsButtons();
     loadChatHistory();
     updateImagineTracker();
-    setupIOSInstallPrompt();
 
     // Handle hash navigation
     handleHashNavigation();
