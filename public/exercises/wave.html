@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Wave Exercise | Cowch</title>
+    <meta name="theme-color" content="#0a1628">
+    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --ocean-deep: #0a1628;
+            --ocean-mid: #12243d;
+            --ocean-light: #1a3a5c;
+            --wave-color: #2d5a7b;
+            --wave-highlight: #4a8fb8;
+            --foam: rgba(255,255,255,0.8);
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: linear-gradient(180deg, var(--ocean-deep) 0%, var(--ocean-mid) 50%, var(--ocean-light) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* ============================================
+           SCREENS
+           ============================================ */
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: max(4rem, env(safe-area-inset-top));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================
+           INTRO SCREEN
+           ============================================ */
+
+        .intro-screen {
+            text-align: center;
+            z-index: 20;
+        }
+
+        .intro-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: gentleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .intro-title {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .start-btn {
+            background: var(--coral);
+            border: 4px solid rgba(0,0,0,0.2);
+            color: var(--ocean-deep);
+            padding: 1.25rem 3rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px rgba(212, 137, 106, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(212, 137, 106, 0.4);
+        }
+
+        /* ============================================
+           WAVE SCREEN
+           ============================================ */
+
+        .wave-screen {
+            justify-content: flex-start;
+            padding-top: max(6rem, env(safe-area-inset-top));
+        }
+
+        .wave-content {
+            text-align: center;
+            z-index: 20;
+            margin-bottom: auto;
+        }
+
+        .wave-instruction {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            transition: all 0.5s ease;
+        }
+
+        .wave-hint {
+            font-size: 1rem;
+            color: var(--text-muted);
+            transition: all 0.5s ease;
+        }
+
+        /* Ocean container */
+        .ocean-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Wave layers */
+        .wave-layer {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            bottom: 0;
+            left: 0;
+        }
+
+        .wave-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+        }
+
+        /* Main breathing wave */
+        .breath-wave {
+            position: absolute;
+            width: 200%;
+            bottom: 0;
+            left: -50%;
+            transition: transform 4s ease-in-out;
+        }
+
+        .breath-wave svg {
+            width: 100%;
+            display: block;
+        }
+
+        .breath-wave.inhale {
+            transform: translateY(-80px);
+        }
+
+        .breath-wave.exhale {
+            transform: translateY(0);
+        }
+
+        /* Background waves (ambient) */
+        .ambient-wave {
+            position: absolute;
+            width: 200%;
+            bottom: 0;
+            left: -50%;
+        }
+
+        .ambient-wave svg {
+            width: 100%;
+            display: block;
+        }
+
+        .ambient-wave-1 {
+            animation: ambientDrift1 8s ease-in-out infinite;
+            opacity: 0.3;
+        }
+
+        .ambient-wave-2 {
+            animation: ambientDrift2 12s ease-in-out infinite;
+            opacity: 0.2;
+        }
+
+        .ambient-wave-3 {
+            animation: ambientDrift3 10s ease-in-out infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes ambientDrift1 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(2%) translateY(-20px); }
+        }
+
+        @keyframes ambientDrift2 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-3%) translateY(-15px); }
+        }
+
+        @keyframes ambientDrift3 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(1.5%) translateY(-25px); }
+        }
+
+        /* Foam particles */
+        .foam-container {
+            position: absolute;
+            width: 100%;
+            height: 150px;
+            bottom: 45%;
+            left: 0;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .foam-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--foam);
+            border-radius: 50%;
+            opacity: 0;
+            animation: foamFloat 4s ease-out infinite;
+        }
+
+        @keyframes foamFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            20% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+
+        /* Stars/reflections */
+        .reflection {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.5); }
+        }
+
+        /* Timer */
+        .wave-timer {
+            position: absolute;
+            bottom: max(2rem, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            text-align: center;
+        }
+
+        .timer-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .stop-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: var(--text-primary);
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stop-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ============================================
+           COMPLETE SCREEN
+           ============================================ */
+
+        .complete-screen {
+            text-align: center;
+            z-index: 30;
+        }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .complete-title {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .complete-message {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .complete-stat {
+            font-size: 1rem;
+            color: var(--coral);
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .done-btn {
+            background: transparent;
+            border: 3px solid var(--coral);
+            color: var(--coral);
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+        }
+
+        .done-btn:hover {
+            background: var(--coral);
+            color: var(--ocean-deep);
+        }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/app.html#imagine" class="back-btn">← Back</a>
+
+        <!-- INTRO SCREEN -->
+        <div class="screen intro-screen active" id="intro-screen">
+            <div class="intro-icon">🌊</div>
+            <h1 class="intro-title">The Wave</h1>
+            <p class="intro-subtitle">Emotions come in waves. They rise, crest, and fall. You don't have to fight them - just watch them pass.</p>
+            <button class="start-btn" id="start-btn">Begin</button>
+        </div>
+
+        <!-- WAVE SCREEN -->
+        <div class="screen wave-screen" id="wave-screen">
+            <div class="wave-content">
+                <div class="wave-instruction" id="wave-instruction">Breathe in...</div>
+                <div class="wave-hint" id="wave-hint">Let the wave rise</div>
+            </div>
+
+            <div class="ocean-container">
+                <!-- Ambient background waves -->
+                <div class="ambient-wave ambient-wave-3">
+                    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                        <path fill="#1a3a5c" d="M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,186.7C672,181,768,203,864,213.3C960,224,1056,224,1152,213.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L0,320Z"></path>
+                    </svg>
+                </div>
+
+                <div class="ambient-wave ambient-wave-2">
+                    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                        <path fill="#15354f" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,261.3C672,256,768,224,864,213.3C960,203,1056,213,1152,218.7C1248,224,1344,224,1392,224L1440,224L1440,320L0,320Z"></path>
+                    </svg>
+                </div>
+
+                <div class="ambient-wave ambient-wave-1">
+                    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                        <path fill="#12304a" d="M0,224L48,218.7C96,213,192,203,288,208C384,213,480,235,576,240C672,245,768,235,864,218.7C960,203,1056,181,1152,181.3C1248,181,1344,203,1392,213.3L1440,224L1440,320L0,320Z"></path>
+                    </svg>
+                </div>
+
+                <!-- Main breathing wave -->
+                <div class="breath-wave" id="breath-wave">
+                    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a8fb8;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2d5a7b;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#waveGradient)" d="M0,160L40,165.3C80,171,160,181,240,192C320,203,400,213,480,208C560,203,640,181,720,176C800,171,880,181,960,192C1040,203,1120,213,1200,208C1280,203,1360,181,1400,170.7L1440,160L1440,320L0,320Z"></path>
+                    </svg>
+                </div>
+
+                <!-- Foam particles -->
+                <div class="foam-container" id="foam-container"></div>
+            </div>
+
+            <!-- Reflections/stars -->
+            <div id="reflections"></div>
+
+            <div class="wave-timer">
+                <div class="timer-text" id="timer-text">Wave 1 of 5</div>
+                <button class="stop-btn" id="stop-btn">I'm Ready</button>
+            </div>
+        </div>
+
+        <!-- COMPLETE SCREEN -->
+        <div class="screen complete-screen" id="complete-screen">
+            <div class="complete-icon">🌅</div>
+            <h2 class="complete-title">The Waves Pass</h2>
+            <p class="complete-message">You watched emotions rise and fall without being swept away. This is acceptance in practice.</p>
+            <div class="complete-stat" id="complete-stat">5 waves observed</div>
+            <button class="done-btn" id="done-btn">Done</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let isRunning = false;
+        let waveCount = 0;
+        let breathPhase = 'inhale'; // inhale or exhale
+        let breathTimer = null;
+        const BREATH_DURATION = 4000; // 4 seconds per phase
+        const TOTAL_WAVES = 5;
+
+        // DOM elements
+        const breathWave = document.getElementById('breath-wave');
+        const instruction = document.getElementById('wave-instruction');
+        const hint = document.getElementById('wave-hint');
+        const timerText = document.getElementById('timer-text');
+
+        // Create foam particles
+        function createFoam() {
+            const container = document.getElementById('foam-container');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'foam-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Create reflections
+        function createReflections() {
+            const container = document.getElementById('reflections');
+            for (let i = 0; i < 15; i++) {
+                const reflection = document.createElement('div');
+                reflection.className = 'reflection';
+                reflection.style.left = Math.random() * 100 + '%';
+                reflection.style.top = 5 + Math.random() * 30 + '%';
+                reflection.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(reflection);
+            }
+        }
+
+        // Breath cycle
+        function breathCycle() {
+            if (!isRunning) return;
+
+            if (breathPhase === 'inhale') {
+                // Rising
+                breathWave.classList.add('inhale');
+                breathWave.classList.remove('exhale');
+                instruction.textContent = 'Breathe in...';
+                hint.textContent = 'Let the wave rise';
+
+                breathPhase = 'exhale';
+            } else {
+                // Falling
+                breathWave.classList.add('exhale');
+                breathWave.classList.remove('inhale');
+                instruction.textContent = 'Breathe out...';
+                hint.textContent = 'Let it fall';
+
+                breathPhase = 'inhale';
+                waveCount++;
+                timerText.textContent = `Wave ${Math.min(waveCount + 1, TOTAL_WAVES)} of ${TOTAL_WAVES}`;
+
+                // Check if done
+                if (waveCount >= TOTAL_WAVES) {
+                    setTimeout(() => {
+                        completeExercise();
+                    }, BREATH_DURATION);
+                    return;
+                }
+            }
+
+            breathTimer = setTimeout(breathCycle, BREATH_DURATION);
+        }
+
+        // Start exercise
+        function startExercise() {
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('wave-screen').classList.add('active');
+
+            isRunning = true;
+            waveCount = 0;
+            breathPhase = 'inhale';
+            timerText.textContent = `Wave 1 of ${TOTAL_WAVES}`;
+
+            // Start with exhale position, then begin cycle
+            breathWave.classList.add('exhale');
+            setTimeout(breathCycle, 500);
+        }
+
+        // Complete exercise
+        function completeExercise() {
+            isRunning = false;
+            clearTimeout(breathTimer);
+
+            document.getElementById('complete-stat').textContent = `${TOTAL_WAVES} waves observed`;
+            document.getElementById('wave-screen').classList.remove('active');
+            document.getElementById('complete-screen').classList.add('active');
+        }
+
+        // Stop early
+        function stopEarly() {
+            isRunning = false;
+            clearTimeout(breathTimer);
+
+            document.getElementById('complete-stat').textContent = `${waveCount} wave${waveCount !== 1 ? 's' : ''} observed`;
+            document.getElementById('wave-screen').classList.remove('active');
+            document.getElementById('complete-screen').classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createFoam();
+            createReflections();
+
+            document.getElementById('start-btn').addEventListener('click', startExercise);
+            document.getElementById('stop-btn').addEventListener('click', stopEarly);
+            document.getElementById('done-btn').addEventListener('click', () => {
+                window.location.href = '/app.html#imagine';
+            });
+        });
+    </script>
+</body>
+</html>

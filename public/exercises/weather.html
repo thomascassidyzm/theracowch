@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Inner Weather | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #0f0d0b;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background 1s ease;
+        }
+
+        /* Weather-specific body backgrounds */
+        body.weather-sunny { background: linear-gradient(180deg, #1a3a5c 0%, #2d5a7b 50%, #d4896a 100%); }
+        body.weather-cloudy { background: linear-gradient(180deg, #2a2d35 0%, #4a5568 50%, #6b7280 100%); }
+        body.weather-overcast { background: linear-gradient(180deg, #1f2328 0%, #374151 100%); }
+        body.weather-rainy { background: linear-gradient(180deg, #1a2634 0%, #2d3e4f 50%, #3d4f5f 100%); }
+        body.weather-stormy { background: linear-gradient(180deg, #0f1419 0%, #1a1f2e 50%, #252d3d 100%); }
+        body.weather-foggy { background: linear-gradient(180deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%); }
+        body.weather-rainbow { background: linear-gradient(180deg, #2d4a6b 0%, #4a6b8a 40%, #7ea88b 70%, #c9a857 100%); }
+        body:not([class*="weather-"]) { background: var(--bg-deep); }
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* ============================================
+           SCREENS
+           ============================================ */
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: max(4rem, env(safe-area-inset-top));
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            color: var(--text-primary);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================
+           SELECTION SCREEN
+           ============================================ */
+
+        .selection-screen {
+            text-align: center;
+        }
+
+        .selection-title {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .selection-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .weather-option {
+            background: rgba(255,255,255,0.08);
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .weather-option:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-4px);
+        }
+
+        .weather-option:active {
+            transform: translateY(0);
+        }
+
+        .weather-icon {
+            font-size: 2.5rem;
+        }
+
+        .weather-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Wide option for rainbow */
+        .weather-option.wide {
+            grid-column: span 2;
+        }
+
+        /* ============================================
+           WEATHER DISPLAY SCREEN
+           ============================================ */
+
+        .weather-screen {
+            position: relative;
+        }
+
+        .weather-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .weather-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 350px;
+        }
+
+        .weather-display-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: weatherFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes weatherFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .weather-display-title {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .weather-display-message {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .weather-prompt {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .weather-prompt p {
+            font-size: 1rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .change-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: var(--text-primary);
+            padding: 0.875rem 2rem;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .change-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* ============================================
+           WEATHER ANIMATIONS
+           ============================================ */
+
+        /* SUNNY - Rays */
+        .sunny-rays {
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+        }
+
+        .sunny-ray {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 300px;
+            background: linear-gradient(to bottom, rgba(255,220,150,0.6), transparent);
+            transform-origin: top center;
+            animation: rayPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes rayPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .sunny-glow {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,200,100,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: sunGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes sunGlow {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+        }
+
+        /* CLOUDY - Drifting clouds */
+        .cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.15);
+            border-radius: 100px;
+            filter: blur(20px);
+        }
+
+        .cloud-1 { width: 300px; height: 100px; top: 10%; animation: cloudDrift 25s linear infinite; }
+        .cloud-2 { width: 250px; height: 80px; top: 25%; animation: cloudDrift 30s linear infinite; animation-delay: -10s; }
+        .cloud-3 { width: 350px; height: 120px; top: 40%; animation: cloudDrift 35s linear infinite; animation-delay: -20s; }
+
+        @keyframes cloudDrift {
+            0% { left: -30%; }
+            100% { left: 110%; }
+        }
+
+        /* OVERCAST - Heavy clouds */
+        .overcast-layer {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 300px 150px at 20% 20%, rgba(100,100,100,0.3), transparent),
+                radial-gradient(ellipse 400px 200px at 60% 30%, rgba(80,80,80,0.4), transparent),
+                radial-gradient(ellipse 350px 180px at 80% 50%, rgba(90,90,90,0.35), transparent),
+                radial-gradient(ellipse 500px 250px at 30% 60%, rgba(70,70,70,0.4), transparent);
+            animation: overcastShift 20s ease-in-out infinite;
+        }
+
+        @keyframes overcastShift {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* RAINY - Falling drops */
+        .rain-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(150,180,200,0.6));
+            animation: rainFall linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        /* STORMY - Lightning + heavy rain */
+        .storm-flash {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            animation: lightning 8s ease-in-out infinite;
+        }
+
+        @keyframes lightning {
+            0%, 89%, 91%, 93%, 100% { opacity: 0; }
+            90%, 92% { opacity: 0.8; }
+        }
+
+        .storm-clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background:
+                radial-gradient(ellipse 400px 200px at 20% 50%, rgba(30,30,40,0.8), transparent),
+                radial-gradient(ellipse 500px 250px at 70% 40%, rgba(25,25,35,0.9), transparent),
+                radial-gradient(ellipse 350px 180px at 50% 60%, rgba(35,35,45,0.7), transparent);
+        }
+
+        /* FOGGY - Mist layers */
+        .fog-layer {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(200,200,200,0.1) 20%,
+                rgba(200,200,200,0.15) 50%,
+                rgba(200,200,200,0.1) 80%,
+                transparent 100%
+            );
+            animation: fogDrift 15s ease-in-out infinite;
+        }
+
+        .fog-layer:nth-child(1) { top: 20%; animation-duration: 15s; }
+        .fog-layer:nth-child(2) { top: 40%; animation-duration: 20s; animation-delay: -5s; }
+        .fog-layer:nth-child(3) { top: 60%; animation-duration: 25s; animation-delay: -10s; }
+
+        @keyframes fogDrift {
+            0%, 100% { transform: translateX(-25%); }
+            50% { transform: translateX(0%); }
+        }
+
+        /* RAINBOW - Arc + shimmer */
+        .rainbow-arc {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 250px;
+            border-radius: 250px 250px 0 0;
+            background: conic-gradient(
+                from 180deg at 50% 100%,
+                transparent 0deg,
+                rgba(255,100,100,0.3) 20deg,
+                rgba(255,180,100,0.3) 40deg,
+                rgba(255,255,100,0.3) 60deg,
+                rgba(100,255,100,0.3) 80deg,
+                rgba(100,200,255,0.3) 100deg,
+                rgba(150,100,255,0.3) 120deg,
+                rgba(255,100,200,0.3) 140deg,
+                transparent 160deg
+            );
+            filter: blur(30px);
+            animation: rainbowShimmer 5s ease-in-out infinite;
+        }
+
+        @keyframes rainbowShimmer {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+        }
+
+        .rainbow-sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ============================================
+           MOBILE
+           ============================================ */
+
+        @media (max-width: 480px) {
+            .weather-grid {
+                gap: 0.75rem;
+            }
+
+            .weather-option {
+                padding: 1.25rem 0.75rem;
+            }
+
+            .weather-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/app.html#imagine" class="back-btn">← Back</a>
+
+        <!-- SELECTION SCREEN -->
+        <div class="screen selection-screen active" id="selection-screen">
+            <h1 class="selection-title">Inner Weather</h1>
+            <p class="selection-subtitle">How does your inner world feel right now?</p>
+
+            <div class="weather-grid">
+                <div class="weather-option" data-weather="sunny">
+                    <span class="weather-icon">☀️</span>
+                    <span class="weather-name">Sunny</span>
+                </div>
+                <div class="weather-option" data-weather="cloudy">
+                    <span class="weather-icon">⛅</span>
+                    <span class="weather-name">Partly Cloudy</span>
+                </div>
+                <div class="weather-option" data-weather="overcast">
+                    <span class="weather-icon">☁️</span>
+                    <span class="weather-name">Overcast</span>
+                </div>
+                <div class="weather-option" data-weather="rainy">
+                    <span class="weather-icon">🌧️</span>
+                    <span class="weather-name">Rainy</span>
+                </div>
+                <div class="weather-option" data-weather="stormy">
+                    <span class="weather-icon">⛈️</span>
+                    <span class="weather-name">Stormy</span>
+                </div>
+                <div class="weather-option" data-weather="foggy">
+                    <span class="weather-icon">🌫️</span>
+                    <span class="weather-name">Foggy</span>
+                </div>
+                <div class="weather-option wide" data-weather="rainbow">
+                    <span class="weather-icon">🌈</span>
+                    <span class="weather-name">Rainbow</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- WEATHER DISPLAY SCREEN -->
+        <div class="screen weather-screen" id="weather-screen">
+            <div class="weather-canvas" id="weather-canvas"></div>
+            <div class="weather-content">
+                <div class="weather-display-icon" id="display-icon"></div>
+                <h2 class="weather-display-title" id="display-title"></h2>
+                <p class="weather-display-message" id="display-message"></p>
+                <div class="weather-prompt">
+                    <p id="display-prompt"></p>
+                </div>
+                <button class="change-btn" id="change-btn">Check Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEATHER_DATA = {
+            sunny: {
+                icon: '☀️',
+                title: 'Sunny',
+                message: "There's warmth and light in your inner world right now. This is a moment worth noticing - let yourself feel it fully.",
+                prompt: "What's contributing to this brightness? How can you carry some of this warmth with you?"
+            },
+            cloudy: {
+                icon: '⛅',
+                title: 'Partly Cloudy',
+                message: "Light and shadow are mixing inside you. That's okay - most days have clouds. The sun is still there, even when it's hidden.",
+                prompt: "What's casting the shadows? What glimpses of light can you still see?"
+            },
+            overcast: {
+                icon: '☁️',
+                title: 'Overcast',
+                message: "A heavy blanket of cloud. Everything feels muted, flat, grey. This is a familiar feeling for many. It doesn't last forever.",
+                prompt: "What would help right now? Sometimes we need rest. Sometimes we need movement. What does your body want?"
+            },
+            rainy: {
+                icon: '🌧️',
+                title: 'Rainy',
+                message: "Tears, release, letting go. Rain nourishes the earth. Sometimes we need to let things flow rather than holding them in.",
+                prompt: "What needs to be released? Can you let this rain fall without fighting it?"
+            },
+            stormy: {
+                icon: '⛈️',
+                title: 'Stormy',
+                message: "Intense energy, turbulence, maybe some fear. Storms are powerful but temporary. You've weathered storms before.",
+                prompt: "What's at the center of this storm? Can you find one small point of stillness to anchor to?"
+            },
+            foggy: {
+                icon: '🌫️',
+                title: 'Foggy',
+                message: "Hard to see clearly, uncertain, disconnected. The fog makes everything feel distant and unclear. But the world is still there.",
+                prompt: "What feels unclear right now? Sometimes we just need to wait for the fog to lift naturally."
+            },
+            rainbow: {
+                icon: '🌈',
+                title: 'Rainbow',
+                message: "Hope emerging from difficulty. The storm isn't fully gone, but there's color breaking through. This is resilience made visible.",
+                prompt: "What helped you get here? What colors are starting to appear in your sky?"
+            }
+        };
+
+        function createWeatherAnimation(type) {
+            const canvas = document.getElementById('weather-canvas');
+            canvas.innerHTML = '';
+
+            switch(type) {
+                case 'sunny':
+                    // Sun glow
+                    const glow = document.createElement('div');
+                    glow.className = 'sunny-glow';
+                    canvas.appendChild(glow);
+
+                    // Rays
+                    const rays = document.createElement('div');
+                    rays.className = 'sunny-rays';
+                    for (let i = 0; i < 12; i++) {
+                        const ray = document.createElement('div');
+                        ray.className = 'sunny-ray';
+                        ray.style.transform = `rotate(${i * 30}deg)`;
+                        ray.style.animationDelay = `${i * 0.2}s`;
+                        rays.appendChild(ray);
+                    }
+                    canvas.appendChild(rays);
+                    break;
+
+                case 'cloudy':
+                    for (let i = 1; i <= 3; i++) {
+                        const cloud = document.createElement('div');
+                        cloud.className = `cloud cloud-${i}`;
+                        canvas.appendChild(cloud);
+                    }
+                    break;
+
+                case 'overcast':
+                    const overcast = document.createElement('div');
+                    overcast.className = 'overcast-layer';
+                    canvas.appendChild(overcast);
+                    break;
+
+                case 'rainy':
+                    const rainContainer = document.createElement('div');
+                    rainContainer.className = 'rain-container';
+                    for (let i = 0; i < 100; i++) {
+                        const drop = document.createElement('div');
+                        drop.className = 'raindrop';
+                        drop.style.left = Math.random() * 100 + '%';
+                        drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+                        drop.style.animationDelay = Math.random() * 2 + 's';
+                        drop.style.opacity = 0.3 + Math.random() * 0.4;
+                        rainContainer.appendChild(drop);
+                    }
+                    canvas.appendChild(rainContainer);
+                    break;
+
+                case 'stormy':
+                    // Storm clouds
+                    const stormClouds = document.createElement('div');
+                    stormClouds.className = 'storm-clouds';
+                    canvas.appendChild(stormClouds);
+
+                    // Lightning flash
+                    const flash = document.createElement('div');
+                    flash.className = 'storm-flash';
+                    canvas.appendChild(flash);
+
+                    // Heavy rain
+                    const stormRain = document.createElement('div');
+                    stormRain.className = 'rain-container';
+                    for (let i = 0; i < 150; i++) {
+                        const drop = document.createElement('div');
+                        drop.className = 'raindrop';
+                        drop.style.left = Math.random() * 100 + '%';
+                        drop.style.animationDuration = (0.3 + Math.random() * 0.3) + 's';
+                        drop.style.animationDelay = Math.random() * 2 + 's';
+                        drop.style.opacity = 0.4 + Math.random() * 0.4;
+                        drop.style.height = '25px';
+                        stormRain.appendChild(drop);
+                    }
+                    canvas.appendChild(stormRain);
+                    break;
+
+                case 'foggy':
+                    for (let i = 0; i < 3; i++) {
+                        const fog = document.createElement('div');
+                        fog.className = 'fog-layer';
+                        canvas.appendChild(fog);
+                    }
+                    break;
+
+                case 'rainbow':
+                    const arc = document.createElement('div');
+                    arc.className = 'rainbow-arc';
+                    canvas.appendChild(arc);
+
+                    // Sparkles
+                    for (let i = 0; i < 15; i++) {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'rainbow-sparkle';
+                        sparkle.style.left = 20 + Math.random() * 60 + '%';
+                        sparkle.style.top = 30 + Math.random() * 40 + '%';
+                        sparkle.style.animationDelay = Math.random() * 2 + 's';
+                        canvas.appendChild(sparkle);
+                    }
+
+                    // Light rain clearing
+                    const lightRain = document.createElement('div');
+                    lightRain.className = 'rain-container';
+                    for (let i = 0; i < 30; i++) {
+                        const drop = document.createElement('div');
+                        drop.className = 'raindrop';
+                        drop.style.left = Math.random() * 100 + '%';
+                        drop.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
+                        drop.style.animationDelay = Math.random() * 3 + 's';
+                        drop.style.opacity = 0.2 + Math.random() * 0.2;
+                        lightRain.appendChild(drop);
+                    }
+                    canvas.appendChild(lightRain);
+                    break;
+            }
+        }
+
+        function showWeather(type) {
+            const data = WEATHER_DATA[type];
+
+            // Update body class for background
+            document.body.className = `weather-${type}`;
+
+            // Update content
+            document.getElementById('display-icon').textContent = data.icon;
+            document.getElementById('display-title').textContent = data.title;
+            document.getElementById('display-message').textContent = data.message;
+            document.getElementById('display-prompt').textContent = data.prompt;
+
+            // Create animation
+            createWeatherAnimation(type);
+
+            // Switch screens
+            document.getElementById('selection-screen').classList.remove('active');
+            document.getElementById('weather-screen').classList.add('active');
+        }
+
+        function showSelection() {
+            document.body.className = '';
+            document.getElementById('weather-screen').classList.remove('active');
+            document.getElementById('selection-screen').classList.add('active');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.weather-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const weather = option.dataset.weather;
+                    showWeather(weather);
+
+                    // Haptic feedback
+                    if (navigator.vibrate) navigator.vibrate(30);
+                });
+            });
+
+            document.getElementById('change-btn').addEventListener('click', showSelection);
+        });
+    </script>
+</body>
+</html>

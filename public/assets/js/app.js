@@ -118,8 +118,8 @@ const IMAGINE_DOMAINS = {
         color: '#B8860B',
         description: 'Acceptance isn\'t about giving up - it\'s about acknowledging reality so you can respond wisely rather than react. These exercises help you make peace with what you cannot change.',
         exercises: [
+            { title: 'The Wave', description: 'Watch emotions rise and fall like ocean waves', duration: '3 min', interactive: 'wave', prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.' },
             { title: 'What Am I Pushing Away?', description: 'Notice thoughts or feelings you might be avoiding', prompt: 'Can you guide me through a resistance scan? I want to gently notice what I might be avoiding or pushing away.' },
-            { title: 'Let the Feeling Rise & Fall', description: 'Learn that emotions come in waves, not permanent states', prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.' },
             { title: 'Sort It Out', description: 'Distinguish between what you can and cannot control', prompt: 'Can you help me do the circle of control exercise? I want to sort out what I can control versus what I need to accept.' }
         ]
     },
@@ -257,14 +257,26 @@ function setupDomainPanel() {
             </button>
         `;
 
+        // Interactive exercise URL mapping
+        const EXERCISE_URLS = {
+            breathing: '/exercises/box-breathing.html',
+            grounding: '/exercises/grounding.html',
+            weather: '/exercises/weather.html',
+            wave: '/exercises/wave.html'
+        };
+
         // Add click handlers for exercise cards
         domainPanelContent.querySelectorAll('.exercise-card').forEach(card => {
             card.addEventListener('click', () => {
                 const interactive = card.dataset.interactive;
-                if (interactive) {
-                    // Open interactive exercise in chat.html
+                if (interactive && EXERCISE_URLS[interactive]) {
+                    // Open dedicated exercise page
                     closeDomainPanel();
-                    window.location.href = `/chat.html#exercise-${interactive}`;
+                    window.location.href = EXERCISE_URLS[interactive];
+                } else if (interactive) {
+                    // Fallback for exercises without dedicated pages
+                    const prompt = card.dataset.prompt;
+                    triggerChatWithPrompt(prompt);
                 } else {
                     // Send prompt to chat
                     const prompt = card.dataset.prompt;

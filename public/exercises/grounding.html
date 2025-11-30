@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>5-4-3-2-1 Grounding | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/assets/theracowch_main_image.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #0f0d0b;
+            --bg-primary: #1a1512;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+
+            /* Sense colors - each sense has its own accent */
+            --see-color: #7EB8DA;      /* Soft blue - vision */
+            --hear-color: #B794C4;     /* Soft purple - sound */
+            --touch-color: #D4896A;    /* Warm coral - tactile */
+            --smell-color: #7EA88B;    /* Sage green - organic */
+            --taste-color: #C9A857;    /* Golden - rich */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================
+           EXERCISE CONTAINER
+           ============================================ */
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: max(2rem, env(safe-area-inset-top));
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           INTRO SCREEN
+           ============================================ */
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .intro-screen {
+            text-align: center;
+        }
+
+        .intro-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        .start-btn {
+            background: var(--touch-color);
+            border: 4px solid rgba(0,0,0,0.3);
+            color: var(--bg-deep);
+            padding: 1.25rem 3rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px rgba(212, 137, 106, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(212, 137, 106, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Floating numbers preview */
+        .numbers-preview {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.25rem;
+            opacity: 0.8;
+            animation: floatNum 3s ease-in-out infinite;
+        }
+
+        .preview-num:nth-child(1) { background: var(--see-color); animation-delay: 0s; }
+        .preview-num:nth-child(2) { background: var(--hear-color); animation-delay: 0.2s; }
+        .preview-num:nth-child(3) { background: var(--touch-color); animation-delay: 0.4s; }
+        .preview-num:nth-child(4) { background: var(--smell-color); animation-delay: 0.6s; }
+        .preview-num:nth-child(5) { background: var(--taste-color); animation-delay: 0.8s; }
+
+        @keyframes floatNum {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ============================================
+           SENSE SCREENS
+           ============================================ */
+
+        .sense-screen {
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Background animation container */
+        .sense-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Sense number */
+        .sense-number {
+            font-size: clamp(6rem, 25vw, 12rem);
+            font-weight: 900;
+            line-height: 1;
+            opacity: 0.15;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        /* Sense label */
+        .sense-label {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .sense-instruction {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Item dots */
+        .item-dots {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .item-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .item-dot.filled {
+            transform: scale(1.2);
+        }
+
+        /* Tap area */
+        .tap-area {
+            width: min(280px, 70vw);
+            height: min(280px, 70vw);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transition: all 0.2s ease;
+            border: 3px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tap-area:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .tap-area:active {
+            transform: scale(0.98);
+        }
+
+        .tap-text {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .tap-hint {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 0.5rem;
+        }
+
+        /* Ripple effect on tap */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            animation: rippleOut 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes rippleOut {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.5;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+                margin-left: -150px;
+                margin-top: -150px;
+            }
+        }
+
+        /* ============================================
+           SEE - Vision ripples
+           ============================================ */
+
+        .see-screen .sense-number,
+        .see-screen .sense-label { color: var(--see-color); }
+        .see-screen .item-dot.filled { background: var(--see-color); border-color: var(--see-color); }
+        .see-screen .tap-area { border-color: rgba(126, 184, 218, 0.3); }
+        .see-screen .ripple { background: var(--see-color); }
+
+        .see-ripples {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .see-ring {
+            position: absolute;
+            border: 2px solid var(--see-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: seeExpand 4s ease-out infinite;
+        }
+
+        .see-ring:nth-child(1) { animation-delay: 0s; }
+        .see-ring:nth-child(2) { animation-delay: 1s; }
+        .see-ring:nth-child(3) { animation-delay: 2s; }
+        .see-ring:nth-child(4) { animation-delay: 3s; }
+
+        @keyframes seeExpand {
+            0% {
+                width: 50px;
+                height: 50px;
+                margin-left: -25px;
+                margin-top: -25px;
+                opacity: 0.6;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                margin-left: -200px;
+                margin-top: -200px;
+                opacity: 0;
+            }
+        }
+
+        /* ============================================
+           HEAR - Sound waves
+           ============================================ */
+
+        .hear-screen .sense-number,
+        .hear-screen .sense-label { color: var(--hear-color); }
+        .hear-screen .item-dot.filled { background: var(--hear-color); border-color: var(--hear-color); }
+        .hear-screen .tap-area { border-color: rgba(183, 148, 196, 0.3); }
+        .hear-screen .ripple { background: var(--hear-color); }
+
+        .hear-waves {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+        }
+
+        .hear-wave {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 4px;
+            background: var(--hear-color);
+            border-radius: 2px;
+            transform-origin: center;
+            animation: hearPulse 1.5s ease-in-out infinite;
+        }
+
+        .hear-wave:nth-child(1) { height: 60px; margin-left: -60px; animation-delay: 0s; }
+        .hear-wave:nth-child(2) { height: 100px; margin-left: -40px; animation-delay: 0.1s; }
+        .hear-wave:nth-child(3) { height: 140px; margin-left: -20px; animation-delay: 0.2s; }
+        .hear-wave:nth-child(4) { height: 80px; margin-left: 0px; animation-delay: 0.3s; }
+        .hear-wave:nth-child(5) { height: 120px; margin-left: 20px; animation-delay: 0.2s; }
+        .hear-wave:nth-child(6) { height: 90px; margin-left: 40px; animation-delay: 0.1s; }
+        .hear-wave:nth-child(7) { height: 50px; margin-left: 60px; animation-delay: 0s; }
+
+        @keyframes hearPulse {
+            0%, 100% {
+                transform: translateY(-50%) scaleY(0.3);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-50%) scaleY(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* ============================================
+           TOUCH - Texture dots
+           ============================================ */
+
+        .touch-screen .sense-number,
+        .touch-screen .sense-label { color: var(--touch-color); }
+        .touch-screen .item-dot.filled { background: var(--touch-color); border-color: var(--touch-color); }
+        .touch-screen .tap-area { border-color: rgba(212, 137, 106, 0.3); }
+        .touch-screen .ripple { background: var(--touch-color); }
+
+        .touch-particles {
+            position: absolute;
+            inset: 0;
+        }
+
+        .touch-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--touch-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: touchFloat 8s ease-in-out infinite;
+        }
+
+        @keyframes touchFloat {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            50% {
+                transform: translateY(-100px) scale(1);
+            }
+        }
+
+        /* ============================================
+           SMELL - Rising wisps
+           ============================================ */
+
+        .smell-screen .sense-number,
+        .smell-screen .sense-label { color: var(--smell-color); }
+        .smell-screen .item-dot.filled { background: var(--smell-color); border-color: var(--smell-color); }
+        .smell-screen .tap-area { border-color: rgba(126, 168, 139, 0.3); }
+        .smell-screen .ripple { background: var(--smell-color); }
+
+        .smell-wisps {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .smell-wisp {
+            position: absolute;
+            width: 40px;
+            height: 150px;
+            background: linear-gradient(to top, var(--smell-color), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            filter: blur(15px);
+            animation: smellRise 4s ease-out infinite;
+        }
+
+        .smell-wisp:nth-child(1) { left: -40px; animation-delay: 0s; }
+        .smell-wisp:nth-child(2) { left: 0px; animation-delay: 1s; }
+        .smell-wisp:nth-child(3) { left: 40px; animation-delay: 2s; }
+
+        @keyframes smellRise {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scaleX(1);
+            }
+            20% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-200px) scaleX(1.5);
+            }
+        }
+
+        /* ============================================
+           TASTE - Drop ripple
+           ============================================ */
+
+        .taste-screen .sense-number,
+        .taste-screen .sense-label { color: var(--taste-color); }
+        .taste-screen .item-dot.filled { background: var(--taste-color); border-color: var(--taste-color); }
+        .taste-screen .tap-area { border-color: rgba(201, 168, 87, 0.3); }
+        .taste-screen .ripple { background: var(--taste-color); }
+
+        .taste-drop {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .taste-droplet {
+            width: 20px;
+            height: 30px;
+            background: var(--taste-color);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: tasteFall 3s ease-in infinite;
+            opacity: 0.8;
+        }
+
+        .taste-splash {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .taste-ring {
+            position: absolute;
+            border: 2px solid var(--taste-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: tasteSplash 3s ease-out infinite;
+        }
+
+        .taste-ring:nth-child(1) { animation-delay: 1s; }
+        .taste-ring:nth-child(2) { animation-delay: 1.2s; }
+        .taste-ring:nth-child(3) { animation-delay: 1.4s; }
+
+        @keyframes tasteFall {
+            0%, 30% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 0.8;
+            }
+            35% {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes tasteSplash {
+            0% {
+                width: 10px;
+                height: 5px;
+                margin-left: -5px;
+                opacity: 0;
+            }
+            35% {
+                opacity: 0;
+            }
+            40% {
+                opacity: 0.6;
+            }
+            100% {
+                width: 200px;
+                height: 100px;
+                margin-left: -100px;
+                opacity: 0;
+            }
+        }
+
+        /* ============================================
+           COMPLETE SCREEN
+           ============================================ */
+
+        .complete-screen {
+            text-align: center;
+        }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: completeFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes completeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .complete-title {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .complete-message {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .complete-stats {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .stat-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .done-btn {
+            background: transparent;
+            border: 3px solid var(--touch-color);
+            color: var(--touch-color);
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+        }
+
+        .done-btn:hover {
+            background: var(--touch-color);
+            color: var(--bg-deep);
+        }
+
+        /* Screen transitions */
+        .screen {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .screen:not(.active) {
+            transform: scale(0.95);
+        }
+
+        /* ============================================
+           MOBILE ADJUSTMENTS
+           ============================================ */
+
+        @media (max-width: 480px) {
+            .tap-area {
+                width: min(260px, 80vw);
+                height: min(260px, 80vw);
+            }
+
+            .numbers-preview {
+                gap: 1rem;
+            }
+
+            .preview-num {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/app.html#imagine" class="back-btn">← Back</a>
+
+        <!-- INTRO SCREEN -->
+        <div class="screen intro-screen active" id="intro-screen">
+            <div class="numbers-preview">
+                <div class="preview-num">5</div>
+                <div class="preview-num">4</div>
+                <div class="preview-num">3</div>
+                <div class="preview-num">2</div>
+                <div class="preview-num">1</div>
+            </div>
+            <h1 class="intro-title">Ground Yourself</h1>
+            <p class="intro-subtitle">Use your senses to anchor in the present moment. Notice what's around you right now.</p>
+            <button class="start-btn" id="start-btn">Begin</button>
+        </div>
+
+        <!-- SEE SCREEN (5 things) -->
+        <div class="screen sense-screen see-screen" id="see-screen">
+            <div class="sense-bg">
+                <div class="see-ripples">
+                    <div class="see-ring"></div>
+                    <div class="see-ring"></div>
+                    <div class="see-ring"></div>
+                    <div class="see-ring"></div>
+                </div>
+            </div>
+            <div class="sense-number">5</div>
+            <div class="sense-label">See</div>
+            <p class="sense-instruction">Notice 5 things you can see</p>
+            <div class="item-dots" id="see-dots">
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+            </div>
+            <div class="tap-area" id="see-tap">
+                <span class="tap-text">Tap when you notice one</span>
+                <span class="tap-hint">Look around you</span>
+            </div>
+        </div>
+
+        <!-- HEAR SCREEN (4 things) -->
+        <div class="screen sense-screen hear-screen" id="hear-screen">
+            <div class="sense-bg">
+                <div class="hear-waves">
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                    <div class="hear-wave"></div>
+                </div>
+            </div>
+            <div class="sense-number">4</div>
+            <div class="sense-label">Hear</div>
+            <p class="sense-instruction">Notice 4 things you can hear</p>
+            <div class="item-dots" id="hear-dots">
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+            </div>
+            <div class="tap-area" id="hear-tap">
+                <span class="tap-text">Tap when you notice one</span>
+                <span class="tap-hint">Listen carefully</span>
+            </div>
+        </div>
+
+        <!-- TOUCH SCREEN (3 things) -->
+        <div class="screen sense-screen touch-screen" id="touch-screen">
+            <div class="sense-bg">
+                <div class="touch-particles" id="touch-particles"></div>
+            </div>
+            <div class="sense-number">3</div>
+            <div class="sense-label">Touch</div>
+            <p class="sense-instruction">Notice 3 things you can feel</p>
+            <div class="item-dots" id="touch-dots">
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+            </div>
+            <div class="tap-area" id="touch-tap">
+                <span class="tap-text">Tap when you notice one</span>
+                <span class="tap-hint">What textures surround you?</span>
+            </div>
+        </div>
+
+        <!-- SMELL SCREEN (2 things) -->
+        <div class="screen sense-screen smell-screen" id="smell-screen">
+            <div class="sense-bg">
+                <div class="smell-wisps">
+                    <div class="smell-wisp"></div>
+                    <div class="smell-wisp"></div>
+                    <div class="smell-wisp"></div>
+                </div>
+            </div>
+            <div class="sense-number">2</div>
+            <div class="sense-label">Smell</div>
+            <p class="sense-instruction">Notice 2 things you can smell</p>
+            <div class="item-dots" id="smell-dots">
+                <div class="item-dot"></div>
+                <div class="item-dot"></div>
+            </div>
+            <div class="tap-area" id="smell-tap">
+                <span class="tap-text">Tap when you notice one</span>
+                <span class="tap-hint">Take a breath</span>
+            </div>
+        </div>
+
+        <!-- TASTE SCREEN (1 thing) -->
+        <div class="screen sense-screen taste-screen" id="taste-screen">
+            <div class="sense-bg">
+                <div class="taste-drop">
+                    <div class="taste-droplet"></div>
+                </div>
+                <div class="taste-splash">
+                    <div class="taste-ring"></div>
+                    <div class="taste-ring"></div>
+                    <div class="taste-ring"></div>
+                </div>
+            </div>
+            <div class="sense-number">1</div>
+            <div class="sense-label">Taste</div>
+            <p class="sense-instruction">Notice 1 thing you can taste</p>
+            <div class="item-dots" id="taste-dots">
+                <div class="item-dot"></div>
+            </div>
+            <div class="tap-area" id="taste-tap">
+                <span class="tap-text">Tap when you notice one</span>
+                <span class="tap-hint">What's on your tongue?</span>
+            </div>
+        </div>
+
+        <!-- COMPLETE SCREEN -->
+        <div class="screen complete-screen" id="complete-screen">
+            <div class="complete-icon">🌿</div>
+            <h2 class="complete-title">You're Here</h2>
+            <p class="complete-message">You've grounded yourself in this moment. All 15 things you noticed are anchors to the present.</p>
+            <div class="complete-stats">
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--see-color);"></div>
+                    <span>5 seen</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--hear-color);"></div>
+                    <span>4 heard</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--touch-color);"></div>
+                    <span>3 felt</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--smell-color);"></div>
+                    <span>2 smelled</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--taste-color);"></div>
+                    <span>1 tasted</span>
+                </div>
+            </div>
+            <button class="done-btn" id="done-btn">Done</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const SENSES = [
+            { id: 'see', count: 5 },
+            { id: 'hear', count: 4 },
+            { id: 'touch', count: 3 },
+            { id: 'smell', count: 2 },
+            { id: 'taste', count: 1 }
+        ];
+
+        let currentSenseIndex = 0;
+        let currentCount = 0;
+
+        // Generate touch particles
+        function generateTouchParticles() {
+            const container = document.getElementById('touch-particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'touch-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Show screen
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Add ripple effect
+        function addRipple(element, color) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.background = color;
+            ripple.style.left = '50%';
+            ripple.style.top = '50%';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Handle tap
+        function handleTap(senseId) {
+            const sense = SENSES[currentSenseIndex];
+            const dots = document.querySelectorAll(`#${senseId}-dots .item-dot`);
+            const tapArea = document.getElementById(`${senseId}-tap`);
+
+            // Get the sense color
+            const colors = {
+                see: '#7EB8DA',
+                hear: '#B794C4',
+                touch: '#D4896A',
+                smell: '#7EA88B',
+                taste: '#C9A857'
+            };
+
+            // Add ripple
+            addRipple(tapArea, colors[senseId]);
+
+            // Fill dot
+            if (currentCount < sense.count) {
+                dots[currentCount].classList.add('filled');
+                currentCount++;
+
+                // Haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+
+                // Check if sense complete
+                if (currentCount >= sense.count) {
+                    setTimeout(() => {
+                        currentSenseIndex++;
+                        currentCount = 0;
+
+                        if (currentSenseIndex >= SENSES.length) {
+                            showScreen('complete-screen');
+                        } else {
+                            showScreen(`${SENSES[currentSenseIndex].id}-screen`);
+                        }
+                    }, 500);
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTouchParticles();
+
+            // Start button
+            document.getElementById('start-btn').addEventListener('click', () => {
+                showScreen('see-screen');
+            });
+
+            // Tap areas
+            SENSES.forEach(sense => {
+                document.getElementById(`${sense.id}-tap`).addEventListener('click', () => {
+                    handleTap(sense.id);
+                });
+            });
+
+            // Done button
+            document.getElementById('done-btn').addEventListener('click', () => {
+                window.location.href = '/app.html#imagine';
+            });
+        });
+    </script>
+</body>
+</html>
