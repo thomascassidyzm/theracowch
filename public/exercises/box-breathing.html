@@ -197,7 +197,13 @@
         .tick {
             width: 2px;
             height: 100%;
-            background: rgba(12, 10, 9, 0.6);
+            background: rgba(224, 122, 95, 0.15);
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tick.lit {
+            background: var(--breath);
+            box-shadow: 0 0 8px var(--breath);
         }
 
         .tick-marks.vertical .tick {
@@ -226,29 +232,6 @@
         .corner.tr { top: 0; left: 100%; }
         .corner.br { top: 100%; left: 100%; }
         .corner.bl { top: 100%; left: 0; }
-
-        /* Side labels - outside the box area */
-        .side-label {
-            position: absolute;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            opacity: 0.4;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .side-label.active {
-            color: var(--breath);
-            opacity: 1;
-        }
-
-        .side-label.top { top: -2.5rem; left: 50%; transform: translateX(-50%); }
-        .side-label.right { right: -2.5rem; top: 50%; transform: translateY(-50%); }
-        .side-label.bottom { bottom: -2.5rem; left: 50%; transform: translateX(-50%); }
-        .side-label.left { left: -2.5rem; top: 50%; transform: translateY(-50%); }
 
         /* Center content */
         .center-content {
@@ -475,35 +458,35 @@
             <!-- Fixed outer frame with edge timers -->
             <div class="box-frame">
                 <!-- Edge tracks with progress -->
-                <div class="edge-track top">
+                <div class="edge-track top" data-edge="top">
                     <div class="tick-marks horizontal">
-                        <span class="tick"></span>
-                        <span class="tick"></span>
-                        <span class="tick"></span>
+                        <span class="tick" data-tick="1"></span>
+                        <span class="tick" data-tick="2"></span>
+                        <span class="tick" data-tick="3"></span>
                     </div>
                     <div class="edge-progress" id="progress-top"></div>
                 </div>
-                <div class="edge-track right">
+                <div class="edge-track right" data-edge="right">
                     <div class="tick-marks vertical right">
-                        <span class="tick"></span>
-                        <span class="tick"></span>
-                        <span class="tick"></span>
+                        <span class="tick" data-tick="1"></span>
+                        <span class="tick" data-tick="2"></span>
+                        <span class="tick" data-tick="3"></span>
                     </div>
                     <div class="edge-progress" id="progress-right"></div>
                 </div>
-                <div class="edge-track bottom">
+                <div class="edge-track bottom" data-edge="bottom">
                     <div class="tick-marks horizontal bottom">
-                        <span class="tick"></span>
-                        <span class="tick"></span>
-                        <span class="tick"></span>
+                        <span class="tick" data-tick="1"></span>
+                        <span class="tick" data-tick="2"></span>
+                        <span class="tick" data-tick="3"></span>
                     </div>
                     <div class="edge-progress" id="progress-bottom"></div>
                 </div>
-                <div class="edge-track left">
+                <div class="edge-track left" data-edge="left">
                     <div class="tick-marks vertical left">
-                        <span class="tick"></span>
-                        <span class="tick"></span>
-                        <span class="tick"></span>
+                        <span class="tick" data-tick="1"></span>
+                        <span class="tick" data-tick="2"></span>
+                        <span class="tick" data-tick="3"></span>
                     </div>
                     <div class="edge-progress" id="progress-left"></div>
                 </div>
@@ -514,12 +497,6 @@
                 <div class="corner br" data-corner="2"></div>
                 <div class="corner bl" data-corner="3"></div>
             </div>
-
-            <!-- Labels outside box area -->
-            <span class="side-label top">IN</span>
-            <span class="side-label right">HOLD</span>
-            <span class="side-label bottom">OUT</span>
-            <span class="side-label left">HOLD</span>
 
             <!-- Center text -->
             <div class="center-content">
@@ -614,7 +591,7 @@
         };
 
         const corners = document.querySelectorAll('.corner');
-        const sideLabels = document.querySelectorAll('.side-label');
+        const edgeTracks = document.querySelectorAll('.edge-track');
 
         // Duration buttons
         document.querySelectorAll('.duration-btn').forEach(btn => {
@@ -701,6 +678,8 @@
                 if (newCountdown !== state.countdown) {
                     state.countdown = newCountdown;
                     countdownEl.textContent = state.countdown;
+                    // Light up tick marks as seconds pass
+                    updateTickMarks(4 - newCountdown);
                 }
 
                 if (progress >= 1) {
@@ -756,19 +735,37 @@
             });
         }
 
+        function updateTickMarks(secondsPassed) {
+            const edge = PHASES[state.phase].edge;
+            const currentTrack = document.querySelector(`.edge-track[data-edge="${edge}"]`);
+            const ticks = currentTrack.querySelectorAll('.tick');
+
+            ticks.forEach((tick, index) => {
+                // Light up ticks as seconds pass (tick 1 at 1s, tick 2 at 2s, tick 3 at 3s)
+                if (index < secondsPassed) {
+                    tick.classList.add('lit');
+                } else {
+                    tick.classList.remove('lit');
+                }
+            });
+        }
+
+        function resetAllTicks() {
+            document.querySelectorAll('.tick').forEach(tick => {
+                tick.classList.remove('lit');
+            });
+        }
+
         function updatePhase() {
             const phase = PHASES[state.phase];
 
-            // Reset progress bars
+            // Reset progress bars and ticks
             resetAllProgress();
+            resetAllTicks();
 
             // Update corners
             corners.forEach(c => c.classList.remove('active'));
             corners[phase.corner].classList.add('active');
-
-            // Update labels
-            sideLabels.forEach(l => l.classList.remove('active'));
-            document.querySelector(`.side-label.${phase.edge}`).classList.add('active');
 
             // Update word
             phaseWord.classList.remove('visible');
@@ -844,8 +841,8 @@
 
             setScale(SCALE_MIN);
             resetAllProgress();
+            resetAllTicks();
             corners.forEach(c => c.classList.remove('active'));
-            sideLabels.forEach(l => l.classList.remove('active'));
 
             state.isRunning = false;
             state.isPaused = false;
