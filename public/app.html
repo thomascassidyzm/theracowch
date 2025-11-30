@@ -499,6 +499,22 @@
             max-width: 85%;
             line-height: 1.6;
             animation: messageSlideIn 0.3s ease-out;
+            font-family: var(--font-family);
+        }
+
+        /* Ensure all message content uses Gabarito */
+        .message ul, .message ol, .message li,
+        .message p, .message strong, .message em {
+            font-family: inherit;
+        }
+
+        .message ul {
+            padding-left: 1.25em;
+            margin: var(--space-sm) 0;
+        }
+
+        .message li {
+            margin-bottom: var(--space-xs);
         }
 
         @keyframes messageSlideIn {

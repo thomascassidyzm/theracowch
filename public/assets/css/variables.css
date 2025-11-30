@@ -7,8 +7,9 @@
 
 :root {
     /* ===== Typography ===== */
+    --font-family: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-display: 'Gabarito', sans-serif;
-    --font-body: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: var(--font-family);
 
     /* Font Sizes */
     --font-size-xs: 0.75rem;    /* 12px */

@@ -65,10 +65,17 @@ a:hover {
 ul, ol {
     padding-left: var(--space-lg);
     margin-bottom: var(--space-md);
+    font-family: inherit;
 }
 
 li {
     margin-bottom: var(--space-xs);
+    font-family: inherit;
+}
+
+/* Ensure inline elements inherit font */
+strong, b, em, i, span {
+    font-family: inherit;
 }
 
 /* Selection */
