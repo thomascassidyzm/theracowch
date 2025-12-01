@@ -97,6 +97,19 @@
                 12px 12px 0 0 var(--coral);
         }
 
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-full);
+        }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-small);
+        }
+
         .greeting-text-wrapper {
             flex: 1;
         }
@@ -1821,7 +1834,9 @@
                 <div class="home-tab">
                     <!-- Greeting with Mandy Avatar -->
                     <div class="greeting-section">
-                        <div class="avatar-container">🐄</div>
+                        <div class="avatar-container">
+                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="avatar-img">
+                        </div>
                         <div class="greeting-text-wrapper">
                             <h1 id="greeting-text">good morning</h1>
                             <p>How are you feeling today?</p>
@@ -2005,7 +2020,7 @@
                 <div class="chat-tab">
                     <header class="chat-header">
                         <div class="chat-header-title">
-                            <span>🐄</span>
+                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="chat-avatar">
                             <h1>Mandy</h1>
                         </div>
                         <button class="new-chat-btn" id="new-chat-btn" aria-label="New Chat">
