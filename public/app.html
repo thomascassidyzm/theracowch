@@ -350,6 +350,29 @@
             }
         }
 
+        .exercises-see-all {
+            display: block;
+            width: 100%;
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: transparent;
+            border: var(--border-medium) dashed var(--border-warm);
+            border-radius: var(--radius-medium);
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+        }
+
+        .exercises-see-all:hover {
+            border-color: var(--coral);
+            border-style: solid;
+            color: var(--coral);
+            background: var(--bg-card);
+        }
+
         /* IMAGINE Mini Preview */
         .imagine-mini {
             animation: fadeIn 0.8s ease-out 0.4s both;
@@ -2035,14 +2058,14 @@
                                 <span class="exercise-name">Box Breathing</span>
                                 <span class="exercise-time">4 min</span>
                             </a>
-                            <a href="/exercises/grounding.html" class="exercise-card" style="--ex-color: #7EB8DA;">
-                                <span class="exercise-icon">👁️</span>
-                                <span class="exercise-name">5-4-3-2-1</span>
+                            <a href="/exercises/gratitude.html" class="exercise-card" style="--ex-color: #ffd700;">
+                                <span class="exercise-icon">⭐</span>
+                                <span class="exercise-name">Gratitude Stars</span>
                                 <span class="exercise-time">3 min</span>
                             </a>
-                            <a href="/exercises/weather.html" class="exercise-card" style="--ex-color: #B794C4;">
-                                <span class="exercise-icon">🌤️</span>
-                                <span class="exercise-name">Inner Weather</span>
+                            <a href="/exercises/joy.html" class="exercise-card" style="--ex-color: #ff9ecd;">
+                                <span class="exercise-icon">🫧</span>
+                                <span class="exercise-name">Joy Bubbles</span>
                                 <span class="exercise-time">2 min</span>
                             </a>
                             <a href="/exercises/wave.html" class="exercise-card" style="--ex-color: #4a8fb8;">
@@ -2051,6 +2074,7 @@
                                 <span class="exercise-time">3 min</span>
                             </a>
                         </div>
+                        <button class="exercises-see-all" id="home-see-all-exercises">See all 8 exercises →</button>
                     </div>
 
                     <!-- IMAGINE Mini Preview -->
@@ -2583,6 +2607,42 @@
                             <h3>The Wave</h3>
                             <p>Watch emotions rise and fall like ocean waves</p>
                             <span class="exercise-panel-meta">3 min • Accept</span>
+                        </div>
+                    </a>
+
+                    <a href="/exercises/gratitude.html" class="exercise-panel-card" style="--ex-accent: #ffd700;">
+                        <div class="exercise-panel-icon">⭐</div>
+                        <div class="exercise-panel-info">
+                            <h3>Gratitude Stars</h3>
+                            <p>Name what you're grateful for and watch stars fill your sky</p>
+                            <span class="exercise-panel-meta">3 min • Gratitude</span>
+                        </div>
+                    </a>
+
+                    <a href="/exercises/kindness.html" class="exercise-panel-card" style="--ex-accent: #e94560;">
+                        <div class="exercise-panel-icon">💗</div>
+                        <div class="exercise-panel-info">
+                            <h3>Kindness Ripple</h3>
+                            <p>Send warm thoughts to people you care about</p>
+                            <span class="exercise-panel-meta">3 min • Interact</span>
+                        </div>
+                    </a>
+
+                    <a href="/exercises/joy.html" class="exercise-panel-card" style="--ex-accent: #ff9ecd;">
+                        <div class="exercise-panel-icon">🫧</div>
+                        <div class="exercise-panel-info">
+                            <h3>Joy Bubbles</h3>
+                            <p>Pop bubbles. No goals, no pressure. Just play.</p>
+                            <span class="exercise-panel-meta">2 min • Nurture</span>
+                        </div>
+                    </a>
+
+                    <a href="/exercises/wonder.html" class="exercise-panel-card" style="--ex-accent: #667eea;">
+                        <div class="exercise-panel-icon">🃏</div>
+                        <div class="exercise-panel-info">
+                            <h3>Wonder Cards</h3>
+                            <p>Flip cards to discover tiny adventures and new ideas</p>
+                            <span class="exercise-panel-meta">2 min • Explore</span>
                         </div>
                     </a>
                 </div>

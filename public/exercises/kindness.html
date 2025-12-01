@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Kindness Ripple | Cowch</title>
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1a2e;
+            --bg-mid: #16213e;
+            --ripple-primary: #e94560;
+            --ripple-secondary: #ff6b6b;
+            --ripple-glow: rgba(233, 69, 96, 0.4);
+            --heart-pink: #ff8fab;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: radial-gradient(ellipse at center, var(--bg-mid) 0%, var(--bg-deep) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Ripple canvas */
+        .ripple-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Ambient particles */
+        .ambient-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--heart-pink);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+            50% { transform: translateY(-30px) translateX(10px); opacity: 0.5; }
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid var(--ripple-primary);
+            animation: rippleExpand 3s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes rippleExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+                border-width: 4px;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+                border-width: 1px;
+                margin-left: -200px;
+                margin-top: -200px;
+            }
+        }
+
+        /* Heart burst */
+        .heart-burst {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: heartFloat 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes heartFloat {
+            0% {
+                opacity: 1;
+                transform: scale(0) translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1.2) translateY(-20px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8) translateY(-100px);
+            }
+        }
+
+        /* Center glow */
+        .center-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--ripple-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: max(4rem, env(safe-area-inset-top));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            z-index: 50;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Intro screen */
+        .intro-screen {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+        }
+
+        .intro-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: heartBeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+            60% { transform: scale(1); }
+        }
+
+        .intro-title {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--ripple-primary), var(--heart-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .start-btn {
+            background: var(--ripple-primary);
+            border: 4px solid rgba(0,0,0,0.2);
+            color: white;
+            padding: 1.25rem 3rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px var(--ripple-glow);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px var(--ripple-glow);
+        }
+
+        /* Main screen */
+        .main-screen {
+            justify-content: flex-end;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            background: transparent;
+        }
+
+        .kindness-count {
+            position: absolute;
+            top: max(1.5rem, env(safe-area-inset-top));
+            right: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--heart-pink);
+        }
+
+        .input-section {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .prompt-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .recipient-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-bottom: 0.75rem;
+        }
+
+        .recipient-input:focus {
+            border-color: var(--ripple-primary);
+            box-shadow: 0 0 20px var(--ripple-glow);
+        }
+
+        .recipient-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .wish-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .wish-chip {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .wish-chip:hover {
+            background: var(--ripple-primary);
+            border-color: var(--ripple-primary);
+            color: white;
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--ripple-primary);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px var(--ripple-glow);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--ripple-glow);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .done-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .done-link:hover {
+            color: var(--coral);
+        }
+
+        /* Sent message */
+        .sent-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 60;
+        }
+
+        .sent-message.show {
+            opacity: 1;
+            animation: sentPulse 2s ease-out forwards;
+        }
+
+        @keyframes sentPulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .sent-message-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--heart-pink);
+            text-shadow: 0 0 20px var(--ripple-glow);
+        }
+
+        /* Complete screen */
+        .complete-screen {
+            text-align: center;
+            background: rgba(26, 26, 46, 0.95);
+        }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .complete-title {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--heart-pink);
+        }
+
+        .complete-message {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .complete-stat {
+            font-size: 1rem;
+            color: var(--coral);
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .finish-btn {
+            background: transparent;
+            border: 3px solid var(--coral);
+            color: var(--coral);
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+        }
+
+        .finish-btn:hover {
+            background: var(--coral);
+            color: var(--bg-deep);
+        }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/app.html" class="back-btn">← Back</a>
+
+        <!-- Ripple canvas -->
+        <div class="ripple-canvas" id="ripple-canvas">
+            <div class="center-glow"></div>
+        </div>
+
+        <!-- Sent message overlay -->
+        <div class="sent-message" id="sent-message">
+            <div class="sent-message-text" id="sent-message-text">💕 Sending warmth...</div>
+        </div>
+
+        <!-- INTRO SCREEN -->
+        <div class="screen intro-screen active" id="intro-screen">
+            <div class="intro-icon">💗</div>
+            <h1 class="intro-title">Kindness Ripple</h1>
+            <p class="intro-subtitle">Send warm thoughts to people you care about. Watch your kindness ripple outward into the world.</p>
+            <button class="start-btn" id="start-btn">Begin</button>
+        </div>
+
+        <!-- MAIN SCREEN -->
+        <div class="screen main-screen" id="main-screen">
+            <div class="kindness-count">
+                <span id="kindness-count">0</span> 💕
+            </div>
+
+            <div class="input-section">
+                <div class="prompt-text">Who would you like to send warmth to?</div>
+                <input type="text" class="recipient-input" id="recipient-input" placeholder="A name, or just 'someone'..." maxlength="30" autocomplete="off">
+
+                <div class="wish-suggestions">
+                    <button class="wish-chip" data-wish="peace">Peace</button>
+                    <button class="wish-chip" data-wish="joy">Joy</button>
+                    <button class="wish-chip" data-wish="strength">Strength</button>
+                    <button class="wish-chip" data-wish="love">Love</button>
+                    <button class="wish-chip" data-wish="healing">Healing</button>
+                </div>
+
+                <button class="send-btn" id="send-btn" disabled>Send Warmth 💕</button>
+                <a href="#" class="done-link" id="done-link">I'm done for now</a>
+            </div>
+        </div>
+
+        <!-- COMPLETE SCREEN -->
+        <div class="screen complete-screen" id="complete-screen">
+            <div class="complete-icon">✨</div>
+            <h2 class="complete-title">Kindness Sent</h2>
+            <p class="complete-message">Your warmth ripples outward, touching lives in ways you may never know. This is connection.</p>
+            <div class="complete-stat" id="complete-stat">5 moments of kindness</div>
+            <button class="finish-btn" id="finish-btn">Done</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let kindnessCount = 0;
+        let selectedWish = '';
+        const recipients = [];
+
+        // DOM elements
+        const rippleCanvas = document.getElementById('ripple-canvas');
+        const recipientInput = document.getElementById('recipient-input');
+        const sendBtn = document.getElementById('send-btn');
+        const countDisplay = document.getElementById('kindness-count');
+        const sentMessage = document.getElementById('sent-message');
+        const sentMessageText = document.getElementById('sent-message-text');
+
+        // Create ambient particles
+        function createAmbientParticles() {
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'ambient-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                rippleCanvas.appendChild(particle);
+            }
+        }
+
+        // Create ripple effect
+        function createRipple() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // Create multiple ripples with delay
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    ripple.style.left = centerX + 'px';
+                    ripple.style.top = centerY + 'px';
+                    rippleCanvas.appendChild(ripple);
+
+                    // Remove after animation
+                    setTimeout(() => ripple.remove(), 3000);
+                }, i * 300);
+            }
+
+            // Create heart bursts
+            const hearts = ['💕', '💗', '💖', '💝', '✨'];
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-burst';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+
+                    // Random position around center
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 30 + Math.random() * 50;
+                    heart.style.left = (centerX + Math.cos(angle) * distance) + 'px';
+                    heart.style.top = (centerY + Math.sin(angle) * distance) + 'px';
+
+                    rippleCanvas.appendChild(heart);
+                    setTimeout(() => heart.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // Send kindness
+        function sendKindness() {
+            const recipient = recipientInput.value.trim() || 'someone';
+            const wish = selectedWish || 'warmth';
+
+            // Show sent message
+            sentMessageText.textContent = `💕 Sending ${wish} to ${recipient}...`;
+            sentMessage.classList.add('show');
+
+            // Create visual effect
+            createRipple();
+
+            // Update state
+            kindnessCount++;
+            countDisplay.textContent = kindnessCount;
+            recipients.push({ recipient, wish });
+
+            // Reset input
+            recipientInput.value = '';
+            selectedWish = '';
+            document.querySelectorAll('.wish-chip').forEach(c => c.style.background = '');
+            sendBtn.disabled = true;
+
+            // Hide sent message
+            setTimeout(() => {
+                sentMessage.classList.remove('show');
+            }, 2000);
+        }
+
+        // Start exercise
+        function startExercise() {
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('main-screen').classList.add('active');
+            recipientInput.focus();
+        }
+
+        // Complete exercise
+        function completeExercise() {
+            document.getElementById('complete-stat').textContent = `${kindnessCount} moment${kindnessCount !== 1 ? 's' : ''} of kindness`;
+            document.getElementById('main-screen').classList.remove('active');
+            document.getElementById('complete-screen').classList.add('active');
+        }
+
+        // Update button state
+        function updateButtonState() {
+            sendBtn.disabled = !recipientInput.value.trim() && !selectedWish;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createAmbientParticles();
+
+            document.getElementById('start-btn').addEventListener('click', startExercise);
+
+            recipientInput.addEventListener('input', updateButtonState);
+
+            // Wish chip selection
+            document.querySelectorAll('.wish-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.wish-chip').forEach(c => {
+                        c.style.background = '';
+                        c.style.borderColor = '';
+                        c.style.color = '';
+                    });
+                    chip.style.background = 'var(--ripple-primary)';
+                    chip.style.borderColor = 'var(--ripple-primary)';
+                    chip.style.color = 'white';
+                    selectedWish = chip.dataset.wish;
+                    updateButtonState();
+                });
+            });
+
+            recipientInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !sendBtn.disabled) {
+                    sendKindness();
+                }
+            });
+
+            sendBtn.addEventListener('click', sendKindness);
+
+            document.getElementById('done-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (kindnessCount > 0) {
+                    completeExercise();
+                } else {
+                    window.location.href = '/app.html';
+                }
+            });
+
+            document.getElementById('finish-btn').addEventListener('click', () => {
+                window.location.href = '/app.html';
+            });
+        });
+    </script>
+</body>
+</html>

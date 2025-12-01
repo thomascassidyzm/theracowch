@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Wonder Cards | Cowch</title>
+    <meta name="theme-color" content="#2d1b4e">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #2d1b4e;
+            --bg-mid: #3d2963;
+            --card-front: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-back: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gold: #ffd700;
+            --accent-pink: #ff6b9d;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Magic particles */
+        .magic-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .magic-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: sparkle 4s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: max(4rem, env(safe-area-inset-top));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            z-index: 50;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Intro screen */
+        .intro-screen {
+            text-align: center;
+        }
+
+        .intro-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .intro-title {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .start-btn {
+            background: var(--card-front);
+            border: 4px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 1.25rem 3rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Card screen */
+        .card-screen {
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .card-counter {
+            position: absolute;
+            top: max(1.5rem, env(safe-area-inset-top));
+            right: 1.5rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .card-instruction {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-instruction-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* Card container */
+        .card-container {
+            perspective: 1000px;
+            width: 280px;
+            height: 380px;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.3),
+                0 0 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .card-front {
+            background: var(--card-front);
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .card-front-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-front-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .card-front-hint {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 1rem;
+        }
+
+        .card-back {
+            background: var(--text-primary);
+            color: var(--bg-deep);
+            transform: rotateY(180deg);
+            border: 3px solid rgba(0,0,0,0.1);
+        }
+
+        .card-category {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-pink);
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 107, 157, 0.1);
+            border-radius: 20px;
+        }
+
+        .card-prompt {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--bg-deep);
+        }
+
+        .card-subtext {
+            font-size: 0.9rem;
+            color: rgba(45, 27, 78, 0.6);
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Card actions */
+        .card-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .next-btn {
+            background: var(--card-front);
+            border: none;
+            color: white;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .done-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: var(--text-primary);
+        }
+
+        .done-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Complete screen */
+        .complete-screen {
+            text-align: center;
+        }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .complete-title {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+        }
+
+        .complete-message {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 320px;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .complete-stat {
+            font-size: 1rem;
+            color: var(--coral);
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .finish-btn {
+            background: transparent;
+            border: 3px solid var(--coral);
+            color: var(--coral);
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+        }
+
+        .finish-btn:hover {
+            background: var(--coral);
+            color: var(--bg-deep);
+        }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/app.html" class="back-btn">← Back</a>
+
+        <!-- Magic particles -->
+        <div class="magic-canvas" id="magic-canvas"></div>
+
+        <!-- INTRO SCREEN -->
+        <div class="screen intro-screen active" id="intro-screen">
+            <div class="intro-icon">🃏</div>
+            <h1 class="intro-title">Wonder Cards</h1>
+            <p class="intro-subtitle">Flip a card. Discover a tiny adventure. You don't have to do it - just let it spark something.</p>
+            <button class="start-btn" id="start-btn">Draw a Card</button>
+        </div>
+
+        <!-- CARD SCREEN -->
+        <div class="screen card-screen" id="card-screen">
+            <div class="card-counter">
+                Card <span id="card-number">1</span>
+            </div>
+
+            <div class="card-instruction">
+                <span class="card-instruction-text">Tap the card to flip it</span>
+            </div>
+
+            <div class="card-container">
+                <div class="card" id="wonder-card">
+                    <div class="card-face card-front">
+                        <div class="card-front-icon">✨</div>
+                        <div class="card-front-text">Wonder Awaits</div>
+                        <div class="card-front-hint">Tap to reveal</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="card-category" id="card-category">Explore</div>
+                        <div class="card-prompt" id="card-prompt">Loading wonder...</div>
+                        <div class="card-subtext" id="card-subtext"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button class="action-btn next-btn" id="next-btn">Next Card</button>
+                <button class="action-btn done-btn" id="card-done-btn">I'm Done</button>
+            </div>
+        </div>
+
+        <!-- COMPLETE SCREEN -->
+        <div class="screen complete-screen" id="complete-screen">
+            <div class="complete-icon">🌟</div>
+            <h2 class="complete-title">Wonder Found</h2>
+            <p class="complete-message">Curiosity is a muscle. You just exercised it. Maybe one of those ideas will stick with you.</p>
+            <div class="complete-stat" id="complete-stat">3 cards explored</div>
+            <button class="finish-btn" id="finish-btn">Done</button>
+        </div>
+    </div>
+
+    <script>
+        // Wonder prompts organized by category
+        const WONDER_PROMPTS = [
+            { category: 'Explore', prompt: 'Take a different route home today', subtext: 'Even a small detour can shift your perspective' },
+            { category: 'Create', prompt: 'Draw something with your non-dominant hand', subtext: 'Imperfection is part of the joy' },
+            { category: 'Connect', prompt: 'Text someone you haven\'t spoken to in a while', subtext: 'Just say "thinking of you"' },
+            { category: 'Notice', prompt: 'Find three things that are the same color', subtext: 'Right now, wherever you are' },
+            { category: 'Taste', prompt: 'Try a food you\'ve never had before', subtext: 'Next time you\'re shopping or eating out' },
+            { category: 'Listen', prompt: 'Put on music from a genre you never listen to', subtext: 'Give it three songs before deciding' },
+            { category: 'Move', prompt: 'Dance for 30 seconds when no one is watching', subtext: 'Or when everyone is. Your choice.' },
+            { category: 'Learn', prompt: 'Look up the answer to a question you\'ve always wondered about', subtext: 'The one you keep forgetting to search' },
+            { category: 'Give', prompt: 'Leave a genuine compliment for someone today', subtext: 'Written or spoken - both count' },
+            { category: 'Rest', prompt: 'Spend 5 minutes doing absolutely nothing', subtext: 'Not scrolling. Not planning. Just being.' },
+            { category: 'Play', prompt: 'Build something with whatever\'s around you', subtext: 'A tower of books. A paper airplane. Anything.' },
+            { category: 'Observe', prompt: 'Watch the clouds for 2 minutes', subtext: 'Or stars, if it\'s nighttime' },
+            { category: 'Express', prompt: 'Write down one thing you\'ve never told anyone', subtext: 'You can throw it away after' },
+            { category: 'Wander', prompt: 'Go somewhere in your neighborhood you\'ve never been', subtext: 'A shop, a street, a park bench' },
+            { category: 'Imagine', prompt: 'Picture where you\'d love to wake up tomorrow', subtext: 'Real or imaginary. Let yourself dream.' },
+            { category: 'Sense', prompt: 'Close your eyes and identify 5 different sounds', subtext: 'The world is louder than we think' },
+            { category: 'Dare', prompt: 'Say yes to something you\'d usually say no to', subtext: 'Within reason, of course' },
+            { category: 'Remember', prompt: 'Think of a happy memory from childhood', subtext: 'Let yourself smile about it' },
+            { category: 'Wonder', prompt: 'Ask someone "what\'s something interesting about your day?"', subtext: 'And really listen to the answer' },
+            { category: 'Grow', prompt: 'Try to learn one word in a language you don\'t speak', subtext: 'Hello, thank you, or something fun' }
+        ];
+
+        // State
+        let cardsViewed = 0;
+        let usedPrompts = [];
+        let currentPrompt = null;
+
+        // DOM
+        const card = document.getElementById('wonder-card');
+        const categoryEl = document.getElementById('card-category');
+        const promptEl = document.getElementById('card-prompt');
+        const subtextEl = document.getElementById('card-subtext');
+        const cardNumberEl = document.getElementById('card-number');
+        const magicCanvas = document.getElementById('magic-canvas');
+
+        // Create magic particles
+        function createMagicParticles() {
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'magic-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+
+                // Random colors
+                const colors = ['#ffd700', '#ff6b9d', '#667eea', '#f5576c'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+                magicCanvas.appendChild(particle);
+            }
+        }
+
+        // Get random prompt
+        function getRandomPrompt() {
+            // Filter out used prompts if we haven't gone through all
+            let available = WONDER_PROMPTS.filter((_, i) => !usedPrompts.includes(i));
+
+            // Reset if all used
+            if (available.length === 0) {
+                usedPrompts = [];
+                available = WONDER_PROMPTS;
+            }
+
+            const randomIndex = Math.floor(Math.random() * available.length);
+            const originalIndex = WONDER_PROMPTS.indexOf(available[randomIndex]);
+            usedPrompts.push(originalIndex);
+
+            return available[randomIndex];
+        }
+
+        // Load new card
+        function loadNewCard() {
+            currentPrompt = getRandomPrompt();
+            categoryEl.textContent = currentPrompt.category;
+            promptEl.textContent = currentPrompt.prompt;
+            subtextEl.textContent = currentPrompt.subtext;
+
+            // Reset card to front
+            card.classList.remove('flipped');
+        }
+
+        // Flip card
+        function flipCard() {
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+            }
+        }
+
+        // Next card
+        function nextCard() {
+            cardsViewed++;
+            cardNumberEl.textContent = cardsViewed + 1;
+            loadNewCard();
+        }
+
+        // Start exercise
+        function startExercise() {
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('card-screen').classList.add('active');
+
+            cardsViewed = 1;
+            loadNewCard();
+        }
+
+        // Complete exercise
+        function completeExercise() {
+            document.getElementById('complete-stat').textContent = `${cardsViewed} card${cardsViewed !== 1 ? 's' : ''} explored`;
+            document.getElementById('card-screen').classList.remove('active');
+            document.getElementById('complete-screen').classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createMagicParticles();
+
+            document.getElementById('start-btn').addEventListener('click', startExercise);
+
+            card.addEventListener('click', flipCard);
+
+            document.getElementById('next-btn').addEventListener('click', nextCard);
+            document.getElementById('card-done-btn').addEventListener('click', completeExercise);
+
+            document.getElementById('finish-btn').addEventListener('click', () => {
+                window.location.href = '/app.html';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -717,6 +717,11 @@ function setupToolPanels() {
         e.preventDefault();
         openToolPanel('exercises');
     });
+
+    // Home page "See all exercises" button
+    document.getElementById('home-see-all-exercises').addEventListener('click', () => {
+        openToolPanel('exercises');
+    });
 }
 
 function openToolPanel(tool) {
