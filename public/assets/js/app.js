@@ -81,6 +81,41 @@ function updateGreeting() {
 }
 
 // ============================================
+// Daily Quotes
+// ============================================
+
+const MANDY_QUOTES = [
+    "Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.",
+    "You don't have to have it all figured out. Taking one small step is enough.",
+    "Your feelings are valid, even the messy ones. They're part of being human.",
+    "Rest isn't a reward for productivity. It's a basic need, and you deserve it.",
+    "You've survived 100% of your hardest days so far. That's remarkable.",
+    "Progress isn't always visible. Sometimes growth happens in the quiet moments.",
+    "Be gentle with yourself today. You're doing harder things than anyone knows.",
+    "It's okay to not be okay. What matters is that you're still here, still trying.",
+    "Your worth isn't measured by what you accomplish. You matter just as you are.",
+    "Small moments of peace add up. Even one deep breath is a gift to yourself.",
+    "You don't have to earn rest or joy. They're already yours to claim.",
+    "Some days just showing up is the victory. And that's more than enough.",
+    "Healing isn't linear. It's okay to have setbacks while moving forward.",
+    "The fact that you're looking after yourself right now? That takes courage.",
+    "You're allowed to outgrow old versions of yourself. Change is natural.",
+    "Not every day needs to be productive. Some days are for simply being.",
+    "Your struggles don't define you, but how you treat yourself through them does.",
+    "It's okay to ask for help. Strength includes knowing when you need support.",
+    "You're not behind in life. You're exactly where you need to be right now.",
+    "Every emotion you feel is trying to tell you something. Listen gently."
+];
+
+function updateDailyQuote() {
+    const quoteElement = document.querySelector('.daily-thought-text');
+    if (quoteElement) {
+        const randomIndex = Math.floor(Math.random() * MANDY_QUOTES.length);
+        quoteElement.textContent = MANDY_QUOTES[randomIndex];
+    }
+}
+
+// ============================================
 // IMAGINE Framework Data & Domain Panel
 // ============================================
 
@@ -675,6 +710,13 @@ function setupToolPanels() {
     document.getElementById('notice-panel-back').addEventListener('click', () => closeToolPanel('notice'));
     document.getElementById('choice-panel-back').addEventListener('click', () => closeToolPanel('choice'));
     document.getElementById('values-panel-back').addEventListener('click', () => closeToolPanel('values'));
+    document.getElementById('exercises-panel-back').addEventListener('click', () => closeToolPanel('exercises'));
+
+    // Explore All Exercises button
+    document.getElementById('explore-exercises-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        openToolPanel('exercises');
+    });
 }
 
 function openToolPanel(tool) {
@@ -1295,6 +1337,7 @@ function init() {
 
     // Setup all functionality
     updateGreeting();
+    updateDailyQuote();
     setupTabNavigation();
     setupDomainPanel();
     setupToolPanels();
