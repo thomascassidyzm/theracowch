@@ -2,10 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Values Compass | cowch.app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Values Compass | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-warm: #2a2320;
+            --importance-color: #7EA88B;
+            --alignment-color: #D4896A;
+            --gap-color: #B794C4;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+        }
 
         * {
             margin: 0;
@@ -14,1022 +30,744 @@
         }
 
         body {
-            font-family: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1512;
-            color: #F5F0E8;
-            line-height: 1.6;
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 2rem 1rem;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            border-bottom: 3px solid #F5F0E8;
-            padding-bottom: 2rem;
-        }
-
-        h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            letter-spacing: -0.02em;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            font-size: 1.125rem;
-            color: #D4896A;
-            font-weight: 500;
-        }
-
-        /* Screens */
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Introduction Screen */
-        .intro-content {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .intro-content h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            font-weight: 800;
-        }
-
-        .intro-content p {
-            font-size: 1.125rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        .intro-content ul {
-            list-style: none;
-            margin: 2rem 0;
-        }
-
-        .intro-content li {
-            padding: 1rem 0;
-            padding-left: 2rem;
+        .exercise-container {
             position: relative;
-            font-size: 1.125rem;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
         }
 
-        .intro-content li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: #D4896A;
-            font-weight: bold;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background: #F5F0E8;
-            color: #1a1512;
-            border: none;
-            font-size: 1.125rem;
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
             font-weight: 700;
-            text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 3px solid #F5F0E8;
-            letter-spacing: 0.05em;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
         }
 
-        .btn:hover {
-            background: transparent;
-            color: #F5F0E8;
-            transform: translate(-2px, -2px);
-            box-shadow: 4px 4px 0 #D4896A;
-        }
-
-        .btn:active {
-            transform: translate(0, 0);
-            box-shadow: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 3px solid #7EA88B;
-            color: #7EA88B;
-        }
-
-        .btn-secondary:hover {
-            background: #7EA88B;
-            color: #1a1512;
-            box-shadow: 4px 4px 0 #F5F0E8;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        /* Rating Screen */
-        .rating-content {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .progress {
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-
+        /* Progress bar */
         .progress-bar {
-            height: 6px;
-            background: #2a2520;
-            border: 2px solid #F5F0E8;
-            margin-bottom: 1rem;
+            position: fixed;
+            top: max(4rem, env(safe-area-inset-top) + 1rem);
+            left: 1rem;
+            right: 1rem;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            z-index: 90;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: #7EA88B;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--importance-color), var(--alignment-color));
+            border-radius: 2px;
+            transition: width 0.5s ease;
         }
 
-        .progress-text {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #D4896A;
+        /* Screens */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 6rem 1.5rem 2rem;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            animation: fadeIn 0.5s ease;
         }
 
-        .value-card {
-            background: #2a2520;
-            border: 3px solid #F5F0E8;
-            padding: 2.5rem;
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen-content {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Typography */
+        .screen-title {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        .screen-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
             margin-bottom: 2rem;
         }
 
-        .value-card h3 {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
-            font-weight: 800;
+        /* Intro */
+        .intro-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: compass 4s ease-in-out infinite;
+        }
+
+        @keyframes compass {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .intro-title {
+            text-align: center;
+            background: linear-gradient(135deg, var(--importance-color), var(--alignment-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .intro-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .intro-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--coral);
+            font-weight: bold;
+        }
+
+        /* Value card */
+        .value-card {
+            background: var(--bg-warm);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .value-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-icon {
+            font-size: 2rem;
+        }
+
+        .value-name {
+            font-size: 1.25rem;
+            font-weight: 900;
             text-transform: uppercase;
         }
 
         .value-description {
-            color: #D4896A;
-            margin-bottom: 2rem;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
         }
 
-        .rating-question {
-            margin-bottom: 2rem;
-        }
-
-        .rating-question label {
-            display: block;
-            font-weight: 600;
+        .rating-section {
             margin-bottom: 1rem;
-            font-size: 1rem;
+        }
+
+        .rating-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-label-text {
+            font-size: 0.85rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .slider-container {
-            position: relative;
-            margin-bottom: 0.5rem;
+        .rating-label-text.importance { color: var(--importance-color); }
+        .rating-label-text.alignment { color: var(--alignment-color); }
+
+        .rating-value {
+            font-size: 1.5rem;
+            font-weight: 900;
         }
 
         input[type="range"] {
             width: 100%;
             height: 8px;
-            background: #1a1512;
-            border: 2px solid #F5F0E8;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
             outline: none;
             -webkit-appearance: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #F5F0E8;
+            width: 28px;
+            height: 28px;
+            background: var(--text-primary);
+            border-radius: 50%;
             cursor: pointer;
-            border: 3px solid #D4896A;
-            transition: all 0.2s;
+            border: 4px solid var(--coral);
+            transition: transform 0.2s ease;
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: #D4896A;
+            transform: scale(1.1);
         }
 
-        input[type="range"]::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            background: #F5F0E8;
-            cursor: pointer;
-            border: 3px solid #D4896A;
-            border-radius: 0;
-            transition: all 0.2s;
-        }
-
-        input[type="range"]::-moz-range-thumb:hover {
-            transform: scale(1.2);
-            background: #D4896A;
-        }
-
-        .slider-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-            color: #7EA88B;
-            margin-top: 0.5rem;
-        }
-
-        .slider-value {
+        .value-counter {
             text-align: center;
-            font-size: 2rem;
-            font-weight: 900;
-            color: #D4896A;
-            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
         }
 
-        /* Compass Visualization */
-        .compass-container {
-            max-width: 800px;
-            margin: 0 auto 3rem;
-            padding: 2rem;
+        /* Results */
+        .compass-visual {
+            background: var(--bg-warm);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         #compass-canvas {
             width: 100%;
-            max-width: 600px;
-            height: 600px;
+            max-width: 350px;
+            height: 350px;
             margin: 0 auto;
             display: block;
         }
 
         .legend {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: #2a2520;
-            border: 2px solid #F5F0E8;
+            gap: 0.5rem;
+            font-size: 0.85rem;
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #F5F0E8;
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
 
-        .legend-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        /* Insights */
-        .insights {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .insight-card {
-            background: #2a2520;
-            border: 3px solid #D4896A;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .insight-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #D4896A;
-            font-weight: 800;
-        }
-
-        .insight-card p {
-            font-size: 1.125rem;
-            line-height: 1.8;
-        }
-
-        .gap-list {
-            list-style: none;
-            margin: 1.5rem 0;
-        }
-
-        .gap-item {
-            padding: 1rem;
-            background: #1a1512;
-            border-left: 4px solid #D4896A;
-            margin-bottom: 1rem;
-        }
-
-        .gap-item strong {
-            color: #F5F0E8;
-            font-size: 1.125rem;
-        }
-
-        .gap-value {
-            color: #D4896A;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        /* Reflection */
-        .reflection-area {
-            margin: 2rem 0;
-        }
-
-        .reflection-area textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: 1.5rem;
-            background: #1a1512;
-            border: 3px solid #F5F0E8;
-            color: #F5F0E8;
-            font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-        }
-
-        .reflection-area textarea:focus {
-            outline: none;
-            border-color: #7EA88B;
-        }
+        .legend-dot.importance { background: var(--importance-color); }
+        .legend-dot.alignment { background: var(--alignment-color); }
 
         /* Stats */
-        .stats-grid {
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .stat-box {
-            background: #2a2520;
-            border: 3px solid #F5F0E8;
-            padding: 1.5rem;
+            background: var(--bg-warm);
+            border-radius: 16px;
+            padding: 1rem;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 900;
-            color: #7EA88B;
-            display: block;
-            margin-bottom: 0.5rem;
         }
+
+        .stat-value.importance { color: var(--importance-color); }
+        .stat-value.alignment { color: var(--alignment-color); }
+        .stat-value.gap { color: var(--gap-color); }
 
         .stat-label {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #D4896A;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .header {
-                margin-bottom: 2rem;
-                padding-bottom: 1rem;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .value-card {
-                padding: 1.5rem;
-            }
-
-            #compass-canvas {
-                height: 400px;
-            }
-
-            .btn {
-                padding: 0.875rem 1.5rem;
-                font-size: 1rem;
-            }
-        }
-
-        /* Loading animation */
-        .loading {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #2a2520;
-            border-top: 4px solid #D4896A;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #2a2320;
-            border-top: 3px solid #3a3533;
-            padding: 0.75rem 1rem;
-            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            text-decoration: none;
-            color: #9a8f85;
             font-size: 0.75rem;
-            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Gaps */
+        .gaps-section {
+            background: var(--bg-warm);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .gaps-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: var(--gap-color);
+        }
+
+        .gaps-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .gap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .gap-item:last-child {
+            border-bottom: none;
+        }
+
+        .gap-name {
+            font-weight: 700;
+        }
+
+        .gap-value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--gap-color);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--importance-color), var(--alignment-color));
+            border: none;
+            border-radius: 16px;
+            color: var(--bg-deep);
+            font-size: 1rem;
+            font-weight: 900;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
             transition: all 0.2s ease;
-            padding: 0.5rem;
+            box-shadow: 0 4px 20px rgba(126, 168, 139, 0.3);
+            width: 100%;
         }
 
-        .nav-item:hover, .nav-item.active {
-            color: #D4896A;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(126, 168, 139, 0.4);
         }
 
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .btn-secondary {
+            background: transparent;
+            border: 3px solid var(--coral);
+            color: var(--coral);
+            box-shadow: none;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 137, 106, 0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Values Compass</h1>
-            <p class="subtitle">Discover what matters most and where to focus your energy</p>
+    <div class="exercise-container">
+        <a href="/app.html" class="back-btn">← Back</a>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
         </div>
 
-        <!-- Introduction Screen -->
-        <div id="intro-screen" class="screen active">
-            <div class="intro-content">
-                <h2>Navigate Your Life with Clarity</h2>
-                <p>Your values are your internal compass. They guide decisions, shape priorities, and define what a meaningful life looks like for you.</p>
+        <!-- INTRO SCREEN -->
+        <div class="screen active" id="intro-screen">
+            <div class="screen-content">
+                <div class="intro-icon">🧭</div>
+                <h1 class="screen-title intro-title">Values Compass</h1>
+                <p class="screen-subtitle">Discover what truly matters to you and where your life might need more alignment.</p>
 
-                <p>When your daily life aligns with your deepest values, you feel energized and purposeful. When there's a gap, you might feel stuck, anxious, or unfulfilled.</p>
-
-                <ul>
-                    <li>Rate 10 core life values on what matters to you</li>
-                    <li>Assess how well your current life aligns with each value</li>
-                    <li>Visualize the gaps between importance and reality</li>
-                    <li>Identify where to focus your energy for meaningful change</li>
+                <ul class="intro-list">
+                    <li>Rate 6 core values on importance</li>
+                    <li>Rate how aligned your life currently is</li>
+                    <li>See where the gaps are</li>
+                    <li>Takes about 5 minutes</li>
                 </ul>
 
-                <p><strong>This takes about 10 minutes. Be honest with yourself.</strong></p>
-
-                <div class="button-group">
-                    <button class="btn" onclick="app.startImportance()">Begin</button>
-                </div>
+                <button class="btn" onclick="startRating()">Begin</button>
             </div>
         </div>
 
-        <!-- Importance Rating Screen -->
-        <div id="importance-screen" class="screen">
-            <div class="rating-content">
-                <div class="progress">
-                    <div class="progress-bar">
-                        <div id="importance-progress" class="progress-fill" style="width: 0%"></div>
+        <!-- RATING SCREEN -->
+        <div class="screen" id="rating-screen">
+            <div class="screen-content">
+                <div class="value-counter" id="value-counter">Value 1 of 6</div>
+
+                <div class="value-card" id="value-card">
+                    <div class="value-header">
+                        <span class="value-icon" id="value-icon">❤️</span>
+                        <span class="value-name" id="value-name">Relationships</span>
                     </div>
-                    <p class="progress-text">Step 1/2: Rating Importance</p>
+                    <p class="value-description" id="value-description">Deep connections with loved ones</p>
+
+                    <div class="rating-section">
+                        <div class="rating-label">
+                            <span class="rating-label-text importance">How important?</span>
+                            <span class="rating-value" id="importance-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" id="importance-slider" oninput="updateImportance(this.value)">
+                    </div>
+
+                    <div class="rating-section">
+                        <div class="rating-label">
+                            <span class="rating-label-text alignment">How aligned?</span>
+                            <span class="rating-value" id="alignment-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" id="alignment-slider" oninput="updateAlignment(this.value)">
+                    </div>
                 </div>
 
-                <div id="importance-cards"></div>
-
-                <div class="button-group">
-                    <button class="btn" onclick="app.startAlignment()">Continue to Step 2</button>
-                </div>
+                <button class="btn" id="next-value-btn" onclick="nextValue()">Next Value</button>
             </div>
         </div>
 
-        <!-- Alignment Rating Screen -->
-        <div id="alignment-screen" class="screen">
-            <div class="rating-content">
-                <div class="progress">
-                    <div class="progress-bar">
-                        <div id="alignment-progress" class="progress-fill" style="width: 0%"></div>
+        <!-- RESULTS SCREEN -->
+        <div class="screen" id="results-screen">
+            <div class="screen-content">
+                <h1 class="screen-title">Your Values Compass</h1>
+
+                <div class="compass-visual">
+                    <canvas id="compass-canvas"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-dot importance"></div>
+                            <span>Importance</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot alignment"></div>
+                            <span>Alignment</span>
+                        </div>
                     </div>
-                    <p class="progress-text">Step 2/2: Rating Current Alignment</p>
                 </div>
 
-                <div id="alignment-cards"></div>
-
-                <div class="button-group">
-                    <button class="btn" onclick="app.showResults()">See My Compass</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Screen -->
-        <div id="results-screen" class="screen">
-            <div class="compass-container">
-                <canvas id="compass-canvas"></canvas>
-            </div>
-
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background: rgba(126, 168, 139, 0.3); border-color: #7EA88B;"></div>
-                    <span class="legend-label">Importance (outer)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: rgba(212, 137, 106, 0.3); border-color: #D4896A;"></div>
-                    <span class="legend-label">Current Alignment (inner)</span>
-                </div>
-            </div>
-
-            <div class="insights">
-                <div class="stats-grid">
+                <div class="stats-row">
                     <div class="stat-box">
-                        <span class="stat-value" id="avg-importance">-</span>
-                        <span class="stat-label">Avg Importance</span>
+                        <div class="stat-value importance" id="avg-importance">-</div>
+                        <div class="stat-label">Avg Import.</div>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-value" id="avg-alignment">-</span>
-                        <span class="stat-label">Avg Alignment</span>
+                        <div class="stat-value alignment" id="avg-alignment">-</div>
+                        <div class="stat-label">Avg Align.</div>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-value" id="overall-gap">-</span>
-                        <span class="stat-label">Overall Gap</span>
+                        <div class="stat-value gap" id="overall-gap">-</div>
+                        <div class="stat-label">Gap</div>
                     </div>
                 </div>
 
-                <div class="insight-card">
-                    <h3>Your Biggest Gaps</h3>
-                    <p>These values matter to you, but your life isn't reflecting them right now. These are your opportunities for meaningful change.</p>
-                    <ul class="gap-list" id="gap-list"></ul>
+                <div class="gaps-section">
+                    <div class="gaps-title">Biggest Gaps</div>
+                    <div class="gaps-subtitle">Where your life needs more alignment</div>
+                    <div id="gaps-list"></div>
                 </div>
 
-                <div class="insight-card">
-                    <h3>Reflection: What One Step Could You Take?</h3>
-                    <p>Look at your biggest gap. What's one small, concrete action you could take this week to move toward alignment?</p>
-                    <div class="reflection-area">
-                        <textarea id="reflection" placeholder="Example: If 'Health & Wellbeing' has a big gap, you might write: 'Go for a 15-minute walk after lunch three times this week.'"></textarea>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn" onclick="app.saveReflection()">Save My Reflection</button>
-                    <button class="btn-secondary" onclick="app.reset()">Start Over</button>
-                </div>
+                <button class="btn" onclick="finishExercise()">Done</button>
+                <button class="btn btn-secondary" onclick="restartExercise()">Start Over</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Values data
         const VALUES = [
-            {
-                id: 'family',
-                name: 'Family & Relationships',
-                description: 'Deep connections with loved ones, quality time, nurturing bonds',
-                color: '#E07A5F'
-            },
-            {
-                id: 'career',
-                name: 'Career & Achievement',
-                description: 'Professional success, accomplishment, making an impact through work',
-                color: '#F2CC8F'
-            },
-            {
-                id: 'health',
-                name: 'Health & Wellbeing',
-                description: 'Physical vitality, mental wellness, energy and vitality',
-                color: '#81B29A'
-            },
-            {
-                id: 'learning',
-                name: 'Learning & Growth',
-                description: 'Continuous development, acquiring new skills, intellectual curiosity',
-                color: '#3D5A80'
-            },
-            {
-                id: 'creativity',
-                name: 'Creativity & Expression',
-                description: 'Artistic pursuits, self-expression, bringing ideas to life',
-                color: '#E63946'
-            },
-            {
-                id: 'adventure',
-                name: 'Adventure & Fun',
-                description: 'Novel experiences, playfulness, excitement and spontaneity',
-                color: '#F4A261'
-            },
-            {
-                id: 'security',
-                name: 'Security & Stability',
-                description: 'Financial safety, predictability, comfortable foundation',
-                color: '#2A9D8F'
-            },
-            {
-                id: 'contribution',
-                name: 'Contribution & Service',
-                description: 'Helping others, making a difference, giving back to community',
-                color: '#9D4EDD'
-            },
-            {
-                id: 'freedom',
-                name: 'Freedom & Independence',
-                description: 'Autonomy, flexibility, being your own person',
-                color: '#06FFA5'
-            },
-            {
-                id: 'spirituality',
-                name: 'Spirituality & Meaning',
-                description: 'Connection to something larger, purpose, inner peace',
-                color: '#577590'
-            }
+            { id: 'relationships', name: 'Relationships', icon: '❤️', description: 'Deep connections with loved ones, quality time, nurturing bonds' },
+            { id: 'health', name: 'Health', icon: '💪', description: 'Physical vitality, mental wellness, energy and self-care' },
+            { id: 'growth', name: 'Growth', icon: '🌱', description: 'Learning, personal development, becoming your best self' },
+            { id: 'freedom', name: 'Freedom', icon: '🦋', description: 'Autonomy, flexibility, being true to yourself' },
+            { id: 'contribution', name: 'Contribution', icon: '🤝', description: 'Helping others, making a difference, giving back' },
+            { id: 'joy', name: 'Joy', icon: '✨', description: 'Fun, play, creativity, doing what makes you happy' }
         ];
 
-        const app = {
-            currentStep: 'intro',
-            ratings: {},
+        // State
+        let currentValueIndex = 0;
+        const ratings = {};
 
-            init() {
-                this.loadData();
-                if (Object.keys(this.ratings).length > 0) {
-                    // Show welcome back message if they have data
-                    const intro = document.querySelector('#intro-screen .intro-content');
-                    intro.innerHTML = `
-                        <h2>Welcome Back</h2>
-                        <p>We found your previous Values Compass session. You can continue where you left off or start fresh.</p>
-                        <div class="button-group">
-                            <button class="btn" onclick="app.showResults()">View My Compass</button>
-                            <button class="btn-secondary" onclick="app.reset(); app.startImportance();">Start Fresh</button>
-                        </div>
-                    `;
-                }
-            },
+        // DOM elements
+        const progressFill = document.getElementById('progress-fill');
 
-            startImportance() {
-                this.showScreen('importance-screen');
-                this.renderRatingCards('importance');
-                this.updateProgress('importance');
-            },
+        // Initialize ratings
+        VALUES.forEach(v => {
+            ratings[v.id] = { importance: 5, alignment: 5 };
+        });
 
-            startAlignment() {
-                this.showScreen('alignment-screen');
-                this.renderRatingCards('alignment');
-                this.updateProgress('alignment');
-            },
+        // Update progress
+        function updateProgress() {
+            const progress = (currentValueIndex / VALUES.length) * 100;
+            progressFill.style.width = progress + '%';
+        }
 
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            },
+        // Show screen
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
 
-            renderRatingCards(type) {
-                const container = document.getElementById(`${type}-cards`);
-                const question = type === 'importance'
-                    ? 'How important is this value to you?'
-                    : 'How well is your current life aligned with this value?';
+        // Start rating
+        function startRating() {
+            currentValueIndex = 0;
+            showScreen('rating-screen');
+            loadValue();
+        }
 
-                container.innerHTML = VALUES.map((value, index) => {
-                    const currentRating = this.ratings[value.id]?.[type] || 5;
-                    return `
-                        <div class="value-card">
-                            <h3>${value.name}</h3>
-                            <p class="value-description">${value.description}</p>
-                            <div class="rating-question">
-                                <label>${question}</label>
-                                <div class="slider-container">
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="10"
-                                        value="${currentRating}"
-                                        id="${type}-${value.id}"
-                                        onInput="app.updateRating('${value.id}', '${type}', this.value)"
-                                    >
-                                </div>
-                                <div class="slider-labels">
-                                    <span>Not at all</span>
-                                    <span class="slider-value" id="${type}-${value.id}-value">${currentRating}</span>
-                                    <span>Extremely</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
+        // Load current value
+        function loadValue() {
+            const value = VALUES[currentValueIndex];
 
-            updateRating(valueId, type, rating) {
-                if (!this.ratings[valueId]) {
-                    this.ratings[valueId] = {};
-                }
-                this.ratings[valueId][type] = parseInt(rating);
+            document.getElementById('value-counter').textContent = `Value ${currentValueIndex + 1} of ${VALUES.length}`;
+            document.getElementById('value-icon').textContent = value.icon;
+            document.getElementById('value-name').textContent = value.name;
+            document.getElementById('value-description').textContent = value.description;
 
-                // Update display
-                const valueDisplay = document.getElementById(`${type}-${valueId}-value`);
-                if (valueDisplay) {
-                    valueDisplay.textContent = rating;
-                }
+            // Load saved ratings
+            const saved = ratings[value.id];
+            document.getElementById('importance-slider').value = saved.importance;
+            document.getElementById('alignment-slider').value = saved.alignment;
+            document.getElementById('importance-value').textContent = saved.importance;
+            document.getElementById('alignment-value').textContent = saved.alignment;
 
-                // Update progress
-                this.updateProgress(type);
+            // Update button text
+            const isLast = currentValueIndex === VALUES.length - 1;
+            document.getElementById('next-value-btn').textContent = isLast ? 'See Results' : 'Next Value';
 
-                // Save to localStorage
-                this.saveData();
-            },
+            updateProgress();
+        }
 
-            updateProgress(type) {
-                const rated = VALUES.filter(v => this.ratings[v.id]?.[type]).length;
-                const percentage = (rated / VALUES.length) * 100;
-                document.getElementById(`${type}-progress`).style.width = percentage + '%';
-            },
+        // Update importance
+        function updateImportance(val) {
+            document.getElementById('importance-value').textContent = val;
+            ratings[VALUES[currentValueIndex].id].importance = parseInt(val);
+        }
 
-            showResults() {
-                this.showScreen('results-screen');
-                this.drawCompass();
-                this.calculateInsights();
-            },
+        // Update alignment
+        function updateAlignment(val) {
+            document.getElementById('alignment-value').textContent = val;
+            ratings[VALUES[currentValueIndex].id].alignment = parseInt(val);
+        }
 
-            drawCompass() {
-                const canvas = document.getElementById('compass-canvas');
-                const ctx = canvas.getContext('2d');
-                const dpr = window.devicePixelRatio || 1;
+        // Next value
+        function nextValue() {
+            currentValueIndex++;
 
-                // Set actual size
-                const rect = canvas.getBoundingClientRect();
-                canvas.width = rect.width * dpr;
-                canvas.height = rect.height * dpr;
-                ctx.scale(dpr, dpr);
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const maxRadius = Math.min(rect.width, rect.height) / 2 - 60;
-
-                // Clear canvas
-                ctx.clearRect(0, 0, rect.width, rect.height);
-
-                // Draw background circles
-                ctx.strokeStyle = '#2a2520';
-                ctx.lineWidth = 1;
-                for (let i = 2; i <= 10; i += 2) {
-                    ctx.beginPath();
-                    ctx.arc(centerX, centerY, (maxRadius * i) / 10, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                // Draw axes
-                const angleStep = (Math.PI * 2) / VALUES.length;
-                VALUES.forEach((value, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const x = centerX + Math.cos(angle) * maxRadius;
-                    const y = centerY + Math.sin(angle) * maxRadius;
-
-                    ctx.beginPath();
-                    ctx.moveTo(centerX, centerY);
-                    ctx.lineTo(x, y);
-                    ctx.strokeStyle = '#2a2520';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-
-                // Draw importance polygon
-                ctx.beginPath();
-                VALUES.forEach((value, i) => {
-                    const importance = this.ratings[value.id]?.importance || 5;
-                    const angle = i * angleStep - Math.PI / 2;
-                    const radius = (maxRadius * importance) / 10;
-                    const x = centerX + Math.cos(angle) * radius;
-                    const y = centerY + Math.sin(angle) * radius;
-
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-                ctx.closePath();
-                ctx.fillStyle = 'rgba(126, 168, 139, 0.2)';
-                ctx.fill();
-                ctx.strokeStyle = '#7EA88B';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // Draw alignment polygon
-                ctx.beginPath();
-                VALUES.forEach((value, i) => {
-                    const alignment = this.ratings[value.id]?.alignment || 5;
-                    const angle = i * angleStep - Math.PI / 2;
-                    const radius = (maxRadius * alignment) / 10;
-                    const x = centerX + Math.cos(angle) * radius;
-                    const y = centerY + Math.sin(angle) * radius;
-
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-                ctx.closePath();
-                ctx.fillStyle = 'rgba(212, 137, 106, 0.3)';
-                ctx.fill();
-                ctx.strokeStyle = '#D4896A';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // Draw labels
-                ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                VALUES.forEach((value, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const labelRadius = maxRadius + 30;
-                    const x = centerX + Math.cos(angle) * labelRadius;
-                    const y = centerY + Math.sin(angle) * labelRadius;
-
-                    // Split label into lines
-                    const words = value.name.split(' ');
-                    const lines = [];
-                    let currentLine = words[0];
-
-                    for (let j = 1; j < words.length; j++) {
-                        if ((currentLine + ' ' + words[j]).length < 15) {
-                            currentLine += ' ' + words[j];
-                        } else {
-                            lines.push(currentLine);
-                            currentLine = words[j];
-                        }
-                    }
-                    lines.push(currentLine);
-
-                    ctx.fillStyle = '#F5F0E8';
-                    lines.forEach((line, lineIndex) => {
-                        ctx.fillText(line, x, y + (lineIndex - lines.length/2 + 0.5) * 14);
-                    });
-                });
-
-                // Redraw on window resize
-                window.addEventListener('resize', () => this.drawCompass());
-            },
-
-            calculateInsights() {
-                let totalImportance = 0;
-                let totalAlignment = 0;
-                const gaps = [];
-
-                VALUES.forEach(value => {
-                    const importance = this.ratings[value.id]?.importance || 5;
-                    const alignment = this.ratings[value.id]?.alignment || 5;
-                    const gap = importance - alignment;
-
-                    totalImportance += importance;
-                    totalAlignment += alignment;
-
-                    if (gap > 0) {
-                        gaps.push({ value, gap, importance, alignment });
-                    }
-                });
-
-                const avgImportance = (totalImportance / VALUES.length).toFixed(1);
-                const avgAlignment = (totalAlignment / VALUES.length).toFixed(1);
-                const overallGap = (avgImportance - avgAlignment).toFixed(1);
-
-                document.getElementById('avg-importance').textContent = avgImportance;
-                document.getElementById('avg-alignment').textContent = avgAlignment;
-                document.getElementById('overall-gap').textContent = overallGap;
-
-                // Sort gaps and show top 5
-                gaps.sort((a, b) => b.gap - a.gap);
-                const topGaps = gaps.slice(0, 5);
-
-                const gapList = document.getElementById('gap-list');
-                gapList.innerHTML = topGaps.map(item => `
-                    <li class="gap-item">
-                        <strong>${item.value.name}</strong><br>
-                        Importance: ${item.importance}/10 | Current Alignment: ${item.alignment}/10 |
-                        <span class="gap-value">Gap: ${item.gap.toFixed(1)}</span>
-                    </li>
-                `).join('');
-
-                // Load saved reflection
-                const savedReflection = localStorage.getItem('values_reflection');
-                if (savedReflection) {
-                    document.getElementById('reflection').value = savedReflection;
-                }
-            },
-
-            saveReflection() {
-                const reflection = document.getElementById('reflection').value;
-                localStorage.setItem('values_reflection', reflection);
-
-                // Show confirmation
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = 'Saved!';
-                btn.style.background = '#7EA88B';
-                btn.style.borderColor = '#7EA88B';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                    btn.style.borderColor = '';
-                }, 2000);
-            },
-
-            saveData() {
-                localStorage.setItem('values_compass_data', JSON.stringify(this.ratings));
-            },
-
-            loadData() {
-                const saved = localStorage.getItem('values_compass_data');
-                if (saved) {
-                    this.ratings = JSON.parse(saved);
-                }
-            },
-
-            reset() {
-                if (confirm('Are you sure you want to start over? This will clear all your ratings.')) {
-                    this.ratings = {};
-                    localStorage.removeItem('values_compass_data');
-                    localStorage.removeItem('values_reflection');
-                    location.reload();
-                }
+            if (currentValueIndex >= VALUES.length) {
+                showResults();
+            } else {
+                loadValue();
             }
-        };
+        }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', () => {
-            app.init();
+        // Show results
+        function showResults() {
+            showScreen('results-screen');
+            progressFill.style.width = '100%';
+            drawCompass();
+            calculateStats();
+        }
+
+        // Draw compass
+        function drawCompass() {
+            const canvas = document.getElementById('compass-canvas');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const maxRadius = Math.min(rect.width, rect.height) / 2 - 40;
+
+            // Clear
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // Background circles
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 2; i <= 10; i += 2) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, (maxRadius * i) / 10, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Draw axes and labels
+            const angleStep = (Math.PI * 2) / VALUES.length;
+            ctx.font = 'bold 11px Gabarito, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            VALUES.forEach((value, i) => {
+                const angle = i * angleStep - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * maxRadius;
+                const y = centerY + Math.sin(angle) * maxRadius;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.stroke();
+
+                // Label
+                const labelRadius = maxRadius + 25;
+                const lx = centerX + Math.cos(angle) * labelRadius;
+                const ly = centerY + Math.sin(angle) * labelRadius;
+                ctx.fillStyle = '#F5F0E8';
+                ctx.fillText(value.name, lx, ly);
+            });
+
+            // Importance polygon
+            ctx.beginPath();
+            VALUES.forEach((value, i) => {
+                const importance = ratings[value.id].importance;
+                const angle = i * angleStep - Math.PI / 2;
+                const radius = (maxRadius * importance) / 10;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(126, 168, 139, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#7EA88B';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Alignment polygon
+            ctx.beginPath();
+            VALUES.forEach((value, i) => {
+                const alignment = ratings[value.id].alignment;
+                const angle = i * angleStep - Math.PI / 2;
+                const radius = (maxRadius * alignment) / 10;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(212, 137, 106, 0.3)';
+            ctx.fill();
+            ctx.strokeStyle = '#D4896A';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        // Calculate stats
+        function calculateStats() {
+            let totalImportance = 0;
+            let totalAlignment = 0;
+            const gaps = [];
+
+            VALUES.forEach(value => {
+                const imp = ratings[value.id].importance;
+                const ali = ratings[value.id].alignment;
+                const gap = imp - ali;
+
+                totalImportance += imp;
+                totalAlignment += ali;
+
+                if (gap > 0) {
+                    gaps.push({ name: value.name, gap });
+                }
+            });
+
+            const avgImp = (totalImportance / VALUES.length).toFixed(1);
+            const avgAli = (totalAlignment / VALUES.length).toFixed(1);
+            const overallGap = (avgImp - avgAli).toFixed(1);
+
+            document.getElementById('avg-importance').textContent = avgImp;
+            document.getElementById('avg-alignment').textContent = avgAli;
+            document.getElementById('overall-gap').textContent = overallGap;
+
+            // Sort and show gaps
+            gaps.sort((a, b) => b.gap - a.gap);
+            const topGaps = gaps.slice(0, 3);
+
+            const gapsList = document.getElementById('gaps-list');
+            if (topGaps.length === 0) {
+                gapsList.innerHTML = '<p style="color: var(--importance-color); text-align: center;">Great alignment! No significant gaps.</p>';
+            } else {
+                gapsList.innerHTML = topGaps.map(g => `
+                    <div class="gap-item">
+                        <span class="gap-name">${g.name}</span>
+                        <span class="gap-value">-${g.gap}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Save data
+            localStorage.setItem('valuesCompassData', JSON.stringify(ratings));
+        }
+
+        // Finish
+        function finishExercise() {
+            window.location.href = '/app.html';
+        }
+
+        // Restart
+        function restartExercise() {
+            currentValueIndex = 0;
+            VALUES.forEach(v => {
+                ratings[v.id] = { importance: 5, alignment: 5 };
+            });
+            startRating();
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (document.getElementById('results-screen').classList.contains('active')) {
+                drawCompass();
+            }
         });
     </script>
-
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="/app.html" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="/app.html#imagine" class="nav-item">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            <span>IMAGINE</span>
-        </a>
-        <a href="/chat.html" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span>Chat</span>
-        </a>
-        <a href="/app.html#you" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>You</span>
-        </a>
-    </nav>
 </body>
 </html>
