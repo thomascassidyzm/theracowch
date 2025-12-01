@@ -527,12 +527,8 @@ function loadChatHistory() {
 
 function setupQuickCheckin() {
     document.getElementById('quick-checkin').addEventListener('click', () => {
-        switchTab('chat');
-        setTimeout(() => {
-            chatInput.value = "I'd like to do a quick check-in. How am I feeling today?";
-            chatInput.dispatchEvent(new Event('input'));
-            sendMessage();
-        }, 300);
+        // Go to Inner Weather exercise
+        window.location.href = '/exercises/weather.html';
     });
 }
 

@@ -244,6 +244,99 @@
             font-weight: var(--font-weight-normal);
         }
 
+        /* ============================================
+           EXERCISES SECTION
+           ============================================ */
+
+        .exercises-section {
+            margin-bottom: var(--space-2xl);
+            animation: slideUp 0.7s ease-out 0.35s both;
+        }
+
+        .exercises-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-black);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-md);
+        }
+
+        .exercise-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .exercise-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-lg);
+            background: var(--bg-secondary);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            text-decoration: none;
+            transition: all var(--transition-brutal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exercise-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--ex-color, var(--coral));
+            transition: height var(--transition-brutal);
+        }
+
+        .exercise-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--ex-color, var(--coral));
+            transform: translateY(-4px) rotate(-1deg);
+            box-shadow: 6px 6px 0 0 var(--ex-color, var(--coral));
+        }
+
+        .exercise-card:hover::before {
+            height: 8px;
+        }
+
+        .exercise-card:active {
+            transform: translateY(-2px) rotate(-0.5deg);
+            box-shadow: 3px 3px 0 0 var(--ex-color, var(--coral));
+        }
+
+        .exercise-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .exercise-name {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-black);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .exercise-time {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 380px) {
+            .exercise-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* IMAGINE Mini Preview */
         .imagine-mini {
             animation: fadeIn 0.8s ease-out 0.4s both;
@@ -1766,6 +1859,33 @@
                                 <span>How's your inner weather?</span>
                             </div>
                         </button>
+                    </div>
+
+                    <!-- Quick Exercises -->
+                    <div class="exercises-section">
+                        <h2 class="exercises-title">Exercises</h2>
+                        <div class="exercise-cards">
+                            <a href="/exercises/box-breathing.html" class="exercise-card" style="--ex-color: #7EA88B;">
+                                <span class="exercise-icon">🫁</span>
+                                <span class="exercise-name">Box Breathing</span>
+                                <span class="exercise-time">4 min</span>
+                            </a>
+                            <a href="/exercises/grounding.html" class="exercise-card" style="--ex-color: #7EB8DA;">
+                                <span class="exercise-icon">👁️</span>
+                                <span class="exercise-name">5-4-3-2-1</span>
+                                <span class="exercise-time">3 min</span>
+                            </a>
+                            <a href="/exercises/weather.html" class="exercise-card" style="--ex-color: #B794C4;">
+                                <span class="exercise-icon">🌤️</span>
+                                <span class="exercise-name">Inner Weather</span>
+                                <span class="exercise-time">2 min</span>
+                            </a>
+                            <a href="/exercises/wave.html" class="exercise-card" style="--ex-color: #4a8fb8;">
+                                <span class="exercise-icon">🌊</span>
+                                <span class="exercise-name">The Wave</span>
+                                <span class="exercise-time">3 min</span>
+                            </a>
+                        </div>
                     </div>
 
                     <!-- IMAGINE Mini Preview -->
