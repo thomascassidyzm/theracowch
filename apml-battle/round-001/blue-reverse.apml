@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  APML (Application Programming Markup Language) v2.0
+  Cowch Application - Reverse Compiled Intent Expression
+
+  This APML document captures the INTENT of the Cowch application,
+  expressing WHAT it does rather than HOW it's implemented.
+-->
+<application name="cowch" version="1.0.0" platform="web-pwa">
+
+  <meta>
+    <description>AI-powered CBT wellness companion using the IMAGINE framework</description>
+    <author>TherapyCowch</author>
+    <theme>dark-brutalism</theme>
+    <primary-color>#D4896A</primary-color>
+  </meta>
+
+  <!-- ==========================================
+       SECTION 1: DATA MODELS
+       ========================================== -->
+
+  <data-models>
+
+    <model name="Message" storage="transient">
+      <field name="role" type="enum" values="user|assistant" required="true"/>
+      <field name="content" type="string" required="true"/>
+      <field name="timestamp" type="datetime" auto="true"/>
+    </model>
+
+    <model name="ConversationHistory" storage="local" key="theracowch_chat_history">
+      <field name="messages" type="array" of="Message" max="100"/>
+      <lifecycle on-load="trim-to-max" on-save="immediate"/>
+    </model>
+
+    <model name="TherapyProfile" storage="local" key="cowch_therapy_profile">
+      <field name="version" type="integer" default="1"/>
+      <field name="created" type="datetime" auto-on="create"/>
+      <field name="updated" type="datetime" auto-on="save"/>
+      <field name="sessionCount" type="integer" default="0"/>
+      <field name="messageCount" type="integer" default="0"/>
+
+      <field name="patterns" type="array" of="string" max="10">
+        <description>Detected wellness patterns like "perfectionism", "anxiety"</description>
+      </field>
+
+      <field name="patternStrength" type="map" key-type="string" value-type="integer">
+        <constraint value-min="1" value-max="5"/>
+      </field>
+
+      <field name="imagine" type="object">
+        <field name="I" type="integer" default="0" label="Self-care"/>
+        <field name="M" type="integer" default="0" label="Mindfulness"/>
+        <field name="A" type="integer" default="0" label="Acceptance"/>
+        <field name="G" type="integer" default="0" label="Gratitude"/>
+        <field name="I2" type="integer" default="0" label="Interactions"/>
+        <field name="N" type="integer" default="0" label="Nurturing"/>
+        <field name="E" type="integer" default="0" label="Exploring"/>
+      </field>
+
+      <field name="insights" type="array" of="string" max="10" rotate="fifo"/>
+      <field name="activeThemes" type="array" of="string"/>
+      <field name="strengths" type="array" of="string" max="5"/>
+
+      <field name="preferences" type="object">
+        <field name="respondsTo" type="array" of="string"/>
+        <field name="avoids" type="array" of="string"/>
+      </field>
+
+      <field name="lastSession" type="object" nullable="true">
+        <field name="date" type="datetime"/>
+        <field name="summary" type="string"/>
+        <field name="mood" type="string"/>
+      </field>
+
+      <compression trigger="messagesSinceCompression >= 8" endpoint="/api/compress-profile"/>
+    </model>
+
+    <model name="NoticeEntry" storage="local" key="cowch_notices">
+      <index-by type="date-key" format="YYYY-MM-DD"/>
+      <field name="color" type="color"/>
+      <field name="energy" type="integer" min="0" max="100"/>
+      <field name="text" type="string"/>
+      <field name="prompt" type="string"/>
+    </model>
+
+    <model name="Choice" storage="local" key="cowch_choices">
+      <collection-type>array</collection-type>
+      <field name="text" type="string" required="true"/>
+      <field name="timestamp" type="datetime" auto="true"/>
+      <field name="date" type="string" format="display"/>
+    </model>
+
+    <model name="ValuesConfig" storage="local" key="cowch_values">
+      <field name="values" type="array" of="string" min="3" max="6"/>
+    </model>
+
+    <model name="ValuesAlignment" storage="local" key="cowch_values_alignment">
+      <index-by type="date-key" format="YYYY-MM-DD"/>
+      <field name="scores" type="map" key-type="string" value-type="integer">
+        <constraint value-min="0" value-max="100"/>
+      </field>
+    </model>
+
+    <model name="ImagineEngagement" storage="local" key="cowch_imagine_engagement">
+      <field name="I" type="array" of="timestamp" retention="30d"/>
+      <field name="M" type="array" of="timestamp" retention="30d"/>
+      <field name="A" type="array" of="timestamp" retention="30d"/>
+      <field name="G" type="array" of="timestamp" retention="30d"/>
+      <field name="I2" type="array" of="timestamp" retention="30d"/>
+      <field name="N" type="array" of="timestamp" retention="30d"/>
+      <field name="E" type="array" of="timestamp" retention="30d"/>
+    </model>
+
+  </data-models>
+
+  <!-- ==========================================
+       SECTION 2: STATIC DATA / CONSTANTS
+       ========================================== -->
+
+  <constants>
+
+    <constant name="IMAGINE_DOMAINS" type="array">
+      <item key="self">
+        <letter>I</letter>
+        <title>I, Me, Myself</title>
+        <subtitle>Self-care, boundaries &amp; compassion</subtitle>
+        <color>#E88A6A</color>
+        <page>/imagine/self.html</page>
+      </item>
+      <item key="mind">
+        <letter>M</letter>
+        <title>Mindfulness</title>
+        <subtitle>Present moment awareness</subtitle>
+        <color>#7EA88B</color>
+        <page>/imagine/mindfulness.html</page>
+      </item>
+      <item key="accept">
+        <letter>A</letter>
+        <title>Acceptance</title>
+        <subtitle>Making peace with what is</subtitle>
+        <color>#B8860B</color>
+        <page>/imagine/acceptance.html</page>
+      </item>
+      <item key="thanks">
+        <letter>G</letter>
+        <title>Gratitude</title>
+        <subtitle>Noticing the good</subtitle>
+        <color>#DDA0DD</color>
+        <page>/imagine/gratitude.html</page>
+      </item>
+      <item key="connect">
+        <letter>I</letter>
+        <title>Interactions</title>
+        <subtitle>Connection with others</subtitle>
+        <color>#6B8E9F</color>
+        <page>/imagine/interactions.html</page>
+      </item>
+      <item key="play">
+        <letter>N</letter>
+        <title>Nurture Fun &amp; Play</title>
+        <subtitle>Joy and lightness</subtitle>
+        <color>#F4A460</color>
+        <page>/imagine/nurturing.html</page>
+      </item>
+      <item key="explore">
+        <letter>E</letter>
+        <title>Explore</title>
+        <subtitle>Growth and discovery</subtitle>
+        <color>#8FBC8F</color>
+        <page>/imagine/exploring.html</page>
+      </item>
+    </constant>
+
+    <constant name="MANDY_QUOTES" type="array" of="string">
+      <item>Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</item>
+      <item>You don't have to have it all figured out. Taking one small step is enough.</item>
+      <item>Your feelings are valid, even the messy ones. They're part of being human.</item>
+      <item>Rest isn't a reward for productivity. It's a basic need, and you deserve it.</item>
+      <item>You've survived 100% of your hardest days so far. That's remarkable.</item>
+      <!-- ... additional quotes omitted for brevity ... -->
+    </constant>
+
+    <constant name="NOTICE_PROMPTS" type="array" of="string">
+      <item>What mattered to me today?</item>
+      <item>What surprised me today?</item>
+      <item>Where did I feel most like myself?</item>
+      <item>What did I notice today?</item>
+      <item>What did I give myself today?</item>
+    </constant>
+
+    <constant name="PATTERN_KEYWORDS" type="map">
+      <entry key="anxiety" pattern="anxious|anxiety|worry|worried|nervous|panic|fear|scared"/>
+      <entry key="depression" pattern="sad|depressed|depression|down|hopeless|worthless|empty|numb"/>
+      <entry key="relationships" pattern="relationship|partner|husband|wife|boyfriend|girlfriend|family|friend"/>
+      <entry key="trauma" pattern="childhood|trauma|abuse|past|triggered|flashback"/>
+      <entry key="perfectionism" pattern="perfect|perfectionism|mistake|failure|should|must|not good enough"/>
+      <entry key="stress" pattern="stress|stressed|overwhelmed|pressure|too much|burnout"/>
+    </constant>
+
+  </constants>
+
+  <!-- ==========================================
+       SECTION 3: UI COMPONENTS
+       ========================================== -->
+
+  <ui>
+
+    <page name="app" path="/app.html" default="true">
+
+      <layout type="tabbed" tab-position="bottom">
+
+        <!-- HOME TAB -->
+        <tab id="home" label="Home" icon="home">
+
+          <component type="greeting-banner">
+            <avatar src="/assets/theracowch_main_image.jpg" fallback="cow-emoji"/>
+            <title bind="greeting-text" compute="time-based-greeting"/>
+            <subtitle static="How are you feeling today?"/>
+          </component>
+
+          <component type="card" class="daily-thought">
+            <label>Mandy's thought for you</label>
+            <content bind="daily-quote" source="MANDY_QUOTES" selection="random"/>
+            <behavior on-tap="rotate-quote"/>
+          </component>
+
+          <component type="button-group" layout="vertical">
+            <button variant="primary" action="switch-tab" target="chat">
+              <icon>chat</icon>
+              <text>Chat with Mandy</text>
+              <subtext>Talk through what's on your mind</subtext>
+            </button>
+            <button variant="secondary" action="navigate" target="/exercises/weather.html">
+              <icon>weather</icon>
+              <text>Quick Check-in</text>
+              <subtext>How's your inner weather?</subtext>
+            </button>
+          </component>
+
+          <component type="grid" columns="2" class="exercise-cards">
+            <exercise-card name="Box Breathing" icon="wind" duration="4 min"
+                          action="open-modal" target="breathing-modal" color="#7EA88B"/>
+            <exercise-card name="Grounding" icon="anchor" duration="3 min"
+                          action="open-modal" target="grounding-modal" color="#6B8E9F"/>
+            <exercise-card name="Body Scan" icon="body" duration="5 min"
+                          action="navigate" target="/exercises/body-scan.html" color="#E88A6A"/>
+            <exercise-card name="Gratitude" icon="heart" duration="2 min"
+                          action="navigate" target="/exercises/gratitude.html" color="#DDA0DD"/>
+          </component>
+
+          <component type="button" variant="ghost" action="open-panel" target="exercises-panel">
+            See all exercises
+          </component>
+
+          <component type="imagine-preview">
+            <label>The IMAGINE Framework</label>
+            <letters interactive="true" show-engagement="true">
+              <letter domain="self">I</letter>
+              <letter domain="mind">M</letter>
+              <letter domain="accept">A</letter>
+              <letter domain="thanks">G</letter>
+              <letter domain="connect">I</letter>
+              <letter domain="play">N</letter>
+              <letter domain="explore">E</letter>
+            </letters>
+            <behavior on-letter-tap="navigate-to-domain-page"/>
+          </component>
+
+        </tab>
+
+        <!-- IMAGINE TAB -->
+        <tab id="imagine" label="IMAGINE" icon="compass">
+
+          <header>
+            <title>IMAGINE</title>
+            <subtitle>7 domains of wellness</subtitle>
+          </header>
+
+          <component type="list" class="domain-cards">
+            <for-each source="IMAGINE_DOMAINS" as="domain">
+              <domain-card
+                letter="{domain.letter}"
+                title="{domain.title}"
+                subtitle="{domain.subtitle}"
+                color="{domain.color}"
+                action="navigate"
+                target="{domain.page}"/>
+            </for-each>
+          </component>
+
+          <component type="cta-banner" action="open-panel" target="exercises-panel">
+            <icon>dumbbell</icon>
+            <title>Explore All Exercises</title>
+            <subtitle>Browse the full library</subtitle>
+          </component>
+
+        </tab>
+
+        <!-- CHAT TAB -->
+        <tab id="chat" label="Chat" icon="message-circle">
+
+          <header>
+            <title-group>
+              <icon>cow</icon>
+              <title>Mandy</title>
+            </title-group>
+            <button variant="text" action="clear-conversation">New Chat</button>
+          </header>
+
+          <component type="message-list" id="chat-messages" bind="conversationHistory">
+            <welcome-message condition="history.length === 0">
+              <content>Hi there! I'm Mandy, and I'm so glad you're here. This is a space for you - no judgment, just support. What's on your mind?</content>
+            </welcome-message>
+
+            <message-template for="user">
+              <bubble align="right" color="coral">{content}</bubble>
+            </message-template>
+
+            <message-template for="assistant">
+              <bubble align="left" color="surface">{content}</bubble>
+              <typing-effect enabled="true" speed="12ms" punctuation-pause="true"/>
+            </message-template>
+
+            <typing-indicator id="typing-indicator">
+              <dots count="3" animation="bounce"/>
+            </typing-indicator>
+          </component>
+
+          <component type="input-area" sticky="bottom">
+            <textarea
+              id="chat-input"
+              placeholder="What's on your mind..."
+              auto-resize="true"
+              max-height="120px"/>
+            <button
+              id="chat-send-btn"
+              variant="circle"
+              icon="send"
+              action="send-message"
+              disabled-when="input.empty OR isTyping"/>
+          </component>
+
+        </tab>
+
+        <!-- YOU TAB -->
+        <tab id="you" label="You" icon="user">
+
+          <header>
+            <title>You</title>
+            <subtitle>Your wellness journey</subtitle>
+          </header>
+
+          <component type="card" class="progress-card">
+            <icon>cow-emoji</icon>
+            <content>
+              You've been showing up for yourself. That takes <strong>courage</strong>.
+            </content>
+          </component>
+
+          <section title="Your Tools">
+            <tool-card
+              name="Notice"
+              icon="eye"
+              description="Track your daily feelings"
+              action="open-panel"
+              target="notice-panel"/>
+            <tool-card
+              name="Choice"
+              icon="tree"
+              description="Record mindful choices"
+              action="open-panel"
+              target="choice-panel"/>
+            <tool-card
+              name="Values"
+              icon="target"
+              description="Align with what matters"
+              action="open-panel"
+              target="values-panel"/>
+          </section>
+
+          <section title="Settings">
+            <settings-button icon="lock" action="show-privacy-info">Privacy &amp; Safety</settings-button>
+            <settings-button icon="info" action="ask-about-mandy">About Mandy</settings-button>
+            <settings-button icon="download" condition="is-ios-safari AND NOT is-standalone" action="show-install-prompt">
+              Add to Home Screen
+            </settings-button>
+            <settings-button icon="trash" variant="danger" action="clear-history" confirm="true">
+              Clear All History
+            </settings-button>
+          </section>
+
+        </tab>
+
+      </layout>
+
+      <!-- SLIDE-IN PANELS -->
+
+      <panel id="domain-panel" position="right" width="100%">
+        <header>
+          <back-button action="close-panel"/>
+          <title bind="selected-domain.title"/>
+          <subtitle bind="selected-domain.subtitle"/>
+        </header>
+        <content>
+          <description bind="selected-domain.description"/>
+          <exercise-list bind="selected-domain.exercises">
+            <exercise-card for-each="exercise">
+              <title>{exercise.title}</title>
+              <description>{exercise.description}</description>
+              <duration condition="exercise.duration">{exercise.duration}</duration>
+              <behavior on-tap="trigger-chat-with-prompt" prompt="{exercise.prompt}"/>
+            </exercise-card>
+          </exercise-list>
+          <button action="trigger-chat-with-domain">Talk to Mandy about {domain.title}</button>
+        </content>
+      </panel>
+
+      <panel id="notice-panel" position="right" width="100%">
+        <header>
+          <back-button action="close-panel"/>
+          <title>Notice</title>
+        </header>
+        <view-toggle default="today">
+          <view id="today" label="Today">
+            <prompt bind="notice-daily-prompt" source="NOTICE_PROMPTS" selection="day-of-year-mod"/>
+            <color-picker id="notice-color" colors="warm-palette"/>
+            <slider id="notice-energy" min="0" max="100" label="Energy level"/>
+            <textarea id="notice-text" placeholder="What are you noticing?"/>
+            <button action="save-notice">Save</button>
+          </view>
+          <view id="timeline" label="Timeline">
+            <calendar-grid month="current" bind="notices">
+              <cell-template>
+                <background-color bind="notice.color"/>
+                <on-tap action="show-notice-detail"/>
+              </cell-template>
+            </calendar-grid>
+          </view>
+        </view-toggle>
+      </panel>
+
+      <panel id="choice-panel" position="right" width="100%">
+        <header>
+          <back-button action="close-panel"/>
+          <title>Choice</title>
+        </header>
+        <view-toggle default="today">
+          <view id="today" label="Today">
+            <prompt>What conscious choice did you make today?</prompt>
+            <textarea id="choice-text" placeholder="I chose to..."/>
+            <button action="save-choice">Add to my tree</button>
+          </view>
+          <view id="tree" label="Tree">
+            <svg-visualization type="growing-tree" bind="choices.length">
+              <trunk base="true"/>
+              <branches grow-with="count > 5"/>
+              <leaves bind="choices" color-cycle="sage-gold-coral"/>
+            </svg-visualization>
+            <counter label="Choices made">{choices.length}</counter>
+          </view>
+          <view id="history" label="History">
+            <list bind="choices" order="reverse-chronological">
+              <item-template>
+                <date>{choice.date}</date>
+                <text>{choice.text}</text>
+              </item-template>
+            </list>
+          </view>
+        </view-toggle>
+      </panel>
+
+      <panel id="values-panel" position="right" width="100%">
+        <header>
+          <back-button action="close-panel"/>
+          <title>Values</title>
+        </header>
+        <view-toggle default="today">
+          <view id="today" label="Today" condition="values.configured">
+            <prompt>How aligned were you with your values today?</prompt>
+            <for-each source="configured-values" as="value">
+              <value-slider
+                label="{value}"
+                min="0" max="100"
+                min-label="Not at all"
+                max-label="Completely"
+                bind="today-alignment[value]"/>
+            </for-each>
+            <button action="save-values-alignment">Save</button>
+          </view>
+          <view id="chart" label="Chart" condition="values.configured">
+            <svg-visualization type="radar-chart" bind="today-alignment">
+              <axes bind="configured-values"/>
+              <data-shape fill="coral-translucent"/>
+            </svg-visualization>
+            <summary>Average alignment: {computed-average}%</summary>
+          </view>
+          <view id="setup" label="Setup">
+            <prompt>Choose 3-6 values that matter most to you</prompt>
+            <preset-grid>
+              <preset value="Family"/>
+              <preset value="Health"/>
+              <preset value="Growth"/>
+              <preset value="Connection"/>
+              <preset value="Creativity"/>
+              <preset value="Adventure"/>
+              <preset value="Peace"/>
+              <preset value="Purpose"/>
+              <preset value="Integrity"/>
+              <preset value="Fun"/>
+              <preset value="Learning"/>
+              <preset value="Kindness"/>
+            </preset-grid>
+            <custom-input placeholder="Add your own value" action="add-custom-value"/>
+            <button action="save-values-config" validation="count >= 3 AND count <= 6">Save Values</button>
+          </view>
+        </view-toggle>
+      </panel>
+
+      <panel id="exercises-panel" position="right" width="100%">
+        <header>
+          <back-button action="close-panel"/>
+          <title>Exercise Library</title>
+        </header>
+        <content scrollable="true">
+          <for-each source="IMAGINE_EXERCISES" as="category">
+            <section>
+              <header color="{category.color}">
+                <letter>{category.letter}</letter>
+                <title>{category.title}</title>
+                <subtitle>{category.subtitle}</subtitle>
+              </header>
+              <for-each source="category.exercises" as="exercise">
+                <exercise-card
+                  title="{exercise.title}"
+                  description="{exercise.description}"
+                  duration="{exercise.duration}"
+                  interactive="{exercise.hasInteractive}"
+                  action="trigger-chat-or-modal"
+                  prompt="{exercise.prompt}"/>
+              </for-each>
+            </section>
+          </for-each>
+        </content>
+      </panel>
+
+    </page>
+
+    <!-- CHAT PAGE (Alternative standalone) -->
+    <page name="chat" path="/chat.html">
+      <!-- Similar structure to chat tab but with additional menu panels -->
+      <inherits from="app#chat"/>
+
+      <header variant="with-menu">
+        <menu-button action="open-panel" target="menu-panel"/>
+        <title>Mandy</title>
+        <new-chat-button action="clear-conversation"/>
+      </header>
+
+      <panel id="menu-panel" position="left">
+        <menu-item action="navigate" target="/app.html#home">Home</menu-item>
+        <menu-item action="open-panel" target="imagine-panel">IMAGINE Framework</menu-item>
+        <menu-item action="open-panel" target="exercise-panel">Exercise Library</menu-item>
+        <menu-item action="show-privacy">Privacy &amp; Safety</menu-item>
+        <menu-item action="clear-history" variant="danger">Clear Chat History</menu-item>
+      </panel>
+
+      <component type="prompt-banner" id="prompt-banner" hidden="true">
+        <icon>thought-bubble</icon>
+        <label>Mandy's thought for you:</label>
+        <content bind="current-prompt.content"/>
+        <actions>
+          <button variant="primary" action="use-prompt">Let's explore this</button>
+          <button variant="secondary" action="get-new-prompt">Show me another</button>
+        </actions>
+        <dismiss-button action="hide-prompt-banner"/>
+      </component>
+
+      <quick-prompts horizontal-scroll="true">
+        <quick-prompt text="Feeling anxious" prompt="I'm feeling anxious and need help calming down"/>
+        <quick-prompt text="Perfectionism" prompt="I'm being too hard on myself again"/>
+        <quick-prompt text="Relationships" prompt="I need help with a relationship issue"/>
+        <quick-prompt text="IMAGINE" prompt="Tell me about the IMAGINE framework"/>
+      </quick-prompts>
+
+    </page>
+
+  </ui>
+
+  <!-- ==========================================
+       SECTION 4: BEHAVIORS / FLOWS
+       ========================================== -->
+
+  <behaviors>
+
+    <!-- Time-based Greeting Computation -->
+    <behavior name="time-based-greeting" type="computed">
+      <input type="current-hour"/>
+      <output type="string"/>
+      <logic>
+        <when condition="hour < 12" return="Good morning"/>
+        <when condition="hour < 17" return="Good afternoon"/>
+        <when condition="hour < 21" return="Good evening"/>
+        <default return="Time to wind down"/>
+      </logic>
+    </behavior>
+
+    <!-- Message Send Flow -->
+    <behavior name="send-message" type="flow">
+      <trigger event="button-click" target="chat-send-btn"/>
+      <trigger event="keypress" key="Enter" modifier="NOT Shift" target="chat-input"/>
+
+      <precondition check="chat-input.value.trim() !== ''" fail="silent"/>
+      <precondition check="NOT isTyping" fail="silent"/>
+
+      <steps>
+        <step name="capture-input">
+          <action type="get-value" source="chat-input" into="$message"/>
+          <action type="clear-value" target="chat-input"/>
+          <action type="haptic" style="light"/>
+        </step>
+
+        <step name="add-user-message">
+          <action type="append-ui" target="chat-messages">
+            <message sender="user" content="$message"/>
+          </action>
+          <action type="push" target="conversationHistory" value="{role: 'user', content: $message}"/>
+          <action type="save" model="ConversationHistory"/>
+          <action type="scroll-to-bottom" target="chat-messages"/>
+        </step>
+
+        <step name="show-typing">
+          <action type="set" variable="isTyping" value="true"/>
+          <action type="show" target="typing-indicator"/>
+          <action type="disable" target="chat-send-btn"/>
+        </step>
+
+        <step name="call-api" async="true">
+          <action type="http-post" endpoint="/api/chat">
+            <body>
+              <field name="message" value="$message"/>
+              <field name="profile" value="TherapyProfile.buildAPIContext().profile"/>
+              <field name="recentMessages" value="TherapyProfile.buildAPIContext().recentMessages"/>
+            </body>
+            <on-success into="$response"/>
+            <on-error>
+              <action type="hide" target="typing-indicator"/>
+              <action type="append-ui" target="chat-messages">
+                <message sender="mandy" content="I'm having trouble connecting right now. Please try again in a moment."/>
+              </action>
+            </on-error>
+          </action>
+        </step>
+
+        <step name="display-response">
+          <action type="hide" target="typing-indicator"/>
+          <action type="append-ui-with-typing" target="chat-messages" speed="12ms">
+            <message sender="mandy" content="$response.response"/>
+          </action>
+          <action type="push" target="conversationHistory" value="{role: 'assistant', content: $response.response}"/>
+          <action type="save" model="ConversationHistory"/>
+        </step>
+
+        <step name="cleanup">
+          <action type="set" variable="isTyping" value="false"/>
+          <action type="enable" target="chat-send-btn"/>
+          <action type="focus" target="chat-input"/>
+          <action type="check-compression" model="TherapyProfile"/>
+        </step>
+      </steps>
+    </behavior>
+
+    <!-- Tab Navigation -->
+    <behavior name="switch-tab" type="flow">
+      <trigger event="click" target=".tab-btn"/>
+
+      <steps>
+        <step name="get-target">
+          <action type="get-attribute" source="event.target" attribute="data-tab" into="$tabId"/>
+        </step>
+        <step name="update-buttons">
+          <action type="remove-class" target=".tab-btn" class="active"/>
+          <action type="add-class" target=".tab-btn[data-tab=$tabId]" class="active"/>
+        </step>
+        <step name="update-panels">
+          <action type="remove-class" target=".tab-panel" class="active"/>
+          <action type="add-class" target="#tab-$tabId" class="active"/>
+        </step>
+        <step name="post-switch">
+          <action type="conditional">
+            <when condition="$tabId === 'chat'">
+              <action type="focus" target="chat-input" delay="100ms"/>
+            </when>
+          </action>
+          <action type="update-url-hash" value="$tabId"/>
+        </step>
+      </steps>
+    </behavior>
+
+    <!-- Typing Effect for AI Messages -->
+    <behavior name="type-message" type="effect">
+      <input name="content" type="string"/>
+      <input name="target" type="element"/>
+      <input name="speed" type="duration" default="12ms"/>
+
+      <algorithm>
+        <parse content="$content" as="markdown" into="$nodes"/>
+        <for-each node="$nodes">
+          <when type="text">
+            <for-each char="$node.text">
+              <append char="$char" to="$target"/>
+              <scroll-to-bottom target="chat-messages"/>
+              <wait duration="$speed"/>
+              <when char-is="sentence-end">
+                <wait duration="150ms"/>
+              </when>
+              <when char-is="clause-end">
+                <wait duration="80ms"/>
+              </when>
+            </for-each>
+          </when>
+          <when type="element">
+            <create-element tag="$node.tag" into="$element"/>
+            <copy-attributes from="$node" to="$element"/>
+            <append element="$element" to="$target"/>
+            <recurse content="$node.children" target="$element"/>
+          </when>
+        </for-each>
+      </algorithm>
+    </behavior>
+
+    <!-- Box Breathing Exercise -->
+    <behavior name="box-breathing-exercise" type="interactive">
+      <state name="phase" initial="ready"/>
+      <state name="cycle" initial="0"/>
+      <config name="cycles" value="4"/>
+      <config name="duration" value="4000ms"/>
+
+      <phases>
+        <phase name="ready">
+          <display instruction="Ready to begin?"/>
+          <on trigger="start-button">
+            <transition to="inhale"/>
+          </on>
+        </phase>
+
+        <phase name="inhale">
+          <display instruction="Breathe in..."/>
+          <animate target="breathing-circle" property="scale" to="1.3" duration="$duration"/>
+          <wait duration="$duration"/>
+          <transition to="hold-in"/>
+        </phase>
+
+        <phase name="hold-in">
+          <display instruction="Hold..."/>
+          <wait duration="$duration"/>
+          <transition to="exhale"/>
+        </phase>
+
+        <phase name="exhale">
+          <display instruction="Breathe out..."/>
+          <animate target="breathing-circle" property="scale" to="1" duration="$duration"/>
+          <wait duration="$duration"/>
+          <transition to="hold-out"/>
+        </phase>
+
+        <phase name="hold-out">
+          <display instruction="Hold..."/>
+          <wait duration="$duration"/>
+          <increment counter="cycle"/>
+          <when condition="$cycle >= $cycles">
+            <transition to="complete"/>
+          </when>
+          <default>
+            <transition to="inhale"/>
+          </default>
+        </phase>
+
+        <phase name="complete">
+          <display instruction="Well done! Take a moment to notice how you feel."/>
+          <record-engagement domain="M"/>
+          <haptic style="success"/>
+        </phase>
+      </phases>
+    </behavior>
+
+    <!-- Pattern Detection -->
+    <behavior name="detect-pattern" type="function">
+      <input name="text" type="string"/>
+      <output name="pattern" type="string"/>
+      <output name="confidence" type="number"/>
+
+      <algorithm>
+        <lowercase input="$text" into="$lower"/>
+        <for-each entry="PATTERN_KEYWORDS">
+          <regex-match pattern="$entry.pattern" against="$lower" into="$matches"/>
+          <when condition="$matches.length > 0">
+            <score pattern="$entry.key" by="$matches.length"/>
+          </when>
+        </for-each>
+        <return highest-scored="pattern"/>
+      </algorithm>
+    </behavior>
+
+    <!-- Profile Compression -->
+    <behavior name="compress-profile" type="async-flow">
+      <trigger condition="TherapyProfile.messagesSinceCompression >= 8"/>
+
+      <steps>
+        <step name="build-prompt">
+          <action type="call" function="buildCompressionPrompt">
+            <arg name="recentMessages" value="ConversationHistory.messages.slice(-8)"/>
+            <arg name="currentProfile" value="TherapyProfile"/>
+          </action>
+          <into variable="$prompt"/>
+        </step>
+
+        <step name="call-compression-api" async="true">
+          <action type="http-post" endpoint="/api/compress-profile">
+            <body>
+              <field name="prompt" value="$prompt"/>
+            </body>
+            <on-success into="$result"/>
+            <on-error action="log-and-continue"/>
+          </action>
+        </step>
+
+        <step name="merge-updates">
+          <action type="parse-json" source="$result.compressed" into="$updates"/>
+          <action type="merge-arrays" source="$updates.patterns" into="TherapyProfile.patterns" unique="true" max="10"/>
+          <action type="merge-object" source="$updates.patternStrength" into="TherapyProfile.patternStrength"/>
+          <action type="prepend-array" source="$updates.insights" into="TherapyProfile.insights" max="10"/>
+          <action type="set" target="TherapyProfile.activeThemes" value="$updates.activeThemes"/>
+          <action type="merge-arrays" source="$updates.strengths" into="TherapyProfile.strengths" unique="true" max="5"/>
+        </step>
+
+        <step name="reset-counters">
+          <action type="set" target="TherapyProfile.messagesSinceCompression" value="0"/>
+          <action type="increment" target="TherapyProfile.sessionCount"/>
+          <action type="set" target="TherapyProfile.lastCompression" value="now()"/>
+          <action type="save" model="TherapyProfile"/>
+        </step>
+      </steps>
+    </behavior>
+
+    <!-- Notice Save -->
+    <behavior name="save-notice" type="flow">
+      <trigger event="click" target="#notice-save-btn"/>
+
+      <steps>
+        <step name="gather-data">
+          <action type="get" source="noticeSelectedColor" into="$color"/>
+          <action type="get-value" source="#notice-energy-slider" into="$energy"/>
+          <action type="get-value" source="#notice-text" into="$text"/>
+          <action type="get" source="#notice-daily-prompt.textContent" into="$prompt"/>
+        </step>
+
+        <step name="validate">
+          <precondition check="$color OR $text.trim()" fail="silent"/>
+        </step>
+
+        <step name="save">
+          <action type="set" target="NoticeEntry[today]">
+            <value>
+              { color: $color, energy: $energy, text: $text.trim(), prompt: $prompt }
+            </value>
+          </action>
+          <action type="save" model="NoticeEntry"/>
+        </step>
+
+        <step name="feedback">
+          <action type="set-text" target="#notice-save-btn" value="Saved"/>
+          <action type="disable" target="#notice-save-btn"/>
+          <action type="wait" duration="2000ms"/>
+          <action type="set-text" target="#notice-save-btn" value="Save today's notice"/>
+          <action type="enable" target="#notice-save-btn"/>
+        </step>
+      </steps>
+    </behavior>
+
+    <!-- Haptic Feedback Utility -->
+    <behavior name="haptic" type="utility">
+      <input name="style" type="enum" values="light|medium|heavy|success|error"/>
+      <platform-check feature="navigator.vibrate"/>
+
+      <patterns>
+        <pattern style="light" vibration="[10]"/>
+        <pattern style="medium" vibration="[20]"/>
+        <pattern style="heavy" vibration="[30]"/>
+        <pattern style="success" vibration="[10, 50, 20]"/>
+        <pattern style="error" vibration="[30, 50, 30, 50, 30]"/>
+      </patterns>
+    </behavior>
+
+  </behaviors>
+
+  <!-- ==========================================
+       SECTION 5: API INTEGRATIONS
+       ========================================== -->
+
+  <integrations>
+
+    <api name="chat" endpoint="/api/chat" method="POST">
+      <request>
+        <field name="message" type="string" required="true"/>
+        <field name="profile" type="object" optional="true"/>
+        <field name="recentMessages" type="array" optional="true"/>
+        <field name="history" type="array" optional="true"/>
+        <field name="currentPattern" type="string" optional="true"/>
+        <field name="sessionPhase" type="string" optional="true"/>
+      </request>
+      <response>
+        <field name="response" type="string"/>
+        <field name="pattern" type="string"/>
+        <field name="timestamp" type="datetime"/>
+        <field name="sessionPhase" type="string"/>
+      </response>
+      <backend>
+        <fetch-resource url="/imagine-framework-prompts-enhanced.txt" cache="2h"/>
+        <build-system-prompt include="profile-context"/>
+        <call-llm provider="anthropic" model="claude-sonnet-4-20250514" max-tokens="500"/>
+        <detect-pattern from="user-message"/>
+      </backend>
+    </api>
+
+    <api name="compress-profile" endpoint="/api/compress-profile" method="POST">
+      <request>
+        <field name="prompt" type="string" required="true"/>
+      </request>
+      <response>
+        <field name="compressed" type="json-string"/>
+      </response>
+      <backend>
+        <call-llm provider="anthropic" model="claude-sonnet-4-20250514" max-tokens="300"/>
+        <parse-as-json field="compressed"/>
+      </backend>
+    </api>
+
+  </integrations>
+
+  <!-- ==========================================
+       SECTION 6: STYLING SYSTEM
+       ========================================== -->
+
+  <styles theme="dark-brutalism">
+
+    <design-tokens>
+      <token name="font-family" value="Gabarito, system-ui, sans-serif"/>
+      <token name="bg-primary" value="#1a1512"/>
+      <token name="bg-card" value="#2d2825"/>
+      <token name="coral" value="#D4896A"/>
+      <token name="text-primary" value="#F5F0E8"/>
+      <token name="text-muted" value="#b0a499"/>
+      <token name="border-thicc" value="5px"/>
+      <token name="radius-chunky" value="32px"/>
+      <token name="shadow-brutal" value="8px 8px 0 0 var(--bg-card)"/>
+      <token name="transition-brutal" value="0.3s cubic-bezier(0.4, 0, 0.2, 1)"/>
+    </design-tokens>
+
+    <component-styles>
+      <style component="button" variant="primary">
+        <property name="background" value="var(--coral)"/>
+        <property name="border" value="var(--border-thicc) solid var(--coral-dark)"/>
+        <property name="border-radius" value="var(--radius-chunky)"/>
+        <property name="color" value="var(--bg-primary)"/>
+        <property name="font-weight" value="900"/>
+        <property name="text-transform" value="uppercase"/>
+        <hover>
+          <property name="transform" value="translateY(-4px) rotate(-1deg)"/>
+          <property name="box-shadow" value="8px 8px 0 0 var(--bg-card)"/>
+        </hover>
+      </style>
+
+      <style component="card">
+        <property name="background" value="var(--bg-card)"/>
+        <property name="border" value="var(--border-thicc) solid var(--border-warm)"/>
+        <property name="border-radius" value="var(--radius-medium)"/>
+        <hover>
+          <property name="transform" value="translateY(-4px) rotate(-0.5deg)"/>
+          <property name="box-shadow" value="8px 12px 0 0 var(--coral)"/>
+        </hover>
+      </style>
+
+      <style component="message" variant="user">
+        <property name="background" value="var(--coral)"/>
+        <property name="align-self" value="flex-end"/>
+        <property name="border-bottom-right-radius" value="var(--space-xs)"/>
+      </style>
+
+      <style component="message" variant="assistant">
+        <property name="background" value="var(--bg-card)"/>
+        <property name="align-self" value="flex-start"/>
+        <property name="border-bottom-left-radius" value="var(--space-xs)"/>
+      </style>
+    </component-styles>
+
+    <animations>
+      <animation name="slideUp">
+        <from opacity="0" transform="translateY(30px)"/>
+        <to opacity="1" transform="translateY(0)"/>
+      </animation>
+      <animation name="typingBounce">
+        <keyframe at="0%" transform="translateY(0)"/>
+        <keyframe at="30%" transform="translateY(-8px)"/>
+        <keyframe at="60%" transform="translateY(0)"/>
+        <keyframe at="100%" transform="translateY(0)"/>
+      </animation>
+    </animations>
+
+  </styles>
+
+</application>
