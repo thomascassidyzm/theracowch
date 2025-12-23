@@ -440,6 +440,131 @@
             color: var(--coral);
         }
 
+        /* Stack Flow */
+        .stack-flow {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .stack-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-small);
+            border-left: 3px solid var(--coral);
+        }
+
+        .stack-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .stack-content strong {
+            display: block;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            margin-bottom: 2px;
+        }
+
+        .stack-content span {
+            color: var(--text-muted);
+            font-size: var(--font-size-xs);
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+
+        @media (max-width: 500px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .column-card {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-lg);
+        }
+
+        .column-card.now {
+            border-color: var(--coral);
+        }
+
+        .column-card h4 {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .simple-list {
+            list-style: none;
+        }
+
+        .simple-list li {
+            padding: var(--space-xs) 0;
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            padding-left: var(--space-md);
+            position: relative;
+        }
+
+        .simple-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--coral);
+        }
+
+        /* Decision Grid */
+        .decision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+
+        @media (max-width: 500px) {
+            .decision-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .decision-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+        }
+
+        .decision-question {
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .decision-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .option {
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -676,31 +801,149 @@
             </div>
         </section>
 
-        <!-- Next Steps -->
+        <!-- Technical Stack -->
         <section class="section">
             <div class="section-header">
                 <div class="section-number">6</div>
-                <h2>To Discuss</h2>
+                <h2>What We Need to Build</h2>
             </div>
 
             <div class="card">
-                <h3>Pricing & Tiers</h3>
-                <p>Are these price points right for your audience? Do you want a Complete tier with personal touch, or keep it fully automated?</p>
+                <h3>The Conversion Stack</h3>
+                <p style="margin-bottom: var(--space-md);">To move from free app to paid subscriptions, we need these pieces:</p>
+                <div class="stack-flow">
+                    <div class="stack-item">
+                        <div class="stack-icon">🔐</div>
+                        <div class="stack-content">
+                            <strong>1. Authentication (Clerk)</strong>
+                            <span>Sign up with email, Google, or Apple. Know who's who.</span>
+                        </div>
+                    </div>
+                    <div class="stack-item">
+                        <div class="stack-icon">💳</div>
+                        <div class="stack-content">
+                            <strong>2. Payments (Stripe)</strong>
+                            <span>Subscription billing. Connects to Clerk via webhooks.</span>
+                        </div>
+                    </div>
+                    <div class="stack-item">
+                        <div class="stack-icon">🚧</div>
+                        <div class="stack-content">
+                            <strong>3. Feature Gating</strong>
+                            <span>Free: 5 msgs/day, 3 exercises. Paid: unlimited everything.</span>
+                        </div>
+                    </div>
+                    <div class="stack-item">
+                        <div class="stack-icon">📧</div>
+                        <div class="stack-content">
+                            <strong>4. Email Capture</strong>
+                            <span>Clerk captures email at signup. Sync to your email tool.</span>
+                        </div>
+                    </div>
+                    <div class="stack-item">
+                        <div class="stack-icon">📬</div>
+                        <div class="stack-content">
+                            <strong>5. Campaigns</strong>
+                            <span>Welcome sequence, "hit your limit" nudges, weekly tips.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Build vs Plan -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">7</div>
+                <h2>Build Now vs Plan Later</h2>
             </div>
 
-            <div class="card">
-                <h3>Launch Strategy</h3>
-                <p>Email blast to your list? Blog post announcement? Soft launch to select readers first?</p>
+            <div class="two-column">
+                <div class="column-card now">
+                    <h4>🔧 Build Now (Technical)</h4>
+                    <ul class="simple-list">
+                        <li>Clerk integration</li>
+                        <li>Stripe subscriptions</li>
+                        <li>Feature gating logic</li>
+                        <li>Email capture</li>
+                    </ul>
+                </div>
+                <div class="column-card later">
+                    <h4>📣 Plan Later (Marketing)</h4>
+                    <ul class="simple-list">
+                        <li>Launch email to your list</li>
+                        <li>Blog announcement post</li>
+                        <li>"Hit your limit" flow</li>
+                        <li>Drip email campaign</li>
+                        <li>Sponsored post about the app</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Your Involvement</h3>
-                <p>Monthly audio messages for Complete tier? Occasional live Q&As? Or purely passive after setup?</p>
+            <div class="card" style="margin-top: var(--space-lg);">
+                <h3>Why This Order?</h3>
+                <p>Technical first means when you're ready to announce, the payment flow just works. No "coming soon" - people can subscribe immediately.</p>
+            </div>
+        </section>
+
+        <!-- Decisions Needed -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">8</div>
+                <h2>Decisions We Need</h2>
             </div>
 
-            <div class="card">
-                <h3>B2B Later?</h3>
-                <p>Corporate wellness packages once proven? You already have the Cisco relationship...</p>
+            <div class="decision-grid">
+                <div class="decision-card">
+                    <div class="decision-question">Soft launch or big bang?</div>
+                    <div class="decision-options">
+                        <span class="option">Test with 50 people first</span>
+                        <span class="option">Email the whole list</span>
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-question">Free tier limits?</div>
+                    <div class="decision-options">
+                        <span class="option">3 messages/day</span>
+                        <span class="option">5 messages/day</span>
+                        <span class="option">10 messages/day</span>
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-question">Payment options?</div>
+                    <div class="decision-options">
+                        <span class="option">Monthly only</span>
+                        <span class="option">Annual discount (2 months free)</span>
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-question">Email tool?</div>
+                    <div class="decision-options">
+                        <span class="option">Use existing (Mailchimp?)</span>
+                        <span class="option">New tool (ConvertKit)</span>
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-question">Complete tier involvement?</div>
+                    <div class="decision-options">
+                        <span class="option">Monthly audio message</span>
+                        <span class="option">Quarterly live Q&A</span>
+                        <span class="option">Keep it automated</span>
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-question">Price points feel right?</div>
+                    <div class="decision-options">
+                        <span class="option">£4.99 / £9.99</span>
+                        <span class="option">£5.99 / £11.99</span>
+                        <span class="option">£3.99 / £7.99</span>
+                    </div>
+                </div>
             </div>
         </section>
 
