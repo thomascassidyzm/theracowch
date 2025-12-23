@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Cowch Vision - The Future of Wellness</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/css/variables.css">
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: var(--space-3xl) 0;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .hero-emoji {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: var(--space-lg);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+            margin-bottom: var(--space-md);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--text-muted);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: var(--space-3xl);
+            animation: slideUp 0.6s ease-out both;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+        .section:nth-child(5) { animation-delay: 0.4s; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .section-number {
+            width: 48px;
+            height: 48px;
+            background: var(--coral);
+            color: var(--bg-primary);
+            border-radius: var(--radius-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-black);
+            font-size: var(--font-size-xl);
+            flex-shrink: 0;
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
+        .section h2 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            box-shadow: 6px 6px 0 0 var(--bg-elevated);
+            transition: all var(--transition-brutal);
+        }
+
+        .card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 0 var(--coral);
+        }
+
+        .card h3 {
+            color: var(--coral);
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: var(--font-size-base);
+        }
+
+        /* Value Prop Grid */
+        .value-grid {
+            display: grid;
+            gap: var(--space-md);
+        }
+
+        .value-item {
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-start;
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-small);
+            border-left: 4px solid var(--coral);
+        }
+
+        .value-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .value-item strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .value-item span {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Pricing Table */
+        .pricing-grid {
+            display: grid;
+            gap: var(--space-md);
+        }
+
+        .pricing-tier {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 6px 6px 0 0 var(--bg-elevated);
+        }
+
+        .pricing-tier.featured {
+            border-color: var(--coral);
+            box-shadow: 6px 6px 0 0 var(--coral);
+        }
+
+        .pricing-tier.featured::before {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: 12px;
+            right: -32px;
+            background: var(--coral);
+            color: var(--bg-primary);
+            font-size: 10px;
+            font-weight: var(--font-weight-bold);
+            padding: 4px 40px;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
+        }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+
+        .tier-name {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        .tier-price {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+        }
+
+        .tier-price span {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-normal);
+        }
+
+        .tier-features {
+            list-style: none;
+        }
+
+        .tier-features li {
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .tier-features li::before {
+            content: '✓';
+            color: var(--coral);
+            font-weight: bold;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            text-align: center;
+            border: 2px dashed var(--border-warm);
+        }
+
+        .arch-device {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--coral);
+            border-radius: var(--radius-small);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+
+        .arch-device h4 {
+            color: var(--coral);
+            margin-bottom: var(--space-sm);
+            font-size: var(--font-size-base);
+        }
+
+        .arch-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            justify-content: center;
+        }
+
+        .arch-item {
+            background: var(--bg-elevated);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+
+        .arch-arrow {
+            font-size: var(--font-size-2xl);
+            color: var(--text-muted);
+            margin: var(--space-sm) 0;
+        }
+
+        .arch-cloud {
+            background: var(--bg-card);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            padding: var(--space-md);
+        }
+
+        .arch-cloud h4 {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: rgba(126, 168, 139, 0.2);
+            color: var(--color-mind);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 20px;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            margin-top: var(--space-md);
+        }
+
+        /* Funnel Diagram */
+        .funnel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-card);
+            border-radius: var(--radius-small);
+            border-left: 4px solid var(--coral);
+        }
+
+        .funnel-step:nth-child(1) { opacity: 1; }
+        .funnel-step:nth-child(2) { opacity: 0.9; margin-left: 20px; }
+        .funnel-step:nth-child(3) { opacity: 0.8; margin-left: 40px; }
+        .funnel-step:nth-child(4) { opacity: 0.7; margin-left: 60px; }
+
+        .funnel-number {
+            background: var(--coral);
+            color: var(--bg-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .funnel-content strong {
+            display: block;
+            color: var(--text-primary);
+        }
+
+        .funnel-content span {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+
+        /* Quote Box */
+        .quote-box {
+            background: linear-gradient(135deg, var(--coral) 0%, var(--coral-dark) 100%);
+            color: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-medium);
+            text-align: center;
+            box-shadow: 8px 8px 0 0 var(--bg-card);
+        }
+
+        .quote-box blockquote {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            font-style: italic;
+            margin-bottom: var(--space-md);
+        }
+
+        .quote-box cite {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            text-align: center;
+        }
+
+        .stat {
+            padding: var(--space-md);
+        }
+
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-black);
+            color: var(--coral);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: var(--space-3xl) 0;
+            border-top: 2px solid var(--border-subtle);
+            margin-top: var(--space-3xl);
+        }
+
+        .cta-section h2 {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-md);
+        }
+
+        .cta-section p {
+            color: var(--text-muted);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            padding: var(--space-sm) 0;
+            transition: color var(--transition-fast);
+        }
+
+        .back-link:hover {
+            color: var(--coral);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html" class="back-link">← Back to Cowch</a>
+
+        <header class="hero">
+            <span class="hero-emoji">🐮</span>
+            <h1>Cowch Vision</h1>
+            <p class="hero-subtitle">Scaling Mandy's therapeutic wisdom to help thousands - while keeping everyone's journey private.</p>
+        </header>
+
+        <!-- The Opportunity -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2>The Opportunity</h2>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat">
+                    <span class="stat-value">20+</span>
+                    <span class="stat-label">Years Experience</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">Top 10</span>
+                    <span class="stat-label">UK Mental Health Blog</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">1000s</span>
+                    <span class="stat-label">Blog Readers</span>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-lg);">
+                <h3>You Have Something Rare</h3>
+                <p>Your therapeutic voice, your IMAGINE framework, your authentic approach - refined over two decades. Cowch captures this and makes it available 24/7, in everyone's pocket.</p>
+            </div>
+        </section>
+
+        <!-- What Makes Cowch Different -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2>What Makes Cowch Different</h2>
+            </div>
+
+            <div class="value-grid">
+                <div class="value-item">
+                    <span class="value-icon">🎯</span>
+                    <div>
+                        <strong>It's YOUR Voice</strong>
+                        <span>Not generic wellness advice. Trained on your language patterns, your therapeutic approach, your framework.</span>
+                    </div>
+                </div>
+                <div class="value-item">
+                    <span class="value-icon">🧠</span>
+                    <div>
+                        <strong>It Learns Their Patterns</strong>
+                        <span>Remembers what they're working on, spots anxiety vs relationship patterns, knows what approaches work for them.</span>
+                    </div>
+                </div>
+                <div class="value-item">
+                    <span class="value-icon">🔒</span>
+                    <div>
+                        <strong>100% Private</strong>
+                        <span>Everything stays on their device. We literally cannot see their conversations. GDPR by design.</span>
+                    </div>
+                </div>
+                <div class="value-item">
+                    <span class="value-icon">🌉</span>
+                    <div>
+                        <strong>Bridge to Real Therapy</strong>
+                        <span>Not a replacement - a complement. Users who connect with AI-Mandy often want the real thing.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quote-box" style="margin-top: var(--space-xl);">
+                <blockquote>"Those apps give everyone the same content. Cowch learns YOU - and it's built by a real therapist you can actually see."</blockquote>
+                <cite>— The Cowch Difference</cite>
+            </div>
+        </section>
+
+        <!-- Privacy Architecture -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2>Privacy-First Architecture</h2>
+            </div>
+
+            <div class="architecture">
+                <div class="arch-device">
+                    <h4>📱 User's Device (All Personal Data Stays Here)</h4>
+                    <div class="arch-items">
+                        <span class="arch-item">Chat History</span>
+                        <span class="arch-item">Detected Patterns</span>
+                        <span class="arch-item">Personal Insights</span>
+                        <span class="arch-item">Strengths</span>
+                        <span class="arch-item">IMAGINE Progress</span>
+                        <span class="arch-item">What Works</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow">↓ compressed summary only ↓</div>
+
+                <div class="arch-cloud">
+                    <h4>☁️ Cowch Cloud — Stateless, No Storage</h4>
+                </div>
+
+                <div class="privacy-badge">
+                    🛡️ GDPR Compliant by Design
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-lg);">
+                <h3>Why This Matters</h3>
+                <p>Mental health is deeply personal. Users trust Cowch because they know their deepest thoughts never leave their phone. We can honestly say: "We can't see your data - it never leaves your device."</p>
+            </div>
+        </section>
+
+        <!-- Pricing Strategy -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2>Pricing Strategy</h2>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-tier">
+                    <div class="tier-header">
+                        <span class="tier-name">Free</span>
+                        <span class="tier-price">£0</span>
+                    </div>
+                    <ul class="tier-features">
+                        <li>5 messages per day</li>
+                        <li>3 core exercises</li>
+                        <li>Basic IMAGINE intro</li>
+                        <li>Experience Mandy's approach</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier featured">
+                    <div class="tier-header">
+                        <span class="tier-name">Personal</span>
+                        <span class="tier-price">£4.99<span>/mo</span></span>
+                    </div>
+                    <ul class="tier-features">
+                        <li>Unlimited conversations</li>
+                        <li>All 30+ exercises</li>
+                        <li>Pattern learning & insights</li>
+                        <li>Full IMAGINE framework</li>
+                        <li>Progress tracking</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="tier-header">
+                        <span class="tier-name">Complete</span>
+                        <span class="tier-price">£9.99<span>/mo</span></span>
+                    </div>
+                    <ul class="tier-features">
+                        <li>Everything in Personal</li>
+                        <li>Monthly audio from Mandy</li>
+                        <li>Priority booking for real sessions</li>
+                        <li>Exclusive content drops</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Funnel -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2>The Growth Funnel</h2>
+            </div>
+
+            <div class="funnel">
+                <div class="funnel-step">
+                    <div class="funnel-number">1</div>
+                    <div class="funnel-content">
+                        <strong>1000 Free Users</strong>
+                        <span>From blog traffic, socials, word of mouth</span>
+                    </div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-number">2</div>
+                    <div class="funnel-content">
+                        <strong>100 → Personal (£499/mo)</strong>
+                        <span>10% conversion, want unlimited access</span>
+                    </div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-number">3</div>
+                    <div class="funnel-content">
+                        <strong>10 → Complete (£99/mo)</strong>
+                        <span>Want the Mandy connection</span>
+                    </div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-number">4</div>
+                    <div class="funnel-content">
+                        <strong>2 → Real Therapy (£200-400/mo)</strong>
+                        <span>Ready for 1:1 sessions @ £100/hr</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-lg);">
+                <h3>Conservative Estimate</h3>
+                <p><strong style="color: var(--coral);">~£800-1000/month</strong> from 1000 users, plus therapy conversions. Scales with your existing blog traffic - no cold audience building needed.</p>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2>To Discuss</h2>
+            </div>
+
+            <div class="card">
+                <h3>Pricing & Tiers</h3>
+                <p>Are these price points right for your audience? Do you want a Complete tier with personal touch, or keep it fully automated?</p>
+            </div>
+
+            <div class="card">
+                <h3>Launch Strategy</h3>
+                <p>Email blast to your list? Blog post announcement? Soft launch to select readers first?</p>
+            </div>
+
+            <div class="card">
+                <h3>Your Involvement</h3>
+                <p>Monthly audio messages for Complete tier? Occasional live Q&As? Or purely passive after setup?</p>
+            </div>
+
+            <div class="card">
+                <h3>B2B Later?</h3>
+                <p>Corporate wellness packages once proven? You already have the Cisco relationship...</p>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to Scale Your Impact?</h2>
+            <p>Cowch is built and working. Now let's turn it into a sustainable business that helps thousands while you sleep.</p>
+            <span class="hero-emoji" style="font-size: 3rem;">🐮💜</span>
+        </section>
+    </div>
+</body>
+</html>
