@@ -565,6 +565,49 @@
             border: 1px solid var(--border-subtle);
         }
 
+        /* Checklist */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            cursor: pointer;
+            padding: var(--space-sm);
+            border-radius: var(--radius-xs);
+            transition: background var(--transition-fast);
+        }
+
+        .check-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .check-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: var(--coral);
+        }
+
+        .check-item span {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
+            padding-top: 1px;
+        }
+
+        .check-item:has(input:checked) span {
+            color: var(--text-primary);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -943,6 +986,65 @@
                         <span class="option">£5.99 / £11.99</span>
                         <span class="option">£3.99 / £7.99</span>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Info We Need -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">9</div>
+                <h2>Quick Questions for Mandy</h2>
+            </div>
+
+            <div class="card">
+                <h3>📊 Audience & Reach</h3>
+                <div class="checklist">
+                    <label class="check-item"><input type="checkbox"><span>Monthly blog traffic (unique visitors)?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Email list size?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Email provider (Mailchimp, ConvertKit, etc.)?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Social followers (Insta, LinkedIn)?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Any existing email automations we shouldn't break?</span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💼 Current Business</h3>
+                <div class="checklist">
+                    <label class="check-item"><input type="checkbox"><span>Typical therapy clients per month?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Currently have a waitlist?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Rough sponsored post rate?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Existing Stripe account?</span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🚀 Launch Preferences</h3>
+                <div class="checklist">
+                    <label class="check-item"><input type="checkbox"><span>Soft launch (50 testers) or big bang (full list)?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Timeline: ASAP or take our time?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Happy to write a blog announcement?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Can mention in future sponsored posts?</span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎙️ Your Involvement</h3>
+                <div class="checklist">
+                    <label class="check-item"><input type="checkbox"><span>Complete tier: monthly audio / quarterly Q&A / none?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Want to review AI responses before launch?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Add new exercises occasionally, or keep static?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Handle support queries? (You / Us / Hybrid)</span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>✅ Quick Confirms</h3>
+                <div class="checklist">
+                    <label class="check-item"><input type="checkbox"><span>Happy with "Cowch" branding?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Any concerns about AI representing you?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Own the thoughtsonlifeandlove.com domain?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Anyone else in the loop (tech/business)?</span></label>
                 </div>
             </div>
         </section>
