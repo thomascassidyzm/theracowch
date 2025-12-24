@@ -565,16 +565,115 @@
             border: 1px solid var(--border-subtle);
         }
 
-        /* Checklist */
-        .checklist {
+        /* Form Inputs */
+        .form-group {
             display: flex;
             flex-direction: column;
             gap: var(--space-sm);
         }
 
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .input-row:last-child {
+            border-bottom: none;
+        }
+
+        .input-label {
+            flex: 1;
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .input-field {
+            width: 140px;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            transition: border-color var(--transition-fast);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--coral);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* Option Buttons */
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .option-row {
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .option-row:last-child {
+            border-bottom: none;
+        }
+
+        .option-label {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-sm);
+            display: block;
+        }
+
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .option-btn {
+            padding: 6px 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-subtle);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: var(--font-size-xs);
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .option-btn:hover {
+            border-color: var(--coral);
+            color: var(--text-primary);
+        }
+
+        .option-btn.selected {
+            background: var(--coral);
+            border-color: var(--coral);
+            color: var(--bg-primary);
+        }
+
+        /* Checklist (for simple yes/no) */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
         .check-item {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: var(--space-sm);
             cursor: pointer;
             padding: var(--space-sm);
@@ -587,8 +686,8 @@
         }
 
         .check-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             margin: 0;
             flex-shrink: 0;
             cursor: pointer;
@@ -598,14 +697,10 @@
         .check-item span {
             color: var(--text-muted);
             font-size: var(--font-size-sm);
-            line-height: 1.4;
-            padding-top: 1px;
         }
 
         .check-item:has(input:checked) span {
-            color: var(--text-primary);
-            text-decoration: line-through;
-            opacity: 0.7;
+            color: var(--coral);
         }
 
         /* Animations */
@@ -999,52 +1094,138 @@
 
             <div class="card">
                 <h3>📊 Audience & Reach</h3>
-                <div class="checklist">
-                    <label class="check-item"><input type="checkbox"><span>Monthly blog traffic (unique visitors)?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Email list size?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Email provider (Mailchimp, ConvertKit, etc.)?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Social followers (Insta, LinkedIn)?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Any existing email automations we shouldn't break?</span></label>
+                <div class="form-group">
+                    <div class="input-row">
+                        <span class="input-label">Monthly blog visitors</span>
+                        <input type="text" class="input-field" placeholder="e.g. 10,000">
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">Email list size</span>
+                        <input type="text" class="input-field" placeholder="e.g. 2,500">
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">Email provider</span>
+                        <input type="text" class="input-field" placeholder="e.g. Mailchimp">
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">Instagram followers</span>
+                        <input type="text" class="input-field" placeholder="e.g. 5,000">
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">LinkedIn followers</span>
+                        <input type="text" class="input-field" placeholder="e.g. 3,000">
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h3>💼 Current Business</h3>
-                <div class="checklist">
-                    <label class="check-item"><input type="checkbox"><span>Typical therapy clients per month?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Currently have a waitlist?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Rough sponsored post rate?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Existing Stripe account?</span></label>
+                <div class="form-group">
+                    <div class="input-row">
+                        <span class="input-label">Therapy clients per month</span>
+                        <input type="text" class="input-field" placeholder="e.g. 20">
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">Sponsored post rate</span>
+                        <input type="text" class="input-field" placeholder="e.g. £200">
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Currently have a waitlist?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">No</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Existing Stripe account?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">No</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h3>🚀 Launch Preferences</h3>
-                <div class="checklist">
-                    <label class="check-item"><input type="checkbox"><span>Soft launch (50 testers) or big bang (full list)?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Timeline: ASAP or take our time?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Happy to write a blog announcement?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Can mention in future sponsored posts?</span></label>
+                <div class="option-group">
+                    <div class="option-row">
+                        <span class="option-label">Launch approach?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Soft launch (50 testers)</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Big bang (full list)</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Timeline?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">ASAP</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Take our time</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Happy to write blog announcement?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Maybe later</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Mention in sponsored posts?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">No</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h3>🎙️ Your Involvement</h3>
-                <div class="checklist">
-                    <label class="check-item"><input type="checkbox"><span>Complete tier: monthly audio / quarterly Q&A / none?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Want to review AI responses before launch?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Add new exercises occasionally, or keep static?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Handle support queries? (You / Us / Hybrid)</span></label>
+                <div class="option-group">
+                    <div class="option-row">
+                        <span class="option-label">Complete tier personal touch?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Monthly audio</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Quarterly Q&A</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Keep automated</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Review AI before launch?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes please</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Trust the training</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">New exercises over time?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Yes, occasionally</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Keep it static</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">Handle support queries?</span>
+                        <div class="option-buttons">
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Me</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">You/Tom</button>
+                            <button class="option-btn" onclick="this.classList.toggle('selected')">Hybrid</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h3>✅ Quick Confirms</h3>
                 <div class="checklist">
-                    <label class="check-item"><input type="checkbox"><span>Happy with "Cowch" branding?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Any concerns about AI representing you?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Own the thoughtsonlifeandlove.com domain?</span></label>
-                    <label class="check-item"><input type="checkbox"><span>Anyone else in the loop (tech/business)?</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Happy with "Cowch" branding</span></label>
+                    <label class="check-item"><input type="checkbox"><span>Comfortable with AI representing me</span></label>
+                    <label class="check-item"><input type="checkbox"><span>I own thoughtsonlifeandlove.com domain</span></label>
+                </div>
+                <div class="input-row" style="margin-top: var(--space-md);">
+                    <span class="input-label">Anyone else in the loop?</span>
+                    <input type="text" class="input-field" placeholder="e.g. Partner, VA">
                 </div>
             </div>
         </section>
