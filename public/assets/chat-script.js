@@ -730,25 +730,18 @@ function addMessage(content, sender, quickReplies = null) {
     scrollToBottom();
 }
 
-// Add message with typing effect (for Mandy's messages)
+// Add Mandy's response message instantly
 async function addMessageWithTypingEffect(content, sender, quickReplies = null) {
-    // Keep input disabled during typing
-    isTyping = true;
-    sendButton.disabled = true;
-    chatInput.disabled = true;
-
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
 
-    // Create container for text content
+    // Render formatted content all at once
     const textContainer = document.createElement('div');
+    textContainer.innerHTML = formatMessage(content);
     messageDiv.appendChild(textContainer);
     chatMessages.appendChild(messageDiv);
 
-    // Type out the message character by character
-    await typeText(textContainer, content);
-
-    // Add quick reply buttons after typing is complete
+    // Add quick reply buttons
     if (quickReplies && sender === 'mandy') {
         const quickRepliesDiv = document.createElement('div');
         quickRepliesDiv.className = 'quick-replies';
@@ -780,74 +773,8 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
         messageDiv.appendChild(quickRepliesDiv);
     }
 
-    // Re-enable input after typing
-    isTyping = false;
-    sendButton.disabled = false;
-    chatInput.disabled = false;
-    focusInput();
-}
-
-// Type text character by character with natural pauses
-async function typeText(container, text) {
-    const formattedContent = formatMessage(text);
-
-    // Create a temporary div to parse the HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = formattedContent;
-
-    // Type through all nodes
-    await typeNodes(container, tempDiv.childNodes);
     scrollToBottom();
-}
-
-// Recursively type through DOM nodes
-async function typeNodes(targetParent, nodes) {
-    for (let node of nodes) {
-        if (node.nodeType === Node.TEXT_NODE) {
-            // Text node - type character by character
-            const text = node.textContent;
-            const textNode = document.createTextNode('');
-            targetParent.appendChild(textNode);
-
-            for (let i = 0; i < text.length; i++) {
-                textNode.textContent += text[i];
-                scrollToBottom();
-
-                // Natural pauses at punctuation
-                const char = text[i];
-                let delay = 12; // Base speed (faster)
-
-                if (char === '.' || char === '!' || char === '?') {
-                    delay = 150; // Pause after sentences
-                } else if (char === ',' || char === ':' || char === ';') {
-                    delay = 80; // Pause after clauses
-                } else if (char === '\n') {
-                    delay = 100; // Pause at line breaks
-                } else if (char === ' ') {
-                    delay = 15; // Slight pause between words
-                }
-
-                await sleep(delay);
-            }
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            // Element node - recreate and type its children
-            const element = document.createElement(node.nodeName);
-
-            // Copy attributes
-            for (let attr of node.attributes || []) {
-                element.setAttribute(attr.name, attr.value);
-            }
-
-            targetParent.appendChild(element);
-
-            // Recursively type children
-            await typeNodes(element, node.childNodes);
-        }
-    }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    focusInput();
 }
 
 function formatMessage(content) {
