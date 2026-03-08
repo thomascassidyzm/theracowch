@@ -414,8 +414,8 @@ async function sendMessage() {
         // Remove typing indicator
         typingDiv.remove();
 
-        // Add response with typing effect
-        await addMessageWithTyping(data.response, 'mandy');
+        // Add response instantly
+        addMessage(data.response, 'mandy');
         conversationHistory.push({ role: 'assistant', content: data.response });
         saveChatHistory();
 
@@ -437,50 +437,7 @@ function addMessage(content, sender, skipTyping = false) {
     scrollToBottom();
 }
 
-// Add message with typing effect for Mandy
-async function addMessageWithTyping(content, sender) {
-    const div = document.createElement('div');
-    div.className = `message ${sender}`;
-    chatMessages.appendChild(div);
 
-    const formattedContent = formatMessage(content);
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = formattedContent;
-
-    await typeNodes(div, tempDiv.childNodes);
-    scrollToBottom();
-}
-
-// Type through DOM nodes with natural pauses
-async function typeNodes(target, nodes) {
-    for (const node of nodes) {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent;
-            const textNode = document.createTextNode('');
-            target.appendChild(textNode);
-            for (const char of text) {
-                textNode.textContent += char;
-                scrollToBottom();
-                // Natural typing delays
-                let delay = 12 + Math.random() * 8;
-                if ('.!?'.includes(char)) delay = 150;
-                else if (',;:'.includes(char)) delay = 80;
-                await sleep(delay);
-            }
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = document.createElement(node.tagName.toLowerCase());
-            for (const attr of node.attributes) {
-                el.setAttribute(attr.name, attr.value);
-            }
-            target.appendChild(el);
-            await typeNodes(el, node.childNodes);
-        }
-    }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 // Markdown formatting
 function formatMessage(content) {
