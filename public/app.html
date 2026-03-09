@@ -1996,6 +1996,81 @@
                 font-size: var(--font-size-base);
             }
         }
+
+        /* Confirm Modal */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+
+        .confirm-modal.active {
+            display: flex;
+        }
+
+        .confirm-modal-content {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .confirm-modal-message {
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            margin-bottom: var(--space-xl);
+        }
+
+        .confirm-modal-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+        }
+
+        .btn-confirm {
+            padding: var(--space-sm) var(--space-xl);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+        }
+
+        .btn-confirm-cancel {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--text-secondary);
+        }
+
+        .btn-confirm-ok {
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            color: var(--bg-primary);
+        }
+
+        .btn-confirm-ok:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Keyboard open — hide tab bar, let input stay in flow */
+        body.keyboard-open .tab-bar {
+            display: none;
+        }
     </style>
 </head>
 <body>

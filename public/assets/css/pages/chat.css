@@ -7,118 +7,15 @@
    Chat Layout
    ============================================ */
 
-body {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+/* Body styles removed — only applied to standalone chat.html which no longer exists */
 
-/* ============================================
-   Chat Header
-   ============================================ */
-
-.chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-md) var(--space-lg);
-    padding-top: max(var(--space-md), env(safe-area-inset-top));
-    background: var(--bg-secondary);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid var(--glass-border);
-    flex-shrink: 0;
-}
-
-.chat-header-title {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.chat-header-title span {
-    font-size: 1.5rem;
-}
-
-.chat-header-title h1 {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    margin: 0;
-}
-
-.header-spacer {
-    width: 80px;
-}
-
-.new-chat-btn {
-    padding: var(--space-sm) var(--space-md);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.new-chat-btn:hover {
-    background: var(--glass-bg-strong);
-    color: var(--accent-primary);
-    border-color: var(--accent-primary);
-}
+/* Chat header and new-chat-btn styles are in app.html inline styles */
 
 /* ============================================
    Chat Messages
    ============================================ */
 
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding: var(--space-lg);
-    padding-bottom: calc(12rem + var(--tab-bar-height) + env(safe-area-inset-bottom));
-    background: var(--bg-primary);
-}
-
-/* Message Styling */
-.message {
-    margin-bottom: var(--space-md);
-    max-width: 75%;
-    padding: var(--space-md) var(--space-lg);
-    border-radius: var(--radius-lg);
-    line-height: 1.6;
-    font-size: var(--font-size-base);
-    animation: messageSlideIn 0.3s ease-out;
-    box-shadow: var(--shadow-sm);
-}
-
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message.mandy {
-    background: var(--bg-mandy-message);
-    border: 1px solid var(--glass-border);
-    border-bottom-left-radius: 4px;
-    margin-right: auto;
-}
-
-.message.user {
-    background: var(--bg-user-message);
-    border: 1px solid var(--glass-border);
-    border-bottom-right-radius: 4px;
-    margin-left: auto;
-}
+/* Chat messages and message bubble styles are in app.html inline styles */
 
 /* Markdown in Messages */
 .message p {
@@ -205,26 +102,15 @@ body {
     margin-bottom: var(--space-md);
 }
 
-/* ============================================
-   Quick Prompts
-   ============================================ */
-
+/* Quick prompt styles - non-fixed layout for app.html */
 .quick-prompts {
-    position: fixed;
-    bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 4.5rem);
-    left: 0;
-    right: 0;
-    padding: var(--space-md) var(--space-lg);
-    background: rgba(38, 33, 29, 0.85);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-top: 1px solid var(--glass-border);
     display: flex;
     gap: var(--space-sm);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    z-index: var(--z-dropdown);
+    padding: var(--space-sm) 0;
+    margin-bottom: var(--space-md);
 }
 
 .quick-prompts::-webkit-scrollbar {
@@ -237,105 +123,25 @@ body {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
+    background: var(--bg-card);
+    border: var(--border-medium) solid var(--border-warm);
+    border-radius: var(--radius-small);
     cursor: pointer;
-    transition: all var(--transition-smooth);
+    transition: all var(--transition-brutal);
     white-space: nowrap;
 }
 
 .quick-prompt-btn:hover {
-    background: var(--accent-primary);
-    color: white;
-    border-color: var(--accent-primary);
+    background: var(--coral);
+    color: var(--bg-primary);
+    border-color: var(--coral);
 }
 
 .quick-prompt-btn:active {
     transform: scale(0.97);
 }
 
-/* ============================================
-   Chat Input
-   ============================================ */
-
-.chat-input-container {
-    position: fixed;
-    bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
-    left: 0;
-    right: 0;
-    padding: var(--space-md) var(--space-lg);
-    background: rgba(38, 33, 29, 0.95);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-top: 1px solid var(--glass-border);
-    z-index: var(--z-dropdown);
-}
-
-.input-wrapper {
-    display: flex;
-    gap: var(--space-sm);
-    align-items: center;
-}
-
-#chat-input {
-    flex: 1;
-    padding: var(--space-md) var(--space-lg);
-    font-size: 16px;
-    font-family: inherit;
-    font-weight: var(--font-weight-medium);
-    color: var(--text-primary);
-    background: var(--bg-elevated);
-    border: 1.5px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    outline: none;
-    transition: all var(--transition-smooth);
-    -webkit-appearance: none;
-}
-
-#chat-input:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-    background: var(--bg-secondary);
-}
-
-#chat-input::placeholder {
-    color: var(--text-muted);
-    font-weight: var(--font-weight-normal);
-}
-
-.send-button {
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-    border: none;
-    border-radius: var(--radius-full);
-    color: white;
-    cursor: pointer;
-    transition: all var(--transition-smooth);
-    flex-shrink: 0;
-    box-shadow: var(--shadow-accent);
-}
-
-.send-button:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent-primary) 100%);
-    transform: scale(1.05);
-}
-
-.send-button:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.send-button:disabled {
-    background: var(--bg-elevated);
-    opacity: 0.5;
-    cursor: not-allowed;
-    box-shadow: none;
-}
+/* Chat input styles are in app.html inline styles */
 
 /* ============================================
    Slide Panels
@@ -692,30 +498,4 @@ body {
     flex-wrap: wrap;
 }
 
-/* ============================================
-   Mobile Adjustments
-   ============================================ */
-
-@media (max-width: 480px) {
-    .chat-messages {
-        padding: var(--space-md);
-    }
-
-    .message {
-        max-width: 90%;
-        font-size: var(--font-size-sm);
-    }
-
-    .quick-prompts {
-        padding: var(--space-sm) var(--space-md);
-    }
-
-    .quick-prompt-btn {
-        font-size: var(--font-size-xs);
-        padding: var(--space-xs) var(--space-sm);
-    }
-
-    .chat-input-container {
-        padding: var(--space-sm) var(--space-md);
-    }
-}
+/* Mobile adjustments handled by app.html inline responsive styles */

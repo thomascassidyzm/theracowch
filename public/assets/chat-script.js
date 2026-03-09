@@ -397,14 +397,8 @@ function openInteractiveExercise(type) {
 // ================================
 
 function setupEventListeners() {
-    // Send message
+    // Send message — only via the send button (Enter adds new line on mobile)
     sendButton.addEventListener('click', handleSendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
-    });
 
     // Quick prompts
     const quickPromptButtons = document.querySelectorAll('.quick-prompt-btn');
