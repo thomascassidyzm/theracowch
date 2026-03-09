@@ -3,8 +3,9 @@
 // ============================================
 
 // DOM Elements (initialized after DOM ready)
+// Note: chatInput and chatMessages are owned by chat-script.js
 let app, tabBtns, tabPanels;
-let chatInput, chatSendBtn, chatMessages, greetingText;
+let appChatInput, chatSendBtn, greetingText;
 
 // ============================================
 // Tab Navigation
@@ -23,7 +24,7 @@ function switchTab(tabId) {
 
     // Focus chat input when switching to chat
     if (tabId === 'chat') {
-        setTimeout(() => chatInput.focus(), 100);
+        setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
 }
 
@@ -458,22 +459,7 @@ function setupSettingsButtons() {
 // IMAGINE Tracker
 // ============================================
 
-function updateImagineTracker() {
-    try {
-        const data = localStorage.getItem('cowch-imagine-engagement');
-        if (data) {
-            const engagement = JSON.parse(data);
-            document.querySelectorAll('.imagine-mini-letter').forEach(el => {
-                const domain = el.dataset.domain;
-                if (engagement[domain] && engagement[domain] > 0) {
-                    el.classList.add('active');
-                }
-            });
-        }
-    } catch (e) {
-        // Ignore errors
-    }
-}
+// updateImagineTracker is provided by chat-script.js
 
 // ============================================
 // YOU TAB TOOLS (Notice, Choice, Values)
@@ -1145,9 +1131,8 @@ function init() {
     app = document.getElementById('app');
     tabBtns = document.querySelectorAll('.tab-btn');
     tabPanels = document.querySelectorAll('.tab-panel');
-    chatInput = document.getElementById('chat-input');
+    appChatInput = document.getElementById('chat-input');
     chatSendBtn = document.getElementById('chat-send-btn');
-    chatMessages = document.getElementById('chat-messages');
     greetingText = document.getElementById('greeting-text');
 
     // Setup all functionality

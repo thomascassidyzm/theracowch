@@ -340,12 +340,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const isAppMode = document.querySelector('.tab-btn[data-tab]');
     if (!isAppMode) {
         initChat();
-        handleHashNavigation();
+        chatHandleHashNavigation();
     }
 });
 
-// Handle hash-based navigation from other pages
-function handleHashNavigation() {
+// Handle hash-based navigation (standalone mode only)
+function chatHandleHashNavigation() {
     const hash = window.location.hash.slice(1); // Remove the '#'
 
     if (hash === 'privacy') {
@@ -1218,7 +1218,7 @@ function setupIOSKeyboard() {
 // IMAGINE Framework Panel
 // ================================
 
-const IMAGINE_DOMAINS = [
+const IMAGINE_DOMAIN_LIST = [
     {
         letter: 'I',
         title: 'Me, Myself & I',
@@ -1271,7 +1271,7 @@ const IMAGINE_DOMAINS = [
 ];
 
 function populateImaginePanel() {
-    const domainCards = IMAGINE_DOMAINS.map(domain => `
+    const domainCards = IMAGINE_DOMAIN_LIST.map(domain => `
         <div class="resource-card resource-card-minimal">
             <div class="resource-card-header">
                 <div class="resource-card-icon">${domain.icon}</div>
