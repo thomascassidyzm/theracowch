@@ -43,7 +43,7 @@ function saveImagineEngagement(data) {
 }
 
 // Record that user engaged with an exercise in a domain
-function recordImagineEngagement(letter) {
+function recordImagineEngagementByLetter(letter) {
     const data = getImagineEngagement();
     const now = Date.now();
 
@@ -400,6 +400,12 @@ function setupEventListeners() {
     // Send message — only via the send button (Enter adds new line on mobile)
     sendButton.addEventListener('click', handleSendMessage);
 
+    // Auto-grow textarea as user types
+    chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    });
+
     // Quick prompts
     const quickPromptButtons = document.querySelectorAll('.quick-prompt-btn');
     quickPromptButtons.forEach(btn => {
@@ -444,13 +450,17 @@ function setupEventListeners() {
         });
     }
 
-    closeImaginePanelButton.addEventListener('click', () => {
-        imaginePanel.classList.remove('active');
-    });
+    if (closeImaginePanelButton) {
+        closeImaginePanelButton.addEventListener('click', () => {
+            imaginePanel.classList.remove('active');
+        });
+    }
 
-    closeExercisePanelButton.addEventListener('click', () => {
-        exercisePanel.classList.remove('active');
-    });
+    if (closeExercisePanelButton) {
+        closeExercisePanelButton.addEventListener('click', () => {
+            exercisePanel.classList.remove('active');
+        });
+    }
 
     // Box breathing modal
     closeBreathingButton.addEventListener('click', () => {
@@ -495,26 +505,32 @@ function setupEventListeners() {
     });
 
     // Close modals on backdrop click
-    breathingModal.addEventListener('click', (e) => {
-        if (e.target === breathingModal) {
-            stopBreathing();
-            breathingModal.classList.remove('active');
-        }
-    });
+    if (breathingModal) {
+        breathingModal.addEventListener('click', (e) => {
+            if (e.target === breathingModal) {
+                stopBreathing();
+                breathingModal.classList.remove('active');
+            }
+        });
+    }
 
-    groundingModal.addEventListener('click', (e) => {
-        if (e.target === groundingModal) {
-            stopGrounding();
-            groundingModal.classList.remove('active');
-        }
-    });
+    if (groundingModal) {
+        groundingModal.addEventListener('click', (e) => {
+            if (e.target === groundingModal) {
+                stopGrounding();
+                groundingModal.classList.remove('active');
+            }
+        });
+    }
 
-    pmrModal.addEventListener('click', (e) => {
-        if (e.target === pmrModal) {
-            stopPMR();
-            pmrModal.classList.remove('active');
-        }
-    });
+    if (pmrModal) {
+        pmrModal.addEventListener('click', (e) => {
+            if (e.target === pmrModal) {
+                stopPMR();
+                pmrModal.classList.remove('active');
+            }
+        });
+    }
 
     // Escape key closes panels and modals
     document.addEventListener('keydown', (e) => {
@@ -545,10 +561,10 @@ function setupEventListeners() {
     });
 
     // On-Demand Prompts
-    promptButton.addEventListener('click', handlePromptButtonClick);
-    promptAction.addEventListener('click', handlePromptAction);
-    promptNew.addEventListener('click', handlePromptNew);
-    promptDismiss.addEventListener('click', hidePromptBanner);
+    if (promptButton) promptButton.addEventListener('click', handlePromptButtonClick);
+    if (promptAction) promptAction.addEventListener('click', handlePromptAction);
+    if (promptNew) promptNew.addEventListener('click', handlePromptNew);
+    if (promptDismiss) promptDismiss.addEventListener('click', hidePromptBanner);
 
     // Pull-to-refresh on chat messages
     setupPullToRefresh();
@@ -1643,7 +1659,7 @@ function populateExercisePanel() {
             // Record engagement when starting an interactive exercise
             const letter = getExerciseLetter(exerciseName);
             if (letter) {
-                recordImagineEngagement(letter);
+                recordImagineEngagementByLetter(letter);
             }
 
             // Close exercise panel first
@@ -1721,7 +1737,7 @@ function triggerChatPrompt(promptText, exerciseName = null) {
     if (exerciseName) {
         const letter = getExerciseLetter(exerciseName);
         if (letter) {
-            recordImagineEngagement(letter);
+            recordImagineEngagementByLetter(letter);
         }
     } else {
         // Try to infer exercise from prompt text
@@ -1729,7 +1745,7 @@ function triggerChatPrompt(promptText, exerciseName = null) {
             for (const exercise of category.exercises) {
                 if (exercise.prompt === promptText) {
                     const letter = category.title === 'Interactions' ? 'I2' : category.letter;
-                    recordImagineEngagement(letter);
+                    recordImagineEngagementByLetter(letter);
                     break;
                 }
             }

@@ -2007,7 +2007,7 @@
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            z-index: 9999;
+            z-index: var(--z-modal);
             display: none;
             align-items: center;
             justify-content: center;
@@ -2065,6 +2065,66 @@
 
         .btn-confirm-ok:hover {
             transform: translateY(-2px);
+        }
+
+        /* Exercise modal buttons */
+        .close-modal {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .close-modal:hover {
+            color: var(--coral);
+        }
+
+        .btn-exercise {
+            padding: var(--space-sm) var(--space-xl);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            transition: all var(--transition-brutal);
+        }
+
+        .btn-exercise-primary {
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            color: var(--bg-primary);
+        }
+
+        .btn-exercise-secondary {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--text-secondary);
+        }
+
+        /* Prompt banner action buttons */
+        .prompt-action-btn {
+            padding: var(--space-sm) var(--space-lg);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            border-radius: var(--radius-small);
+            cursor: pointer;
+        }
+
+        .prompt-action-btn.primary {
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            color: var(--bg-primary);
+        }
+
+        .prompt-action-btn.secondary {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--text-secondary);
         }
 
         /* Keyboard open — hide tab bar, let input stay in flow */
@@ -2286,6 +2346,8 @@
                             <h1>Mandy</h1>
                         </div>
                         <div class="chat-header-actions">
+                            <button class="new-chat-btn" id="open-imagine-panel" aria-label="IMAGINE framework">🧭</button>
+                            <button class="new-chat-btn" id="open-exercise-panel" aria-label="Exercises">🏋️</button>
                             <button class="new-chat-btn" id="prompt-button" aria-label="Get prompt">
                                 💭
                             </button>
@@ -3130,5 +3192,10 @@
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js"></script>
     <script src="/assets/js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
 </body>
 </html>
