@@ -1,5 +1,8 @@
 {
   "public": true,
+  "redirects": [
+    { "source": "/chat.html", "destination": "/app.html#chat", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",

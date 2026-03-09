@@ -2,15 +2,6 @@
 // Cowch App - Core JavaScript
 // ============================================
 
-const STORAGE_KEY = 'cowch-chat-history';
-const API_ENDPOINT = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000/api/chat'
-    : '/api/chat';
-
-// State
-let conversationHistory = [];
-let isTyping = false;
-
 // DOM Elements (initialized after DOM ready)
 let app, tabBtns, tabPanels;
 let chatInput, chatSendBtn, chatMessages, greetingText;
@@ -56,11 +47,34 @@ function setupTabNavigation() {
     });
 }
 
-// Handle URL hash navigation (e.g., from chat.html links)
+// Handle URL hash navigation
 function handleHashNavigation() {
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['home', 'imagine', 'chat', 'you'].includes(hash)) {
+    if (!hash) return;
+
+    // Tab navigation
+    if (['home', 'imagine', 'chat', 'you'].includes(hash)) {
         switchTab(hash);
+        return;
+    }
+
+    // Chat-specific hashes
+    if (hash === 'privacy') {
+        switchTab('chat');
+        setTimeout(() => { if (window.handlePrivacyInfo) window.handlePrivacyInfo(); }, 200);
+        history.replaceState(null, null, '#chat');
+    } else if (hash === 'exercises') {
+        switchTab('chat');
+        setTimeout(() => {
+            const ep = document.getElementById('exercise-panel');
+            if (ep) ep.classList.add('active');
+        }, 200);
+        history.replaceState(null, null, '#chat');
+    } else if (hash.startsWith('exercise-')) {
+        const type = hash.replace('exercise-', '');
+        switchTab('chat');
+        setTimeout(() => { if (window.openInteractiveExercise) window.openInteractiveExercise(type); }, 300);
+        history.replaceState(null, null, '#chat');
     }
 }
 
@@ -339,9 +353,11 @@ function setupDomainPanel() {
         closeDomainPanel();
         switchTab('chat');
         setTimeout(() => {
-            chatInput.value = prompt;
-            chatInput.dispatchEvent(new Event('input'));
-            sendMessage();
+            if (window.triggerChatPrompt) {
+                window.triggerChatPrompt(prompt);
+            } else if (typeof triggerChatPrompt === 'function') {
+                triggerChatPrompt(prompt);
+            }
         }, 300);
     }
 
@@ -350,168 +366,8 @@ function setupDomainPanel() {
 }
 
 // ============================================
-// Chat Functionality
+// Chat - delegated to chat-script.js via initChat()
 // ============================================
-
-function setupChat() {
-    // Auto-resize textarea
-    chatInput.addEventListener('input', () => {
-        chatInput.style.height = 'auto';
-        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-        chatSendBtn.disabled = !chatInput.value.trim();
-    });
-
-    // Send on Enter (Shift+Enter for newline)
-    chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (chatInput.value.trim()) {
-                sendMessage();
-            }
-        }
-    });
-
-    chatSendBtn.addEventListener('click', sendMessage);
-}
-
-async function sendMessage() {
-    const message = chatInput.value.trim();
-    if (!message || isTyping) return;
-
-    // Add user message
-    addMessage(message, 'user');
-    conversationHistory.push({ role: 'user', content: message });
-
-    // Clear input
-    chatInput.value = '';
-    chatInput.style.height = 'auto';
-    chatSendBtn.disabled = true;
-
-    // Save history
-    saveChatHistory();
-
-    // Show typing indicator
-    isTyping = true;
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message mandy typing';
-    typingDiv.id = 'typing-indicator';
-    typingDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-    chatMessages.appendChild(typingDiv);
-    scrollToBottom();
-
-    try {
-        const response = await fetch(API_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message,
-                history: conversationHistory.slice(-10)
-            })
-        });
-
-        const data = await response.json();
-
-        // Remove typing indicator
-        typingDiv.remove();
-
-        // Add response instantly
-        addMessage(data.response, 'mandy');
-        conversationHistory.push({ role: 'assistant', content: data.response });
-        saveChatHistory();
-
-    } catch (error) {
-        console.error('Error:', error);
-        typingDiv.remove();
-        addMessage("I'm having trouble connecting right now. Please try again in a moment.", 'mandy');
-    }
-
-    isTyping = false;
-    chatSendBtn.disabled = false;
-}
-
-function addMessage(content, sender, skipTyping = false) {
-    const div = document.createElement('div');
-    div.className = `message ${sender}`;
-    div.innerHTML = formatMessage(content);
-    chatMessages.appendChild(div);
-    scrollToBottom();
-}
-
-
-
-// Markdown formatting
-function formatMessage(content) {
-    let formatted = content;
-
-    // Process line by line for lists and headers
-    const lines = formatted.split('\n');
-    const processed = [];
-    let inList = false;
-
-    for (let line of lines) {
-        if (line.match(/^[-*]\s+/)) {
-            const text = line.replace(/^[-*]\s+/, '');
-            if (!inList) {
-                line = '<ul><li>' + text + '</li>';
-                inList = true;
-            } else {
-                line = '<li>' + text + '</li>';
-            }
-        } else if (inList && line.trim() !== '') {
-            processed.push('</ul>');
-            inList = false;
-        }
-        processed.push(line);
-    }
-    if (inList) processed.push('</ul>');
-
-    formatted = processed.join('\n');
-
-    // Bold **text**
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    // Italic *text*
-    formatted = formatted.replace(/(?<![*])\*(?!\*)([^*]+)\*(?![*])/g, '<em>$1</em>');
-
-    // Paragraphs
-    formatted = formatted.split('\n\n').map(p => {
-        if (p.match(/^<(ul|li|h)/)) return p;
-        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
-    }).join('');
-
-    return formatted;
-}
-
-function scrollToBottom() {
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function saveChatHistory() {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversationHistory));
-    } catch (e) {
-        console.error('Error saving chat history:', e);
-    }
-}
-
-function loadChatHistory() {
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            conversationHistory = JSON.parse(saved);
-            // Clear default message and show history
-            if (conversationHistory.length > 0) {
-                chatMessages.innerHTML = '';
-                conversationHistory.forEach(msg => {
-                    const sender = msg.role === 'user' ? 'user' : 'mandy';
-                    addMessage(msg.content, sender);
-                });
-            }
-        }
-    } catch (e) {
-        console.error('Error loading chat history:', e);
-    }
-}
 
 // ============================================
 // Quick Check-in
@@ -530,14 +386,16 @@ function setupQuickCheckin() {
 
 function setupClearHistory() {
     document.getElementById('clear-btn').addEventListener('click', () => {
-        if (confirm('Clear all conversation history? This cannot be undone.')) {
-            clearConversation();
+        if (window.handleClearChat) {
+            window.handleClearChat();
         }
     });
 
     // New Chat button in chat header
     document.getElementById('new-chat-btn').addEventListener('click', () => {
-        clearConversation();
+        if (window.handleClearChat) {
+            window.handleClearChat();
+        }
     });
 }
 
@@ -569,11 +427,14 @@ function setupSettingsButtons() {
         });
     }
 
-    // Privacy button - navigate to chat with privacy info
+    // Privacy button - show privacy info in chat
     const privacyBtn = document.getElementById('privacy-btn');
     if (privacyBtn) {
         privacyBtn.addEventListener('click', () => {
-            window.location.href = '/chat.html#privacy';
+            switchTab('chat');
+            setTimeout(() => {
+                if (window.handlePrivacyInfo) window.handlePrivacyInfo();
+            }, 200);
         });
     }
 
@@ -583,23 +444,15 @@ function setupSettingsButtons() {
         aboutBtn.addEventListener('click', () => {
             switchTab('chat');
             setTimeout(() => {
-                chatInput.value = "Tell me about yourself, Mandy. What's the IMAGINE framework and how can you help me?";
-                chatInput.dispatchEvent(new Event('input'));
-                sendMessage();
+                if (window.triggerChatPrompt) {
+                    window.triggerChatPrompt("Tell me about yourself, Mandy. What's the IMAGINE framework and how can you help me?");
+                }
             }, 300);
         });
     }
 }
 
-function clearConversation() {
-    localStorage.removeItem(STORAGE_KEY);
-    conversationHistory = [];
-    chatMessages.innerHTML = `
-        <div class="message mandy">
-            Hi there! I'm Mandy, and I'm so glad you're here. This is a space for you - no judgment, just support. What's on your mind?
-        </div>
-    `;
-}
+// clearConversation is now handled by chat-script.js via window.handleClearChat
 
 // ============================================
 // IMAGINE Tracker
@@ -1303,14 +1156,17 @@ function init() {
     setupTabNavigation();
     setupDomainPanel();
     setupToolPanels();
-    setupChat();
     setupQuickCheckin();
     setupClearHistory();
     setupSettingsButtons();
-    loadChatHistory();
     updateImagineTracker();
 
-    // Handle hash navigation
+    // Initialize chat via chat-script.js
+    if (window.initChat) {
+        window.initChat();
+    }
+
+    // Handle hash navigation (extended for chat-specific hashes)
     handleHashNavigation();
     window.addEventListener('hashchange', handleHashNavigation);
 }

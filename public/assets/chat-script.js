@@ -148,73 +148,86 @@ function setupTrackerLetterClicks() {
 }
 
 // ================================
-// DOM Elements
+// DOM Elements (initialized in initChatDOM)
 // ================================
 
-const chatMessages = document.getElementById('chat-messages');
-const chatInput = document.getElementById('chat-input');
-const sendButton = document.getElementById('send-button');
-const quickPromptsContainer = document.getElementById('quick-prompts');
-const menuButton = document.getElementById('menu-button');
-const menuPanel = document.getElementById('menu-panel');
-const closeMenuPanelButton = document.getElementById('close-menu-panel');
+let chatMessages, chatInput, sendButton, quickPromptsContainer;
+let menuButton, menuPanel, closeMenuPanelButton;
+let clearChatButton, privacyInfoButton;
+let openImaginePanelButton, openExercisePanelButton;
+let imaginePanel, exercisePanel;
+let closeImaginePanelButton, closeExercisePanelButton;
+let imagineContent, exerciseContent;
+let breathingModal, closeBreathingButton, startBreathingButton;
+let talkAboutBreathingButton, breathingCircle, breathingInstruction;
+let groundingModal, closeGroundingButton, startGroundingButton;
+let talkAboutGroundingButton, groundingContainer, groundingInstruction;
+let pmrModal, closePmrButton, startPmrButton;
+let talkAboutPmrButton, bodyDiagram, pmrInstruction;
+let weatherModal, socialModal, ladderModal;
+let promptButton, promptBanner, promptMessage;
+let promptAction, promptNew, promptDismiss;
+let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
 
-// Menu options
-const clearChatButton = document.getElementById('clear-chat');
-const privacyInfoButton = document.getElementById('privacy-info');
+function initChatDOM() {
+    chatMessages = document.getElementById('chat-messages');
+    chatInput = document.getElementById('chat-input');
+    // Support both standalone (send-button) and app (chat-send-btn) IDs
+    sendButton = document.getElementById('send-button') || document.getElementById('chat-send-btn');
+    quickPromptsContainer = document.getElementById('quick-prompts');
+    menuButton = document.getElementById('menu-button');
+    menuPanel = document.getElementById('menu-panel');
+    closeMenuPanelButton = document.getElementById('close-menu-panel');
 
-// Slide panels
-const openImaginePanelButton = document.getElementById('open-imagine-panel');
-const openExercisePanelButton = document.getElementById('open-exercise-panel');
-const imaginePanel = document.getElementById('imagine-panel');
-const exercisePanel = document.getElementById('exercise-panel');
-const closeImaginePanelButton = document.getElementById('close-imagine-panel');
-const closeExercisePanelButton = document.getElementById('close-exercise-panel');
-const imagineContent = document.getElementById('imagine-content');
-const exerciseContent = document.getElementById('exercise-content');
+    clearChatButton = document.getElementById('clear-chat');
+    privacyInfoButton = document.getElementById('privacy-info');
 
-// Box breathing modal
-const breathingModal = document.getElementById('breathing-modal');
-const closeBreathingButton = document.getElementById('close-breathing');
-const startBreathingButton = document.getElementById('start-breathing');
-const talkAboutBreathingButton = document.getElementById('talk-about-breathing');
-const breathingCircle = document.getElementById('breathing-circle');
-const breathingInstruction = document.getElementById('breathing-instruction');
+    openImaginePanelButton = document.getElementById('open-imagine-panel');
+    openExercisePanelButton = document.getElementById('open-exercise-panel');
+    imaginePanel = document.getElementById('imagine-panel');
+    exercisePanel = document.getElementById('exercise-panel');
+    closeImaginePanelButton = document.getElementById('close-imagine-panel');
+    closeExercisePanelButton = document.getElementById('close-exercise-panel');
+    imagineContent = document.getElementById('imagine-content');
+    exerciseContent = document.getElementById('exercise-content');
 
-// Grounding exercise modal
-const groundingModal = document.getElementById('grounding-modal');
-const closeGroundingButton = document.getElementById('close-grounding');
-const startGroundingButton = document.getElementById('start-grounding');
-const talkAboutGroundingButton = document.getElementById('talk-about-grounding');
-const groundingContainer = document.getElementById('grounding-container');
-const groundingInstruction = document.getElementById('grounding-instruction');
+    breathingModal = document.getElementById('breathing-modal');
+    closeBreathingButton = document.getElementById('close-breathing');
+    startBreathingButton = document.getElementById('start-breathing');
+    talkAboutBreathingButton = document.getElementById('talk-about-breathing');
+    breathingCircle = document.getElementById('breathing-circle');
+    breathingInstruction = document.getElementById('breathing-instruction');
 
-// PMR modal
-const pmrModal = document.getElementById('pmr-modal');
-const closePmrButton = document.getElementById('close-pmr');
-const startPmrButton = document.getElementById('start-pmr');
-const talkAboutPmrButton = document.getElementById('talk-about-pmr');
-const bodyDiagram = document.getElementById('body-diagram');
-const pmrInstruction = document.getElementById('pmr-instruction');
+    groundingModal = document.getElementById('grounding-modal');
+    closeGroundingButton = document.getElementById('close-grounding');
+    startGroundingButton = document.getElementById('start-grounding');
+    talkAboutGroundingButton = document.getElementById('talk-about-grounding');
+    groundingContainer = document.getElementById('grounding-container');
+    groundingInstruction = document.getElementById('grounding-instruction');
 
-// IMAGINE Exercise modals
-const weatherModal = document.getElementById('weather-modal');
-const socialModal = document.getElementById('social-modal');
-const ladderModal = document.getElementById('ladder-modal');
+    pmrModal = document.getElementById('pmr-modal');
+    closePmrButton = document.getElementById('close-pmr');
+    startPmrButton = document.getElementById('start-pmr');
+    talkAboutPmrButton = document.getElementById('talk-about-pmr');
+    bodyDiagram = document.getElementById('body-diagram');
+    pmrInstruction = document.getElementById('pmr-instruction');
 
-// On-Demand Prompts
-const promptButton = document.getElementById('prompt-button');
-const promptBanner = document.getElementById('prompt-banner');
-const promptMessage = document.getElementById('prompt-message');
-const promptAction = document.getElementById('prompt-action');
-const promptNew = document.getElementById('prompt-new');
-const promptDismiss = document.getElementById('prompt-dismiss');
+    weatherModal = document.getElementById('weather-modal');
+    socialModal = document.getElementById('social-modal');
+    ladderModal = document.getElementById('ladder-modal');
 
-// Confirmation Modal
-const confirmModal = document.getElementById('confirm-modal');
-const confirmModalMessage = document.getElementById('confirm-modal-message');
-const confirmCancelButton = document.getElementById('confirm-cancel');
-const confirmOkButton = document.getElementById('confirm-ok');
+    promptButton = document.getElementById('prompt-button');
+    promptBanner = document.getElementById('prompt-banner');
+    promptMessage = document.getElementById('prompt-message');
+    promptAction = document.getElementById('prompt-action');
+    promptNew = document.getElementById('prompt-new');
+    promptDismiss = document.getElementById('prompt-dismiss');
+
+    confirmModal = document.getElementById('confirm-modal');
+    confirmModalMessage = document.getElementById('confirm-modal-message');
+    confirmCancelButton = document.getElementById('confirm-cancel');
+    confirmOkButton = document.getElementById('confirm-ok');
+}
 
 // ================================
 // State Management
@@ -255,42 +268,80 @@ function hapticFeedback(type = 'light') {
 // Initialize
 // ================================
 
-window.addEventListener('DOMContentLoaded', () => {
+// Main initialization function - called by DOMContentLoaded or externally by app.js
+function initChat() {
+    initChatDOM();
+    migrateStorageKey();
+    initExerciseListeners();
     loadChatHistory();
     showWelcomeMessage();
     setupEventListeners();
     populateImaginePanel();
     populateExercisePanel();
-    // Don't show prompt banner on chat page - it's messy
-    // checkAndShowPrompt();
-
-    // Handle hash navigation (e.g., #privacy, #exercises)
-    handleHashNavigation();
 
     // Add swipe-to-dismiss to modals
-    addSwipeToDismiss(breathingModal, () => {
-        stopBreathing();
-        breathingModal.classList.remove('active');
-    });
-    addSwipeToDismiss(groundingModal, () => {
-        stopGrounding();
-        groundingModal.classList.remove('active');
-    });
-    addSwipeToDismiss(pmrModal, () => {
-        stopPMR();
-        pmrModal.classList.remove('active');
-    });
+    if (breathingModal) {
+        addSwipeToDismiss(breathingModal, () => {
+            stopBreathing();
+            breathingModal.classList.remove('active');
+        });
+    }
+    if (groundingModal) {
+        addSwipeToDismiss(groundingModal, () => {
+            stopGrounding();
+            groundingModal.classList.remove('active');
+        });
+    }
+    if (pmrModal) {
+        addSwipeToDismiss(pmrModal, () => {
+            stopPMR();
+            pmrModal.classList.remove('active');
+        });
+    }
     if (ladderModal) {
         addSwipeToDismiss(ladderModal.querySelector('.exercise-modal-content'), closeLadderModal);
     }
 
-    // Initialize IMAGINE tracker on page load
     updateImagineTracker();
-
-    // Make tracker letters clickable
     setupTrackerLetterClicks();
-
+    setupIOSKeyboard();
     focusInput();
+}
+
+// Migrate old storage key to new one (WI-5)
+function migrateStorageKey() {
+    const OLD_KEY = 'cowch-chat-history';
+    try {
+        const oldData = localStorage.getItem(OLD_KEY);
+        const newData = localStorage.getItem(STORAGE_KEY);
+        if (oldData && !newData) {
+            localStorage.setItem(STORAGE_KEY, oldData);
+            localStorage.removeItem(OLD_KEY);
+        } else if (oldData && newData) {
+            // Both exist — keep the newer one, remove old
+            localStorage.removeItem(OLD_KEY);
+        }
+    } catch (e) {
+        console.warn('Storage migration failed:', e);
+    }
+}
+
+// Expose for app.js
+window.initChat = initChat;
+window.handleClearChat = function() { handleClearChat(); };
+window.handlePrivacyInfo = function() { handlePrivacyInfo(); };
+window.openInteractiveExercise = function(type) { openInteractiveExercise(type); };
+window.triggerChatPrompt = function(prompt) { triggerChatPrompt(prompt); };
+
+// Standalone mode: auto-init on DOMContentLoaded
+// In app.html, app.js calls initChat() from its own init — detect by checking
+// if app.js's tab system exists (data-tab buttons).
+window.addEventListener('DOMContentLoaded', () => {
+    const isAppMode = document.querySelector('.tab-btn[data-tab]');
+    if (!isAppMode) {
+        initChat();
+        handleHashNavigation();
+    }
 });
 
 // Handle hash-based navigation from other pages
@@ -1146,18 +1197,21 @@ function setupPullToRefresh() {
 // Prevent iOS zoom on input focus
 if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
     const viewport = document.querySelector('meta[name=viewport]');
-    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    if (viewport) {
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    }
 }
 
-// Handle iOS keyboard appearance
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    chatInput.addEventListener('focus', () => {
-        document.body.classList.add('keyboard-open');
-    });
-
-    chatInput.addEventListener('blur', () => {
-        document.body.classList.remove('keyboard-open');
-    });
+// Handle iOS keyboard appearance (deferred until chatInput is ready)
+function setupIOSKeyboard() {
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && chatInput) {
+        chatInput.addEventListener('focus', () => {
+            document.body.classList.add('keyboard-open');
+        });
+        chatInput.addEventListener('blur', () => {
+            document.body.classList.remove('keyboard-open');
+        });
+    }
 }
 
 // ================================
@@ -1998,15 +2052,9 @@ function stopPMR() {
 // Social Pulse Check Exercise
 // ============================================
 
-const closeSocialButton = document.getElementById('close-social');
-const socialNextButton = document.getElementById('social-next');
-const socialBackButton = document.getElementById('social-back');
-const talkAboutSocialButton = document.getElementById('talk-about-social');
-const socialSummary = document.getElementById('social-summary');
-
-const inpersonSlider = document.getElementById('inperson-slider');
-const digitalSlider = document.getElementById('digital-slider');
-const qualitySlider = document.getElementById('quality-slider');
+let closeSocialButton, socialNextButton, socialBackButton;
+let talkAboutSocialButton, socialSummary;
+let inpersonSlider, digitalSlider, qualitySlider;
 
 let socialPhase = 1;
 let socialData = {
@@ -2100,76 +2148,7 @@ function generateSocialSummary() {
     `;
 }
 
-// Event Listeners
-if (closeSocialButton) {
-    closeSocialButton.addEventListener('click', closeSocialModal);
-}
-
-if (socialNextButton) {
-    socialNextButton.addEventListener('click', () => {
-        if (socialPhase < 4) {
-            hapticFeedback('light');
-            socialPhase++;
-            showSocialPhase();
-        }
-    });
-}
-
-if (socialBackButton) {
-    socialBackButton.addEventListener('click', () => {
-        if (socialPhase > 1) {
-            hapticFeedback('light');
-            socialPhase--;
-            showSocialPhase();
-        }
-    });
-}
-
-if (talkAboutSocialButton) {
-    talkAboutSocialButton.addEventListener('click', () => {
-        closeSocialModal();
-        const total = socialData.inperson + socialData.digital + socialData.quality;
-        const prompt = `I just did a social pulse check. My total was ${total}/15 - in-person: ${socialData.inperson}, digital: ${socialData.digital}, quality: ${socialData.quality}. Can you help me reflect on my connection patterns?`;
-        triggerChatPrompt(prompt);
-    });
-}
-
-// Slider event listeners
-if (inpersonSlider) {
-    inpersonSlider.addEventListener('input', (e) => {
-        socialData.inperson = parseInt(e.target.value);
-        document.getElementById('inperson-value').textContent = socialData.inperson;
-        hapticFeedback('light');
-    });
-}
-
-if (digitalSlider) {
-    digitalSlider.addEventListener('input', (e) => {
-        socialData.digital = parseInt(e.target.value);
-        document.getElementById('digital-value').textContent = socialData.digital;
-        hapticFeedback('light');
-    });
-}
-
-if (qualitySlider) {
-    qualitySlider.addEventListener('input', (e) => {
-        socialData.quality = parseInt(e.target.value);
-        document.getElementById('quality-value').textContent = socialData.quality;
-        hapticFeedback('light');
-    });
-}
-
-// Close modal on backdrop click
-socialModal.addEventListener('click', (e) => {
-    if (e.target === socialModal) {
-        closeSocialModal();
-    }
-});
-
-// Add swipe to dismiss
-if (socialModal) {
-    addSwipeToDismiss(socialModal.querySelector('.exercise-modal-content'), closeSocialModal);
-}
+// Social event listeners are set up in initExerciseListeners()
 
 // ================================
 // Swipe-to-Dismiss for Modals
@@ -2303,14 +2282,8 @@ console.log('Conversation history:', conversationHistory.length, 'messages');// 
 // Uncertainty Ladder Exercise
 // ============================================
 
-const closeLadderButton = document.getElementById('close-ladder');
-const ladderVisual = document.getElementById('ladder-visual');
-const ladderSelection = document.getElementById('ladder-selection');
-const ladderComplete = document.getElementById('ladder-complete');
-const selectedChallenge = document.getElementById('selected-challenge');
-const ladderCompleteText = document.getElementById('ladder-complete-text');
-const ladderConfirmButton = document.getElementById('ladder-confirm');
-const talkAboutLadderButton = document.getElementById('talk-about-ladder');
+let closeLadderButton, ladderVisual, ladderSelection, ladderComplete;
+let selectedChallenge, ladderCompleteText, ladderConfirmButton, talkAboutLadderButton;
 
 let selectedRung = null;
 
@@ -2381,52 +2354,14 @@ function confirmLadderChoice() {
     ladderCompleteText.textContent = selectedRung.challenge;
 }
 
-// Event Listeners
-if (closeLadderButton) {
-    closeLadderButton.addEventListener('click', closeLadderModal);
-}
-
-// Rung click handlers
-document.querySelectorAll('.ladder-rung').forEach(rung => {
-    rung.addEventListener('click', () => selectRung(rung));
-});
-
-if (ladderConfirmButton) {
-    ladderConfirmButton.addEventListener('click', confirmLadderChoice);
-}
-
-if (talkAboutLadderButton) {
-    talkAboutLadderButton.addEventListener('click', () => {
-        closeLadderModal();
-        let prompt;
-        if (selectedRung) {
-            prompt = `I'm working on the uncertainty ladder. I chose level ${selectedRung.level}: "${selectedRung.challenge}". Can you help me think through this and support me in trying it?`;
-        } else {
-            prompt = `Can you help me with the uncertainty ladder? I want to build my tolerance for uncertainty but I'm not sure which step to start with.`;
-        }
-        triggerChatPrompt(prompt);
-    });
-}
-
-// Close on backdrop click
-if (ladderModal) {
-    ladderModal.addEventListener('click', (e) => {
-        if (e.target === ladderModal) {
-            closeLadderModal();
-        }
-    });
-}
+// Ladder event listeners are set up in initExerciseListeners()
 
 // ============================================
 // Inner Weather Report Exercise
 // ============================================
 
-const closeWeatherButton = document.getElementById('close-weather');
-const weatherSections = document.getElementById('weather-sections');
-const weatherNextButton = document.getElementById('weather-next');
-const weatherBackButton = document.getElementById('weather-back');
-const talkAboutWeatherButton = document.getElementById('talk-about-weather');
-const weatherSummary = document.getElementById('weather-summary');
+let closeWeatherButton, weatherSections, weatherNextButton;
+let weatherBackButton, talkAboutWeatherButton, weatherSummary;
 
 let weatherPhase = 1;
 let weatherData = {
@@ -2529,108 +2464,152 @@ function generateWeatherSummary() {
     `;
 }
 
-// Event Listeners for Weather Modal
-if (closeWeatherButton) {
-    closeWeatherButton.addEventListener('click', closeWeatherModal);
-}
+// Weather event listeners are set up in initExerciseListeners()
 
-if (weatherNextButton) {
-    weatherNextButton.addEventListener('click', () => {
-        if (weatherPhase < 5) {
-            hapticFeedback('light');
-            weatherPhase++;
-            showWeatherPhase();
-        }
+// ================================
+// Deferred Exercise Listener Setup
+// ================================
+// All exercise modal DOM refs and event listeners that were previously
+// top-level are now initialized here, called from initChat().
+
+function initExerciseListeners() {
+    // Social Pulse Check DOM
+    closeSocialButton = document.getElementById('close-social');
+    socialNextButton = document.getElementById('social-next');
+    socialBackButton = document.getElementById('social-back');
+    talkAboutSocialButton = document.getElementById('talk-about-social');
+    socialSummary = document.getElementById('social-summary');
+    inpersonSlider = document.getElementById('inperson-slider');
+    digitalSlider = document.getElementById('digital-slider');
+    qualitySlider = document.getElementById('quality-slider');
+
+    if (closeSocialButton) closeSocialButton.addEventListener('click', closeSocialModal);
+    if (socialNextButton) socialNextButton.addEventListener('click', () => {
+        if (socialPhase < 4) { hapticFeedback('light'); socialPhase++; showSocialPhase(); }
     });
-}
-
-if (weatherBackButton) {
-    weatherBackButton.addEventListener('click', () => {
-        if (weatherPhase > 1) {
-            hapticFeedback('light');
-            weatherPhase--;
-            showWeatherPhase();
-        }
+    if (socialBackButton) socialBackButton.addEventListener('click', () => {
+        if (socialPhase > 1) { hapticFeedback('light'); socialPhase--; showSocialPhase(); }
     });
-}
+    if (talkAboutSocialButton) talkAboutSocialButton.addEventListener('click', () => {
+        closeSocialModal();
+        const total = socialData.inperson + socialData.digital + socialData.quality;
+        triggerChatPrompt(`I just did a social pulse check. My total was ${total}/15 - in-person: ${socialData.inperson}, digital: ${socialData.digital}, quality: ${socialData.quality}. Can you help me reflect on my connection patterns?`);
+    });
+    if (inpersonSlider) inpersonSlider.addEventListener('input', (e) => {
+        socialData.inperson = parseInt(e.target.value);
+        document.getElementById('inperson-value').textContent = socialData.inperson;
+        hapticFeedback('light');
+    });
+    if (digitalSlider) digitalSlider.addEventListener('input', (e) => {
+        socialData.digital = parseInt(e.target.value);
+        document.getElementById('digital-value').textContent = socialData.digital;
+        hapticFeedback('light');
+    });
+    if (qualitySlider) qualitySlider.addEventListener('input', (e) => {
+        socialData.quality = parseInt(e.target.value);
+        document.getElementById('quality-value').textContent = socialData.quality;
+        hapticFeedback('light');
+    });
+    if (socialModal) {
+        socialModal.addEventListener('click', (e) => { if (e.target === socialModal) closeSocialModal(); });
+        addSwipeToDismiss(socialModal.querySelector('.exercise-modal-content'), closeSocialModal);
+    }
 
-if (talkAboutWeatherButton) {
-    talkAboutWeatherButton.addEventListener('click', () => {
-        closeWeatherModal();
-        // Build prompt with available data, skipping null/empty values
-        const parts = ['I just did an inner weather check.'];
-        if (weatherData.emotion) {
-            parts.push(`I'm feeling ${weatherData.emotion}.`);
+    // Uncertainty Ladder DOM
+    closeLadderButton = document.getElementById('close-ladder');
+    ladderVisual = document.getElementById('ladder-visual');
+    ladderSelection = document.getElementById('ladder-selection');
+    ladderComplete = document.getElementById('ladder-complete');
+    selectedChallenge = document.getElementById('selected-challenge');
+    ladderCompleteText = document.getElementById('ladder-complete-text');
+    ladderConfirmButton = document.getElementById('ladder-confirm');
+    talkAboutLadderButton = document.getElementById('talk-about-ladder');
+
+    if (closeLadderButton) closeLadderButton.addEventListener('click', closeLadderModal);
+    document.querySelectorAll('.ladder-rung').forEach(rung => {
+        rung.addEventListener('click', () => selectRung(rung));
+    });
+    if (ladderConfirmButton) ladderConfirmButton.addEventListener('click', confirmLadderChoice);
+    if (talkAboutLadderButton) talkAboutLadderButton.addEventListener('click', () => {
+        closeLadderModal();
+        let prompt;
+        if (selectedRung) {
+            prompt = `I'm working on the uncertainty ladder. I chose level ${selectedRung.level}: "${selectedRung.challenge}". Can you help me think through this and support me in trying it?`;
+        } else {
+            prompt = `Can you help me with the uncertainty ladder? I want to build my tolerance for uncertainty but I'm not sure which step to start with.`;
         }
-        if (weatherData.body && weatherData.body.length > 0) {
-            parts.push(`I noticed ${weatherData.body.join(', ')} in my body.`);
-        }
-        if (weatherData.thought) {
-            parts.push(`A thought that keeps coming up: "${weatherData.thought}".`);
-        }
-        if (weatherData.need) {
-            parts.push(`I think I need ${weatherData.need}.`);
-        }
-        parts.push('Can you help me process this?');
-        const prompt = parts.join(' ');
         triggerChatPrompt(prompt);
     });
-}
+    if (ladderModal) {
+        ladderModal.addEventListener('click', (e) => { if (e.target === ladderModal) closeLadderModal(); });
+    }
 
-// Option selection handlers
-document.querySelectorAll('#emotion-options .weather-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#emotion-options .weather-option').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        weatherData.emotion = btn.dataset.value;
-        hapticFeedback('light');
-        updateNextButtonState();
+    // Inner Weather Report DOM
+    closeWeatherButton = document.getElementById('close-weather');
+    weatherSections = document.getElementById('weather-sections');
+    weatherNextButton = document.getElementById('weather-next');
+    weatherBackButton = document.getElementById('weather-back');
+    talkAboutWeatherButton = document.getElementById('talk-about-weather');
+    weatherSummary = document.getElementById('weather-summary');
+
+    if (closeWeatherButton) closeWeatherButton.addEventListener('click', closeWeatherModal);
+    if (weatherNextButton) weatherNextButton.addEventListener('click', () => {
+        if (weatherPhase < 5) { hapticFeedback('light'); weatherPhase++; showWeatherPhase(); }
     });
-});
-
-document.querySelectorAll('#body-options .weather-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.classList.toggle('selected');
-        if (btn.classList.contains('selected')) {
-            weatherData.body.push(btn.dataset.value);
-        } else {
-            weatherData.body = weatherData.body.filter(v => v !== btn.dataset.value);
-        }
-        hapticFeedback('light');
-        updateNextButtonState();
+    if (weatherBackButton) weatherBackButton.addEventListener('click', () => {
+        if (weatherPhase > 1) { hapticFeedback('light'); weatherPhase--; showWeatherPhase(); }
     });
-});
-
-document.querySelectorAll('#thought-options .weather-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#thought-options .weather-option').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        weatherData.thought = btn.dataset.value;
-        hapticFeedback('light');
-        updateNextButtonState();
+    if (talkAboutWeatherButton) talkAboutWeatherButton.addEventListener('click', () => {
+        closeWeatherModal();
+        const parts = ['I just did an inner weather check.'];
+        if (weatherData.emotion) parts.push(`I'm feeling ${weatherData.emotion}.`);
+        if (weatherData.body && weatherData.body.length > 0) parts.push(`I noticed ${weatherData.body.join(', ')} in my body.`);
+        if (weatherData.thought) parts.push(`A thought that keeps coming up: "${weatherData.thought}".`);
+        if (weatherData.need) parts.push(`I think I need ${weatherData.need}.`);
+        parts.push('Can you help me process this?');
+        triggerChatPrompt(parts.join(' '));
     });
-});
 
-document.querySelectorAll('#need-options .weather-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#need-options .weather-option').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        weatherData.need = btn.dataset.value;
-        hapticFeedback('light');
-        updateNextButtonState();
+    // Weather option selection handlers
+    document.querySelectorAll('#emotion-options .weather-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#emotion-options .weather-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            weatherData.emotion = btn.dataset.value;
+            hapticFeedback('light');
+            updateNextButtonState();
+        });
     });
-});
-
-// Add swipe to dismiss
-if (weatherModal) {
-    addSwipeToDismiss(weatherModal.querySelector('.exercise-modal-content'), closeWeatherModal);
-}
-
-// Close on backdrop click
-if (weatherModal) {
-    weatherModal.addEventListener('click', (e) => {
-        if (e.target === weatherModal) {
-            closeWeatherModal();
-        }
+    document.querySelectorAll('#body-options .weather-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('selected');
+            if (btn.classList.contains('selected')) { weatherData.body.push(btn.dataset.value); }
+            else { weatherData.body = weatherData.body.filter(v => v !== btn.dataset.value); }
+            hapticFeedback('light');
+            updateNextButtonState();
+        });
     });
+    document.querySelectorAll('#thought-options .weather-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#thought-options .weather-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            weatherData.thought = btn.dataset.value;
+            hapticFeedback('light');
+            updateNextButtonState();
+        });
+    });
+    document.querySelectorAll('#need-options .weather-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#need-options .weather-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            weatherData.need = btn.dataset.value;
+            hapticFeedback('light');
+            updateNextButtonState();
+        });
+    });
+
+    if (weatherModal) {
+        addSwipeToDismiss(weatherModal.querySelector('.exercise-modal-content'), closeWeatherModal);
+        weatherModal.addEventListener('click', (e) => { if (e.target === weatherModal) closeWeatherModal(); });
+    }
 }
