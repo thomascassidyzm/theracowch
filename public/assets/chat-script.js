@@ -172,7 +172,6 @@ let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
 function initChatDOM() {
     chatMessages = document.getElementById('chat-messages');
     chatInput = document.getElementById('chat-input');
-    // Support both standalone (send-button) and app (chat-send-btn) IDs
     sendButton = document.getElementById('send-button') || document.getElementById('chat-send-btn');
     quickPromptsContainer = document.getElementById('quick-prompts');
     menuButton = document.getElementById('menu-button');
@@ -332,41 +331,6 @@ window.handleClearChat = function() { handleClearChat(); };
 window.handlePrivacyInfo = function() { handlePrivacyInfo(); };
 window.openInteractiveExercise = function(type) { openInteractiveExercise(type); };
 window.triggerChatPrompt = function(prompt) { triggerChatPrompt(prompt); };
-
-// Standalone mode: auto-init on DOMContentLoaded
-// In app.html, app.js calls initChat() from its own init — detect by checking
-// if app.js's tab system exists (data-tab buttons).
-window.addEventListener('DOMContentLoaded', () => {
-    const isAppMode = document.querySelector('.tab-btn[data-tab]');
-    if (!isAppMode) {
-        initChat();
-        chatHandleHashNavigation();
-    }
-});
-
-// Handle hash-based navigation (standalone mode only)
-function chatHandleHashNavigation() {
-    const hash = window.location.hash.slice(1); // Remove the '#'
-
-    if (hash === 'privacy') {
-        // Show privacy info automatically
-        handlePrivacyInfo();
-        // Clear hash to avoid re-triggering
-        history.replaceState(null, null, ' ');
-    } else if (hash === 'exercises') {
-        // Open exercise panel automatically
-        exercisePanel.classList.add('active');
-        // Clear hash to avoid re-triggering
-        history.replaceState(null, null, ' ');
-    } else if (hash.startsWith('exercise-')) {
-        // Open specific interactive exercise
-        const exerciseType = hash.replace('exercise-', '');
-        setTimeout(() => {
-            openInteractiveExercise(exerciseType);
-        }, 300);
-        history.replaceState(null, null, ' ');
-    }
-}
 
 // Open a specific interactive exercise by type
 function openInteractiveExercise(type) {
@@ -1602,12 +1566,6 @@ const IMAGINE_EXERCISES = [
         ]
     }
 ];
-
-// Keep backward compatibility - flatten for existing code that expects EXERCISES
-const EXERCISES = IMAGINE_EXERCISES.map(category => ({
-    category: `${category.letter} - ${category.title}`,
-    exercises: category.exercises
-}));
 
 function populateExercisePanel() {
     exerciseContent.innerHTML = IMAGINE_EXERCISES.map(category => `

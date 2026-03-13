@@ -1,23 +1,12 @@
 /* ============================================
-   Chat Page Specific Styles
-   /chat.html
+   Chat & Exercise Styles
+   Shared styles for chat features, exercise modals, and slide panels
    ============================================ */
 
 /* ============================================
-   Chat Layout
+   Markdown in Messages
    ============================================ */
 
-/* Body styles removed — only applied to standalone chat.html which no longer exists */
-
-/* Chat header and new-chat-btn styles are in app.html inline styles */
-
-/* ============================================
-   Chat Messages
-   ============================================ */
-
-/* Chat messages and message bubble styles are in app.html inline styles */
-
-/* Markdown in Messages */
 .message p {
     margin: 0 0 var(--space-sm) 0;
 }
@@ -51,43 +40,10 @@
     margin-top: 0;
 }
 
-/* Typing Indicator */
-.message.typing {
-    padding: var(--space-md) var(--space-lg);
-}
+/* ============================================
+   Welcome Message
+   ============================================ */
 
-.typing-indicator {
-    display: flex;
-    gap: 0.35rem;
-    align-items: center;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-full);
-    background: var(--text-secondary);
-    animation: typingBounce 1.4s infinite;
-}
-
-.typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes typingBounce {
-    0%, 60%, 100% {
-        transform: translateY(0);
-    }
-    30% {
-        transform: translateY(-8px);
-    }
-}
-
-/* Welcome Message */
 .welcome-message {
     text-align: center;
     padding: var(--space-xl) var(--space-md);
@@ -102,7 +58,10 @@
     margin-bottom: var(--space-md);
 }
 
-/* Quick prompt styles - non-fixed layout for app.html */
+/* ============================================
+   Quick Prompts
+   ============================================ */
+
 .quick-prompts {
     display: flex;
     gap: var(--space-sm);
@@ -140,8 +99,6 @@
 .quick-prompt-btn:active {
     transform: scale(0.97);
 }
-
-/* Chat input styles are in app.html inline styles */
 
 /* ============================================
    Slide Panels
@@ -276,7 +233,10 @@
     margin-top: var(--space-lg);
 }
 
-/* Breathing Circle Animation */
+/* ============================================
+   Breathing Circle Animation
+   ============================================ */
+
 .breathing-circle {
     width: 150px;
     height: 150px;
@@ -298,7 +258,10 @@
     transform: scale(1);
 }
 
-/* Grounding Exercise */
+/* ============================================
+   Grounding Exercise
+   ============================================ */
+
 .grounding-container {
     width: 100%;
     max-width: 280px;
@@ -497,5 +460,3 @@
     gap: var(--space-sm);
     flex-wrap: wrap;
 }
-
-/* Mobile adjustments handled by app.html inline responsive styles */

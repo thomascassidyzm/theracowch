@@ -7,8 +7,6 @@
 // ================================
 
 const PROMPT_STORAGE_KEY = 'theracowch_daily_prompt';
-const PATTERNS_STORAGE_KEY = 'theracowch_detected_patterns';
-const LAST_PROMPT_KEY = 'theracowch_last_prompt_time';
 
 // ================================
 // IMAGINE Framework Prompts
@@ -367,9 +365,6 @@ function getDailyPrompt(conversationHistory) {
 function getOnDemandPrompt(conversationHistory) {
     // Always generate fresh prompt
     const prompt = generateContextualPrompt(conversationHistory);
-
-    // Store last prompt time
-    localStorage.setItem(LAST_PROMPT_KEY, Date.now().toString());
 
     return prompt;
 }

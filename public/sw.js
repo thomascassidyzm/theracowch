@@ -1,13 +1,10 @@
-const CACHE_NAME = 'cowch-wellness-v21';
+const CACHE_NAME = 'cowch-wellness-v22';
 const urlsToCache = [
   '/',
   '/app.html',
   '/index.html',
   '/manifest.json',
   '/offline.html',
-  '/notice.html',
-  '/choice.html',
-  '/values.html',
   '/assets/theracowch_main_image.jpg'
 ];
 
