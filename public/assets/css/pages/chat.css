@@ -498,4 +498,18 @@
     flex-wrap: wrap;
 }
 
+/* Exercise link buttons in panel */
+.exercise-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg, 12px);
+    font-weight: 600;
+    font-size: var(--font-size-sm, 0.875rem);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
 /* Mobile adjustments handled by app.html inline responsive styles */

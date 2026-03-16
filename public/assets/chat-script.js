@@ -1344,6 +1344,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Boost energy through small intentional movement',
                 hasInteractive: true,
                 duration: '5 min',
+                url: '/exercises/body-scan.html',
                 prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.'
             },
             {
@@ -1365,6 +1366,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Talk to Yourself Like a Friend',
                 description: 'Reduce harsh self-talk and build resilience',
                 hasInteractive: false,
+                url: '/exercises/self-compassion.html',
                 prompt: 'Can you help me practice self-compassion? I noticed some harsh self-talk and want to respond to myself like I would a friend.'
             },
             {
@@ -1403,6 +1405,7 @@ const IMAGINE_EXERCISES = [
                 description: '4-4-4-4 breathing to calm your nervous system',
                 hasInteractive: true,
                 duration: '4 min',
+                url: '/exercises/box-breathing.html',
                 prompt: 'Can you guide me through box breathing?'
             },
             {
@@ -1411,6 +1414,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Use your senses to anchor in the present',
                 hasInteractive: true,
                 duration: '3 min',
+                url: '/exercises/grounding-54321.html',
                 prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?'
             },
             {
@@ -1434,6 +1438,7 @@ const IMAGINE_EXERCISES = [
                 title: 'What Am I Pushing Away?',
                 description: 'Notice thoughts or feelings you might be avoiding',
                 hasInteractive: false,
+                url: '/exercises/thought-stream.html',
                 prompt: 'Can you guide me through a resistance scan? I want to gently notice what I might be avoiding or pushing away.'
             },
             {
@@ -1441,6 +1446,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Let the Feeling Rise & Fall',
                 description: 'Learn that emotions come in waves, not permanent states',
                 hasInteractive: false,
+                url: '/exercises/wave.html',
                 prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.'
             },
             {
@@ -1464,6 +1470,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Tune into subtle positives you might have missed',
                 hasInteractive: true,
                 duration: '2 min',
+                url: '/exercises/gratitude.html',
                 prompt: 'Can you help me with the tiny wins gratitude check? I want to notice three small things that made today even slightly better.'
             },
             {
@@ -1471,6 +1478,7 @@ const IMAGINE_EXERCISES = [
                 title: 'A Different Angle',
                 description: 'Reframe a challenge through appreciation',
                 hasInteractive: false,
+                url: '/exercises/gratitude-journal.html',
                 prompt: 'Can you guide me through the gratitude lens exercise? I have a challenge I\'d like to look at from a different angle.'
             }
         ]
@@ -1487,6 +1495,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Build awareness of your daily interaction levels',
                 hasInteractive: true,
                 duration: '2 min',
+                url: '/exercises/connection-web.html',
                 prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.'
             },
             {
@@ -1501,6 +1510,7 @@ const IMAGINE_EXERCISES = [
                 title: 'A Small Step Away From Isolation',
                 description: 'Break isolation with one tiny, achievable action',
                 hasInteractive: false,
+                url: '/exercises/kindness.html',
                 prompt: 'Can you guide me through the one-step outward challenge? I want to take a small step toward connection today.'
             },
             {
@@ -1524,6 +1534,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Interrupt seriousness with 10 minutes of play',
                 hasInteractive: true,
                 duration: '10 min',
+                url: '/exercises/fun-prompts.html',
                 prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.'
             },
             {
@@ -1531,6 +1542,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Replaying Joy',
                 description: 'Unlock playfulness through nostalgia',
                 hasInteractive: false,
+                url: '/exercises/joy.html',
                 prompt: 'Can you guide me through the childhood micro-joy exercise? I want to rediscover something I loved as a child.'
             },
             {
@@ -1561,6 +1573,7 @@ const IMAGINE_EXERCISES = [
                 title: 'What\'s Protecting You... and Limiting You?',
                 description: 'Identify behaviours that block growth',
                 hasInteractive: false,
+                url: '/exercises/values-compass.html',
                 prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.'
             },
             {
@@ -1582,6 +1595,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Small Steps Into the Unknown',
                 description: 'Gentle novelty-seeking and confidence building',
                 hasInteractive: false,
+                url: '/exercises/wonder.html',
                 prompt: 'Can you suggest a micro-adventure for me? I want to try something small and new in the next 24 hours.'
             },
             {
@@ -1589,6 +1603,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Climb, Don\'t Leap',
                 description: 'Build tolerance for uncertainty in gradual steps',
                 hasInteractive: true,
+                url: '/exercises/comfort-ladder.html',
                 prompt: 'Can you help me with the uncertainty ladder? I want to practice tolerating uncertainty in small, manageable steps.'
             },
             {
@@ -1597,6 +1612,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Check in with your internal state without judgment',
                 hasInteractive: true,
                 duration: '3 min',
+                url: '/exercises/inner-weather.html',
                 prompt: 'Can you guide me through an inner weather report? I want to explore what\'s happening inside me right now.'
             }
         ]
@@ -1627,14 +1643,19 @@ function populateExercisePanel() {
                     </div>
                     <p class="resource-card-description">${exercise.description}</p>
                     <div class="resource-card-actions">
+                        ${exercise.url ? `
+                            <a href="${exercise.url}" class="btn-primary exercise-link">
+                                Try Exercise →
+                            </a>
+                        ` : ''}
                         ${exercise.hasInteractive ? `
-                            <button class="btn-primary start-exercise" data-exercise="${exercise.name}">
+                            <button class="btn-${exercise.url ? 'secondary' : 'primary'} start-exercise" data-exercise="${exercise.name}">
                                 Start Exercise
                             </button>
                         ` : ''}
-                        <button class="btn-${exercise.hasInteractive ? 'secondary' : 'primary'} chat-trigger"
+                        <button class="btn-${exercise.hasInteractive || exercise.url ? 'secondary' : 'primary'} chat-trigger"
                                 data-prompt="${exercise.prompt}">
-                            ${exercise.hasInteractive ? 'Ask Mandy →' : 'Explore with Mandy →'}
+                            ${exercise.hasInteractive || exercise.url ? 'Ask Mandy →' : 'Explore with Mandy →'}
                         </button>
                     </div>
                 </div>
