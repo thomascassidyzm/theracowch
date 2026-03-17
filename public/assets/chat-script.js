@@ -435,6 +435,21 @@ function setupEventListeners() {
     if (clearChatButton) clearChatButton.addEventListener('click', handleClearChat);
     if (privacyInfoButton) privacyInfoButton.addEventListener('click', handlePrivacyInfo);
 
+    // New Chat button in chat header
+    const newChatBtn = document.getElementById('new-chat-btn');
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            hapticFeedback('medium');
+            conversationHistory = [];
+            chatMessages.innerHTML = '';
+            showWelcomeMessage();
+            saveChatHistory();
+            // Show quick prompts again
+            if (quickPromptsContainer) quickPromptsContainer.style.display = '';
+            focusInput();
+        });
+    }
+
     // Slide panels
     if (openImaginePanelButton) {
         openImaginePanelButton.addEventListener('click', () => {
@@ -445,8 +460,17 @@ function setupEventListeners() {
 
     if (openExercisePanelButton) {
         openExercisePanelButton.addEventListener('click', () => {
+            hapticFeedback('light');
             if (menuPanel) menuPanel.classList.remove('active');
-            exercisePanel.classList.add('active');
+            // Open the exercises tool panel (has direct links to exercise pages)
+            const toolPanel = document.getElementById('exercises-panel');
+            if (toolPanel) {
+                toolPanel.classList.add('active');
+            } else {
+                // Fallback to chat slide panel
+                const panel = exercisePanel || document.getElementById('exercise-panel');
+                if (panel) panel.classList.add('active');
+            }
         });
     }
 
