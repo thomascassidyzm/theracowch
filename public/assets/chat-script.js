@@ -462,14 +462,9 @@ function setupEventListeners() {
         openExercisePanelButton.addEventListener('click', () => {
             hapticFeedback('light');
             if (menuPanel) menuPanel.classList.remove('active');
-            // Open the exercises tool panel (has direct links to exercise pages)
-            const toolPanel = document.getElementById('exercises-panel');
-            if (toolPanel) {
-                toolPanel.classList.add('active');
-            } else {
-                // Fallback to chat slide panel
-                const panel = exercisePanel || document.getElementById('exercise-panel');
-                if (panel) panel.classList.add('active');
+            // Open the exercise slide panel (populated by populateExercisePanel)
+            if (exercisePanel) {
+                exercisePanel.classList.add('active');
             }
         });
     }
