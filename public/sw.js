@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v22';
+const CACHE_NAME = 'cowch-wellness-v23';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -60,6 +60,22 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  // For JS and CSS assets, use network-first so updates take effect immediately
+  if (event.request.url.match(/\.(js|css)$/)) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
