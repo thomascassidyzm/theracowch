@@ -744,6 +744,12 @@ function generateQuickReplies(pattern, response) {
             { text: '🧭 Explore IMAGINE', action: 'imagine' },
             { text: 'Show me more', prompt: 'Can you tell me more about applying this?' }
         );
+    } else if (lowerResponse.match(/\b(body reset|mini.?movement|body scan|intentional movement)\b/)) {
+        replies.push(
+            { text: '🏃 Try 5-Min Body Reset', action: 'open-exercise-url', url: '/exercises/body-scan.html' },
+            { text: '💪 See all exercises', action: 'exercises' },
+            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+        );
     } else if (lowerResponse.match(/\b(exercise|breathing|grounding|relaxation|practice)\b/)) {
         replies.push(
             { text: '💪 See all exercises', action: 'exercises' },
@@ -789,6 +795,9 @@ function addMessage(content, sender, quickReplies = null) {
                     } else if (reply.exercise === 'pmr') {
                         pmrModal.classList.add('active');
                     }
+                } else if (reply.action === 'open-exercise-url') {
+                    // Open exercise page directly
+                    window.location.href = reply.url;
                 } else if (reply.action === 'exercises') {
                     // Open exercise library panel
                     exercisePanel.classList.add('active');
@@ -839,6 +848,8 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
                     } else if (reply.exercise === 'pmr') {
                         pmrModal.classList.add('active');
                     }
+                } else if (reply.action === 'open-exercise-url') {
+                    window.location.href = reply.url;
                 } else if (reply.action === 'exercises') {
                     exercisePanel.classList.add('active');
                 } else if (reply.action === 'imagine') {
@@ -911,6 +922,23 @@ function formatMessage(content) {
     // Italic *text* or _text_ (but not in URLs or markdown already processed)
     formatted = formatted.replace(/(?<![*_])\*(?!\*)([^*]+)\*(?![*_])/g, '<em>$1</em>');
     formatted = formatted.replace(/(?<![*_])_(?!_)([^_]+)_(?![*_])/g, '<em>$1</em>');
+
+    // Auto-link exercise names to their exercise pages
+    const exerciseLinks = [];
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (exercise.url) {
+                exerciseLinks.push({ title: exercise.title, url: exercise.url });
+            }
+        }
+    }
+    // Sort by title length descending so longer matches take priority
+    exerciseLinks.sort((a, b) => b.title.length - a.title.length);
+    for (const ex of exerciseLinks) {
+        const escaped = ex.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(?!<[^>]*)\\b(${escaped})\\b(?![^<]*>)`, 'gi');
+        formatted = formatted.replace(regex, `<a href="${ex.url}" class="exercise-chat-link" target="_self">$1</a>`);
+    }
 
     // Paragraphs (double newline)
     formatted = formatted.split('\n\n').map(p => {
@@ -1741,8 +1769,16 @@ function populateExercisePanel() {
                     }
                     break;
 
+                // Daily Mini-Movement links to the body-scan exercise page
+                case 'Daily Mini-Movement': {
+                    const dmExercise = findExerciseByName(exerciseName);
+                    if (dmExercise && dmExercise.url) {
+                        window.location.href = dmExercise.url;
+                    }
+                    break;
+                }
+
                 // Exercises that could be interactive but fall back to chat
-                case 'Daily Mini-Movement':
                 case 'Mood & Nutrition Check':
                 case 'Circle of Control':
                 case 'Tiny Wins':

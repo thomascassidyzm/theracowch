@@ -512,4 +512,18 @@
     transition: all 0.2s ease;
 }
 
-/* Mobile adjustments handled by app.html inline responsive styles */
+/* Inline exercise links in chat messages */
+.exercise-chat-link {
+    color: var(--accent-primary, #E88A6A);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.exercise-chat-link:hover {
+    color: var(--accent-secondary, #d4775a);
+    text-decoration-style: solid;
+}
