@@ -1747,7 +1747,7 @@ function populateExercisePanel() {
             ${category.exercises.map(exercise => `
                 <div class="resource-card imagine-card">
                     <div class="resource-card-title">
-                        <h3>${exercise.title}</h3>
+                        <h3>${exercise.url ? `<a href="${exercise.url}" class="exercise-title-link">${exercise.title}</a>` : exercise.title}</h3>
                         ${exercise.duration ? `<span class="exercise-duration">${exercise.duration}</span>` : ''}
                     </div>
                     <p class="resource-card-description">${exercise.description}</p>

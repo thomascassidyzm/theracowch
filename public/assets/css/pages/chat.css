@@ -485,6 +485,19 @@
     margin: 0;
 }
 
+.exercise-title-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.exercise-title-link:hover {
+    color: var(--accent-primary, #E88A6A);
+    text-decoration-style: solid;
+}
+
 .resource-card-description {
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
