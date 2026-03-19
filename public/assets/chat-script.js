@@ -165,6 +165,7 @@ let talkAboutGroundingButton, groundingContainer, groundingInstruction;
 let pmrModal, closePmrButton, startPmrButton;
 let talkAboutPmrButton, bodyDiagram, pmrInstruction;
 let weatherModal, socialModal, ladderModal;
+let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal;
 let promptButton, promptBanner, promptMessage;
 let promptAction, promptNew, promptDismiss;
 let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
@@ -215,6 +216,11 @@ function initChatDOM() {
     weatherModal = document.getElementById('weather-modal');
     socialModal = document.getElementById('social-modal');
     ladderModal = document.getElementById('ladder-modal');
+    bodyresetModal = document.getElementById('bodyreset-modal');
+    tinywinsModal = document.getElementById('tinywins-modal');
+    nutritionModal = document.getElementById('nutrition-modal');
+    controlModal = document.getElementById('control-modal');
+    playbreakModal = document.getElementById('playbreak-modal');
 
     promptButton = document.getElementById('prompt-button');
     promptBanner = document.getElementById('prompt-banner');
@@ -300,6 +306,21 @@ function initChat() {
     }
     if (ladderModal) {
         addSwipeToDismiss(ladderModal.querySelector('.exercise-modal-content'), closeLadderModal);
+    }
+    if (bodyresetModal) {
+        addSwipeToDismiss(bodyresetModal.querySelector('.exercise-modal-content'), closeBodyresetModal);
+    }
+    if (tinywinsModal) {
+        addSwipeToDismiss(tinywinsModal.querySelector('.exercise-modal-content'), closeTinywinsModal);
+    }
+    if (nutritionModal) {
+        addSwipeToDismiss(nutritionModal.querySelector('.exercise-modal-content'), closeNutritionModal);
+    }
+    if (controlModal) {
+        addSwipeToDismiss(controlModal.querySelector('.exercise-modal-content'), closeControlModal);
+    }
+    if (playbreakModal) {
+        addSwipeToDismiss(playbreakModal.querySelector('.exercise-modal-content'), closePlaybreakModal);
     }
 
     updateImagineTracker();
@@ -569,6 +590,16 @@ function setupEventListeners() {
                 closeSocialModal();
             } else if (ladderModal && ladderModal.classList.contains('active')) {
                 closeLadderModal();
+            } else if (bodyresetModal && bodyresetModal.classList.contains('active')) {
+                closeBodyresetModal();
+            } else if (tinywinsModal && tinywinsModal.classList.contains('active')) {
+                closeTinywinsModal();
+            } else if (nutritionModal && nutritionModal.classList.contains('active')) {
+                closeNutritionModal();
+            } else if (controlModal && controlModal.classList.contains('active')) {
+                closeControlModal();
+            } else if (playbreakModal && playbreakModal.classList.contains('active')) {
+                closePlaybreakModal();
             } else if (imaginePanel && imaginePanel.classList.contains('active')) {
                 imaginePanel.classList.remove('active');
             } else if (exercisePanel && exercisePanel.classList.contains('active')) {
@@ -1451,7 +1482,7 @@ const IMAGINE_EXERCISES = [
                 name: 'Daily Mini-Movement',
                 title: '5-Minute Body Reset',
                 description: 'Boost energy through small intentional movement',
-                hasInteractive: false,
+                hasInteractive: true,
                 duration: '5 min',
                 url: '/exercises/body-scan.html',
                 prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.'
@@ -1831,24 +1862,39 @@ function populateExercisePanel() {
                     }
                     break;
 
-                // Daily Mini-Movement links to the body-scan exercise page
-                case 'Daily Mini-Movement': {
-                    const dmExercise = findExerciseByName(exerciseName);
-                    if (dmExercise && dmExercise.url) {
-                        window.location.href = dmExercise.url;
+                case 'Daily Mini-Movement':
+                    if (typeof openBodyresetModal === 'function') {
+                        openBodyresetModal();
+                    } else if (bodyresetModal) {
+                        bodyresetModal.classList.add('active');
                     }
                     break;
-                }
-
-                // Exercises that could be interactive but fall back to chat
-                case 'Mood & Nutrition Check':
-                case 'Circle of Control':
                 case 'Tiny Wins':
+                    if (typeof openTinywinsModal === 'function') {
+                        openTinywinsModal();
+                    } else if (tinywinsModal) {
+                        tinywinsModal.classList.add('active');
+                    }
+                    break;
+                case 'Mood & Nutrition Check':
+                    if (typeof openNutritionModal === 'function') {
+                        openNutritionModal();
+                    } else if (nutritionModal) {
+                        nutritionModal.classList.add('active');
+                    }
+                    break;
+                case 'Circle of Control':
+                    if (typeof openControlModal === 'function') {
+                        openControlModal();
+                    } else if (controlModal) {
+                        controlModal.classList.add('active');
+                    }
+                    break;
                 case 'Play Break':
-                    // These could have modals in the future, for now trigger chat
-                    const exercise = findExerciseByName(exerciseName);
-                    if (exercise && exercise.prompt) {
-                        triggerChatPrompt(exercise.prompt);
+                    if (typeof openPlaybreakModal === 'function') {
+                        openPlaybreakModal();
+                    } else if (playbreakModal) {
+                        playbreakModal.classList.add('active');
                     }
                     break;
 
@@ -2759,5 +2805,544 @@ function initExerciseListeners() {
     if (weatherModal) {
         addSwipeToDismiss(weatherModal.querySelector('.exercise-modal-content'), closeWeatherModal);
         weatherModal.addEventListener('click', (e) => { if (e.target === weatherModal) closeWeatherModal(); });
+    }
+
+    // Initialize new exercise modals
+    initBodyresetExercise();
+    initTinywinsExercise();
+    initNutritionExercise();
+    initControlExercise();
+    initPlaybreakExercise();
+}
+
+// ============================================
+// 5-Minute Body Reset Exercise
+// ============================================
+
+let bodyresetPhase = 1;
+let bodyresetTimerInterval = null;
+
+function openBodyresetModal() {
+    bodyresetModal.classList.add('active');
+    hapticFeedback('light');
+    resetBodyreset();
+}
+
+function closeBodyresetModal() {
+    bodyresetModal.classList.remove('active');
+    if (bodyresetTimerInterval) clearInterval(bodyresetTimerInterval);
+    resetBodyreset();
+}
+
+function resetBodyreset() {
+    bodyresetPhase = 1;
+    if (bodyresetTimerInterval) { clearInterval(bodyresetTimerInterval); bodyresetTimerInterval = null; }
+    showBodyresetPhase();
+}
+
+function showBodyresetPhase() {
+    document.querySelectorAll('.bodyreset-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === bodyresetPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.bodyreset-progress .bodyreset-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < bodyresetPhase);
+        dot.classList.toggle('current', i === bodyresetPhase - 1);
+    });
+
+    const backBtn = document.getElementById('bodyreset-back');
+    const nextBtn = document.getElementById('bodyreset-next');
+    const talkBtn = document.getElementById('talk-about-bodyreset');
+
+    if (backBtn) backBtn.style.display = bodyresetPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = bodyresetPhase < 5 ? '' : 'none';
+        nextBtn.textContent = 'Next →';
+    }
+    if (talkBtn) talkBtn.style.display = bodyresetPhase === 5 ? '' : 'none';
+}
+
+function initBodyresetExercise() {
+    const closeBtn = document.getElementById('close-bodyreset');
+    const nextBtn = document.getElementById('bodyreset-next');
+    const backBtn = document.getElementById('bodyreset-back');
+    const talkBtn = document.getElementById('talk-about-bodyreset');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeBodyresetModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (bodyresetPhase < 5) { hapticFeedback('light'); bodyresetPhase++; showBodyresetPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (bodyresetPhase > 1) { hapticFeedback('light'); bodyresetPhase--; showBodyresetPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeBodyresetModal();
+        triggerChatPrompt('I just did the 5-minute body reset. Can you help me reflect on how my body feels now?');
+    });
+    if (bodyresetModal) {
+        bodyresetModal.addEventListener('click', (e) => { if (e.target === bodyresetModal) closeBodyresetModal(); });
+    }
+}
+
+// ============================================
+// Tiny Wins (Gratitude) Exercise
+// ============================================
+
+let tinywinsPhase = 1;
+let tinywinsData = { win1: '', win2: '', win3: '' };
+
+function openTinywinsModal() {
+    tinywinsModal.classList.add('active');
+    hapticFeedback('light');
+    resetTinywins();
+}
+
+function closeTinywinsModal() {
+    tinywinsModal.classList.remove('active');
+    resetTinywins();
+}
+
+function resetTinywins() {
+    tinywinsPhase = 1;
+    tinywinsData = { win1: '', win2: '', win3: '' };
+    const inputs = [document.getElementById('tinywins-input-1'), document.getElementById('tinywins-input-2'), document.getElementById('tinywins-input-3')];
+    inputs.forEach(input => { if (input) input.value = ''; });
+    showTinywinsPhase();
+}
+
+function showTinywinsPhase() {
+    document.querySelectorAll('.tinywins-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === tinywinsPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.tinywins-progress .tinywins-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < tinywinsPhase);
+        dot.classList.toggle('current', i === tinywinsPhase - 1);
+    });
+
+    const backBtn = document.getElementById('tinywins-back');
+    const nextBtn = document.getElementById('tinywins-next');
+    const talkBtn = document.getElementById('talk-about-tinywins');
+
+    if (backBtn) backBtn.style.display = tinywinsPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = tinywinsPhase < 4 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = tinywinsPhase === 4 ? '' : 'none';
+
+    if (tinywinsPhase === 4) {
+        const summary = document.getElementById('tinywins-summary');
+        if (summary) {
+            const wins = [tinywinsData.win1, tinywinsData.win2, tinywinsData.win3].filter(w => w.trim());
+            summary.innerHTML = wins.map((w, i) => `<div class="tinywins-star">⭐ ${w}</div>`).join('');
+        }
+    }
+}
+
+function initTinywinsExercise() {
+    const closeBtn = document.getElementById('close-tinywins');
+    const nextBtn = document.getElementById('tinywins-next');
+    const backBtn = document.getElementById('tinywins-back');
+    const talkBtn = document.getElementById('talk-about-tinywins');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeTinywinsModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        // Save current input before advancing
+        const currentInput = document.getElementById(`tinywins-input-${tinywinsPhase}`);
+        if (currentInput) tinywinsData[`win${tinywinsPhase}`] = currentInput.value;
+        if (tinywinsPhase < 4) { hapticFeedback('light'); tinywinsPhase++; showTinywinsPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (tinywinsPhase > 1) { hapticFeedback('light'); tinywinsPhase--; showTinywinsPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeTinywinsModal();
+        const wins = [tinywinsData.win1, tinywinsData.win2, tinywinsData.win3].filter(w => w.trim());
+        triggerChatPrompt(`I just did the tiny wins exercise. My small wins today: ${wins.join(', ')}. Can you help me appreciate these?`);
+    });
+    if (tinywinsModal) {
+        tinywinsModal.addEventListener('click', (e) => { if (e.target === tinywinsModal) closeTinywinsModal(); });
+    }
+}
+
+// ============================================
+// Mood & Nutrition Check Exercise
+// ============================================
+
+let nutritionPhase = 1;
+let nutritionData = { hydration: '', meals: '', energy: '' };
+
+function openNutritionModal() {
+    nutritionModal.classList.add('active');
+    hapticFeedback('light');
+    resetNutrition();
+}
+
+function closeNutritionModal() {
+    nutritionModal.classList.remove('active');
+    resetNutrition();
+}
+
+function resetNutrition() {
+    nutritionPhase = 1;
+    nutritionData = { hydration: '', meals: '', energy: '' };
+    document.querySelectorAll('.nutrition-option').forEach(btn => btn.classList.remove('selected'));
+    showNutritionPhase();
+}
+
+function showNutritionPhase() {
+    document.querySelectorAll('.nutrition-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === nutritionPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.nutrition-progress .nutrition-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < nutritionPhase);
+        dot.classList.toggle('current', i === nutritionPhase - 1);
+    });
+
+    const backBtn = document.getElementById('nutrition-back');
+    const nextBtn = document.getElementById('nutrition-next');
+    const talkBtn = document.getElementById('talk-about-nutrition');
+
+    if (backBtn) backBtn.style.display = nutritionPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = nutritionPhase < 4 ? '' : 'none';
+        // Enable next if current phase has a selection
+        const keys = ['', 'hydration', 'meals', 'energy'];
+        nextBtn.disabled = nutritionPhase < 4 && !nutritionData[keys[nutritionPhase]];
+    }
+    if (talkBtn) talkBtn.style.display = nutritionPhase === 4 ? '' : 'none';
+
+    if (nutritionPhase === 4) {
+        const summary = document.getElementById('nutrition-summary');
+        if (summary) {
+            const labels = { hydration: '💧 Hydration', meals: '🍽️ Meals', energy: '⚡ Energy' };
+            summary.innerHTML = Object.entries(nutritionData)
+                .filter(([, v]) => v)
+                .map(([k, v]) => `<div class="nutrition-result">${labels[k]}: ${v}</div>`)
+                .join('');
+        }
+    }
+}
+
+function initNutritionExercise() {
+    const closeBtn = document.getElementById('close-nutrition');
+    const nextBtn = document.getElementById('nutrition-next');
+    const backBtn = document.getElementById('nutrition-back');
+    const talkBtn = document.getElementById('talk-about-nutrition');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeNutritionModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (nutritionPhase < 4) { hapticFeedback('light'); nutritionPhase++; showNutritionPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (nutritionPhase > 1) { hapticFeedback('light'); nutritionPhase--; showNutritionPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeNutritionModal();
+        const parts = ['I just checked in on my nutrition and energy.'];
+        if (nutritionData.hydration) parts.push(`Hydration: ${nutritionData.hydration}.`);
+        if (nutritionData.meals) parts.push(`Meals: ${nutritionData.meals}.`);
+        if (nutritionData.energy) parts.push(`Energy: ${nutritionData.energy}.`);
+        parts.push('Can you help me think about what my body might need?');
+        triggerChatPrompt(parts.join(' '));
+    });
+
+    // Option selection handlers
+    const optionGroups = [
+        { id: 'hydration-options', key: 'hydration' },
+        { id: 'meals-options', key: 'meals' },
+        { id: 'energy-options', key: 'energy' }
+    ];
+    optionGroups.forEach(group => {
+        document.querySelectorAll(`#${group.id} .nutrition-option`).forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll(`#${group.id} .nutrition-option`).forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                nutritionData[group.key] = btn.dataset.value;
+                hapticFeedback('light');
+                const nextBtn = document.getElementById('nutrition-next');
+                if (nextBtn) nextBtn.disabled = false;
+            });
+        });
+    });
+
+    if (nutritionModal) {
+        nutritionModal.addEventListener('click', (e) => { if (e.target === nutritionModal) closeNutritionModal(); });
+    }
+}
+
+// ============================================
+// Circle of Control Exercise
+// ============================================
+
+let controlPhase = 1;
+let controlData = { worry: '', controllable: '', action: '' };
+
+function openControlModal() {
+    controlModal.classList.add('active');
+    hapticFeedback('light');
+    resetControl();
+}
+
+function closeControlModal() {
+    controlModal.classList.remove('active');
+    resetControl();
+}
+
+function resetControl() {
+    controlPhase = 1;
+    controlData = { worry: '', controllable: '', action: '' };
+    const worryInput = document.getElementById('control-worry-input');
+    const actionInput = document.getElementById('control-action-input');
+    if (worryInput) worryInput.value = '';
+    if (actionInput) actionInput.value = '';
+    document.querySelectorAll('.control-option').forEach(btn => btn.classList.remove('selected'));
+    showControlPhase();
+}
+
+function showControlPhase() {
+    document.querySelectorAll('.control-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === controlPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.control-progress .control-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < controlPhase);
+        dot.classList.toggle('current', i === controlPhase - 1);
+    });
+
+    const backBtn = document.getElementById('control-back');
+    const nextBtn = document.getElementById('control-next');
+    const talkBtn = document.getElementById('talk-about-control');
+
+    if (backBtn) backBtn.style.display = controlPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = controlPhase < 4 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = controlPhase === 4 ? '' : 'none';
+
+    // Update phase 3 based on controllability answer
+    if (controlPhase === 3) {
+        const actionTitle = document.getElementById('control-action-title');
+        const actionPrompt = document.getElementById('control-action-prompt');
+        if (controlData.controllable === 'no') {
+            if (actionTitle) actionTitle.textContent = 'Letting Go';
+            if (actionPrompt) actionPrompt.textContent = 'What could help you accept what you can\'t control here?';
+        } else {
+            if (actionTitle) actionTitle.textContent = 'One Small Step';
+            if (actionPrompt) actionPrompt.textContent = 'What\'s one tiny thing you could do about this?';
+        }
+    }
+
+    if (controlPhase === 4) {
+        const summary = document.getElementById('control-summary');
+        if (summary) {
+            const controlLabel = { yes: '✅ Within your control', partly: '🤏 Partly in your control', no: '❌ Outside your control' };
+            summary.innerHTML = `
+                <div class="control-result"><strong>Concern:</strong> ${controlData.worry}</div>
+                <div class="control-result">${controlLabel[controlData.controllable] || ''}</div>
+                <div class="control-result"><strong>Your step:</strong> ${controlData.action}</div>
+            `;
+        }
+    }
+}
+
+function initControlExercise() {
+    const closeBtn = document.getElementById('close-control');
+    const nextBtn = document.getElementById('control-next');
+    const backBtn = document.getElementById('control-back');
+    const talkBtn = document.getElementById('talk-about-control');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeControlModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        // Save data before advancing
+        if (controlPhase === 1) {
+            const worryInput = document.getElementById('control-worry-input');
+            if (worryInput) controlData.worry = worryInput.value;
+        }
+        if (controlPhase === 3) {
+            const actionInput = document.getElementById('control-action-input');
+            if (actionInput) controlData.action = actionInput.value;
+        }
+        if (controlPhase < 4) { hapticFeedback('light'); controlPhase++; showControlPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (controlPhase > 1) { hapticFeedback('light'); controlPhase--; showControlPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeControlModal();
+        triggerChatPrompt(`I just did the circle of control exercise. I'm worried about: "${controlData.worry}". I think it's ${controlData.controllable === 'yes' ? 'something I can control' : controlData.controllable === 'partly' ? 'partly in my control' : 'outside my control'}. My small step: "${controlData.action}". Can you help me think about this?`);
+    });
+
+    // Control option selection
+    document.querySelectorAll('#control-options .control-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#control-options .control-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            controlData.controllable = btn.dataset.value;
+            hapticFeedback('light');
+        });
+    });
+
+    if (controlModal) {
+        controlModal.addEventListener('click', (e) => { if (e.target === controlModal) closeControlModal(); });
+    }
+}
+
+// ============================================
+// Play Break Exercise
+// ============================================
+
+let playbreakPhase = 1;
+let playbreakData = { activity: '', feeling: '' };
+let playbreakTimerInterval = null;
+let playbreakTimeLeft = 120;
+
+const playbreakActivities = {
+    dance: { icon: '💃', title: 'Dance Break!', instruction: 'Put on your favourite song and move! No rules, no judgement. Just let your body do its thing for 2 minutes.' },
+    doodle: { icon: '✏️', title: 'Doodle Time!', instruction: 'Grab a pen and scribble anything. Shapes, faces, spirals — whatever comes out. No masterpiece needed.' },
+    sing: { icon: '🎤', title: 'Sing It Out!', instruction: 'Pick any song — hum it, whisper it, belt it out. Bonus points for making up lyrics.' },
+    stretch: { icon: '🤸', title: 'Silly Stretch!', instruction: 'Make the biggest stretch you can. Reach high, wiggle low, twist around. Be as dramatic as possible.' },
+    faces: { icon: '🤪', title: 'Funny Faces!', instruction: 'Make 5 of the silliest faces you can. Scrunch, stretch, puff out your cheeks. If you laugh, even better.' },
+    surprise: { icon: '🎁', title: 'Surprise Challenge!', instruction: 'Close your eyes, spin around once, then point at something. Now make up a 10-second song about that thing.' }
+};
+
+function openPlaybreakModal() {
+    playbreakModal.classList.add('active');
+    hapticFeedback('light');
+    resetPlaybreak();
+}
+
+function closePlaybreakModal() {
+    playbreakModal.classList.remove('active');
+    if (playbreakTimerInterval) clearInterval(playbreakTimerInterval);
+    resetPlaybreak();
+}
+
+function resetPlaybreak() {
+    playbreakPhase = 1;
+    playbreakData = { activity: '', feeling: '' };
+    playbreakTimeLeft = 120;
+    if (playbreakTimerInterval) { clearInterval(playbreakTimerInterval); playbreakTimerInterval = null; }
+    document.querySelectorAll('.playbreak-option').forEach(btn => btn.classList.remove('selected'));
+    const timerDisplay = document.getElementById('playbreak-timer');
+    if (timerDisplay) timerDisplay.textContent = '2:00';
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+    if (startTimerBtn) startTimerBtn.style.display = 'none';
+    showPlaybreakPhase();
+}
+
+function showPlaybreakPhase() {
+    document.querySelectorAll('.playbreak-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === playbreakPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.playbreak-progress .playbreak-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < playbreakPhase);
+        dot.classList.toggle('current', i === playbreakPhase - 1);
+    });
+
+    const backBtn = document.getElementById('playbreak-back');
+    const nextBtn = document.getElementById('playbreak-next');
+    const talkBtn = document.getElementById('talk-about-playbreak');
+
+    if (backBtn) backBtn.style.display = playbreakPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = playbreakPhase < 4 ? '' : 'none';
+        nextBtn.disabled = (playbreakPhase === 1 && !playbreakData.activity) || (playbreakPhase === 3 && !playbreakData.feeling);
+    }
+    if (talkBtn) talkBtn.style.display = playbreakPhase === 4 ? '' : 'none';
+
+    // Set up phase 2 content
+    if (playbreakPhase === 2 && playbreakData.activity) {
+        const activity = playbreakActivities[playbreakData.activity];
+        const goIcon = document.getElementById('playbreak-go-icon');
+        const goTitle = document.getElementById('playbreak-go-title');
+        const goInstruction = document.getElementById('playbreak-go-instruction');
+        const startTimerBtn = document.getElementById('playbreak-start-timer');
+        if (goIcon) goIcon.textContent = activity.icon;
+        if (goTitle) goTitle.textContent = activity.title;
+        if (goInstruction) goInstruction.textContent = activity.instruction;
+        if (startTimerBtn) startTimerBtn.style.display = '';
+    }
+
+    if (playbreakPhase === 4) {
+        const summary = document.getElementById('playbreak-summary');
+        const activity = playbreakActivities[playbreakData.activity];
+        if (summary && activity) {
+            summary.innerHTML = `<div class="playbreak-result">${activity.icon} You chose: ${activity.title}</div>
+                <div class="playbreak-result">You felt: ${playbreakData.feeling}</div>`;
+        }
+    }
+}
+
+function startPlaybreakTimer() {
+    const timerDisplay = document.getElementById('playbreak-timer');
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+    const nextBtn = document.getElementById('playbreak-next');
+    if (startTimerBtn) startTimerBtn.style.display = 'none';
+    if (nextBtn) nextBtn.disabled = true;
+
+    playbreakTimerInterval = setInterval(() => {
+        playbreakTimeLeft--;
+        const mins = Math.floor(playbreakTimeLeft / 60);
+        const secs = playbreakTimeLeft % 60;
+        if (timerDisplay) timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        if (playbreakTimeLeft <= 0) {
+            clearInterval(playbreakTimerInterval);
+            playbreakTimerInterval = null;
+            if (timerDisplay) timerDisplay.textContent = 'Done! 🎉';
+            if (nextBtn) nextBtn.disabled = false;
+            hapticFeedback('medium');
+        }
+    }, 1000);
+}
+
+function initPlaybreakExercise() {
+    const closeBtn = document.getElementById('close-playbreak');
+    const nextBtn = document.getElementById('playbreak-next');
+    const backBtn = document.getElementById('playbreak-back');
+    const talkBtn = document.getElementById('talk-about-playbreak');
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+
+    if (closeBtn) closeBtn.addEventListener('click', closePlaybreakModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (playbreakPhase < 4) { hapticFeedback('light'); playbreakPhase++; showPlaybreakPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (playbreakPhase > 1) {
+            if (playbreakTimerInterval) { clearInterval(playbreakTimerInterval); playbreakTimerInterval = null; }
+            hapticFeedback('light'); playbreakPhase--; showPlaybreakPhase();
+        }
+    });
+    if (startTimerBtn) startTimerBtn.addEventListener('click', startPlaybreakTimer);
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closePlaybreakModal();
+        triggerChatPrompt(`I just did a play break! I chose ${playbreakData.activity} and felt ${playbreakData.feeling} afterwards. Can you help me notice what play does for me?`);
+    });
+
+    // Activity selection
+    document.querySelectorAll('#playbreak-options .playbreak-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#playbreak-options .playbreak-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            playbreakData.activity = btn.dataset.value;
+            hapticFeedback('light');
+            const nextBtn = document.getElementById('playbreak-next');
+            if (nextBtn) nextBtn.disabled = false;
+        });
+    });
+
+    // Feeling selection
+    document.querySelectorAll('#playbreak-feeling-options .playbreak-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#playbreak-feeling-options .playbreak-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            playbreakData.feeling = btn.dataset.value;
+            hapticFeedback('light');
+            const nextBtn = document.getElementById('playbreak-next');
+            if (nextBtn) nextBtn.disabled = false;
+        });
+    });
+
+    if (playbreakModal) {
+        playbreakModal.addEventListener('click', (e) => { if (e.target === playbreakModal) closePlaybreakModal(); });
     }
 }
