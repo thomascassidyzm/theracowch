@@ -527,3 +527,59 @@
     color: var(--accent-secondary, #d4775a);
     text-decoration-style: solid;
 }
+
+/* Exercise action card in chat messages */
+.exercise-action-card {
+    margin-top: var(--space-md, 0.75rem);
+    padding: var(--space-md, 0.75rem);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid var(--card-accent, #E88A6A);
+    border-radius: var(--radius-lg, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 0.5rem);
+}
+
+.exercise-action-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm, 0.5rem);
+}
+
+.exercise-action-card-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.exercise-action-card-title {
+    font-weight: var(--font-weight-semibold, 600);
+    font-size: var(--font-size-base, 1rem);
+    color: var(--text-primary, #F5F0E8);
+}
+
+.exercise-action-card-desc {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, rgba(245, 240, 232, 0.6));
+    line-height: 1.4;
+}
+
+.exercise-action-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-lg, 12px);
+    font-weight: 700;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: #fff;
+    background: var(--card-accent, #E88A6A);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.exercise-action-card-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}

@@ -776,6 +776,12 @@ function addMessage(content, sender, quickReplies = null) {
     const formattedContent = formatMessage(content);
     messageDiv.innerHTML = formattedContent;
 
+    // Add exercise action card if Mandy mentions an exercise
+    if (sender === 'mandy') {
+        const exerciseCard = buildExerciseCard(content);
+        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+    }
+
     // Add quick reply buttons if provided (only for Mandy's messages)
     if (quickReplies && sender === 'mandy') {
         const quickRepliesDiv = document.createElement('div');
@@ -828,6 +834,13 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
     const textContainer = document.createElement('div');
     textContainer.innerHTML = formatMessage(content);
     messageDiv.appendChild(textContainer);
+
+    // Add exercise action card if Mandy mentions an exercise
+    if (sender === 'mandy') {
+        const exerciseCard = buildExerciseCard(content);
+        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+    }
+
     chatMessages.appendChild(messageDiv);
 
     // Add quick reply buttons
@@ -950,6 +963,55 @@ function formatMessage(content) {
     }).join('');
 
     return formatted;
+}
+
+// Build an exercise action card if the message references a known exercise
+function buildExerciseCard(content) {
+    const lower = content.toLowerCase();
+    const matched = [];
+
+    // Check each exercise that has a URL
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (!exercise.url) continue;
+            // Match on title or key phrases
+            const titleWords = exercise.title.toLowerCase();
+            const nameWords = exercise.name.toLowerCase();
+            if (lower.includes(titleWords) || lower.includes(nameWords)) {
+                matched.push({ title: exercise.title, description: exercise.description, url: exercise.url, duration: exercise.duration, color: category.color });
+            }
+        }
+    }
+
+    // Also match common phrases for body reset specifically
+    if (matched.length === 0 && lower.match(/\b(body reset|body scan|mini.?movement|tense.*release|muscle relaxation.*body)\b/)) {
+        const bodyExercise = findExerciseByName('Daily Mini-Movement');
+        if (bodyExercise && bodyExercise.url) {
+            const category = IMAGINE_EXERCISES.find(c => c.exercises.includes(bodyExercise));
+            matched.push({ title: bodyExercise.title, description: bodyExercise.description, url: bodyExercise.url, duration: bodyExercise.duration, color: category ? category.color : '#E88A6A' });
+        }
+    }
+
+    if (matched.length === 0) return null;
+
+    // Only show the first matched exercise card
+    const ex = matched[0];
+    const card = document.createElement('div');
+    card.className = 'exercise-action-card';
+    card.innerHTML = `
+        <div class="exercise-action-card-header">
+            <span class="exercise-action-card-icon">🧘</span>
+            <div>
+                <div class="exercise-action-card-title">${ex.title}</div>
+                <div class="exercise-action-card-desc">${ex.description}</div>
+            </div>
+        </div>
+        <a href="${ex.url}" class="exercise-action-card-btn">
+            Start Exercise${ex.duration ? ` (${ex.duration})` : ''} →
+        </a>
+    `;
+    card.style.setProperty('--card-accent', ex.color);
+    return card;
 }
 
 function showTypingIndicator() {
