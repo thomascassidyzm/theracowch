@@ -165,7 +165,7 @@ let talkAboutGroundingButton, groundingContainer, groundingInstruction;
 let pmrModal, closePmrButton, startPmrButton;
 let talkAboutPmrButton, bodyDiagram, pmrInstruction;
 let weatherModal, socialModal, ladderModal;
-let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal;
+let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal, safetyModal;
 let promptButton, promptBanner, promptMessage;
 let promptAction, promptNew, promptDismiss;
 let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
@@ -221,6 +221,7 @@ function initChatDOM() {
     nutritionModal = document.getElementById('nutrition-modal');
     controlModal = document.getElementById('control-modal');
     playbreakModal = document.getElementById('playbreak-modal');
+    safetyModal = document.getElementById('safety-modal');
 
     promptButton = document.getElementById('prompt-button');
     promptBanner = document.getElementById('prompt-banner');
@@ -321,6 +322,9 @@ function initChat() {
     }
     if (playbreakModal) {
         addSwipeToDismiss(playbreakModal.querySelector('.exercise-modal-content'), closePlaybreakModal);
+    }
+    if (safetyModal) {
+        addSwipeToDismiss(safetyModal.querySelector('.exercise-modal-content'), closeSafetyModal);
     }
 
     updateImagineTracker();
@@ -600,6 +604,8 @@ function setupEventListeners() {
                 closeControlModal();
             } else if (playbreakModal && playbreakModal.classList.contains('active')) {
                 closePlaybreakModal();
+            } else if (safetyModal && safetyModal.classList.contains('active')) {
+                closeSafetyModal();
             } else if (imaginePanel && imaginePanel.classList.contains('active')) {
                 imaginePanel.classList.remove('active');
             } else if (exercisePanel && exercisePanel.classList.contains('active')) {
@@ -1710,9 +1716,9 @@ const IMAGINE_EXERCISES = [
         exercises: [
             {
                 name: 'Safety Behaviours',
-                title: 'What\'s Protecting You... and Limiting You?',
-                description: 'Identify behaviours that block growth',
-                hasInteractive: false,
+                title: 'What\'s Protecting You… and What\'s Limiting You?',
+                description: 'Spot behaviours designed to prevent discomfort — but which may also block growth, opportunities, and confidence',
+                hasInteractive: true,
                 url: '/exercises/values-compass.html',
                 prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.'
             },
@@ -1895,6 +1901,13 @@ function populateExercisePanel() {
                         openPlaybreakModal();
                     } else if (playbreakModal) {
                         playbreakModal.classList.add('active');
+                    }
+                    break;
+                case 'Safety Behaviours':
+                    if (typeof openSafetyModal === 'function') {
+                        openSafetyModal();
+                    } else if (safetyModal) {
+                        safetyModal.classList.add('active');
                     }
                     break;
 
@@ -2813,6 +2826,7 @@ function initExerciseListeners() {
     initNutritionExercise();
     initControlExercise();
     initPlaybreakExercise();
+    initSafetyExercise();
 }
 
 // ============================================
@@ -3344,5 +3358,153 @@ function initPlaybreakExercise() {
 
     if (playbreakModal) {
         playbreakModal.addEventListener('click', (e) => { if (e.target === playbreakModal) closePlaybreakModal(); });
+    }
+}
+
+// ============================================
+// Spot Your Safety Behaviours Exercise
+// ============================================
+
+let safetyPhase = 1;
+let safetyData = {
+    behaviours: ['', '', ''],
+    protections: ['', '', ''],
+    losses: ['', '', ''],
+    alternatives: ['', '', '']
+};
+
+function openSafetyModal() {
+    safetyModal.classList.add('active');
+    hapticFeedback('light');
+    resetSafety();
+}
+
+function closeSafetyModal() {
+    safetyModal.classList.remove('active');
+    resetSafety();
+}
+
+function resetSafety() {
+    safetyPhase = 1;
+    safetyData = {
+        behaviours: ['', '', ''],
+        protections: ['', '', ''],
+        losses: ['', '', ''],
+        alternatives: ['', '', '']
+    };
+    // Clear all inputs
+    for (let i = 1; i <= 3; i++) {
+        const fields = ['behaviour', 'protect', 'losing', 'alternative'];
+        fields.forEach(field => {
+            const el = document.getElementById(`safety-${field}-${i}`);
+            if (el) el.value = '';
+        });
+    }
+    showSafetyPhase();
+}
+
+function saveSafetyPhaseData() {
+    // Phase 2: behaviour 1, Phase 3: reflect 1, Phase 4: behaviour 2, etc.
+    if (safetyPhase === 2) {
+        const el = document.getElementById('safety-behaviour-1');
+        if (el) safetyData.behaviours[0] = el.value;
+    } else if (safetyPhase === 3) {
+        const p = document.getElementById('safety-protect-1');
+        const l = document.getElementById('safety-losing-1');
+        const a = document.getElementById('safety-alternative-1');
+        if (p) safetyData.protections[0] = p.value;
+        if (l) safetyData.losses[0] = l.value;
+        if (a) safetyData.alternatives[0] = a.value;
+    } else if (safetyPhase === 4) {
+        const el = document.getElementById('safety-behaviour-2');
+        if (el) safetyData.behaviours[1] = el.value;
+    } else if (safetyPhase === 5) {
+        const p = document.getElementById('safety-protect-2');
+        const l = document.getElementById('safety-losing-2');
+        const a = document.getElementById('safety-alternative-2');
+        if (p) safetyData.protections[1] = p.value;
+        if (l) safetyData.losses[1] = l.value;
+        if (a) safetyData.alternatives[1] = a.value;
+    } else if (safetyPhase === 6) {
+        const el = document.getElementById('safety-behaviour-3');
+        if (el) safetyData.behaviours[2] = el.value;
+    } else if (safetyPhase === 7) {
+        const p = document.getElementById('safety-protect-3');
+        const l = document.getElementById('safety-losing-3');
+        const a = document.getElementById('safety-alternative-3');
+        if (p) safetyData.protections[2] = p.value;
+        if (l) safetyData.losses[2] = l.value;
+        if (a) safetyData.alternatives[2] = a.value;
+    }
+}
+
+function showSafetyPhase() {
+    document.querySelectorAll('.safety-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === safetyPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.safety-progress .safety-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < safetyPhase);
+        dot.classList.toggle('current', i === safetyPhase - 1);
+    });
+
+    const backBtn = document.getElementById('safety-back');
+    const nextBtn = document.getElementById('safety-next');
+    const talkBtn = document.getElementById('talk-about-safety');
+
+    if (backBtn) backBtn.style.display = safetyPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = safetyPhase < 8 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = safetyPhase === 8 ? '' : 'none';
+
+    // Build summary on final phase
+    if (safetyPhase === 8) {
+        const summary = document.getElementById('safety-summary');
+        if (summary) {
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                if (safetyData.behaviours[i].trim()) {
+                    html += `<div class="safety-result-card">
+                        <div class="safety-result-header">🛡️ ${safetyData.behaviours[i]}</div>
+                        ${safetyData.protections[i] ? `<div class="safety-result-detail"><strong>Protecting from:</strong> ${safetyData.protections[i]}</div>` : ''}
+                        ${safetyData.losses[i] ? `<div class="safety-result-detail"><strong>Losing:</strong> ${safetyData.losses[i]}</div>` : ''}
+                        ${safetyData.alternatives[i] ? `<div class="safety-result-detail"><strong>Tiny alternative:</strong> ${safetyData.alternatives[i]}</div>` : ''}
+                    </div>`;
+                }
+            }
+            summary.innerHTML = html;
+        }
+    }
+}
+
+function initSafetyExercise() {
+    const closeBtn = document.getElementById('close-safety');
+    const nextBtn = document.getElementById('safety-next');
+    const backBtn = document.getElementById('safety-back');
+    const talkBtn = document.getElementById('talk-about-safety');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSafetyModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        saveSafetyPhaseData();
+        if (safetyPhase < 8) { hapticFeedback('light'); safetyPhase++; showSafetyPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        saveSafetyPhaseData();
+        if (safetyPhase > 1) { hapticFeedback('light'); safetyPhase--; showSafetyPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeSafetyModal();
+        const parts = ['I just spotted my safety behaviours.'];
+        for (let i = 0; i < 3; i++) {
+            if (safetyData.behaviours[i].trim()) {
+                parts.push(`Behaviour ${i + 1}: "${safetyData.behaviours[i]}".`);
+                if (safetyData.protections[i]) parts.push(`I'm protecting myself from: ${safetyData.protections[i]}.`);
+                if (safetyData.alternatives[i]) parts.push(`My tiny alternative: ${safetyData.alternatives[i]}.`);
+            }
+        }
+        parts.push('Can you help me think about these patterns and how to gently experiment with change?');
+        triggerChatPrompt(parts.join(' '));
+    });
+    if (safetyModal) {
+        safetyModal.addEventListener('click', (e) => { if (e.target === safetyModal) closeSafetyModal(); });
     }
 }

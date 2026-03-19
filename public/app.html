@@ -3455,6 +3455,118 @@
         </div>
     </div>
 
+    <!-- Spot Your Safety Behaviours Modal -->
+    <div class="exercise-modal" id="safety-modal">
+        <div class="exercise-modal-content safety-content">
+            <div class="exercise-modal-header">
+                <h3>Spot Your Safety Behaviours</h3>
+                <button class="close-modal" id="close-safety">&times;</button>
+            </div>
+            <p class="safety-intro">Today, notice three things you regularly avoid or control to prevent negative outcomes...</p>
+            <div class="safety-sections" id="safety-sections">
+                <!-- Phase 1: Examples -->
+                <div class="safety-section active" data-section="1">
+                    <div class="safety-icon">🛡️</div>
+                    <h4>What Are Safety Behaviours?</h4>
+                    <p class="safety-description">Things we do to avoid discomfort — but which may also block growth, opportunities, and confidence.</p>
+                    <div class="safety-examples">
+                        <div class="safety-example">Constantly checking your phone to avoid eye contact</div>
+                        <div class="safety-example">Cancelling plans because the unknown feels tiring</div>
+                        <div class="safety-example">Rehearsing messages 20 times before sending</div>
+                        <div class="safety-example">Sticking to the same foods/shops/routes to avoid uncertainty</div>
+                        <div class="safety-example">Avoiding silence by always using TV/music</div>
+                        <div class="safety-example">Letting others make decisions to avoid responsibility</div>
+                        <div class="safety-example">Over-preparing so nothing can surprise you</div>
+                        <div class="safety-example">Never asking questions in case you "sound stupid"</div>
+                    </div>
+                </div>
+
+                <!-- Phase 2: Safety Behaviour #1 -->
+                <div class="safety-section" data-section="2">
+                    <div class="safety-icon">1️⃣</div>
+                    <h4>Safety Behaviour #1</h4>
+                    <p class="safety-question">What's one thing you avoid or control to prevent discomfort?</p>
+                    <textarea class="safety-input" id="safety-behaviour-1" placeholder="e.g. I rehearse what I'm going to say before phone calls..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 3: Reflect on #1 -->
+                <div class="safety-section" data-section="3">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #1</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-1" placeholder="e.g. Fear of sounding awkward or saying the wrong thing..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-1" placeholder="e.g. Spontaneous, natural conversations..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-1" placeholder="e.g. Make one call without rehearsing first..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 4: Safety Behaviour #2 -->
+                <div class="safety-section" data-section="4">
+                    <div class="safety-icon">2️⃣</div>
+                    <h4>Safety Behaviour #2</h4>
+                    <p class="safety-question">What's another thing you avoid or control?</p>
+                    <textarea class="safety-input" id="safety-behaviour-2" placeholder="e.g. I always take the same route to work..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 5: Reflect on #2 -->
+                <div class="safety-section" data-section="5">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #2</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-2" placeholder="e.g. The anxiety of not knowing what to expect..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-2" placeholder="e.g. Discovering a nicer route or a new coffee shop..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-2" placeholder="e.g. Take one different turning tomorrow..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 6: Safety Behaviour #3 -->
+                <div class="safety-section" data-section="6">
+                    <div class="safety-icon">3️⃣</div>
+                    <h4>Safety Behaviour #3</h4>
+                    <p class="safety-question">One more. What else do you do to stay "safe"?</p>
+                    <textarea class="safety-input" id="safety-behaviour-3" placeholder="e.g. I let my partner choose the restaurant every time..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 7: Reflect on #3 -->
+                <div class="safety-section" data-section="7">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #3</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-3" placeholder="e.g. Being blamed if the choice is bad..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-3" placeholder="e.g. Trusting my own preferences and building confidence..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-3" placeholder="e.g. Suggest one place next time, even a small one..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 8: Summary -->
+                <div class="safety-section" data-section="8">
+                    <div class="safety-icon">🌟</div>
+                    <h4>Your Safety Behaviours</h4>
+                    <div class="safety-summary" id="safety-summary"></div>
+                    <p class="safety-reflection">Becoming aware of safety behaviours is the first step in gently experimenting with real-world courage. 🐄</p>
+                </div>
+            </div>
+            <div class="safety-progress">
+                <span class="safety-dot active"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="safety-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="safety-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-safety" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
