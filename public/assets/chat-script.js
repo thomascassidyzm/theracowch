@@ -1451,7 +1451,7 @@ const IMAGINE_EXERCISES = [
                 name: 'Daily Mini-Movement',
                 title: '5-Minute Body Reset',
                 description: 'Boost energy through small intentional movement',
-                hasInteractive: true,
+                hasInteractive: false,
                 duration: '5 min',
                 url: '/exercises/body-scan.html',
                 prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.'
