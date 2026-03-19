@@ -2,722 +2,522 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-    <title>Body Scan | Cowch</title>
-    <meta name="theme-color" content="#1a1a2e">
-    <link rel="icon" href="/icons/cowch-icon.svg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Body Scan – cowch.app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
-
         :root {
-            --bg-deep: #1a1a2e;
-            --bg-mid: #16213e;
-            --glow-tense: #7EA88B;
-            --glow-release: #D4896A;
-            --glow-complete: #B794C4;
-            --text-primary: #F5F0E8;
-            --text-muted: rgba(245, 240, 232, 0.6);
-            --coral: #D4896A;
+            --bg: #1a1714;
+            --surface: #252220;
+            --surface2: #2e2b28;
+            --accent: #d4826a;
+            --accent-soft: #c4705840;
+            --text: #f0ebe4;
+            --text-muted: #9a9088;
+            --region-idle: #3a3530;
+            --region-active: #d4826a;
+            --region-done: #6a9e7a;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Gabarito', sans-serif;
-            background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 100%);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
             min-height: 100vh;
             min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            -webkit-font-smoothing: antialiased;
         }
 
-        .exercise-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-        }
-
-        /* Back button */
-        .back-btn {
-            position: absolute;
-            top: max(1rem, env(safe-area-inset-top));
-            left: 1rem;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.2);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            z-index: 100;
-            transition: all 0.2s ease;
-        }
-
-        /* Ambient particles */
-        .ambient-canvas {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .ambient-particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--glow-tense);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: float 8s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); opacity: 0.2; }
-            50% { transform: translateY(-20px); opacity: 0.5; }
-        }
-
-        /* Screens */
+        /* ── SCREENS ── */
         .screen {
-            position: absolute;
+            position: fixed;
             inset: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            padding-top: max(4rem, env(safe-area-inset-top));
+            padding: 2rem 1.5rem;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.8s ease;
-            z-index: 50;
+            transition: opacity 0.5s ease;
         }
-
         .screen.active {
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: all;
         }
 
-        /* Intro screen */
-        .intro-screen {
-            text-align: center;
-        }
-
-        .intro-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            animation: breathe 4s ease-in-out infinite;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-
-        .intro-title {
-            font-size: clamp(2rem, 8vw, 3rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--glow-tense), var(--glow-release));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .intro-subtitle {
-            font-size: 1.1rem;
+        /* ── BACK BUTTON ── */
+        .back-btn {
+            position: fixed;
+            top: 1.2rem;
+            left: 1.2rem;
+            background: var(--surface);
+            border: none;
             color: var(--text-muted);
-            max-width: 320px;
-            line-height: 1.7;
-            margin-bottom: 2.5rem;
-        }
-
-        .start-btn {
-            background: var(--glow-tense);
-            border: 4px solid rgba(0,0,0,0.2);
-            color: var(--bg-deep);
-            padding: 1.25rem 3rem;
-            border-radius: 20px;
             font-size: 1.2rem;
-            font-weight: 900;
-            font-family: inherit;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 32px rgba(126, 168, 139, 0.3);
-        }
-
-        .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(126, 168, 139, 0.4);
-        }
-
-        /* Main screen */
-        .main-screen {
-            justify-content: space-between;
-            padding-bottom: max(2rem, env(safe-area-inset-bottom));
-        }
-
-        /* Progress bar */
-        .progress-container {
-            position: absolute;
-            top: max(4rem, env(safe-area-inset-top));
-            left: 2rem;
-            right: 2rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--glow-tense), var(--glow-release));
-            transition: width 0.5s ease;
-            border-radius: 3px;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
-
-        /* Body visualization */
-        .body-container {
-            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            z-index: 100;
+            transition: background 0.2s, color 0.2s;
+        }
+        .back-btn:hover { background: var(--surface2); color: var(--text); }
+
+        /* ── INTRO SCREEN ── */
+        #intro .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            animation: breathe 4s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+        #intro h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.4rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        #intro .tagline {
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+        .meta-pills {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 2.5rem;
+        }
+        .pill {
+            background: var(--surface);
+            border-radius: 2rem;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .body-svg {
+        /* ── PRIMARY BUTTON ── */
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 3rem;
+            padding: 1rem 2.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 20px #d4826a30;
+        }
+        .btn-primary:active { transform: scale(0.96); }
+
+        /* ── GHOST BUTTON ── */
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--surface2);
+            border-radius: 3rem;
+            padding: 0.7rem 1.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-ghost:hover { background: var(--surface); color: var(--text); }
+
+        /* ── MAIN EXERCISE SCREEN ── */
+        #main {
+            gap: 0;
+            justify-content: flex-start;
+            padding-top: 5rem;
+        }
+
+        .region-label {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.8rem;
+            text-align: center;
+            color: var(--text);
+            min-height: 2.4rem;
+            transition: opacity 0.4s;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0.4rem;
+            margin-bottom: 1.5rem;
+            min-height: 1.4rem;
+            transition: opacity 0.4s;
+        }
+
+        /* SVG Body */
+        .body-wrap {
+            position: relative;
+            width: 160px;
+            flex-shrink: 0;
+        }
+        .body-wrap svg {
             width: 100%;
-            max-width: 200px;
             height: auto;
+            filter: drop-shadow(0 0 0px transparent);
+            transition: filter 0.6s;
+        }
+        .body-wrap.glowing svg {
+            filter: drop-shadow(0 0 18px #d4826a55);
         }
 
-        .body-part {
-            fill: none;
-            stroke: rgba(255,255,255,0.2);
-            stroke-width: 2;
-            transition: all 0.8s ease;
+        .body-region {
+            fill: var(--region-idle);
+            transition: fill 0.6s ease, opacity 0.4s;
+            cursor: default;
         }
-
-        .body-part.active {
-            stroke: var(--glow-tense);
-            stroke-width: 3;
-            fill: rgba(126, 168, 139, 0.2);
-            filter: drop-shadow(0 0 20px var(--glow-tense));
-            animation: pulse 1.5s ease-in-out infinite;
+        .body-region.active {
+            fill: var(--region-active);
+            animation: pulse-region 1.5s ease-in-out infinite;
         }
-
-        .body-part.releasing {
-            stroke: var(--glow-release);
-            fill: rgba(212, 137, 106, 0.2);
-            filter: drop-shadow(0 0 20px var(--glow-release));
-            animation: release 2s ease-out infinite;
-        }
-
-        .body-part.completed {
-            stroke: var(--glow-complete);
-            stroke-width: 2;
-            fill: rgba(183, 148, 196, 0.15);
+        .body-region.done {
+            fill: var(--region-done);
             opacity: 0.7;
         }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        @keyframes pulse-region {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
-        @keyframes release {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+        /* Timer ring */
+        .timer-wrap {
+            margin-top: 1.5rem;
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
         }
-
-        /* Instruction area */
-        .instruction-area {
+        .timer-wrap svg {
+            transform: rotate(-90deg);
+            width: 100px;
+            height: 100px;
+        }
+        .timer-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
+        .timer-fill {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 251;
+            transition: stroke-dashoffset 0.2s linear, stroke 0.4s;
+        }
+        .timer-fill.release { stroke: var(--region-done); }
+        .timer-number {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.9rem;
+            color: var(--text);
+        }
+        .timer-phase {
+            position: absolute;
+            bottom: -1.4rem;
+            width: 100%;
             text-align: center;
-            padding: 0 1rem;
-        }
-
-        .phase-badge {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            background: rgba(126, 168, 139, 0.2);
-            border: 2px solid var(--glow-tense);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 1rem;
-            transition: all 0.5s ease;
-        }
-
-        .phase-badge.releasing {
-            background: rgba(212, 137, 106, 0.2);
-            border-color: var(--glow-release);
-            color: var(--glow-release);
-        }
-
-        .region-name {
-            font-size: 1.5rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .instruction-text {
-            font-size: 1.1rem;
+            letter-spacing: 0.12em;
             color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            max-width: 320px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
-        .timer {
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--glow-tense);
-            transition: color 0.5s ease;
-            font-variant-numeric: tabular-nums;
+        /* Progress dots */
+        .progress-dots {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 2.8rem;
         }
-
-        .timer.releasing {
-            color: var(--glow-release);
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--surface2);
+            transition: background 0.4s, transform 0.3s;
         }
-
-        .breath-hint {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            font-style: italic;
-        }
+        .dot.done { background: var(--region-done); }
+        .dot.active { background: var(--accent); transform: scale(1.3); }
 
         /* Controls */
         .controls {
             display: flex;
             gap: 1rem;
-            justify-content: center;
-            margin-top: 1.5rem;
+            margin-top: 1.8rem;
         }
 
-        .control-btn {
-            padding: 0.75rem 1.5rem;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
+        /* ── COMPLETE SCREEN ── */
+        #complete .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.2rem;
         }
-
-        .control-btn:hover {
-            background: rgba(255,255,255,0.2);
+        #complete h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 0.6rem;
         }
-
-        .control-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        #complete p {
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 260px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
         }
-
-        /* Complete screen */
-        .complete-screen {
+        .complete-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
             text-align: center;
         }
-
-        .complete-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
+        .stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.8rem;
+            color: var(--accent);
         }
-
-        .complete-title {
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            color: var(--glow-complete);
-        }
-
-        .complete-message {
-            font-size: 1.1rem;
+        .stat-label {
+            font-size: 0.75rem;
             color: var(--text-muted);
-            max-width: 320px;
-            line-height: 1.7;
-            margin-bottom: 0.5rem;
-        }
-
-        .complete-stat {
-            font-size: 1rem;
-            color: var(--coral);
-            font-weight: 700;
-            margin-bottom: 2rem;
-        }
-
-        .finish-btn {
-            background: transparent;
-            border: 3px solid var(--coral);
-            color: var(--coral);
-            padding: 1rem 2.5rem;
-            border-radius: 16px;
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.2s ease;
-        }
-
-        .finish-btn:hover {
-            background: var(--coral);
-            color: var(--bg-deep);
+            margin-top: 0.2rem;
         }
     </style>
 </head>
 <body>
-    <div class="exercise-container">
-        <a href="/app.html" class="back-btn">← Back</a>
 
-        <!-- Ambient particles -->
-        <div class="ambient-canvas" id="ambient-canvas"></div>
+<button class="back-btn" onclick="goBack()">←</button>
 
-        <!-- INTRO SCREEN -->
-        <div class="screen intro-screen active" id="intro-screen">
-            <div class="intro-icon">🧘</div>
-            <h1 class="intro-title">Body Scan</h1>
-            <p class="intro-subtitle">Release tension from head to toe. Tense each area, then let go and feel the difference.</p>
-            <button class="start-btn" id="start-btn">Begin</button>
-        </div>
+<!-- INTRO -->
+<div class="screen active" id="intro">
+    <div class="icon">🧘</div>
+    <h1>Body Scan</h1>
+    <p class="tagline">Release tension region by region with guided awareness</p>
+    <div class="meta-pills">
+        <span class="pill">5 min</span>
+        <span class="pill">7 regions</span>
+        <span class="pill">Body</span>
+    </div>
+    <button class="btn-primary" onclick="startExercise()">Begin</button>
+</div>
 
-        <!-- MAIN SCREEN -->
-        <div class="screen main-screen" id="main-screen">
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                </div>
-                <div class="progress-text" id="progress-text">Region 1 of 7</div>
-            </div>
+<!-- MAIN -->
+<div class="screen" id="main">
+    <div class="region-label" id="regionLabel">Feet & Ankles</div>
+    <div class="instruction" id="instruction">Get comfortable and take a breath</div>
 
-            <div class="body-container">
-                <svg class="body-svg" viewBox="0 0 100 220" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Head -->
-                    <ellipse id="region-head" class="body-part" cx="50" cy="18" rx="15" ry="18"/>
-                    <!-- Neck & Shoulders -->
-                    <path id="region-shoulders" class="body-part" d="M35 36 L20 50 L20 65 L35 60 L35 45 M65 36 L80 50 L80 65 L65 60 L65 45"/>
-                    <!-- Arms & Hands -->
-                    <path id="region-arms" class="body-part" d="M20 65 L15 110 L20 115 L25 110 L25 65 M80 65 L85 110 L80 115 L75 110 L75 65"/>
-                    <!-- Chest & Back -->
-                    <path id="region-chest" class="body-part" d="M35 45 L65 45 L70 85 L30 85 Z"/>
-                    <!-- Stomach -->
-                    <path id="region-stomach" class="body-part" d="M30 85 L70 85 L68 115 L32 115 Z"/>
-                    <!-- Legs -->
-                    <path id="region-legs" class="body-part" d="M32 115 L45 115 L42 180 L35 180 Z M68 115 L55 115 L58 180 L65 180 Z"/>
-                    <!-- Feet -->
-                    <ellipse id="region-feet" class="body-part" cx="38" cy="195" rx="8" ry="12"/>
-                    <ellipse id="region-feet-r" class="body-part" cx="62" cy="195" rx="8" ry="12"/>
-                </svg>
-            </div>
-
-            <div class="instruction-area">
-                <div class="phase-badge" id="phase-badge">TENSE</div>
-                <div class="region-name" id="region-name">Feet</div>
-                <div class="instruction-text" id="instruction-text">Curl your toes and tense your feet. Hold...</div>
-                <div class="timer" id="timer">5</div>
-                <div class="breath-hint" id="breath-hint">Hold your breath</div>
-
-                <div class="controls">
-                    <button class="control-btn" id="pause-btn">Pause</button>
-                    <button class="control-btn" id="skip-btn">Skip</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- COMPLETE SCREEN -->
-        <div class="screen complete-screen" id="complete-screen">
-            <div class="complete-icon">✨</div>
-            <h2 class="complete-title">Deeply Relaxed</h2>
-            <p class="complete-message">You've released tension throughout your entire body. Notice how you feel now compared to when you started.</p>
-            <div class="complete-stat" id="complete-stat">7 regions relaxed</div>
-            <button class="finish-btn" id="finish-btn">Done</button>
-        </div>
+    <div class="body-wrap" id="bodyWrap">
+        <svg viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg">
+            <!-- Head -->
+            <ellipse id="r-head" class="body-region" cx="80" cy="28" rx="26" ry="26"/>
+            <!-- Neck -->
+            <rect id="r-neck" class="body-region" x="70" y="52" width="20" height="16" rx="6"/>
+            <!-- Shoulders -->
+            <path id="r-shoulders" class="body-region" d="M30 72 Q80 62 130 72 L128 96 Q80 86 32 96 Z"/>
+            <!-- Arms (both) -->
+            <path id="r-arms" class="body-region" d="M28 76 Q14 100 18 130 Q22 148 30 150 L36 148 Q30 128 34 104 L32 96 Z M132 76 Q146 100 142 130 Q138 148 130 150 L124 148 Q130 128 126 104 L128 96 Z"/>
+            <!-- Chest / torso -->
+            <rect id="r-chest" class="body-region" x="38" y="96" width="84" height="60" rx="12"/>
+            <!-- Stomach -->
+            <rect id="r-stomach" class="body-region" x="40" y="158" width="80" height="52" rx="10"/>
+            <!-- Legs -->
+            <path id="r-legs" class="body-region" d="M40 212 L52 212 L60 290 L50 300 Q44 302 42 296 Z M120 212 L108 212 L100 290 L110 300 Q116 302 118 296 Z M52 212 L108 212 L106 260 L54 260 Z"/>
+            <!-- Feet -->
+            <path id="r-feet" class="body-region" d="M38 296 Q30 300 28 310 L62 310 L62 296 Z M122 296 Q130 300 132 310 L98 310 L98 296 Z"/>
+        </svg>
     </div>
 
-    <script>
-        // Body regions
-        const REGIONS = [
-            {
-                id: 'feet',
-                name: 'Feet & Toes',
-                elements: ['region-feet', 'region-feet-r'],
-                tense: 'Curl your toes downward and tense your feet. Hold this tension...',
-                release: 'Release. Let your feet go completely limp. Feel the warmth spreading.',
-                breathTense: 'Hold your breath',
-                breathRelease: 'Breathe slowly and deeply'
-            },
-            {
-                id: 'legs',
-                name: 'Legs & Thighs',
-                elements: ['region-legs'],
-                tense: 'Tighten your leg muscles. Press your thighs together firmly...',
-                release: 'Let go. Feel your legs becoming heavy and relaxed against the surface.',
-                breathTense: 'Breathe shallowly',
-                breathRelease: 'Each breath brings more relaxation'
-            },
-            {
-                id: 'stomach',
-                name: 'Stomach & Core',
-                elements: ['region-stomach'],
-                tense: 'Pull your stomach in tightly, as if bracing. Hold the tension...',
-                release: 'Release completely. Let your belly soften with each breath.',
-                breathTense: 'Hold your core tight',
-                breathRelease: 'Let your belly rise and fall naturally'
-            },
-            {
-                id: 'chest',
-                name: 'Chest & Back',
-                elements: ['region-chest'],
-                tense: 'Take a deep breath and hold it. Tense your chest and upper back...',
-                release: 'Exhale fully. Feel openness in your chest. Let your back sink down.',
-                breathTense: 'Hold that breath',
-                breathRelease: 'Breathing freely now'
-            },
-            {
-                id: 'arms',
-                name: 'Arms & Hands',
-                elements: ['region-arms'],
-                tense: 'Make tight fists. Tense your arms all the way up. Hold firmly...',
-                release: 'Open your hands. Let your arms go heavy. Notice the tingling.',
-                breathTense: 'Squeeze tighter',
-                breathRelease: 'Letting go with each exhale'
-            },
-            {
-                id: 'shoulders',
-                name: 'Shoulders & Neck',
-                elements: ['region-shoulders'],
-                tense: 'Raise your shoulders toward your ears. Tense your neck. Hold...',
-                release: 'Drop your shoulders. Let all the tension drain away. Neck soft.',
-                breathTense: 'Hold the tension',
-                breathRelease: 'Shoulders dropping with each breath'
-            },
-            {
-                id: 'head',
-                name: 'Face & Head',
-                elements: ['region-head'],
-                tense: 'Scrunch your entire face. Squeeze your eyes, clench your jaw...',
-                release: 'Let your face completely relax. Jaw drops. Forehead smooths. Eyes soft.',
-                breathTense: 'Squeeze everything',
-                breathRelease: 'Complete relaxation'
-            }
-        ];
+    <div class="timer-wrap">
+        <svg viewBox="0 0 100 100">
+            <circle class="timer-bg" cx="50" cy="50" r="40"/>
+            <circle class="timer-fill" id="timerFill" cx="50" cy="50" r="40"/>
+        </svg>
+        <div class="timer-number" id="timerNum">5</div>
+        <div class="timer-phase" id="timerPhase">tense</div>
+    </div>
 
-        // State
-        let currentRegion = 0;
-        let phase = 'tense'; // tense or release
-        let isPaused = false;
-        let timeRemaining = 5;
-        let timer = null;
+    <div class="progress-dots" id="dots"></div>
 
-        // DOM elements
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
-        const phaseBadge = document.getElementById('phase-badge');
-        const regionName = document.getElementById('region-name');
-        const instructionText = document.getElementById('instruction-text');
-        const timerDisplay = document.getElementById('timer');
-        const breathHint = document.getElementById('breath-hint');
+    <div class="controls">
+        <button class="btn-ghost" id="pauseBtn" onclick="togglePause()">Pause</button>
+        <button class="btn-ghost" onclick="skipRegion()">Skip →</button>
+    </div>
+</div>
 
-        // Create ambient particles
-        function createAmbientParticles() {
-            const canvas = document.getElementById('ambient-canvas');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'ambient-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                canvas.appendChild(particle);
-            }
-        }
+<!-- COMPLETE -->
+<div class="screen" id="complete">
+    <div class="icon">✨</div>
+    <h1>Deeply Relaxed</h1>
+    <p>You've moved through your whole body with care. Notice how you feel right now.</p>
+    <div class="complete-stats">
+        <div class="stat">
+            <div class="stat-num">7</div>
+            <div class="stat-label">regions</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">5</div>
+            <div class="stat-label">minutes</div>
+        </div>
+    </div>
+    <button class="btn-primary" onclick="window.location.href='/app.html'">Done</button>
+</div>
 
-        // Update body visualization
-        function updateBody(regionIndex, state) {
-            // Clear all states first
-            document.querySelectorAll('.body-part').forEach(part => {
-                part.classList.remove('active', 'releasing');
-            });
+<script>
+    const REGIONS = [
+        { id: 'r-feet',      label: 'Feet & Ankles',   tense: 'Curl your toes tight',        release: 'Let your feet soften and spread' },
+        { id: 'r-legs',      label: 'Legs',             tense: 'Squeeze your thighs and calves', release: 'Feel the weight of your legs sink' },
+        { id: 'r-stomach',   label: 'Stomach',          tense: 'Tighten your belly muscles',  release: 'Let your belly go completely soft' },
+        { id: 'r-chest',     label: 'Chest',            tense: 'Take a deep breath and hold', release: 'Breathe out slowly… let go' },
+        { id: 'r-arms',      label: 'Arms & Hands',     tense: 'Make tight fists, clench arms', release: 'Open your hands and let arms drop' },
+        { id: 'r-shoulders', label: 'Shoulders',        tense: 'Shrug shoulders to your ears', release: 'Drop and roll them back gently' },
+        { id: 'r-head',      label: 'Face & Head',      tense: 'Scrunch your face tightly',   release: 'Smooth out every muscle in your face' },
+    ];
 
-            // Mark completed regions
-            for (let i = 0; i < regionIndex; i++) {
-                REGIONS[i].elements.forEach(id => {
-                    document.getElementById(id).classList.add('completed');
-                });
-            }
+    const TENSE_SECS  = 5;
+    const RELEASE_SECS = 8;
 
-            // Set current region state
-            if (regionIndex < REGIONS.length) {
-                REGIONS[regionIndex].elements.forEach(id => {
-                    const el = document.getElementById(id);
-                    el.classList.remove('completed');
-                    el.classList.add(state);
-                });
-            }
-        }
+    let currentRegion = 0;
+    let phase = 'tense'; // 'tense' | 'release'
+    let timeLeft = TENSE_SECS;
+    let ticker = null;
+    let paused = false;
 
-        // Update UI
-        function updateUI() {
-            const region = REGIONS[currentRegion];
-            const progress = (currentRegion / REGIONS.length) * 100;
+    function goBack() {
+        window.location.href = '/app.html';
+    }
 
-            progressFill.style.width = progress + '%';
-            progressText.textContent = `Region ${currentRegion + 1} of ${REGIONS.length}`;
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
 
-            regionName.textContent = region.name;
-
-            if (phase === 'tense') {
-                phaseBadge.textContent = 'TENSE';
-                phaseBadge.classList.remove('releasing');
-                instructionText.textContent = region.tense;
-                breathHint.textContent = region.breathTense;
-                timerDisplay.classList.remove('releasing');
-                updateBody(currentRegion, 'active');
-            } else {
-                phaseBadge.textContent = 'RELEASE';
-                phaseBadge.classList.add('releasing');
-                instructionText.textContent = region.release;
-                breathHint.textContent = region.breathRelease;
-                timerDisplay.classList.add('releasing');
-                updateBody(currentRegion, 'releasing');
-            }
-        }
-
-        // Timer tick
-        function tick() {
-            if (isPaused) return;
-
-            timeRemaining--;
-            timerDisplay.textContent = timeRemaining;
-
-            if (timeRemaining <= 0) {
-                if (phase === 'tense') {
-                    // Switch to release phase
-                    phase = 'release';
-                    timeRemaining = 8;
-                    updateUI();
-                } else {
-                    // Move to next region
-                    currentRegion++;
-                    if (currentRegion >= REGIONS.length) {
-                        completeExercise();
-                        return;
-                    }
-                    phase = 'tense';
-                    timeRemaining = 5;
-                    updateUI();
-                }
-            }
-        }
-
-        // Start exercise
-        function startExercise() {
-            document.getElementById('intro-screen').classList.remove('active');
-            document.getElementById('main-screen').classList.add('active');
-
-            currentRegion = 0;
-            phase = 'tense';
-            timeRemaining = 5;
-            isPaused = false;
-
-            updateUI();
-            timerDisplay.textContent = timeRemaining;
-
-            timer = setInterval(tick, 1000);
-        }
-
-        // Complete exercise
-        function completeExercise() {
-            clearInterval(timer);
-
-            // Mark all as completed
-            document.querySelectorAll('.body-part').forEach(part => {
-                part.classList.remove('active', 'releasing');
-                part.classList.add('completed');
-            });
-
-            progressFill.style.width = '100%';
-
-            document.getElementById('complete-stat').textContent = `${REGIONS.length} regions relaxed`;
-            document.getElementById('main-screen').classList.remove('active');
-            document.getElementById('complete-screen').classList.add('active');
-        }
-
-        // Toggle pause
-        function togglePause() {
-            isPaused = !isPaused;
-            document.getElementById('pause-btn').textContent = isPaused ? 'Resume' : 'Pause';
-
-            if (isPaused) {
-                phaseBadge.textContent = 'PAUSED';
-            } else {
-                updateUI();
-            }
-        }
-
-        // Skip region
-        function skipRegion() {
-            clearInterval(timer);
-
-            currentRegion++;
-            if (currentRegion >= REGIONS.length) {
-                completeExercise();
-                return;
-            }
-
-            phase = 'tense';
-            timeRemaining = 5;
-            updateUI();
-            timerDisplay.textContent = timeRemaining;
-
-            timer = setInterval(tick, 1000);
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            createAmbientParticles();
-
-            document.getElementById('start-btn').addEventListener('click', startExercise);
-            document.getElementById('pause-btn').addEventListener('click', togglePause);
-            document.getElementById('skip-btn').addEventListener('click', skipRegion);
-            document.getElementById('finish-btn').addEventListener('click', () => {
-                window.location.href = '/app.html';
-            });
+    function buildDots() {
+        const wrap = document.getElementById('dots');
+        wrap.innerHTML = '';
+        REGIONS.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            d.id = 'dot-' + i;
+            wrap.appendChild(d);
         });
-    </script>
+    }
+
+    function updateDots() {
+        REGIONS.forEach((_, i) => {
+            const d = document.getElementById('dot-' + i);
+            d.className = 'dot' + (i < currentRegion ? ' done' : i === currentRegion ? ' active' : '');
+        });
+    }
+
+    function highlightRegion(idx, phase) {
+        REGIONS.forEach((r, i) => {
+            const el = document.getElementById(r.id);
+            el.className = 'body-region' + (i < idx ? ' done' : i === idx ? ' active' : '');
+        });
+        document.getElementById('bodyWrap').classList.toggle('glowing', phase === 'tense');
+    }
+
+    function updateTimer() {
+        const total = phase === 'tense' ? TENSE_SECS : RELEASE_SECS;
+        const progress = 1 - (timeLeft / total);
+        const circumference = 251;
+        const offset = circumference - (progress * circumference);
+        const fill = document.getElementById('timerFill');
+        fill.style.strokeDashoffset = offset;
+        fill.className = 'timer-fill' + (phase === 'release' ? ' release' : '');
+        document.getElementById('timerNum').textContent = timeLeft;
+        document.getElementById('timerPhase').textContent = phase === 'tense' ? 'TENSE' : 'RELEASE';
+    }
+
+    function setRegion(idx) {
+        currentRegion = idx;
+        phase = 'tense';
+        timeLeft = TENSE_SECS;
+        const r = REGIONS[idx];
+        document.getElementById('regionLabel').textContent = r.label;
+        document.getElementById('instruction').textContent = r.tense;
+        highlightRegion(idx, 'tense');
+        updateDots();
+        updateTimer();
+    }
+
+    function tick() {
+        if (paused) return;
+        timeLeft--;
+        if (timeLeft <= 0) {
+            if (phase === 'tense') {
+                phase = 'release';
+                timeLeft = RELEASE_SECS;
+                const r = REGIONS[currentRegion];
+                document.getElementById('instruction').textContent = r.release;
+                highlightRegion(currentRegion, 'release');
+            } else {
+                // next region
+                if (currentRegion + 1 >= REGIONS.length) {
+                    finish();
+                    return;
+                }
+                setRegion(currentRegion + 1);
+            }
+        }
+        updateTimer();
+    }
+
+    function startExercise() {
+        showScreen('main');
+        buildDots();
+        setRegion(0);
+        ticker = setInterval(tick, 1000);
+    }
+
+    function togglePause() {
+        paused = !paused;
+        document.getElementById('pauseBtn').textContent = paused ? 'Resume' : 'Pause';
+    }
+
+    function skipRegion() {
+        if (currentRegion + 1 >= REGIONS.length) {
+            finish();
+            return;
+        }
+        setRegion(currentRegion + 1);
+    }
+
+    function finish() {
+        clearInterval(ticker);
+        // mark all done
+        REGIONS.forEach(r => {
+            document.getElementById(r.id).className = 'body-region done';
+        });
+        setTimeout(() => showScreen('complete'), 600);
+    }
+</script>
 </body>
 </html>
