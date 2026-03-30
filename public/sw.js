@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v25';
+const CACHE_NAME = 'cowch-wellness-v26';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -8,7 +8,7 @@ const urlsToCache = [
   '/assets/theracowch_main_image.jpg'
 ];
 
-// Install event - cache resources
+// Install event - cache resources and activate immediately
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -17,6 +17,7 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
 // Fetch event - serve from cache when offline
@@ -107,6 +108,9 @@ self.addEventListener('activate', (event) => {
     })
   );
   
+  // Take control of all open tabs immediately
+  self.clients.claim();
+
   // Start the daily mootivation scheduler
   scheduleDailyMootivations();
 });
