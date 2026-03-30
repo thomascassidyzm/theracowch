@@ -165,6 +165,7 @@ let talkAboutGroundingButton, groundingContainer, groundingInstruction;
 let pmrModal, closePmrButton, startPmrButton;
 let talkAboutPmrButton, bodyDiagram, pmrInstruction;
 let weatherModal, socialModal, ladderModal;
+let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal, safetyModal;
 let promptButton, promptBanner, promptMessage;
 let promptAction, promptNew, promptDismiss;
 let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
@@ -214,6 +215,12 @@ function initChatDOM() {
     weatherModal = document.getElementById('weather-modal');
     socialModal = document.getElementById('social-modal');
     ladderModal = document.getElementById('ladder-modal');
+    bodyresetModal = document.getElementById('bodyreset-modal');
+    tinywinsModal = document.getElementById('tinywins-modal');
+    nutritionModal = document.getElementById('nutrition-modal');
+    controlModal = document.getElementById('control-modal');
+    playbreakModal = document.getElementById('playbreak-modal');
+    safetyModal = document.getElementById('safety-modal');
 
     promptButton = document.getElementById('prompt-button');
     promptBanner = document.getElementById('prompt-banner');
@@ -299,6 +306,24 @@ function initChat() {
     }
     if (ladderModal) {
         addSwipeToDismiss(ladderModal.querySelector('.exercise-modal-content'), closeLadderModal);
+    }
+    if (bodyresetModal) {
+        addSwipeToDismiss(bodyresetModal.querySelector('.exercise-modal-content'), closeBodyresetModal);
+    }
+    if (tinywinsModal) {
+        addSwipeToDismiss(tinywinsModal.querySelector('.exercise-modal-content'), closeTinywinsModal);
+    }
+    if (nutritionModal) {
+        addSwipeToDismiss(nutritionModal.querySelector('.exercise-modal-content'), closeNutritionModal);
+    }
+    if (controlModal) {
+        addSwipeToDismiss(controlModal.querySelector('.exercise-modal-content'), closeControlModal);
+    }
+    if (playbreakModal) {
+        addSwipeToDismiss(playbreakModal.querySelector('.exercise-modal-content'), closePlaybreakModal);
+    }
+    if (safetyModal) {
+        addSwipeToDismiss(safetyModal.querySelector('.exercise-modal-content'), closeSafetyModal);
     }
 
     updateImagineTracker();
@@ -399,6 +424,21 @@ function setupEventListeners() {
     if (clearChatButton) clearChatButton.addEventListener('click', handleClearChat);
     if (privacyInfoButton) privacyInfoButton.addEventListener('click', handlePrivacyInfo);
 
+    // New Chat button in chat header
+    const newChatBtn = document.getElementById('new-chat-btn');
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            hapticFeedback('medium');
+            conversationHistory = [];
+            chatMessages.innerHTML = '';
+            showWelcomeMessage();
+            saveChatHistory();
+            // Show quick prompts again
+            if (quickPromptsContainer) quickPromptsContainer.style.display = '';
+            focusInput();
+        });
+    }
+
     // Slide panels
     if (openImaginePanelButton) {
         openImaginePanelButton.addEventListener('click', () => {
@@ -409,8 +449,12 @@ function setupEventListeners() {
 
     if (openExercisePanelButton) {
         openExercisePanelButton.addEventListener('click', () => {
+            hapticFeedback('light');
             if (menuPanel) menuPanel.classList.remove('active');
-            exercisePanel.classList.add('active');
+            // Open the exercise slide panel (populated by populateExercisePanel)
+            if (exercisePanel) {
+                exercisePanel.classList.add('active');
+            }
         });
     }
 
@@ -514,6 +558,18 @@ function setupEventListeners() {
                 closeSocialModal();
             } else if (ladderModal && ladderModal.classList.contains('active')) {
                 closeLadderModal();
+            } else if (bodyresetModal && bodyresetModal.classList.contains('active')) {
+                closeBodyresetModal();
+            } else if (tinywinsModal && tinywinsModal.classList.contains('active')) {
+                closeTinywinsModal();
+            } else if (nutritionModal && nutritionModal.classList.contains('active')) {
+                closeNutritionModal();
+            } else if (controlModal && controlModal.classList.contains('active')) {
+                closeControlModal();
+            } else if (playbreakModal && playbreakModal.classList.contains('active')) {
+                closePlaybreakModal();
+            } else if (safetyModal && safetyModal.classList.contains('active')) {
+                closeSafetyModal();
             } else if (imaginePanel && imaginePanel.classList.contains('active')) {
                 imaginePanel.classList.remove('active');
             } else if (exercisePanel && exercisePanel.classList.contains('active')) {
@@ -689,6 +745,12 @@ function generateQuickReplies(pattern, response) {
             { text: '🧭 Explore IMAGINE', action: 'imagine' },
             { text: 'Show me more', prompt: 'Can you tell me more about applying this?' }
         );
+    } else if (lowerResponse.match(/\b(body reset|mini.?movement|body scan|intentional movement)\b/)) {
+        replies.push(
+            { text: '🏃 Try 5-Min Body Reset', action: 'open-exercise-url', url: '/exercises/body-scan.html' },
+            { text: '💪 See all exercises', action: 'exercises' },
+            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+        );
     } else if (lowerResponse.match(/\b(exercise|breathing|grounding|relaxation|practice)\b/)) {
         replies.push(
             { text: '💪 See all exercises', action: 'exercises' },
@@ -715,6 +777,12 @@ function addMessage(content, sender, quickReplies = null) {
     const formattedContent = formatMessage(content);
     messageDiv.innerHTML = formattedContent;
 
+    // Add exercise action card if Mandy mentions an exercise
+    if (sender === 'mandy') {
+        const exerciseCard = buildExerciseCard(content);
+        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+    }
+
     // Add quick reply buttons if provided (only for Mandy's messages)
     if (quickReplies && sender === 'mandy') {
         const quickRepliesDiv = document.createElement('div');
@@ -734,6 +802,9 @@ function addMessage(content, sender, quickReplies = null) {
                     } else if (reply.exercise === 'pmr') {
                         pmrModal.classList.add('active');
                     }
+                } else if (reply.action === 'open-exercise-url') {
+                    // Open exercise page directly
+                    window.location.href = reply.url;
                 } else if (reply.action === 'exercises') {
                     // Open exercise library panel
                     exercisePanel.classList.add('active');
@@ -764,6 +835,13 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
     const textContainer = document.createElement('div');
     textContainer.innerHTML = formatMessage(content);
     messageDiv.appendChild(textContainer);
+
+    // Add exercise action card if Mandy mentions an exercise
+    if (sender === 'mandy') {
+        const exerciseCard = buildExerciseCard(content);
+        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+    }
+
     chatMessages.appendChild(messageDiv);
 
     // Add quick reply buttons
@@ -784,6 +862,8 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
                     } else if (reply.exercise === 'pmr') {
                         pmrModal.classList.add('active');
                     }
+                } else if (reply.action === 'open-exercise-url') {
+                    window.location.href = reply.url;
                 } else if (reply.action === 'exercises') {
                     exercisePanel.classList.add('active');
                 } else if (reply.action === 'imagine') {
@@ -857,6 +937,23 @@ function formatMessage(content) {
     formatted = formatted.replace(/(?<![*_])\*(?!\*)([^*]+)\*(?![*_])/g, '<em>$1</em>');
     formatted = formatted.replace(/(?<![*_])_(?!_)([^_]+)_(?![*_])/g, '<em>$1</em>');
 
+    // Auto-link exercise names to their exercise pages
+    const exerciseLinks = [];
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (exercise.url) {
+                exerciseLinks.push({ title: exercise.title, url: exercise.url });
+            }
+        }
+    }
+    // Sort by title length descending so longer matches take priority
+    exerciseLinks.sort((a, b) => b.title.length - a.title.length);
+    for (const ex of exerciseLinks) {
+        const escaped = ex.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(?!<[^>]*)\\b(${escaped})\\b(?![^<]*>)`, 'gi');
+        formatted = formatted.replace(regex, `<a href="${ex.url}" class="exercise-chat-link" target="_self">$1</a>`);
+    }
+
     // Paragraphs (double newline)
     formatted = formatted.split('\n\n').map(p => {
         // Don't wrap if already wrapped in block elements
@@ -867,6 +964,55 @@ function formatMessage(content) {
     }).join('');
 
     return formatted;
+}
+
+// Build an exercise action card if the message references a known exercise
+function buildExerciseCard(content) {
+    const lower = content.toLowerCase();
+    const matched = [];
+
+    // Check each exercise that has a URL
+    for (const category of IMAGINE_EXERCISES) {
+        for (const exercise of category.exercises) {
+            if (!exercise.url) continue;
+            // Match on title or key phrases
+            const titleWords = exercise.title.toLowerCase();
+            const nameWords = exercise.name.toLowerCase();
+            if (lower.includes(titleWords) || lower.includes(nameWords)) {
+                matched.push({ title: exercise.title, description: exercise.description, url: exercise.url, duration: exercise.duration, color: category.color });
+            }
+        }
+    }
+
+    // Also match common phrases for body reset specifically
+    if (matched.length === 0 && lower.match(/\b(body reset|body scan|mini.?movement|tense.*release|muscle relaxation.*body)\b/)) {
+        const bodyExercise = findExerciseByName('Daily Mini-Movement');
+        if (bodyExercise && bodyExercise.url) {
+            const category = IMAGINE_EXERCISES.find(c => c.exercises.includes(bodyExercise));
+            matched.push({ title: bodyExercise.title, description: bodyExercise.description, url: bodyExercise.url, duration: bodyExercise.duration, color: category ? category.color : '#E88A6A' });
+        }
+    }
+
+    if (matched.length === 0) return null;
+
+    // Only show the first matched exercise card
+    const ex = matched[0];
+    const card = document.createElement('div');
+    card.className = 'exercise-action-card';
+    card.innerHTML = `
+        <div class="exercise-action-card-header">
+            <span class="exercise-action-card-icon">🧘</span>
+            <div>
+                <div class="exercise-action-card-title">${ex.title}</div>
+                <div class="exercise-action-card-desc">${ex.description}</div>
+            </div>
+        </div>
+        <a href="${ex.url}" class="exercise-action-card-btn">
+            Start Exercise${ex.duration ? ` (${ex.duration})` : ''} →
+        </a>
+    `;
+    card.style.setProperty('--card-accent', ex.color);
+    return card;
 }
 
 function showTypingIndicator() {
@@ -1308,6 +1454,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Boost energy through small intentional movement',
                 hasInteractive: true,
                 duration: '5 min',
+                url: '/exercises/body-scan.html',
                 prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.'
             },
             {
@@ -1329,6 +1476,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Talk to Yourself Like a Friend',
                 description: 'Reduce harsh self-talk and build resilience',
                 hasInteractive: false,
+                url: '/exercises/self-compassion.html',
                 prompt: 'Can you help me practice self-compassion? I noticed some harsh self-talk and want to respond to myself like I would a friend.'
             },
             {
@@ -1367,6 +1515,7 @@ const IMAGINE_EXERCISES = [
                 description: '4-4-4-4 breathing to calm your nervous system',
                 hasInteractive: true,
                 duration: '4 min',
+                url: '/exercises/box-breathing.html',
                 prompt: 'Can you guide me through box breathing?'
             },
             {
@@ -1375,6 +1524,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Use your senses to anchor in the present',
                 hasInteractive: true,
                 duration: '3 min',
+                url: '/exercises/grounding-54321.html',
                 prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?'
             },
             {
@@ -1398,6 +1548,7 @@ const IMAGINE_EXERCISES = [
                 title: 'What Am I Pushing Away?',
                 description: 'Notice thoughts or feelings you might be avoiding',
                 hasInteractive: false,
+                url: '/exercises/thought-stream.html',
                 prompt: 'Can you guide me through a resistance scan? I want to gently notice what I might be avoiding or pushing away.'
             },
             {
@@ -1405,6 +1556,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Let the Feeling Rise & Fall',
                 description: 'Learn that emotions come in waves, not permanent states',
                 hasInteractive: false,
+                url: '/exercises/wave.html',
                 prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.'
             },
             {
@@ -1428,6 +1580,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Tune into subtle positives you might have missed',
                 hasInteractive: true,
                 duration: '2 min',
+                url: '/exercises/gratitude.html',
                 prompt: 'Can you help me with the tiny wins gratitude check? I want to notice three small things that made today even slightly better.'
             },
             {
@@ -1435,6 +1588,7 @@ const IMAGINE_EXERCISES = [
                 title: 'A Different Angle',
                 description: 'Reframe a challenge through appreciation',
                 hasInteractive: false,
+                url: '/exercises/gratitude-journal.html',
                 prompt: 'Can you guide me through the gratitude lens exercise? I have a challenge I\'d like to look at from a different angle.'
             }
         ]
@@ -1451,6 +1605,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Build awareness of your daily interaction levels',
                 hasInteractive: true,
                 duration: '2 min',
+                url: '/exercises/connection-web.html',
                 prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.'
             },
             {
@@ -1465,6 +1620,7 @@ const IMAGINE_EXERCISES = [
                 title: 'A Small Step Away From Isolation',
                 description: 'Break isolation with one tiny, achievable action',
                 hasInteractive: false,
+                url: '/exercises/kindness.html',
                 prompt: 'Can you guide me through the one-step outward challenge? I want to take a small step toward connection today.'
             },
             {
@@ -1488,6 +1644,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Interrupt seriousness with 10 minutes of play',
                 hasInteractive: true,
                 duration: '10 min',
+                url: '/exercises/fun-prompts.html',
                 prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.'
             },
             {
@@ -1495,6 +1652,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Replaying Joy',
                 description: 'Unlock playfulness through nostalgia',
                 hasInteractive: false,
+                url: '/exercises/joy.html',
                 prompt: 'Can you guide me through the childhood micro-joy exercise? I want to rediscover something I loved as a child.'
             },
             {
@@ -1522,9 +1680,10 @@ const IMAGINE_EXERCISES = [
         exercises: [
             {
                 name: 'Safety Behaviours',
-                title: 'What\'s Protecting You... and Limiting You?',
-                description: 'Identify behaviours that block growth',
-                hasInteractive: false,
+                title: 'What\'s Protecting You… and What\'s Limiting You?',
+                description: 'Spot behaviours designed to prevent discomfort — but which may also block growth, opportunities, and confidence',
+                hasInteractive: true,
+                url: '/exercises/values-compass.html',
                 prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.'
             },
             {
@@ -1546,6 +1705,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Small Steps Into the Unknown',
                 description: 'Gentle novelty-seeking and confidence building',
                 hasInteractive: false,
+                url: '/exercises/wonder.html',
                 prompt: 'Can you suggest a micro-adventure for me? I want to try something small and new in the next 24 hours.'
             },
             {
@@ -1553,6 +1713,7 @@ const IMAGINE_EXERCISES = [
                 title: 'Climb, Don\'t Leap',
                 description: 'Build tolerance for uncertainty in gradual steps',
                 hasInteractive: true,
+                url: '/exercises/comfort-ladder.html',
                 prompt: 'Can you help me with the uncertainty ladder? I want to practice tolerating uncertainty in small, manageable steps.'
             },
             {
@@ -1561,6 +1722,7 @@ const IMAGINE_EXERCISES = [
                 description: 'Check in with your internal state without judgment',
                 hasInteractive: true,
                 duration: '3 min',
+                url: '/exercises/inner-weather.html',
                 prompt: 'Can you guide me through an inner weather report? I want to explore what\'s happening inside me right now.'
             }
         ]
@@ -1580,19 +1742,24 @@ function populateExercisePanel() {
             ${category.exercises.map(exercise => `
                 <div class="resource-card imagine-card">
                     <div class="resource-card-title">
-                        <h3>${exercise.title}</h3>
+                        <h3>${exercise.url ? `<a href="${exercise.url}" class="exercise-title-link">${exercise.title}</a>` : exercise.title}</h3>
                         ${exercise.duration ? `<span class="exercise-duration">${exercise.duration}</span>` : ''}
                     </div>
                     <p class="resource-card-description">${exercise.description}</p>
                     <div class="resource-card-actions">
+                        ${exercise.url ? `
+                            <a href="${exercise.url}" class="btn-primary exercise-link">
+                                Try Exercise →
+                            </a>
+                        ` : ''}
                         ${exercise.hasInteractive ? `
-                            <button class="btn-primary start-exercise" data-exercise="${exercise.name}">
+                            <button class="btn-${exercise.url ? 'secondary' : 'primary'} start-exercise" data-exercise="${exercise.name}">
                                 Start Exercise
                             </button>
                         ` : ''}
-                        <button class="btn-${exercise.hasInteractive ? 'secondary' : 'primary'} chat-trigger"
+                        <button class="btn-${exercise.hasInteractive || exercise.url ? 'secondary' : 'primary'} chat-trigger"
                                 data-prompt="${exercise.prompt}">
-                            ${exercise.hasInteractive ? 'Ask Mandy →' : 'Explore with Mandy →'}
+                            ${exercise.hasInteractive || exercise.url ? 'Ask Mandy →' : 'Explore with Mandy →'}
                         </button>
                     </div>
                 </div>
@@ -1659,16 +1826,46 @@ function populateExercisePanel() {
                     }
                     break;
 
-                // Exercises that could be interactive but fall back to chat
                 case 'Daily Mini-Movement':
-                case 'Mood & Nutrition Check':
-                case 'Circle of Control':
+                    if (typeof openBodyresetModal === 'function') {
+                        openBodyresetModal();
+                    } else if (bodyresetModal) {
+                        bodyresetModal.classList.add('active');
+                    }
+                    break;
                 case 'Tiny Wins':
+                    if (typeof openTinywinsModal === 'function') {
+                        openTinywinsModal();
+                    } else if (tinywinsModal) {
+                        tinywinsModal.classList.add('active');
+                    }
+                    break;
+                case 'Mood & Nutrition Check':
+                    if (typeof openNutritionModal === 'function') {
+                        openNutritionModal();
+                    } else if (nutritionModal) {
+                        nutritionModal.classList.add('active');
+                    }
+                    break;
+                case 'Circle of Control':
+                    if (typeof openControlModal === 'function') {
+                        openControlModal();
+                    } else if (controlModal) {
+                        controlModal.classList.add('active');
+                    }
+                    break;
                 case 'Play Break':
-                    // These could have modals in the future, for now trigger chat
-                    const exercise = findExerciseByName(exerciseName);
-                    if (exercise && exercise.prompt) {
-                        triggerChatPrompt(exercise.prompt);
+                    if (typeof openPlaybreakModal === 'function') {
+                        openPlaybreakModal();
+                    } else if (playbreakModal) {
+                        playbreakModal.classList.add('active');
+                    }
+                    break;
+                case 'Safety Behaviours':
+                    if (typeof openSafetyModal === 'function') {
+                        openSafetyModal();
+                    } else if (safetyModal) {
+                        safetyModal.classList.add('active');
                     }
                     break;
 
@@ -2579,5 +2776,693 @@ function initExerciseListeners() {
     if (weatherModal) {
         addSwipeToDismiss(weatherModal.querySelector('.exercise-modal-content'), closeWeatherModal);
         weatherModal.addEventListener('click', (e) => { if (e.target === weatherModal) closeWeatherModal(); });
+    }
+
+    // Initialize new exercise modals
+    initBodyresetExercise();
+    initTinywinsExercise();
+    initNutritionExercise();
+    initControlExercise();
+    initPlaybreakExercise();
+    initSafetyExercise();
+}
+
+// ============================================
+// 5-Minute Body Reset Exercise
+// ============================================
+
+let bodyresetPhase = 1;
+let bodyresetTimerInterval = null;
+
+function openBodyresetModal() {
+    bodyresetModal.classList.add('active');
+    hapticFeedback('light');
+    resetBodyreset();
+}
+
+function closeBodyresetModal() {
+    bodyresetModal.classList.remove('active');
+    if (bodyresetTimerInterval) clearInterval(bodyresetTimerInterval);
+    resetBodyreset();
+}
+
+function resetBodyreset() {
+    bodyresetPhase = 1;
+    if (bodyresetTimerInterval) { clearInterval(bodyresetTimerInterval); bodyresetTimerInterval = null; }
+    showBodyresetPhase();
+}
+
+function showBodyresetPhase() {
+    document.querySelectorAll('.bodyreset-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === bodyresetPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.bodyreset-progress .bodyreset-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < bodyresetPhase);
+        dot.classList.toggle('current', i === bodyresetPhase - 1);
+    });
+
+    const backBtn = document.getElementById('bodyreset-back');
+    const nextBtn = document.getElementById('bodyreset-next');
+    const talkBtn = document.getElementById('talk-about-bodyreset');
+
+    if (backBtn) backBtn.style.display = bodyresetPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = bodyresetPhase < 5 ? '' : 'none';
+        nextBtn.textContent = 'Next →';
+    }
+    if (talkBtn) talkBtn.style.display = bodyresetPhase === 5 ? '' : 'none';
+}
+
+function initBodyresetExercise() {
+    const closeBtn = document.getElementById('close-bodyreset');
+    const nextBtn = document.getElementById('bodyreset-next');
+    const backBtn = document.getElementById('bodyreset-back');
+    const talkBtn = document.getElementById('talk-about-bodyreset');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeBodyresetModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (bodyresetPhase < 5) { hapticFeedback('light'); bodyresetPhase++; showBodyresetPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (bodyresetPhase > 1) { hapticFeedback('light'); bodyresetPhase--; showBodyresetPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeBodyresetModal();
+        triggerChatPrompt('I just did the 5-minute body reset. Can you help me reflect on how my body feels now?');
+    });
+    if (bodyresetModal) {
+        bodyresetModal.addEventListener('click', (e) => { if (e.target === bodyresetModal) closeBodyresetModal(); });
+    }
+}
+
+// ============================================
+// Tiny Wins (Gratitude) Exercise
+// ============================================
+
+let tinywinsPhase = 1;
+let tinywinsData = { win1: '', win2: '', win3: '' };
+
+function openTinywinsModal() {
+    tinywinsModal.classList.add('active');
+    hapticFeedback('light');
+    resetTinywins();
+}
+
+function closeTinywinsModal() {
+    tinywinsModal.classList.remove('active');
+    resetTinywins();
+}
+
+function resetTinywins() {
+    tinywinsPhase = 1;
+    tinywinsData = { win1: '', win2: '', win3: '' };
+    const inputs = [document.getElementById('tinywins-input-1'), document.getElementById('tinywins-input-2'), document.getElementById('tinywins-input-3')];
+    inputs.forEach(input => { if (input) input.value = ''; });
+    showTinywinsPhase();
+}
+
+function showTinywinsPhase() {
+    document.querySelectorAll('.tinywins-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === tinywinsPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.tinywins-progress .tinywins-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < tinywinsPhase);
+        dot.classList.toggle('current', i === tinywinsPhase - 1);
+    });
+
+    const backBtn = document.getElementById('tinywins-back');
+    const nextBtn = document.getElementById('tinywins-next');
+    const talkBtn = document.getElementById('talk-about-tinywins');
+
+    if (backBtn) backBtn.style.display = tinywinsPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = tinywinsPhase < 4 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = tinywinsPhase === 4 ? '' : 'none';
+
+    if (tinywinsPhase === 4) {
+        const summary = document.getElementById('tinywins-summary');
+        if (summary) {
+            const wins = [tinywinsData.win1, tinywinsData.win2, tinywinsData.win3].filter(w => w.trim());
+            summary.innerHTML = wins.map((w, i) => `<div class="tinywins-star">⭐ ${w}</div>`).join('');
+        }
+    }
+}
+
+function initTinywinsExercise() {
+    const closeBtn = document.getElementById('close-tinywins');
+    const nextBtn = document.getElementById('tinywins-next');
+    const backBtn = document.getElementById('tinywins-back');
+    const talkBtn = document.getElementById('talk-about-tinywins');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeTinywinsModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        // Save current input before advancing
+        const currentInput = document.getElementById(`tinywins-input-${tinywinsPhase}`);
+        if (currentInput) tinywinsData[`win${tinywinsPhase}`] = currentInput.value;
+        if (tinywinsPhase < 4) { hapticFeedback('light'); tinywinsPhase++; showTinywinsPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (tinywinsPhase > 1) { hapticFeedback('light'); tinywinsPhase--; showTinywinsPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeTinywinsModal();
+        const wins = [tinywinsData.win1, tinywinsData.win2, tinywinsData.win3].filter(w => w.trim());
+        triggerChatPrompt(`I just did the tiny wins exercise. My small wins today: ${wins.join(', ')}. Can you help me appreciate these?`);
+    });
+    if (tinywinsModal) {
+        tinywinsModal.addEventListener('click', (e) => { if (e.target === tinywinsModal) closeTinywinsModal(); });
+    }
+}
+
+// ============================================
+// Mood & Nutrition Check Exercise
+// ============================================
+
+let nutritionPhase = 1;
+let nutritionData = { hydration: '', meals: '', energy: '' };
+
+function openNutritionModal() {
+    nutritionModal.classList.add('active');
+    hapticFeedback('light');
+    resetNutrition();
+}
+
+function closeNutritionModal() {
+    nutritionModal.classList.remove('active');
+    resetNutrition();
+}
+
+function resetNutrition() {
+    nutritionPhase = 1;
+    nutritionData = { hydration: '', meals: '', energy: '' };
+    document.querySelectorAll('.nutrition-option').forEach(btn => btn.classList.remove('selected'));
+    showNutritionPhase();
+}
+
+function showNutritionPhase() {
+    document.querySelectorAll('.nutrition-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === nutritionPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.nutrition-progress .nutrition-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < nutritionPhase);
+        dot.classList.toggle('current', i === nutritionPhase - 1);
+    });
+
+    const backBtn = document.getElementById('nutrition-back');
+    const nextBtn = document.getElementById('nutrition-next');
+    const talkBtn = document.getElementById('talk-about-nutrition');
+
+    if (backBtn) backBtn.style.display = nutritionPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = nutritionPhase < 4 ? '' : 'none';
+        // Enable next if current phase has a selection
+        const keys = ['', 'hydration', 'meals', 'energy'];
+        nextBtn.disabled = nutritionPhase < 4 && !nutritionData[keys[nutritionPhase]];
+    }
+    if (talkBtn) talkBtn.style.display = nutritionPhase === 4 ? '' : 'none';
+
+    if (nutritionPhase === 4) {
+        const summary = document.getElementById('nutrition-summary');
+        if (summary) {
+            const labels = { hydration: '💧 Hydration', meals: '🍽️ Meals', energy: '⚡ Energy' };
+            summary.innerHTML = Object.entries(nutritionData)
+                .filter(([, v]) => v)
+                .map(([k, v]) => `<div class="nutrition-result">${labels[k]}: ${v}</div>`)
+                .join('');
+        }
+    }
+}
+
+function initNutritionExercise() {
+    const closeBtn = document.getElementById('close-nutrition');
+    const nextBtn = document.getElementById('nutrition-next');
+    const backBtn = document.getElementById('nutrition-back');
+    const talkBtn = document.getElementById('talk-about-nutrition');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeNutritionModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (nutritionPhase < 4) { hapticFeedback('light'); nutritionPhase++; showNutritionPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (nutritionPhase > 1) { hapticFeedback('light'); nutritionPhase--; showNutritionPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeNutritionModal();
+        const parts = ['I just checked in on my nutrition and energy.'];
+        if (nutritionData.hydration) parts.push(`Hydration: ${nutritionData.hydration}.`);
+        if (nutritionData.meals) parts.push(`Meals: ${nutritionData.meals}.`);
+        if (nutritionData.energy) parts.push(`Energy: ${nutritionData.energy}.`);
+        parts.push('Can you help me think about what my body might need?');
+        triggerChatPrompt(parts.join(' '));
+    });
+
+    // Option selection handlers
+    const optionGroups = [
+        { id: 'hydration-options', key: 'hydration' },
+        { id: 'meals-options', key: 'meals' },
+        { id: 'energy-options', key: 'energy' }
+    ];
+    optionGroups.forEach(group => {
+        document.querySelectorAll(`#${group.id} .nutrition-option`).forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll(`#${group.id} .nutrition-option`).forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                nutritionData[group.key] = btn.dataset.value;
+                hapticFeedback('light');
+                const nextBtn = document.getElementById('nutrition-next');
+                if (nextBtn) nextBtn.disabled = false;
+            });
+        });
+    });
+
+    if (nutritionModal) {
+        nutritionModal.addEventListener('click', (e) => { if (e.target === nutritionModal) closeNutritionModal(); });
+    }
+}
+
+// ============================================
+// Circle of Control Exercise
+// ============================================
+
+let controlPhase = 1;
+let controlData = { worry: '', controllable: '', action: '' };
+
+function openControlModal() {
+    controlModal.classList.add('active');
+    hapticFeedback('light');
+    resetControl();
+}
+
+function closeControlModal() {
+    controlModal.classList.remove('active');
+    resetControl();
+}
+
+function resetControl() {
+    controlPhase = 1;
+    controlData = { worry: '', controllable: '', action: '' };
+    const worryInput = document.getElementById('control-worry-input');
+    const actionInput = document.getElementById('control-action-input');
+    if (worryInput) worryInput.value = '';
+    if (actionInput) actionInput.value = '';
+    document.querySelectorAll('.control-option').forEach(btn => btn.classList.remove('selected'));
+    showControlPhase();
+}
+
+function showControlPhase() {
+    document.querySelectorAll('.control-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === controlPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.control-progress .control-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < controlPhase);
+        dot.classList.toggle('current', i === controlPhase - 1);
+    });
+
+    const backBtn = document.getElementById('control-back');
+    const nextBtn = document.getElementById('control-next');
+    const talkBtn = document.getElementById('talk-about-control');
+
+    if (backBtn) backBtn.style.display = controlPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = controlPhase < 4 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = controlPhase === 4 ? '' : 'none';
+
+    // Update phase 3 based on controllability answer
+    if (controlPhase === 3) {
+        const actionTitle = document.getElementById('control-action-title');
+        const actionPrompt = document.getElementById('control-action-prompt');
+        if (controlData.controllable === 'no') {
+            if (actionTitle) actionTitle.textContent = 'Letting Go';
+            if (actionPrompt) actionPrompt.textContent = 'What could help you accept what you can\'t control here?';
+        } else {
+            if (actionTitle) actionTitle.textContent = 'One Small Step';
+            if (actionPrompt) actionPrompt.textContent = 'What\'s one tiny thing you could do about this?';
+        }
+    }
+
+    if (controlPhase === 4) {
+        const summary = document.getElementById('control-summary');
+        if (summary) {
+            const controlLabel = { yes: '✅ Within your control', partly: '🤏 Partly in your control', no: '❌ Outside your control' };
+            summary.innerHTML = `
+                <div class="control-result"><strong>Concern:</strong> ${controlData.worry}</div>
+                <div class="control-result">${controlLabel[controlData.controllable] || ''}</div>
+                <div class="control-result"><strong>Your step:</strong> ${controlData.action}</div>
+            `;
+        }
+    }
+}
+
+function initControlExercise() {
+    const closeBtn = document.getElementById('close-control');
+    const nextBtn = document.getElementById('control-next');
+    const backBtn = document.getElementById('control-back');
+    const talkBtn = document.getElementById('talk-about-control');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeControlModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        // Save data before advancing
+        if (controlPhase === 1) {
+            const worryInput = document.getElementById('control-worry-input');
+            if (worryInput) controlData.worry = worryInput.value;
+        }
+        if (controlPhase === 3) {
+            const actionInput = document.getElementById('control-action-input');
+            if (actionInput) controlData.action = actionInput.value;
+        }
+        if (controlPhase < 4) { hapticFeedback('light'); controlPhase++; showControlPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (controlPhase > 1) { hapticFeedback('light'); controlPhase--; showControlPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeControlModal();
+        triggerChatPrompt(`I just did the circle of control exercise. I'm worried about: "${controlData.worry}". I think it's ${controlData.controllable === 'yes' ? 'something I can control' : controlData.controllable === 'partly' ? 'partly in my control' : 'outside my control'}. My small step: "${controlData.action}". Can you help me think about this?`);
+    });
+
+    // Control option selection
+    document.querySelectorAll('#control-options .control-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#control-options .control-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            controlData.controllable = btn.dataset.value;
+            hapticFeedback('light');
+        });
+    });
+
+    if (controlModal) {
+        controlModal.addEventListener('click', (e) => { if (e.target === controlModal) closeControlModal(); });
+    }
+}
+
+// ============================================
+// Play Break Exercise
+// ============================================
+
+let playbreakPhase = 1;
+let playbreakData = { activity: '', feeling: '' };
+let playbreakTimerInterval = null;
+let playbreakTimeLeft = 120;
+
+const playbreakActivities = {
+    dance: { icon: '💃', title: 'Dance Break!', instruction: 'Put on your favourite song and move! No rules, no judgement. Just let your body do its thing for 2 minutes.' },
+    doodle: { icon: '✏️', title: 'Doodle Time!', instruction: 'Grab a pen and scribble anything. Shapes, faces, spirals — whatever comes out. No masterpiece needed.' },
+    sing: { icon: '🎤', title: 'Sing It Out!', instruction: 'Pick any song — hum it, whisper it, belt it out. Bonus points for making up lyrics.' },
+    stretch: { icon: '🤸', title: 'Silly Stretch!', instruction: 'Make the biggest stretch you can. Reach high, wiggle low, twist around. Be as dramatic as possible.' },
+    faces: { icon: '🤪', title: 'Funny Faces!', instruction: 'Make 5 of the silliest faces you can. Scrunch, stretch, puff out your cheeks. If you laugh, even better.' },
+    surprise: { icon: '🎁', title: 'Surprise Challenge!', instruction: 'Close your eyes, spin around once, then point at something. Now make up a 10-second song about that thing.' }
+};
+
+function openPlaybreakModal() {
+    playbreakModal.classList.add('active');
+    hapticFeedback('light');
+    resetPlaybreak();
+}
+
+function closePlaybreakModal() {
+    playbreakModal.classList.remove('active');
+    if (playbreakTimerInterval) clearInterval(playbreakTimerInterval);
+    resetPlaybreak();
+}
+
+function resetPlaybreak() {
+    playbreakPhase = 1;
+    playbreakData = { activity: '', feeling: '' };
+    playbreakTimeLeft = 120;
+    if (playbreakTimerInterval) { clearInterval(playbreakTimerInterval); playbreakTimerInterval = null; }
+    document.querySelectorAll('.playbreak-option').forEach(btn => btn.classList.remove('selected'));
+    const timerDisplay = document.getElementById('playbreak-timer');
+    if (timerDisplay) timerDisplay.textContent = '2:00';
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+    if (startTimerBtn) startTimerBtn.style.display = 'none';
+    showPlaybreakPhase();
+}
+
+function showPlaybreakPhase() {
+    document.querySelectorAll('.playbreak-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === playbreakPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.playbreak-progress .playbreak-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < playbreakPhase);
+        dot.classList.toggle('current', i === playbreakPhase - 1);
+    });
+
+    const backBtn = document.getElementById('playbreak-back');
+    const nextBtn = document.getElementById('playbreak-next');
+    const talkBtn = document.getElementById('talk-about-playbreak');
+
+    if (backBtn) backBtn.style.display = playbreakPhase > 1 ? '' : 'none';
+    if (nextBtn) {
+        nextBtn.style.display = playbreakPhase < 4 ? '' : 'none';
+        nextBtn.disabled = (playbreakPhase === 1 && !playbreakData.activity) || (playbreakPhase === 3 && !playbreakData.feeling);
+    }
+    if (talkBtn) talkBtn.style.display = playbreakPhase === 4 ? '' : 'none';
+
+    // Set up phase 2 content
+    if (playbreakPhase === 2 && playbreakData.activity) {
+        const activity = playbreakActivities[playbreakData.activity];
+        const goIcon = document.getElementById('playbreak-go-icon');
+        const goTitle = document.getElementById('playbreak-go-title');
+        const goInstruction = document.getElementById('playbreak-go-instruction');
+        const startTimerBtn = document.getElementById('playbreak-start-timer');
+        if (goIcon) goIcon.textContent = activity.icon;
+        if (goTitle) goTitle.textContent = activity.title;
+        if (goInstruction) goInstruction.textContent = activity.instruction;
+        if (startTimerBtn) startTimerBtn.style.display = '';
+    }
+
+    if (playbreakPhase === 4) {
+        const summary = document.getElementById('playbreak-summary');
+        const activity = playbreakActivities[playbreakData.activity];
+        if (summary && activity) {
+            summary.innerHTML = `<div class="playbreak-result">${activity.icon} You chose: ${activity.title}</div>
+                <div class="playbreak-result">You felt: ${playbreakData.feeling}</div>`;
+        }
+    }
+}
+
+function startPlaybreakTimer() {
+    const timerDisplay = document.getElementById('playbreak-timer');
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+    const nextBtn = document.getElementById('playbreak-next');
+    if (startTimerBtn) startTimerBtn.style.display = 'none';
+    if (nextBtn) nextBtn.disabled = true;
+
+    playbreakTimerInterval = setInterval(() => {
+        playbreakTimeLeft--;
+        const mins = Math.floor(playbreakTimeLeft / 60);
+        const secs = playbreakTimeLeft % 60;
+        if (timerDisplay) timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        if (playbreakTimeLeft <= 0) {
+            clearInterval(playbreakTimerInterval);
+            playbreakTimerInterval = null;
+            if (timerDisplay) timerDisplay.textContent = 'Done! 🎉';
+            if (nextBtn) nextBtn.disabled = false;
+            hapticFeedback('medium');
+        }
+    }, 1000);
+}
+
+function initPlaybreakExercise() {
+    const closeBtn = document.getElementById('close-playbreak');
+    const nextBtn = document.getElementById('playbreak-next');
+    const backBtn = document.getElementById('playbreak-back');
+    const talkBtn = document.getElementById('talk-about-playbreak');
+    const startTimerBtn = document.getElementById('playbreak-start-timer');
+
+    if (closeBtn) closeBtn.addEventListener('click', closePlaybreakModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (playbreakPhase < 4) { hapticFeedback('light'); playbreakPhase++; showPlaybreakPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (playbreakPhase > 1) {
+            if (playbreakTimerInterval) { clearInterval(playbreakTimerInterval); playbreakTimerInterval = null; }
+            hapticFeedback('light'); playbreakPhase--; showPlaybreakPhase();
+        }
+    });
+    if (startTimerBtn) startTimerBtn.addEventListener('click', startPlaybreakTimer);
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closePlaybreakModal();
+        triggerChatPrompt(`I just did a play break! I chose ${playbreakData.activity} and felt ${playbreakData.feeling} afterwards. Can you help me notice what play does for me?`);
+    });
+
+    // Activity selection
+    document.querySelectorAll('#playbreak-options .playbreak-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#playbreak-options .playbreak-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            playbreakData.activity = btn.dataset.value;
+            hapticFeedback('light');
+            const nextBtn = document.getElementById('playbreak-next');
+            if (nextBtn) nextBtn.disabled = false;
+        });
+    });
+
+    // Feeling selection
+    document.querySelectorAll('#playbreak-feeling-options .playbreak-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#playbreak-feeling-options .playbreak-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            playbreakData.feeling = btn.dataset.value;
+            hapticFeedback('light');
+            const nextBtn = document.getElementById('playbreak-next');
+            if (nextBtn) nextBtn.disabled = false;
+        });
+    });
+
+    if (playbreakModal) {
+        playbreakModal.addEventListener('click', (e) => { if (e.target === playbreakModal) closePlaybreakModal(); });
+    }
+}
+
+// ============================================
+// Spot Your Safety Behaviours Exercise
+// ============================================
+
+let safetyPhase = 1;
+let safetyData = {
+    behaviours: ['', '', ''],
+    protections: ['', '', ''],
+    losses: ['', '', ''],
+    alternatives: ['', '', '']
+};
+
+function openSafetyModal() {
+    safetyModal.classList.add('active');
+    hapticFeedback('light');
+    resetSafety();
+}
+
+function closeSafetyModal() {
+    safetyModal.classList.remove('active');
+    resetSafety();
+}
+
+function resetSafety() {
+    safetyPhase = 1;
+    safetyData = {
+        behaviours: ['', '', ''],
+        protections: ['', '', ''],
+        losses: ['', '', ''],
+        alternatives: ['', '', '']
+    };
+    // Clear all inputs
+    for (let i = 1; i <= 3; i++) {
+        const fields = ['behaviour', 'protect', 'losing', 'alternative'];
+        fields.forEach(field => {
+            const el = document.getElementById(`safety-${field}-${i}`);
+            if (el) el.value = '';
+        });
+    }
+    showSafetyPhase();
+}
+
+function saveSafetyPhaseData() {
+    // Phase 2: behaviour 1, Phase 3: reflect 1, Phase 4: behaviour 2, etc.
+    if (safetyPhase === 2) {
+        const el = document.getElementById('safety-behaviour-1');
+        if (el) safetyData.behaviours[0] = el.value;
+    } else if (safetyPhase === 3) {
+        const p = document.getElementById('safety-protect-1');
+        const l = document.getElementById('safety-losing-1');
+        const a = document.getElementById('safety-alternative-1');
+        if (p) safetyData.protections[0] = p.value;
+        if (l) safetyData.losses[0] = l.value;
+        if (a) safetyData.alternatives[0] = a.value;
+    } else if (safetyPhase === 4) {
+        const el = document.getElementById('safety-behaviour-2');
+        if (el) safetyData.behaviours[1] = el.value;
+    } else if (safetyPhase === 5) {
+        const p = document.getElementById('safety-protect-2');
+        const l = document.getElementById('safety-losing-2');
+        const a = document.getElementById('safety-alternative-2');
+        if (p) safetyData.protections[1] = p.value;
+        if (l) safetyData.losses[1] = l.value;
+        if (a) safetyData.alternatives[1] = a.value;
+    } else if (safetyPhase === 6) {
+        const el = document.getElementById('safety-behaviour-3');
+        if (el) safetyData.behaviours[2] = el.value;
+    } else if (safetyPhase === 7) {
+        const p = document.getElementById('safety-protect-3');
+        const l = document.getElementById('safety-losing-3');
+        const a = document.getElementById('safety-alternative-3');
+        if (p) safetyData.protections[2] = p.value;
+        if (l) safetyData.losses[2] = l.value;
+        if (a) safetyData.alternatives[2] = a.value;
+    }
+}
+
+function showSafetyPhase() {
+    document.querySelectorAll('.safety-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === safetyPhase) section.classList.add('active');
+    });
+    document.querySelectorAll('.safety-progress .safety-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < safetyPhase);
+        dot.classList.toggle('current', i === safetyPhase - 1);
+    });
+
+    const backBtn = document.getElementById('safety-back');
+    const nextBtn = document.getElementById('safety-next');
+    const talkBtn = document.getElementById('talk-about-safety');
+
+    if (backBtn) backBtn.style.display = safetyPhase > 1 ? '' : 'none';
+    if (nextBtn) nextBtn.style.display = safetyPhase < 8 ? '' : 'none';
+    if (talkBtn) talkBtn.style.display = safetyPhase === 8 ? '' : 'none';
+
+    // Build summary on final phase
+    if (safetyPhase === 8) {
+        const summary = document.getElementById('safety-summary');
+        if (summary) {
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                if (safetyData.behaviours[i].trim()) {
+                    html += `<div class="safety-result-card">
+                        <div class="safety-result-header">🛡️ ${safetyData.behaviours[i]}</div>
+                        ${safetyData.protections[i] ? `<div class="safety-result-detail"><strong>Protecting from:</strong> ${safetyData.protections[i]}</div>` : ''}
+                        ${safetyData.losses[i] ? `<div class="safety-result-detail"><strong>Losing:</strong> ${safetyData.losses[i]}</div>` : ''}
+                        ${safetyData.alternatives[i] ? `<div class="safety-result-detail"><strong>Tiny alternative:</strong> ${safetyData.alternatives[i]}</div>` : ''}
+                    </div>`;
+                }
+            }
+            summary.innerHTML = html;
+        }
+    }
+}
+
+function initSafetyExercise() {
+    const closeBtn = document.getElementById('close-safety');
+    const nextBtn = document.getElementById('safety-next');
+    const backBtn = document.getElementById('safety-back');
+    const talkBtn = document.getElementById('talk-about-safety');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSafetyModal);
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        saveSafetyPhaseData();
+        if (safetyPhase < 8) { hapticFeedback('light'); safetyPhase++; showSafetyPhase(); }
+    });
+    if (backBtn) backBtn.addEventListener('click', () => {
+        saveSafetyPhaseData();
+        if (safetyPhase > 1) { hapticFeedback('light'); safetyPhase--; showSafetyPhase(); }
+    });
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeSafetyModal();
+        const parts = ['I just spotted my safety behaviours.'];
+        for (let i = 0; i < 3; i++) {
+            if (safetyData.behaviours[i].trim()) {
+                parts.push(`Behaviour ${i + 1}: "${safetyData.behaviours[i]}".`);
+                if (safetyData.protections[i]) parts.push(`I'm protecting myself from: ${safetyData.protections[i]}.`);
+                if (safetyData.alternatives[i]) parts.push(`My tiny alternative: ${safetyData.alternatives[i]}.`);
+            }
+        }
+        parts.push('Can you help me think about these patterns and how to gently experiment with change?');
+        triggerChatPrompt(parts.join(' '));
+    });
+    if (safetyModal) {
+        safetyModal.addEventListener('click', (e) => { if (e.target === safetyModal) closeSafetyModal(); });
     }
 }

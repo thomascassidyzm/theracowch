@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Development branch - preview deployment -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2144,7 +2145,7 @@
                     <!-- Greeting with Mandy Avatar -->
                     <div class="greeting-section">
                         <div class="avatar-container">
-                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="avatar-img">
+                            <img src="/icons/icon-512x512.png" alt="Mandy" class="avatar-img">
                         </div>
                         <div class="greeting-text-wrapper">
                             <h1 id="greeting-text">good morning</h1>
@@ -2342,7 +2343,7 @@
                 <div class="chat-tab">
                     <header class="chat-header">
                         <div class="chat-header-title">
-                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="chat-avatar">
+                            <img src="/icons/icon-512x512.png" alt="Mandy" class="chat-avatar">
                             <h1>Mandy</h1>
                         </div>
                         <div class="chat-header-actions">
@@ -3172,6 +3173,396 @@
                 <button class="btn-exercise btn-exercise-secondary" id="weather-back" style="display: none;">← Back</button>
                 <button class="btn-exercise btn-exercise-primary" id="weather-next" disabled>Next →</button>
                 <button class="btn-exercise btn-exercise-secondary" id="talk-about-weather" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5-Minute Body Reset Modal -->
+    <div class="exercise-modal" id="bodyreset-modal">
+        <div class="exercise-modal-content bodyreset-content">
+            <div class="exercise-modal-header">
+                <h3>5-Minute Body Reset</h3>
+                <button class="close-modal" id="close-bodyreset">&times;</button>
+            </div>
+            <p class="bodyreset-intro">Let's wake up your body with small, intentional movements...</p>
+            <div class="bodyreset-sections" id="bodyreset-sections">
+                <div class="bodyreset-section active" data-section="1">
+                    <div class="bodyreset-icon">🙆</div>
+                    <h4>Neck & Shoulders</h4>
+                    <p class="bodyreset-instruction">Slowly roll your head in a circle. 3 times each direction. Then shrug your shoulders up to your ears, hold 3 seconds, and release.</p>
+                    <div class="bodyreset-timer" id="bodyreset-timer-1">60s</div>
+                </div>
+                <div class="bodyreset-section" data-section="2">
+                    <div class="bodyreset-icon">🙅</div>
+                    <h4>Arms & Wrists</h4>
+                    <p class="bodyreset-instruction">Stretch both arms wide. Make 5 slow circles forward, then backward. Shake out your wrists gently for 10 seconds.</p>
+                    <div class="bodyreset-timer" id="bodyreset-timer-2">60s</div>
+                </div>
+                <div class="bodyreset-section" data-section="3">
+                    <div class="bodyreset-icon">🧍</div>
+                    <h4>Spine & Torso</h4>
+                    <p class="bodyreset-instruction">Stand or sit tall. Twist gently left, hold 5 seconds. Twist right, hold 5 seconds. Repeat 3 times. Then arch and round your back slowly.</p>
+                    <div class="bodyreset-timer" id="bodyreset-timer-3">60s</div>
+                </div>
+                <div class="bodyreset-section" data-section="4">
+                    <div class="bodyreset-icon">🦵</div>
+                    <h4>Legs & Feet</h4>
+                    <p class="bodyreset-instruction">March in place for 15 seconds. Then rise onto your toes 5 times. Gently shake each leg out.</p>
+                    <div class="bodyreset-timer" id="bodyreset-timer-4">60s</div>
+                </div>
+                <div class="bodyreset-section" data-section="5">
+                    <div class="bodyreset-icon">🌬️</div>
+                    <h4>Full Body Settle</h4>
+                    <p class="bodyreset-instruction">Stand still. Take 3 deep breaths. Notice how your body feels different from when you started.</p>
+                    <p class="bodyreset-reflection">You just moved with intention. That's enough. 🐄</p>
+                </div>
+            </div>
+            <div class="bodyreset-progress">
+                <span class="bodyreset-dot active"></span>
+                <span class="bodyreset-dot"></span>
+                <span class="bodyreset-dot"></span>
+                <span class="bodyreset-dot"></span>
+                <span class="bodyreset-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="bodyreset-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="bodyreset-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-bodyreset" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tiny Wins (Gratitude) Modal -->
+    <div class="exercise-modal" id="tinywins-modal">
+        <div class="exercise-modal-content tinywins-content">
+            <div class="exercise-modal-header">
+                <h3>Notice the Small Stuff</h3>
+                <button class="close-modal" id="close-tinywins">&times;</button>
+            </div>
+            <p class="tinywins-intro">Three tiny good things. That's all you need to find...</p>
+            <div class="tinywins-sections" id="tinywins-sections">
+                <div class="tinywins-section active" data-section="1">
+                    <div class="tinywins-icon">⭐</div>
+                    <h4>Tiny Win #1</h4>
+                    <p class="tinywins-question">What's one small thing that went okay today?</p>
+                    <textarea class="tinywins-input" id="tinywins-input-1" placeholder="e.g. My tea was the perfect temperature..." maxlength="200"></textarea>
+                </div>
+                <div class="tinywins-section" data-section="2">
+                    <div class="tinywins-icon">⭐</div>
+                    <h4>Tiny Win #2</h4>
+                    <p class="tinywins-question">What's another small moment you're glad happened?</p>
+                    <textarea class="tinywins-input" id="tinywins-input-2" placeholder="e.g. I saw a dog on my walk..." maxlength="200"></textarea>
+                </div>
+                <div class="tinywins-section" data-section="3">
+                    <div class="tinywins-icon">⭐</div>
+                    <h4>Tiny Win #3</h4>
+                    <p class="tinywins-question">One more. It can be really small.</p>
+                    <textarea class="tinywins-input" id="tinywins-input-3" placeholder="e.g. I remembered to drink water..." maxlength="200"></textarea>
+                </div>
+                <div class="tinywins-section" data-section="4">
+                    <div class="tinywins-icon">🌟</div>
+                    <h4>Your Three Stars</h4>
+                    <div class="tinywins-summary" id="tinywins-summary"></div>
+                    <p class="tinywins-reflection">Tiny wins add up. You noticed them, and that matters. 🐄</p>
+                </div>
+            </div>
+            <div class="tinywins-progress">
+                <span class="tinywins-dot active"></span>
+                <span class="tinywins-dot"></span>
+                <span class="tinywins-dot"></span>
+                <span class="tinywins-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="tinywins-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="tinywins-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-tinywins" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mood & Nutrition Check Modal -->
+    <div class="exercise-modal" id="nutrition-modal">
+        <div class="exercise-modal-content nutrition-content">
+            <div class="exercise-modal-header">
+                <h3>What Fuels Me?</h3>
+                <button class="close-modal" id="close-nutrition">&times;</button>
+            </div>
+            <p class="nutrition-intro">Let's notice what you've taken in today — food, drink, and energy...</p>
+            <div class="nutrition-sections" id="nutrition-sections">
+                <div class="nutrition-section active" data-section="1">
+                    <div class="nutrition-icon">💧</div>
+                    <h4>Hydration</h4>
+                    <p class="nutrition-question">How much water have you had today?</p>
+                    <div class="nutrition-options" id="hydration-options">
+                        <button class="nutrition-option" data-value="barely">Barely any</button>
+                        <button class="nutrition-option" data-value="some">Some</button>
+                        <button class="nutrition-option" data-value="good">A good amount</button>
+                        <button class="nutrition-option" data-value="plenty">Plenty</button>
+                    </div>
+                </div>
+                <div class="nutrition-section" data-section="2">
+                    <div class="nutrition-icon">🍽️</div>
+                    <h4>Meals</h4>
+                    <p class="nutrition-question">How many proper meals have you eaten?</p>
+                    <div class="nutrition-options" id="meals-options">
+                        <button class="nutrition-option" data-value="none">None yet</button>
+                        <button class="nutrition-option" data-value="one">One</button>
+                        <button class="nutrition-option" data-value="two">Two</button>
+                        <button class="nutrition-option" data-value="three">Three+</button>
+                    </div>
+                </div>
+                <div class="nutrition-section" data-section="3">
+                    <div class="nutrition-icon">⚡</div>
+                    <h4>Energy Level</h4>
+                    <p class="nutrition-question">How's your energy right now?</p>
+                    <div class="nutrition-options" id="energy-options">
+                        <button class="nutrition-option" data-value="drained">🪫 Drained</button>
+                        <button class="nutrition-option" data-value="low">🔋 Low</button>
+                        <button class="nutrition-option" data-value="okay">🔋 Okay</button>
+                        <button class="nutrition-option" data-value="good">🔋 Good</button>
+                    </div>
+                </div>
+                <div class="nutrition-section" data-section="4">
+                    <div class="nutrition-icon">🌿</div>
+                    <h4>Your Fuel Check</h4>
+                    <div class="nutrition-summary" id="nutrition-summary"></div>
+                    <p class="nutrition-reflection">Just noticing what you're running on. No judgment. 🐄</p>
+                </div>
+            </div>
+            <div class="nutrition-progress">
+                <span class="nutrition-dot active"></span>
+                <span class="nutrition-dot"></span>
+                <span class="nutrition-dot"></span>
+                <span class="nutrition-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="nutrition-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="nutrition-next" disabled>Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-nutrition" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Circle of Control Modal -->
+    <div class="exercise-modal" id="control-modal">
+        <div class="exercise-modal-content control-content">
+            <div class="exercise-modal-header">
+                <h3>Sort It Out</h3>
+                <button class="close-modal" id="close-control">&times;</button>
+            </div>
+            <p class="control-intro">What's on your mind? Let's sort what you can and can't control...</p>
+            <div class="control-sections" id="control-sections">
+                <div class="control-section active" data-section="1">
+                    <div class="control-icon">🤔</div>
+                    <h4>What's Weighing on You?</h4>
+                    <p class="control-question">Write down something that's bothering you right now.</p>
+                    <textarea class="control-input" id="control-worry-input" placeholder="e.g. My friend hasn't texted me back..." maxlength="200"></textarea>
+                </div>
+                <div class="control-section" data-section="2">
+                    <div class="control-icon">🎯</div>
+                    <h4>Can You Control This?</h4>
+                    <p class="control-question" id="control-question-text">Can you directly change or influence this?</p>
+                    <div class="control-options" id="control-options">
+                        <button class="control-option" data-value="yes">✅ Yes, I can influence this</button>
+                        <button class="control-option" data-value="partly">🤏 Partly</button>
+                        <button class="control-option" data-value="no">❌ No, it's outside my control</button>
+                    </div>
+                </div>
+                <div class="control-section" data-section="3">
+                    <div class="control-icon">💡</div>
+                    <h4 id="control-action-title">One Small Step</h4>
+                    <p class="control-question" id="control-action-prompt">What's one tiny thing you could do about this?</p>
+                    <textarea class="control-input" id="control-action-input" placeholder="e.g. I could send a casual message first..." maxlength="200"></textarea>
+                </div>
+                <div class="control-section" data-section="4">
+                    <div class="control-icon">🌟</div>
+                    <h4>Sorted</h4>
+                    <div class="control-summary" id="control-summary"></div>
+                    <p class="control-reflection">You looked at it clearly. That takes courage. 🐄</p>
+                </div>
+            </div>
+            <div class="control-progress">
+                <span class="control-dot active"></span>
+                <span class="control-dot"></span>
+                <span class="control-dot"></span>
+                <span class="control-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="control-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="control-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-control" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Play Break Modal -->
+    <div class="exercise-modal" id="playbreak-modal">
+        <div class="exercise-modal-content playbreak-content">
+            <div class="exercise-modal-header">
+                <h3>Scheduled Silly Time</h3>
+                <button class="close-modal" id="close-playbreak">&times;</button>
+            </div>
+            <p class="playbreak-intro">Time for something fun. No purpose. No productivity. Just play.</p>
+            <div class="playbreak-sections" id="playbreak-sections">
+                <div class="playbreak-section active" data-section="1">
+                    <div class="playbreak-icon">🎲</div>
+                    <h4>Pick Your Play</h4>
+                    <p class="playbreak-question">What sounds fun right now?</p>
+                    <div class="playbreak-options" id="playbreak-options">
+                        <button class="playbreak-option" data-value="dance">💃 Dance to one song</button>
+                        <button class="playbreak-option" data-value="doodle">✏️ Doodle for 2 minutes</button>
+                        <button class="playbreak-option" data-value="sing">🎤 Sing something silly</button>
+                        <button class="playbreak-option" data-value="stretch">🤸 Do a silly stretch</button>
+                        <button class="playbreak-option" data-value="faces">🤪 Make 5 funny faces</button>
+                        <button class="playbreak-option" data-value="surprise">🎁 Surprise me!</button>
+                    </div>
+                </div>
+                <div class="playbreak-section" data-section="2">
+                    <div class="playbreak-icon" id="playbreak-go-icon">🎉</div>
+                    <h4 id="playbreak-go-title">Go!</h4>
+                    <p class="playbreak-instruction" id="playbreak-go-instruction"></p>
+                    <div class="playbreak-timer" id="playbreak-timer">2:00</div>
+                    <button class="btn-exercise btn-exercise-primary" id="playbreak-start-timer" style="display: none;">Start Timer</button>
+                </div>
+                <div class="playbreak-section" data-section="3">
+                    <div class="playbreak-icon">😄</div>
+                    <h4>How Was That?</h4>
+                    <div class="playbreak-options" id="playbreak-feeling-options">
+                        <button class="playbreak-option" data-value="great">😁 Loved it</button>
+                        <button class="playbreak-option" data-value="silly">🤭 Felt silly</button>
+                        <button class="playbreak-option" data-value="meh">😐 Meh</button>
+                        <button class="playbreak-option" data-value="hard">😬 That was hard</button>
+                    </div>
+                </div>
+                <div class="playbreak-section" data-section="4">
+                    <div class="playbreak-icon">✨</div>
+                    <h4>Play Complete</h4>
+                    <div class="playbreak-summary" id="playbreak-summary"></div>
+                    <p class="playbreak-reflection">Fun doesn't need a reason. You did it. 🐄</p>
+                </div>
+            </div>
+            <div class="playbreak-progress">
+                <span class="playbreak-dot active"></span>
+                <span class="playbreak-dot"></span>
+                <span class="playbreak-dot"></span>
+                <span class="playbreak-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="playbreak-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="playbreak-next" disabled>Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-playbreak" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spot Your Safety Behaviours Modal -->
+    <div class="exercise-modal" id="safety-modal">
+        <div class="exercise-modal-content safety-content">
+            <div class="exercise-modal-header">
+                <h3>Spot Your Safety Behaviours</h3>
+                <button class="close-modal" id="close-safety">&times;</button>
+            </div>
+            <p class="safety-intro">Today, notice three things you regularly avoid or control to prevent negative outcomes...</p>
+            <div class="safety-sections" id="safety-sections">
+                <!-- Phase 1: Examples -->
+                <div class="safety-section active" data-section="1">
+                    <div class="safety-icon">🛡️</div>
+                    <h4>What Are Safety Behaviours?</h4>
+                    <p class="safety-description">Things we do to avoid discomfort — but which may also block growth, opportunities, and confidence.</p>
+                    <div class="safety-examples">
+                        <div class="safety-example">Constantly checking your phone to avoid eye contact</div>
+                        <div class="safety-example">Cancelling plans because the unknown feels tiring</div>
+                        <div class="safety-example">Rehearsing messages 20 times before sending</div>
+                        <div class="safety-example">Sticking to the same foods/shops/routes to avoid uncertainty</div>
+                        <div class="safety-example">Avoiding silence by always using TV/music</div>
+                        <div class="safety-example">Letting others make decisions to avoid responsibility</div>
+                        <div class="safety-example">Over-preparing so nothing can surprise you</div>
+                        <div class="safety-example">Never asking questions in case you "sound stupid"</div>
+                    </div>
+                </div>
+
+                <!-- Phase 2: Safety Behaviour #1 -->
+                <div class="safety-section" data-section="2">
+                    <div class="safety-icon">1️⃣</div>
+                    <h4>Safety Behaviour #1</h4>
+                    <p class="safety-question">What's one thing you avoid or control to prevent discomfort?</p>
+                    <textarea class="safety-input" id="safety-behaviour-1" placeholder="e.g. I rehearse what I'm going to say before phone calls..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 3: Reflect on #1 -->
+                <div class="safety-section" data-section="3">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #1</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-1" placeholder="e.g. Fear of sounding awkward or saying the wrong thing..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-1" placeholder="e.g. Spontaneous, natural conversations..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-1" placeholder="e.g. Make one call without rehearsing first..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 4: Safety Behaviour #2 -->
+                <div class="safety-section" data-section="4">
+                    <div class="safety-icon">2️⃣</div>
+                    <h4>Safety Behaviour #2</h4>
+                    <p class="safety-question">What's another thing you avoid or control?</p>
+                    <textarea class="safety-input" id="safety-behaviour-2" placeholder="e.g. I always take the same route to work..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 5: Reflect on #2 -->
+                <div class="safety-section" data-section="5">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #2</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-2" placeholder="e.g. The anxiety of not knowing what to expect..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-2" placeholder="e.g. Discovering a nicer route or a new coffee shop..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-2" placeholder="e.g. Take one different turning tomorrow..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 6: Safety Behaviour #3 -->
+                <div class="safety-section" data-section="6">
+                    <div class="safety-icon">3️⃣</div>
+                    <h4>Safety Behaviour #3</h4>
+                    <p class="safety-question">One more. What else do you do to stay "safe"?</p>
+                    <textarea class="safety-input" id="safety-behaviour-3" placeholder="e.g. I let my partner choose the restaurant every time..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 7: Reflect on #3 -->
+                <div class="safety-section" data-section="7">
+                    <div class="safety-icon">🔍</div>
+                    <h4>Reflect on Behaviour #3</h4>
+                    <p class="safety-question">What discomfort am I protecting myself from?</p>
+                    <textarea class="safety-input" id="safety-protect-3" placeholder="e.g. Being blamed if the choice is bad..." maxlength="300"></textarea>
+                    <p class="safety-question">What opportunity am I losing?</p>
+                    <textarea class="safety-input" id="safety-losing-3" placeholder="e.g. Trusting my own preferences and building confidence..." maxlength="300"></textarea>
+                    <p class="safety-question">What's one tiny alternative I could try?</p>
+                    <textarea class="safety-input" id="safety-alternative-3" placeholder="e.g. Suggest one place next time, even a small one..." maxlength="300"></textarea>
+                </div>
+
+                <!-- Phase 8: Summary -->
+                <div class="safety-section" data-section="8">
+                    <div class="safety-icon">🌟</div>
+                    <h4>Your Safety Behaviours</h4>
+                    <div class="safety-summary" id="safety-summary"></div>
+                    <p class="safety-reflection">Becoming aware of safety behaviours is the first step in gently experimenting with real-world courage. 🐄</p>
+                </div>
+            </div>
+            <div class="safety-progress">
+                <span class="safety-dot active"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+                <span class="safety-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="safety-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="safety-next">Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-safety" style="display: none;">Talk to Mandy</button>
             </div>
         </div>
     </div>

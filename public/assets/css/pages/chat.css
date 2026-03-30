@@ -327,6 +327,384 @@
 }
 
 /* ============================================
+   Multi-Step Exercise Modal Sections
+   ============================================ */
+
+/* Generic section show/hide for all multi-step modals */
+.bodyreset-section,
+.tinywins-section,
+.nutrition-section,
+.control-section,
+.playbreak-section,
+.social-section,
+.weather-section,
+.safety-section {
+    display: none;
+    text-align: center;
+}
+
+.bodyreset-section.active,
+.tinywins-section.active,
+.nutrition-section.active,
+.control-section.active,
+.playbreak-section.active,
+.social-section.active,
+.weather-section.active,
+.safety-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Section icons */
+.bodyreset-icon,
+.tinywins-icon,
+.nutrition-icon,
+.control-icon,
+.playbreak-icon,
+.social-icon,
+.weather-icon,
+.safety-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+/* Section headings */
+.bodyreset-section h4,
+.tinywins-section h4,
+.nutrition-section h4,
+.control-section h4,
+.playbreak-section h4,
+.safety-section h4 {
+    font-size: var(--font-size-lg);
+    margin: 0 0 var(--space-sm) 0;
+}
+
+/* Section intros */
+.bodyreset-intro,
+.tinywins-intro,
+.nutrition-intro,
+.control-intro,
+.playbreak-intro,
+.safety-intro {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
+}
+
+/* Instructions */
+.bodyreset-instruction,
+.bodyreset-reflection,
+.tinywins-question,
+.tinywins-reflection,
+.nutrition-question,
+.nutrition-reflection,
+.control-question,
+.control-reflection,
+.playbreak-instruction,
+.playbreak-reflection,
+.safety-question,
+.safety-description,
+.safety-reflection {
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin: var(--space-sm) 0 var(--space-md) 0;
+}
+
+/* Timer displays */
+.bodyreset-timer,
+.playbreak-timer {
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--accent-primary);
+    margin: var(--space-md) 0;
+}
+
+/* Text inputs */
+.tinywins-input,
+.control-input,
+.safety-input {
+    width: 100%;
+    padding: var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    resize: none;
+    min-height: 80px;
+    transition: border-color var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.tinywins-input:focus,
+.control-input:focus,
+.safety-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* Option buttons (nutrition, control, playbreak) */
+.nutrition-options,
+.control-options,
+.playbreak-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin: var(--space-md) 0;
+}
+
+.nutrition-option,
+.control-option,
+.playbreak-option {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.nutrition-option:hover,
+.control-option:hover,
+.playbreak-option:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-elevated);
+}
+
+.nutrition-option.selected,
+.control-option.selected,
+.playbreak-option.selected {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+}
+
+/* Weather options (also used in modal) */
+.weather-option {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.weather-option:hover {
+    border-color: var(--accent-primary);
+}
+
+.weather-option.selected {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+}
+
+.weather-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin: var(--space-md) 0;
+}
+
+/* Progress dots */
+.bodyreset-progress,
+.tinywins-progress,
+.nutrition-progress,
+.control-progress,
+.playbreak-progress,
+.social-progress,
+.weather-progress,
+.safety-progress {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin: var(--space-md) 0;
+}
+
+.bodyreset-dot,
+.tinywins-dot,
+.nutrition-dot,
+.control-dot,
+.playbreak-dot,
+.social-dot,
+.weather-dot,
+.safety-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+.bodyreset-dot.active,
+.tinywins-dot.active,
+.nutrition-dot.active,
+.control-dot.active,
+.playbreak-dot.active,
+.social-dot.active,
+.weather-dot.active,
+.safety-dot.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.bodyreset-dot.current,
+.tinywins-dot.current,
+.nutrition-dot.current,
+.control-dot.current,
+.playbreak-dot.current,
+.social-dot.current,
+.weather-dot.current,
+.safety-dot.current {
+    transform: scale(1.3);
+}
+
+/* Summary results */
+.tinywins-star,
+.nutrition-result,
+.control-result,
+.playbreak-result {
+    padding: var(--space-sm);
+    margin: var(--space-sm) 0;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+/* Safety Behaviours examples and results */
+.safety-examples {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin: var(--space-md) 0;
+    text-align: left;
+}
+
+.safety-example {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    border-left: 2px solid var(--accent-primary);
+}
+
+.safety-result-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin: var(--space-sm) 0;
+    text-align: left;
+    border-left: 3px solid var(--accent-primary);
+}
+
+.safety-result-header {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-base);
+}
+
+.safety-result-detail {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: var(--space-xs) 0;
+    line-height: 1.5;
+}
+
+/* Safety modal needs scrollable content for longer phases */
+.safety-content {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+/* Slider styles for social modal */
+.social-slider-container {
+    padding: var(--space-md) 0;
+}
+
+.social-slider {
+    width: 100%;
+    accent-color: var(--accent-primary);
+}
+
+.social-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-top: var(--space-xs);
+}
+
+.social-slider-value {
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--accent-primary);
+    margin-top: var(--space-sm);
+}
+
+/* Ladder styles */
+.ladder-intro,
+.social-intro,
+.weather-intro {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.ladder-visual {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: var(--space-md) 0;
+}
+
+.ladder-rung {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.ladder-rung:hover {
+    border-color: var(--accent-primary);
+}
+
+.ladder-rung.selected {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+}
+
+.rung-level {
+    font-weight: var(--font-weight-bold);
+    min-width: 24px;
+}
+
+.rung-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+}
+
+.rung-difficulty {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* ============================================
    On-Demand Prompt Banner
    ============================================ */
 
@@ -448,6 +826,19 @@
     margin: 0;
 }
 
+.exercise-title-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.exercise-title-link:hover {
+    color: var(--accent-primary, #E88A6A);
+    text-decoration-style: solid;
+}
+
 .resource-card-description {
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
@@ -459,4 +850,91 @@
     display: flex;
     gap: var(--space-sm);
     flex-wrap: wrap;
+}
+
+
+/* Exercise link buttons in panel */
+.exercise-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg, 12px);
+    font-weight: 600;
+    font-size: var(--font-size-sm, 0.875rem);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Inline exercise links in chat messages */
+.exercise-chat-link {
+    color: var(--accent-primary, #E88A6A);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.exercise-chat-link:hover {
+    color: var(--accent-secondary, #d4775a);
+    text-decoration-style: solid;
+}
+
+/* Exercise action card in chat messages */
+.exercise-action-card {
+    margin-top: var(--space-md, 0.75rem);
+    padding: var(--space-md, 0.75rem);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid var(--card-accent, #E88A6A);
+    border-radius: var(--radius-lg, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 0.5rem);
+}
+
+.exercise-action-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm, 0.5rem);
+}
+
+.exercise-action-card-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.exercise-action-card-title {
+    font-weight: var(--font-weight-semibold, 600);
+    font-size: var(--font-size-base, 1rem);
+    color: var(--text-primary, #F5F0E8);
+}
+
+.exercise-action-card-desc {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, rgba(245, 240, 232, 0.6));
+    line-height: 1.4;
+}
+
+.exercise-action-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-lg, 12px);
+    font-weight: 700;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: #fff;
+    background: var(--card-accent, #E88A6A);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.exercise-action-card-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
