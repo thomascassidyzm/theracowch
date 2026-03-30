@@ -57,9 +57,6 @@
     <path d="M -85 -110 Q -95 -160 -70 -180" stroke="#F5F0E8" stroke-width="20" stroke-linecap="round" fill="none"/>
     <path d="M 85 -110 Q 95 -160 70 -180" stroke="#F5F0E8" stroke-width="20" stroke-linecap="round" fill="none"/>
 
-    <!-- Spot on forehead - characteristic cow marking -->
-    <ellipse cx="15" cy="-70" rx="35" ry="25" fill="#C47A5D" transform="rotate(15 15 -70)"/>
-
   </g>
 
   <!-- Texture overlay -->
