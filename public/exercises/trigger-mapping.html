@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Trigger Mapping | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-warm: #2a2320;
+            --accent: #8FBC8F;
+            --accent-soft: rgba(143, 188, 143, 0.2);
+            --coral: #D4896A;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .exercise-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: max(4rem, env(safe-area-inset-top) + 1rem);
+            left: 1rem;
+            right: 1rem;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            z-index: 90;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--coral));
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 6rem 1.5rem 2rem;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen-content {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .screen-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .screen-title {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .screen-title.gradient {
+            background: linear-gradient(135deg, var(--accent), var(--coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .screen-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .intro-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .intro-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .intro-list li::before {
+            content: '\2192';
+            position: absolute;
+            left: 0;
+            color: var(--coral);
+            font-weight: bold;
+        }
+
+        /* Step card */
+        .step-card {
+            background: var(--bg-warm);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-question {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Text input */
+        .text-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 100px;
+            transition: border-color 0.2s ease;
+            line-height: 1.6;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .text-input.small {
+            min-height: 60px;
+            margin-top: 0.75rem;
+        }
+
+        .text-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Option buttons */
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .option-btn {
+            padding: 0.75rem 1.25rem;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .option-btn.selected {
+            background: var(--accent);
+            color: var(--bg-deep);
+            border-color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Guidance bubble */
+        .guidance {
+            margin-top: 1.25rem;
+            padding: 1rem 1.25rem;
+            background: var(--accent-soft);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 14px 14px 0;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            animation: fadeIn 0.4s ease;
+            display: none;
+        }
+
+        .guidance.visible {
+            display: block;
+        }
+
+        /* Summary */
+        .summary-item {
+            background: var(--bg-warm);
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .summary-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-value {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .closing-message {
+            background: var(--bg-warm);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(143, 188, 143, 0.3);
+        }
+
+        .closing-message p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--coral));
+            border: none;
+            border-radius: 16px;
+            color: var(--bg-deep);
+            font-size: 1rem;
+            font-weight: 900;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(143, 188, 143, 0.3);
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(143, 188, 143, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 3px solid var(--coral);
+            color: var(--coral);
+            box-shadow: none;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 137, 106, 0.1);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-row .btn {
+            flex: 1;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="exercise-container">
+        <a href="/imagine/exploring.html" class="back-btn">&larr; Back</a>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+
+        <!-- INTRO -->
+        <div class="screen active" id="screen-intro">
+            <div class="screen-content">
+                <div class="screen-icon">🗺️</div>
+                <h1 class="screen-title gradient">Trigger Mapping</h1>
+                <p class="screen-subtitle">Let's slow this down together. We'll map what just happened so it feels clearer and more manageable.</p>
+
+                <ul class="intro-list">
+                    <li>Identify what triggered you</li>
+                    <li>Notice your thoughts and body responses</li>
+                    <li>Name the emotion and your reaction</li>
+                    <li>Spot patterns and reframe</li>
+                    <li>Plan a small next step</li>
+                </ul>
+
+                <button class="btn" onclick="goToStep(1)">Begin</button>
+            </div>
+        </div>
+
+        <!-- STEP 1: TRIGGER -->
+        <div class="screen" id="screen-1">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 1 of 8</div>
+                    <div class="step-question">What happened just before you started feeling this way?</div>
+                    <textarea class="text-input" id="input-trigger" placeholder="e.g. My colleague ignored me, I saw something upsetting, a thought came up..." maxlength="500" oninput="onTriggerInput()"></textarea>
+                    <div class="guidance" id="guidance-1"></div>
+                </div>
+                <button class="btn" id="btn-1" disabled onclick="goToStep(2)">Next</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: THOUGHTS -->
+        <div class="screen" id="screen-2">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 2 of 8</div>
+                    <div class="step-question">What went through your mind in that moment?</div>
+                    <textarea class="text-input" id="input-thought" placeholder="e.g. They don't like me, I'm not good enough, this is going to go badly..." maxlength="500" oninput="onThoughtInput()"></textarea>
+                    <div class="guidance" id="guidance-2"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
+                    <button class="btn" id="btn-2" disabled onclick="goToStep(3)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: BODY -->
+        <div class="screen" id="screen-3">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 3 of 8</div>
+                    <div class="step-question">What did you feel in your body?</div>
+                    <div class="options-grid" id="body-options">
+                        <button class="option-btn" data-value="tight chest" onclick="toggleBody(this)">😤 Tight chest</button>
+                        <button class="option-btn" data-value="racing heart" onclick="toggleBody(this)">💓 Racing heart</button>
+                        <button class="option-btn" data-value="tense shoulders" onclick="toggleBody(this)">😣 Tense shoulders</button>
+                        <button class="option-btn" data-value="knot in stomach" onclick="toggleBody(this)">🫠 Knot in stomach</button>
+                        <button class="option-btn" data-value="shaky" onclick="toggleBody(this)">🫨 Shaky</button>
+                        <button class="option-btn" data-value="numb" onclick="toggleBody(this)">😶 Numb</button>
+                        <button class="option-btn" data-value="heavy" onclick="toggleBody(this)">😔 Heavy</button>
+                        <button class="option-btn" data-value="restless" onclick="toggleBody(this)">😬 Restless</button>
+                    </div>
+                    <textarea class="text-input small" id="input-body" placeholder="Or describe in your own words..." maxlength="300" oninput="onBodyInput()"></textarea>
+                    <div class="guidance" id="guidance-3"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
+                    <button class="btn" id="btn-3" disabled onclick="goToStep(4)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: EMOTION -->
+        <div class="screen" id="screen-4">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 4 of 8</div>
+                    <div class="step-question">What emotion best fits what you felt?</div>
+                    <div class="options-grid" id="emotion-options">
+                        <button class="option-btn" data-value="anxiety" onclick="selectEmotion(this)">😰 Anxiety</button>
+                        <button class="option-btn" data-value="sadness" onclick="selectEmotion(this)">😢 Sadness</button>
+                        <button class="option-btn" data-value="frustration" onclick="selectEmotion(this)">😤 Frustration</button>
+                        <button class="option-btn" data-value="anger" onclick="selectEmotion(this)">😠 Anger</button>
+                        <button class="option-btn" data-value="shame" onclick="selectEmotion(this)">😳 Shame</button>
+                        <button class="option-btn" data-value="fear" onclick="selectEmotion(this)">😨 Fear</button>
+                        <button class="option-btn" data-value="loneliness" onclick="selectEmotion(this)">🥺 Loneliness</button>
+                        <button class="option-btn" data-value="overwhelm" onclick="selectEmotion(this)">🤯 Overwhelm</button>
+                    </div>
+                    <div class="guidance" id="guidance-4"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
+                    <button class="btn" id="btn-4" disabled onclick="goToStep(5)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: BEHAVIOUR -->
+        <div class="screen" id="screen-5">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 5 of 8</div>
+                    <div class="step-question">What did you do next?</div>
+                    <textarea class="text-input" id="input-behaviour" placeholder="e.g. I didn't reply, I kept messaging them, I snapped, I shut down..." maxlength="500" oninput="onBehaviourInput()"></textarea>
+                    <div class="guidance" id="guidance-5"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(4)">&larr; Back</button>
+                    <button class="btn" id="btn-5" disabled onclick="goToStep(6)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 6: PATTERN -->
+        <div class="screen" id="screen-6">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 6 of 8</div>
+                    <div class="step-question">Does this situation feel familiar in any way?</div>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="yes" onclick="selectPattern(this)">Yes, this feels familiar</button>
+                        <button class="option-btn" data-value="no" onclick="selectPattern(this)">No, this feels new</button>
+                    </div>
+                    <textarea class="text-input small hidden" id="input-pattern" placeholder="What does it remind you of?" maxlength="500" oninput="onPatternInput()"></textarea>
+                    <div class="guidance" id="guidance-6"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(5)">&larr; Back</button>
+                    <button class="btn" id="btn-6" disabled onclick="goToStep(7)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 7: REFRAME -->
+        <div class="screen" id="screen-7">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 7 of 8</div>
+                    <div class="step-question">Let's gently challenge the thought. Is there another way of looking at this situation?</div>
+                    <textarea class="text-input" id="input-reframe" placeholder="e.g. There could be many reasons for their behaviour that aren't about me..." maxlength="500" oninput="onReframeInput()"></textarea>
+                    <div class="guidance" id="guidance-7"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(6)">&larr; Back</button>
+                    <button class="btn" id="btn-7" disabled onclick="goToStep(8)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 8: ACTION -->
+        <div class="screen" id="screen-8">
+            <div class="screen-content">
+                <div class="step-card">
+                    <div class="step-label">Step 8 of 8</div>
+                    <div class="step-question">What could you do differently next time this happens?</div>
+                    <textarea class="text-input" id="input-action" placeholder="e.g. Pause and breathe before reacting, limit to one message, take one small step..." maxlength="500" oninput="onActionInput()"></textarea>
+                    <div class="guidance" id="guidance-8"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" onclick="goToStep(7)">&larr; Back</button>
+                    <button class="btn" id="btn-8" disabled onclick="showSummary()">See My Map</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="screen" id="screen-summary">
+            <div class="screen-content">
+                <div class="screen-icon">✨</div>
+                <h1 class="screen-title gradient">Your Trigger Map</h1>
+                <p class="screen-subtitle">Here's what we noticed together:</p>
+
+                <div id="summary-container"></div>
+
+                <div class="closing-message">
+                    <p>You're not your reactions. You're learning how they work — and that's where change begins.</p>
+                </div>
+
+                <button class="btn" onclick="finishExercise()">Done</button>
+                <button class="btn btn-secondary" onclick="talkToMandy()">Talk to Mandy about this</button>
+                <button class="btn btn-secondary" onclick="restartExercise()">Start Over</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const data = {
+            trigger: '',
+            thought: '',
+            body: [],
+            bodyCustom: '',
+            emotion: null,
+            behaviour: '',
+            patternFamiliar: null,
+            patternDetail: '',
+            reframe: '',
+            action: ''
+        };
+
+        const totalSteps = 8;
+
+        function updateProgress(step) {
+            const pct = (step / totalSteps) * 100;
+            document.getElementById('progress-fill').style.width = pct + '%';
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep(step) {
+            showScreen('screen-' + step);
+            updateProgress(step);
+
+            // Show delayed guidance for reframe step
+            if (step === 7) {
+                setTimeout(function() {
+                    var val = document.getElementById('input-reframe').value;
+                    if (!val.trim()) {
+                        var thought = data.thought || "they don't like me";
+                        showGuidance(7, "For example, instead of '" + thought + ",' it could be: 'There could be many reasons for their behaviour that aren't about me.' What feels like a more balanced thought for you?");
+                    }
+                }, 2500);
+            }
+
+            // Show delayed guidance for action step
+            if (step === 8) {
+                setTimeout(function() {
+                    var val = document.getElementById('input-action').value;
+                    if (!val.trim()) {
+                        var suggestion = '';
+                        if (data.emotion === 'anxiety' || data.emotion === 'fear') {
+                            suggestion = 'If it helps: you could try pausing and breathing before reacting next time.';
+                        } else if (data.emotion === 'frustration' || data.emotion === 'anger') {
+                            suggestion = 'If it helps: you could try stepping away briefly before responding.';
+                        } else if (data.emotion === 'loneliness' || data.emotion === 'sadness') {
+                            suggestion = 'If it helps: you could try reaching out to one person, even briefly.';
+                        } else {
+                            suggestion = 'If it helps: you could try taking one small step instead of withdrawing.';
+                        }
+                        showGuidance(8, suggestion);
+                    }
+                }, 2500);
+            }
+        }
+
+        function showGuidance(step, text) {
+            var el = document.getElementById('guidance-' + step);
+            if (el) {
+                el.textContent = text;
+                el.classList.add('visible');
+            }
+        }
+
+        function escapeHTML(str) {
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Step 1: Trigger
+        function onTriggerInput() {
+            var val = document.getElementById('input-trigger').value;
+            data.trigger = val;
+            document.getElementById('btn-1').disabled = !val.trim();
+
+            var text = val.toLowerCase();
+            if (text.length > 0 && text.length < 15) {
+                showGuidance(1, "That's okay. Let's narrow it down. Did something happen with a person, work, or a thought that came up?");
+            } else if (text.length >= 15) {
+                showGuidance(1, "Got it. That sounds uncomfortable. Let's look at what your mind did next.");
+            }
+        }
+
+        // Step 2: Thoughts
+        function onThoughtInput() {
+            var val = document.getElementById('input-thought').value;
+            data.thought = val;
+            document.getElementById('btn-2').disabled = !val.trim();
+
+            var text = val.toLowerCase();
+            if (text.match(/don't like|hate me|reject|ignore|alone|nobody/)) {
+                showGuidance(2, "That's a really common automatic thought. When something feels off, the mind often jumps to self-blame. Let's explore it gently.");
+            } else if (text.match(/going to go badly|disaster|ruin|fail|worst|never/)) {
+                showGuidance(2, "It sounds like your mind is trying to predict a negative outcome. Let's slow that down and look at it more closely.");
+            } else if (text.match(/nothing|don't know|not sure|blank/)) {
+                showGuidance(2, "Sometimes thoughts are quick or hard to catch. If you rewind the moment, what might your mind have said, even briefly?");
+            } else if (text.length >= 15) {
+                showGuidance(2, "Thank you for sharing that. Noticing your thoughts is a really important first step.");
+            }
+        }
+
+        // Step 3: Body
+        function toggleBody(btn) {
+            btn.classList.toggle('selected');
+            var val = btn.dataset.value;
+            var idx = data.body.indexOf(val);
+            if (idx === -1) { data.body.push(val); }
+            else { data.body.splice(idx, 1); }
+
+            updateBodyButton();
+
+            if (data.body.length > 0) {
+                var hasStrong = data.body.some(function(b) { return ['tight chest', 'racing heart', 'shaky'].includes(b); });
+                if (hasStrong) {
+                    showGuidance(3, "That makes sense. Your body is responding as if there's a threat. Nothing is wrong with you — this is your nervous system trying to protect you.");
+                } else {
+                    showGuidance(3, "Good noticing. Your body holds clues about what you're feeling emotionally.");
+                }
+            }
+        }
+
+        function onBodyInput() {
+            data.bodyCustom = document.getElementById('input-body').value;
+            updateBodyButton();
+        }
+
+        function updateBodyButton() {
+            document.getElementById('btn-3').disabled = !(data.body.length > 0 || data.bodyCustom.trim());
+        }
+
+        // Step 4: Emotion
+        function selectEmotion(btn) {
+            document.querySelectorAll('#emotion-options .option-btn').forEach(function(b) { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+            data.emotion = btn.dataset.value;
+            document.getElementById('btn-4').disabled = false;
+
+            showGuidance(4, "It's completely normal to feel " + data.emotion + ". Naming the emotion is powerful — it creates a small space between you and the feeling.");
+        }
+
+        // Step 5: Behaviour
+        function onBehaviourInput() {
+            var val = document.getElementById('input-behaviour').value;
+            data.behaviour = val;
+            document.getElementById('btn-5').disabled = !val.trim();
+
+            var text = val.toLowerCase();
+            if (text.match(/didn't reply|avoid|withdrew|shut down|hid|ran|left|ignored/)) {
+                showGuidance(5, "Avoiding can feel protective in the moment, but sometimes it keeps the cycle going. Let's notice that pattern.");
+            } else if (text.match(/kept messaging|checked|texted|called|asked|reassur/)) {
+                showGuidance(5, "That sounds like your mind was trying to reduce uncertainty. That urge is very human.");
+            } else if (text.match(/snapped|shouted|yelled|argued|lashed|angry|blew up/)) {
+                showGuidance(5, "That reaction often comes from feeling overwhelmed. Let's understand what led up to it.");
+            } else if (text.length >= 15) {
+                showGuidance(5, "Thank you for being honest about your reaction. Understanding it is what matters.");
+            }
+        }
+
+        // Step 6: Pattern
+        function selectPattern(btn) {
+            document.querySelectorAll('#screen-6 .option-btn').forEach(function(b) { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+            data.patternFamiliar = btn.dataset.value;
+            document.getElementById('btn-6').disabled = false;
+
+            var patternInput = document.getElementById('input-pattern');
+            if (btn.dataset.value === 'yes') {
+                showGuidance(6, "That suggests this might be a pattern rather than a one-off moment. Recognising that is a powerful step.");
+                patternInput.classList.remove('hidden');
+            } else {
+                showGuidance(6, "That's okay. Even a single moment like this can teach us a lot.");
+                patternInput.classList.add('hidden');
+            }
+        }
+
+        function onPatternInput() {
+            data.patternDetail = document.getElementById('input-pattern').value;
+        }
+
+        // Step 7: Reframe
+        function onReframeInput() {
+            var val = document.getElementById('input-reframe').value;
+            data.reframe = val;
+            document.getElementById('btn-7').disabled = !val.trim();
+
+            if (val.trim().length >= 15) {
+                showGuidance(7, "That's a much more balanced way of seeing it. Notice how that shifts the intensity slightly.");
+            }
+        }
+
+        // Step 8: Action
+        function onActionInput() {
+            var val = document.getElementById('input-action').value;
+            data.action = val;
+            document.getElementById('btn-8').disabled = !val.trim();
+        }
+
+        // Summary
+        function showSummary() {
+            showScreen('screen-summary');
+            updateProgress(totalSteps);
+
+            var bodyText = data.body.length > 0 ? data.body.join(', ') : data.bodyCustom;
+            var patternText = data.patternFamiliar === 'yes'
+                ? (data.patternDetail ? data.patternDetail : 'This feels like a recurring pattern')
+                : 'This feels like a one-off moment';
+
+            var items = [
+                { label: 'Trigger', value: data.trigger },
+                { label: 'Thought', value: data.thought },
+                { label: 'Body', value: bodyText },
+                { label: 'Emotion', value: data.emotion || 'Not specified' },
+                { label: 'Behaviour', value: data.behaviour },
+                { label: 'Pattern', value: patternText },
+                { label: 'Reframe', value: data.reframe },
+                { label: 'Next Step', value: data.action }
+            ];
+
+            var html = '';
+            items.forEach(function(item) {
+                html += '<div class="summary-item">';
+                html += '<div class="summary-label">' + escapeHTML(item.label) + '</div>';
+                html += '<div class="summary-value">' + escapeHTML(item.value) + '</div>';
+                html += '</div>';
+            });
+
+            document.getElementById('summary-container').innerHTML = html;
+
+            // Save to localStorage for progress tracking
+            localStorage.setItem('cowch_exploring_trigger-mapping', JSON.stringify({
+                completed: true,
+                date: new Date().toISOString(),
+                data: data
+            }));
+        }
+
+        function finishExercise() {
+            window.location.href = '/imagine/exploring.html';
+        }
+
+        function talkToMandy() {
+            var bodyText = data.body.length > 0 ? data.body.join(', ') : data.bodyCustom;
+            var parts = ['I just completed a trigger mapping exercise.'];
+            if (data.trigger) parts.push('My trigger: "' + data.trigger + '".');
+            if (data.thought) parts.push('My thought: "' + data.thought + '".');
+            if (bodyText) parts.push('Body sensations: ' + bodyText + '.');
+            if (data.emotion) parts.push('Emotion: ' + data.emotion + '.');
+            if (data.behaviour) parts.push('My reaction: "' + data.behaviour + '".');
+            if (data.patternFamiliar === 'yes') parts.push('This feels like a familiar pattern.');
+            if (data.reframe) parts.push('My reframe: "' + data.reframe + '".');
+            if (data.action) parts.push('My next step: "' + data.action + '".');
+            parts.push('Can you help me explore these patterns and what I can learn from this?');
+
+            // Store message and redirect to chat
+            localStorage.setItem('cowch_pending_prompt', parts.join(' '));
+            window.location.href = '/app.html#chat';
+        }
+
+        function restartExercise() {
+            data.trigger = '';
+            data.thought = '';
+            data.body = [];
+            data.bodyCustom = '';
+            data.emotion = null;
+            data.behaviour = '';
+            data.patternFamiliar = null;
+            data.patternDetail = '';
+            data.reframe = '';
+            data.action = '';
+
+            // Clear all inputs
+            document.querySelectorAll('.text-input').forEach(function(el) { el.value = ''; });
+            document.querySelectorAll('.option-btn').forEach(function(el) { el.classList.remove('selected'); });
+            document.querySelectorAll('.guidance').forEach(function(el) { el.classList.remove('visible'); });
+            document.getElementById('input-pattern').classList.add('hidden');
+
+            // Disable all next buttons
+            for (var i = 1; i <= 8; i++) {
+                var btn = document.getElementById('btn-' + i);
+                if (btn) btn.disabled = true;
+            }
+
+            showScreen('screen-intro');
+            updateProgress(0);
+        }
+    </script>
+</body>
+</html>
