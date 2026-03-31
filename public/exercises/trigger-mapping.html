@@ -352,6 +352,11 @@
         }
 
         .hidden { display: none !important; }
+
+        /* Smooth reveal for Next buttons */
+        .btn.fade-in {
+            animation: fadeIn 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -390,7 +395,7 @@
                     <textarea class="text-input" id="input-trigger" placeholder="e.g. My colleague ignored me, I saw something upsetting, a thought came up..." maxlength="500" oninput="onTriggerInput()"></textarea>
                     <div class="guidance" id="guidance-1"></div>
                 </div>
-                <button class="btn" id="btn-1" disabled onclick="goToStep(2)">Next</button>
+                <button class="btn hidden" id="btn-1" onclick="goToStep(2)">Next</button>
             </div>
         </div>
 
@@ -405,7 +410,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
-                    <button class="btn" id="btn-2" disabled onclick="goToStep(3)">Next</button>
+                    <button class="btn hidden" id="btn-2" onclick="goToStep(3)">Next</button>
                 </div>
             </div>
         </div>
@@ -431,7 +436,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
-                    <button class="btn" id="btn-3" disabled onclick="goToStep(4)">Next</button>
+                    <button class="btn hidden" id="btn-3" onclick="goToStep(4)">Next</button>
                 </div>
             </div>
         </div>
@@ -456,7 +461,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
-                    <button class="btn" id="btn-4" disabled onclick="goToStep(5)">Next</button>
+                    <button class="btn hidden" id="btn-4" onclick="goToStep(5)">Next</button>
                 </div>
             </div>
         </div>
@@ -472,7 +477,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(4)">&larr; Back</button>
-                    <button class="btn" id="btn-5" disabled onclick="goToStep(6)">Next</button>
+                    <button class="btn hidden" id="btn-5" onclick="goToStep(6)">Next</button>
                 </div>
             </div>
         </div>
@@ -492,7 +497,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(5)">&larr; Back</button>
-                    <button class="btn" id="btn-6" disabled onclick="goToStep(7)">Next</button>
+                    <button class="btn hidden" id="btn-6" onclick="goToStep(7)">Next</button>
                 </div>
             </div>
         </div>
@@ -508,7 +513,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(6)">&larr; Back</button>
-                    <button class="btn" id="btn-7" disabled onclick="goToStep(8)">Next</button>
+                    <button class="btn hidden" id="btn-7" onclick="goToStep(8)">Next</button>
                 </div>
             </div>
         </div>
@@ -524,7 +529,7 @@
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-secondary" onclick="goToStep(7)">&larr; Back</button>
-                    <button class="btn" id="btn-8" disabled onclick="showSummary()">See My Map</button>
+                    <button class="btn hidden" id="btn-8" onclick="showSummary()">See My Map</button>
                 </div>
             </div>
         </div>
@@ -581,6 +586,13 @@
             showScreen('screen-' + step);
             updateProgress(step);
 
+            // If guidance is already visible for this step, keep Next button visible
+            var guidance = document.getElementById('guidance-' + step);
+            var nextBtn = document.getElementById('btn-' + step);
+            if (guidance && guidance.classList.contains('visible') && nextBtn) {
+                nextBtn.classList.remove('hidden');
+            }
+
             // Show delayed guidance for reframe step
             if (step === 7) {
                 setTimeout(function() {
@@ -619,6 +631,14 @@
                 el.textContent = text;
                 el.classList.add('visible');
             }
+            // Reveal the Next button after a short pause so it feels conversational
+            var btn = document.getElementById('btn-' + step);
+            if (btn && btn.classList.contains('hidden')) {
+                setTimeout(function() {
+                    btn.classList.remove('hidden');
+                    btn.classList.add('fade-in');
+                }, 800);
+            }
         }
 
         // Debounce helper — waits until user stops typing for `delay` ms
@@ -638,7 +658,6 @@
         function onTriggerInput() {
             var val = document.getElementById('input-trigger').value;
             data.trigger = val;
-            document.getElementById('btn-1').disabled = !val.trim();
 
             debounceGuidance(1, function() {
                 var text = data.trigger.toLowerCase();
@@ -654,7 +673,6 @@
         function onThoughtInput() {
             var val = document.getElementById('input-thought').value;
             data.thought = val;
-            document.getElementById('btn-2').disabled = !val.trim();
 
             debounceGuidance(2, function() {
                 var text = data.thought.toLowerCase();
@@ -692,11 +710,15 @@
 
         function onBodyInput() {
             data.bodyCustom = document.getElementById('input-body').value;
-            updateBodyButton();
+            if (data.bodyCustom.trim()) {
+                debounceGuidance(3, function() {
+                    showGuidance(3, "Thank you for noticing that. Your body holds clues about what you're feeling emotionally.");
+                });
+            }
         }
 
         function updateBodyButton() {
-            document.getElementById('btn-3').disabled = !(data.body.length > 0 || data.bodyCustom.trim());
+            // Button visibility is handled by showGuidance
         }
 
         // Step 4: Emotion
@@ -704,7 +726,6 @@
             document.querySelectorAll('#emotion-options .option-btn').forEach(function(b) { b.classList.remove('selected'); });
             btn.classList.add('selected');
             data.emotion = btn.dataset.value;
-            document.getElementById('btn-4').disabled = false;
 
             showGuidance(4, "It's completely normal to feel " + data.emotion + ". Naming the emotion is powerful — it creates a small space between you and the feeling.");
         }
@@ -713,7 +734,6 @@
         function onBehaviourInput() {
             var val = document.getElementById('input-behaviour').value;
             data.behaviour = val;
-            document.getElementById('btn-5').disabled = !val.trim();
 
             debounceGuidance(5, function() {
                 var text = data.behaviour.toLowerCase();
@@ -734,7 +754,6 @@
             document.querySelectorAll('#screen-6 .option-btn').forEach(function(b) { b.classList.remove('selected'); });
             btn.classList.add('selected');
             data.patternFamiliar = btn.dataset.value;
-            document.getElementById('btn-6').disabled = false;
 
             var patternInput = document.getElementById('input-pattern');
             if (btn.dataset.value === 'yes') {
@@ -754,7 +773,6 @@
         function onReframeInput() {
             var val = document.getElementById('input-reframe').value;
             data.reframe = val;
-            document.getElementById('btn-7').disabled = !val.trim();
 
             debounceGuidance(7, function() {
                 if (data.reframe.trim().length >= 15) {
@@ -767,7 +785,12 @@
         function onActionInput() {
             var val = document.getElementById('input-action').value;
             data.action = val;
-            document.getElementById('btn-8').disabled = !val.trim();
+
+            debounceGuidance(8, function() {
+                if (data.action.trim().length >= 10) {
+                    showGuidance(8, "That's a great step. Even small changes can shift the whole pattern over time.");
+                }
+            });
         }
 
         // Summary
@@ -849,10 +872,13 @@
             document.querySelectorAll('.guidance').forEach(function(el) { el.classList.remove('visible'); });
             document.getElementById('input-pattern').classList.add('hidden');
 
-            // Disable all next buttons
+            // Hide all next buttons
             for (var i = 1; i <= 8; i++) {
                 var btn = document.getElementById('btn-' + i);
-                if (btn) btn.disabled = true;
+                if (btn) {
+                    btn.classList.add('hidden');
+                    btn.classList.remove('fade-in');
+                }
             }
 
             showScreen('screen-intro');
