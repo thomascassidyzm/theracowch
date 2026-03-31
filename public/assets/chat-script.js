@@ -165,7 +165,7 @@ let talkAboutGroundingButton, groundingContainer, groundingInstruction;
 let pmrModal, closePmrButton, startPmrButton;
 let talkAboutPmrButton, bodyDiagram, pmrInstruction;
 let weatherModal, socialModal, ladderModal;
-let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal, safetyModal;
+let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal, safetyModal, triggerModal;
 let promptButton, promptBanner, promptMessage;
 let promptAction, promptNew, promptDismiss;
 
@@ -233,6 +233,7 @@ function initChatDOM() {
     controlModal = document.getElementById('control-modal');
     playbreakModal = document.getElementById('playbreak-modal');
     safetyModal = document.getElementById('safety-modal');
+    triggerModal = document.getElementById('trigger-modal');
 
     promptButton = document.getElementById('prompt-button');
     promptBanner = document.getElementById('prompt-banner');
@@ -389,6 +390,9 @@ function openInteractiveExercise(type) {
             break;
         case 'weather':
             if (weatherModal) weatherModal.classList.add('active');
+            break;
+        case 'trigger':
+            if (triggerModal) { openTriggerModal(); }
             break;
     }
 }
@@ -2797,6 +2801,7 @@ function initExerciseListeners() {
     initControlExercise();
     initPlaybreakExercise();
     initSafetyExercise();
+    initTriggerExercise();
 }
 
 // ============================================
@@ -3476,5 +3481,395 @@ function initSafetyExercise() {
     });
     if (safetyModal) {
         safetyModal.addEventListener('click', (e) => { if (e.target === safetyModal) closeSafetyModal(); });
+    }
+}
+
+// ============================================
+// AI-Guided Trigger Mapping Exercise
+// ============================================
+
+let triggerPhase = 1;
+let triggerData = {
+    trigger: '',
+    thought: '',
+    body: [],
+    bodyCustom: '',
+    emotion: null,
+    behaviour: '',
+    patternFamiliar: null,
+    patternDetail: '',
+    reframe: '',
+    action: ''
+};
+
+function openTriggerModal() {
+    resetTriggerData();
+    triggerModal.classList.add('active');
+    showTriggerPhase();
+}
+
+function closeTriggerModal() {
+    triggerModal.classList.remove('active');
+    resetTriggerData();
+}
+
+function resetTriggerData() {
+    triggerPhase = 1;
+    triggerData = {
+        trigger: '', thought: '', body: [], bodyCustom: '',
+        emotion: null, behaviour: '', patternFamiliar: null,
+        patternDetail: '', reframe: '', action: ''
+    };
+    // Clear all inputs
+    const inputs = triggerModal.querySelectorAll('.trigger-input');
+    inputs.forEach(input => { input.value = ''; });
+    // Deselect all options
+    triggerModal.querySelectorAll('.trigger-option').forEach(btn => btn.classList.remove('selected'));
+    // Hide all guidance
+    triggerModal.querySelectorAll('.trigger-guidance').forEach(g => g.classList.add('hidden'));
+    // Hide pattern detail textarea
+    const patternInput = document.getElementById('trigger-input-pattern');
+    if (patternInput) patternInput.classList.add('hidden');
+}
+
+function showTriggerPhase() {
+    // Show/hide sections
+    document.querySelectorAll('.trigger-section').forEach(section => {
+        section.classList.remove('active');
+        if (parseInt(section.dataset.section) === triggerPhase) {
+            section.classList.add('active');
+        }
+    });
+
+    // Update progress dots
+    document.querySelectorAll('.trigger-progress .trigger-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i < triggerPhase);
+        dot.classList.toggle('current', i === triggerPhase - 1);
+    });
+
+    const backBtn = document.getElementById('trigger-back');
+    const nextBtn = document.getElementById('trigger-next');
+    const talkBtn = document.getElementById('talk-about-trigger');
+
+    backBtn.style.display = triggerPhase > 1 ? '' : 'none';
+
+    if (triggerPhase === 9) {
+        nextBtn.style.display = 'none';
+        talkBtn.style.display = '';
+        generateTriggerSummary();
+    } else {
+        nextBtn.style.display = '';
+        talkBtn.style.display = 'none';
+        updateTriggerNextButton();
+    }
+}
+
+function updateTriggerNextButton() {
+    const nextBtn = document.getElementById('trigger-next');
+    let canProceed = false;
+
+    switch (triggerPhase) {
+        case 1: canProceed = triggerData.trigger.trim().length > 0; break;
+        case 2: canProceed = triggerData.thought.trim().length > 0; break;
+        case 3: canProceed = triggerData.body.length > 0 || triggerData.bodyCustom.trim().length > 0; break;
+        case 4: canProceed = triggerData.emotion !== null; break;
+        case 5: canProceed = triggerData.behaviour.trim().length > 0; break;
+        case 6: canProceed = triggerData.patternFamiliar !== null; break;
+        case 7: canProceed = triggerData.reframe.trim().length > 0; break;
+        case 8: canProceed = triggerData.action.trim().length > 0; break;
+    }
+
+    nextBtn.disabled = !canProceed;
+}
+
+// Adaptive guidance based on user input
+function showTriggerGuidance(step, text) {
+    const guidance = document.getElementById('trigger-guidance-' + step);
+    if (guidance) {
+        guidance.textContent = text;
+        guidance.classList.remove('hidden');
+    }
+}
+
+function analyzeTriggerInput(step) {
+    const text = (arguments.length > 1 ? arguments[1] : '').toLowerCase();
+
+    switch (step) {
+        case 1: // Trigger
+            if (text.length < 10 && text.length > 0) {
+                showTriggerGuidance(1, "That's okay. Let's narrow it down. Did something happen with a person, work, or a thought that came up?");
+            } else if (text.length >= 10) {
+                showTriggerGuidance(1, "Got it. That sounds uncomfortable. Let's look at what your mind did next.");
+            }
+            break;
+
+        case 2: // Thoughts
+            if (text.match(/don't like|hate me|reject|ignore|alone|nobody/)) {
+                showTriggerGuidance(2, "That's a really common automatic thought. When something feels off, the mind often jumps to self-blame. Let's explore it gently.");
+            } else if (text.match(/going to go badly|disaster|ruin|fail|worst|never/)) {
+                showTriggerGuidance(2, "It sounds like your mind is trying to predict a negative outcome. Let's slow that down and look at it more closely.");
+            } else if (text.match(/nothing|don't know|not sure|blank/)) {
+                showTriggerGuidance(2, "Sometimes thoughts are quick or hard to catch. If you rewind the moment, what might your mind have said, even briefly?");
+            } else if (text.length >= 10) {
+                showTriggerGuidance(2, "Thank you for sharing that. Noticing your thoughts is a really important first step.");
+            }
+            break;
+
+        case 5: // Behaviour
+            if (text.match(/didn't reply|avoid|withdrew|shut down|hid|ran|left|ignored/)) {
+                showTriggerGuidance(5, "Avoiding can feel protective in the moment, but sometimes it keeps the cycle going. Let's notice that pattern.");
+            } else if (text.match(/kept messaging|checked|texted|called|asked|reassur/)) {
+                showTriggerGuidance(5, "That sounds like your mind was trying to reduce uncertainty. That urge is very human.");
+            } else if (text.match(/snapped|shouted|yelled|argued|lashed|angry|blew up/)) {
+                showTriggerGuidance(5, "That reaction often comes from feeling overwhelmed. Let's understand what led up to it.");
+            } else if (text.length >= 10) {
+                showTriggerGuidance(5, "Thank you for being honest about your reaction. Understanding it is what matters.");
+            }
+            break;
+    }
+}
+
+function generateTriggerSummary() {
+    const summary = document.getElementById('trigger-summary');
+    const bodyText = triggerData.body.length > 0
+        ? triggerData.body.join(', ')
+        : triggerData.bodyCustom;
+    const patternText = triggerData.patternFamiliar === 'yes'
+        ? (triggerData.patternDetail ? triggerData.patternDetail : 'This feels like a recurring pattern')
+        : 'This feels like a one-off moment — but even single moments can teach us a lot';
+
+    // Determine a small action suggestion based on emotion
+    let actionSuggestion = triggerData.action;
+    if (!actionSuggestion.trim()) {
+        if (triggerData.emotion === 'anxiety') actionSuggestion = 'Pause and breathe before reacting';
+        else if (triggerData.emotion === 'anger' || triggerData.emotion === 'frustration') actionSuggestion = 'Step away briefly before responding';
+        else actionSuggestion = 'Take one small step instead of withdrawing';
+    }
+
+    summary.innerHTML = `
+        <div class="trigger-summary-item"><strong>Trigger</strong><span>${escapeHTML(triggerData.trigger)}</span></div>
+        <div class="trigger-summary-item"><strong>Thought</strong><span>${escapeHTML(triggerData.thought)}</span></div>
+        <div class="trigger-summary-item"><strong>Body</strong><span>${escapeHTML(bodyText)}</span></div>
+        <div class="trigger-summary-item"><strong>Emotion</strong><span>${escapeHTML(triggerData.emotion || 'Not specified')}</span></div>
+        <div class="trigger-summary-item"><strong>Behaviour</strong><span>${escapeHTML(triggerData.behaviour)}</span></div>
+        <div class="trigger-summary-item"><strong>Pattern</strong><span>${escapeHTML(patternText)}</span></div>
+        <div class="trigger-summary-item"><strong>Reframe</strong><span>${escapeHTML(triggerData.reframe)}</span></div>
+        <div class="trigger-summary-item"><strong>Next step</strong><span>${escapeHTML(actionSuggestion)}</span></div>
+    `;
+}
+
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function initTriggerExercise() {
+    const closeBtn = document.getElementById('close-trigger');
+    const nextBtn = document.getElementById('trigger-next');
+    const backBtn = document.getElementById('trigger-back');
+    const talkBtn = document.getElementById('talk-about-trigger');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeTriggerModal);
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (triggerPhase < 9) {
+            hapticFeedback('light');
+            triggerPhase++;
+            showTriggerPhase();
+
+            // Show adaptive guidance when entering body step
+            if (triggerPhase === 3) {
+                const bodySelections = triggerData.body;
+                if (bodySelections.length === 0) {
+                    // Guidance shown later when they interact
+                }
+            }
+
+            // Show reframe guidance if user struggles
+            if (triggerPhase === 7) {
+                setTimeout(() => {
+                    const reframeInput = document.getElementById('trigger-input-reframe');
+                    if (reframeInput && !reframeInput.value.trim()) {
+                        showTriggerGuidance(7, "For example, instead of '" + (triggerData.thought || 'they don\'t like me') + ",' it could be: 'There could be many reasons for their behaviour that aren\'t about me.' What feels like a more balanced thought for you?");
+                    }
+                }, 2000);
+            }
+
+            // Show action guidance based on emotion
+            if (triggerPhase === 8) {
+                setTimeout(() => {
+                    const actionInput = document.getElementById('trigger-input-action');
+                    if (actionInput && !actionInput.value.trim()) {
+                        let suggestion = '';
+                        if (triggerData.emotion === 'anxiety' || triggerData.emotion === 'fear') {
+                            suggestion = "If it helps: you could try pausing and breathing before reacting next time.";
+                        } else if (triggerData.emotion === 'frustration' || triggerData.emotion === 'anger') {
+                            suggestion = "If it helps: you could try stepping away briefly before responding.";
+                        } else if (triggerData.emotion === 'loneliness' || triggerData.emotion === 'sadness') {
+                            suggestion = "If it helps: you could try reaching out to one person, even briefly.";
+                        } else {
+                            suggestion = "If it helps: you could try taking one small step instead of withdrawing.";
+                        }
+                        showTriggerGuidance(8, suggestion);
+                    }
+                }, 2000);
+            }
+        }
+    });
+
+    if (backBtn) backBtn.addEventListener('click', () => {
+        if (triggerPhase > 1) {
+            hapticFeedback('light');
+            triggerPhase--;
+            showTriggerPhase();
+        }
+    });
+
+    if (talkBtn) talkBtn.addEventListener('click', () => {
+        closeTriggerModal();
+        const bodyText = triggerData.body.length > 0 ? triggerData.body.join(', ') : triggerData.bodyCustom;
+        const parts = ['I just completed a trigger mapping exercise.'];
+        if (triggerData.trigger) parts.push(`My trigger: "${triggerData.trigger}".`);
+        if (triggerData.thought) parts.push(`My thought: "${triggerData.thought}".`);
+        if (bodyText) parts.push(`Body sensations: ${bodyText}.`);
+        if (triggerData.emotion) parts.push(`Emotion: ${triggerData.emotion}.`);
+        if (triggerData.behaviour) parts.push(`My reaction: "${triggerData.behaviour}".`);
+        if (triggerData.patternFamiliar === 'yes') parts.push('This feels like a familiar pattern.');
+        if (triggerData.reframe) parts.push(`My reframe: "${triggerData.reframe}".`);
+        if (triggerData.action) parts.push(`My next step: "${triggerData.action}".`);
+        parts.push('Can you help me explore these patterns and what I can learn from this?');
+        triggerChatPrompt(parts.join(' '));
+    });
+
+    if (triggerModal) {
+        triggerModal.addEventListener('click', (e) => { if (e.target === triggerModal) closeTriggerModal(); });
+    }
+
+    // Step 1: Trigger input
+    const triggerInput = document.getElementById('trigger-input-trigger');
+    if (triggerInput) {
+        triggerInput.addEventListener('input', () => {
+            triggerData.trigger = triggerInput.value;
+            analyzeTriggerInput(1, triggerInput.value);
+            updateTriggerNextButton();
+        });
+    }
+
+    // Step 2: Thought input
+    const thoughtInput = document.getElementById('trigger-input-thought');
+    if (thoughtInput) {
+        thoughtInput.addEventListener('input', () => {
+            triggerData.thought = thoughtInput.value;
+            analyzeTriggerInput(2, thoughtInput.value);
+            updateTriggerNextButton();
+        });
+    }
+
+    // Step 3: Body options
+    document.querySelectorAll('#trigger-body-options .trigger-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('selected');
+            if (btn.classList.contains('selected')) {
+                triggerData.body.push(btn.dataset.value);
+            } else {
+                triggerData.body = triggerData.body.filter(v => v !== btn.dataset.value);
+            }
+            hapticFeedback('light');
+
+            if (triggerData.body.length > 0) {
+                const hasStrong = triggerData.body.some(b => ['tight chest', 'racing heart', 'shaky'].includes(b));
+                if (hasStrong) {
+                    showTriggerGuidance(3, "That makes sense. Your body is responding as if there's a threat. Nothing is wrong with you — this is your nervous system trying to protect you.");
+                } else {
+                    showTriggerGuidance(3, "Good noticing. Your body holds clues about what you're feeling emotionally.");
+                }
+            }
+            updateTriggerNextButton();
+        });
+    });
+
+    // Step 3: Body custom input
+    const bodyCustomInput = document.getElementById('trigger-input-body');
+    if (bodyCustomInput) {
+        bodyCustomInput.addEventListener('input', () => {
+            triggerData.bodyCustom = bodyCustomInput.value;
+            updateTriggerNextButton();
+        });
+    }
+
+    // Step 4: Emotion options
+    document.querySelectorAll('#trigger-emotion-options .trigger-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#trigger-emotion-options .trigger-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            triggerData.emotion = btn.dataset.value;
+            hapticFeedback('light');
+
+            showTriggerGuidance(4, "It's completely normal to feel " + btn.dataset.value + ". Naming the emotion is powerful — it creates a small space between you and the feeling.");
+
+            updateTriggerNextButton();
+        });
+    });
+
+    // Step 5: Behaviour input
+    const behaviourInput = document.getElementById('trigger-input-behaviour');
+    if (behaviourInput) {
+        behaviourInput.addEventListener('input', () => {
+            triggerData.behaviour = behaviourInput.value;
+            analyzeTriggerInput(5, behaviourInput.value);
+            updateTriggerNextButton();
+        });
+    }
+
+    // Step 6: Pattern options
+    document.querySelectorAll('#trigger-pattern-options .trigger-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#trigger-pattern-options .trigger-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            triggerData.patternFamiliar = btn.dataset.value;
+            hapticFeedback('light');
+
+            const patternInput = document.getElementById('trigger-input-pattern');
+
+            if (btn.dataset.value === 'yes') {
+                showTriggerGuidance(6, "That suggests this might be a pattern rather than a one-off moment. Recognising that is a powerful step.");
+                if (patternInput) patternInput.classList.remove('hidden');
+            } else {
+                showTriggerGuidance(6, "That's okay. Even a single moment like this can teach us a lot.");
+                if (patternInput) patternInput.classList.add('hidden');
+            }
+
+            updateTriggerNextButton();
+        });
+    });
+
+    // Step 6: Pattern detail input
+    const patternDetailInput = document.getElementById('trigger-input-pattern');
+    if (patternDetailInput) {
+        patternDetailInput.addEventListener('input', () => {
+            triggerData.patternDetail = patternDetailInput.value;
+        });
+    }
+
+    // Step 7: Reframe input
+    const reframeInput = document.getElementById('trigger-input-reframe');
+    if (reframeInput) {
+        reframeInput.addEventListener('input', () => {
+            triggerData.reframe = reframeInput.value;
+            if (reframeInput.value.trim().length >= 10) {
+                showTriggerGuidance(7, "That's a much more balanced way of seeing it. Notice how that shifts the intensity slightly.");
+            }
+            updateTriggerNextButton();
+        });
+    }
+
+    // Step 8: Action input
+    const actionInput = document.getElementById('trigger-input-action');
+    if (actionInput) {
+        actionInput.addEventListener('input', () => {
+            triggerData.action = actionInput.value;
+            updateTriggerNextButton();
+        });
     }
 }

@@ -3567,6 +3567,138 @@
         </div>
     </div>
 
+    <!-- Trigger Mapping Modal -->
+    <div class="exercise-modal" id="trigger-modal">
+        <div class="exercise-modal-content trigger-content">
+            <div class="exercise-modal-header">
+                <h3>Trigger Mapping</h3>
+                <button class="close-modal" id="close-trigger">&times;</button>
+            </div>
+            <p class="trigger-intro">Let's slow this down together. We'll map what just happened so it feels clearer and more manageable.</p>
+            <div class="trigger-sections" id="trigger-sections">
+
+                <!-- Step 1: Trigger -->
+                <div class="trigger-section active" data-section="1">
+                    <div class="trigger-step-icon">🎯</div>
+                    <h4>What Triggered You?</h4>
+                    <p class="trigger-question">What happened just before you started feeling this way?</p>
+                    <textarea class="trigger-input" id="trigger-input-trigger" placeholder="e.g. My colleague ignored me, I saw something upsetting, a thought came up..." maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-1"></div>
+                </div>
+
+                <!-- Step 2: Thoughts -->
+                <div class="trigger-section" data-section="2">
+                    <div class="trigger-step-icon">💭</div>
+                    <h4>Your Thoughts</h4>
+                    <p class="trigger-question">What went through your mind in that moment?</p>
+                    <textarea class="trigger-input" id="trigger-input-thought" placeholder="e.g. They don't like me, I'm not good enough, this is going to go badly..." maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-2"></div>
+                </div>
+
+                <!-- Step 3: Body -->
+                <div class="trigger-section" data-section="3">
+                    <div class="trigger-step-icon">🫁</div>
+                    <h4>Body Sensations</h4>
+                    <p class="trigger-question">What did you feel in your body?</p>
+                    <div class="trigger-body-options" id="trigger-body-options">
+                        <button class="trigger-option" data-value="tight chest">😤 Tight chest</button>
+                        <button class="trigger-option" data-value="racing heart">💓 Racing heart</button>
+                        <button class="trigger-option" data-value="tense shoulders">😣 Tense shoulders</button>
+                        <button class="trigger-option" data-value="knot in stomach">🫠 Knot in stomach</button>
+                        <button class="trigger-option" data-value="shaky">🫨 Shaky</button>
+                        <button class="trigger-option" data-value="numb">😶 Numb</button>
+                        <button class="trigger-option" data-value="heavy">😔 Heavy</button>
+                        <button class="trigger-option" data-value="restless">😬 Restless</button>
+                    </div>
+                    <textarea class="trigger-input trigger-input-small" id="trigger-input-body" placeholder="Or describe in your own words..." maxlength="300"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-3"></div>
+                </div>
+
+                <!-- Step 4: Emotion -->
+                <div class="trigger-section" data-section="4">
+                    <div class="trigger-step-icon">🎭</div>
+                    <h4>Your Emotion</h4>
+                    <p class="trigger-question">What emotion best fits what you felt?</p>
+                    <div class="trigger-emotion-options" id="trigger-emotion-options">
+                        <button class="trigger-option" data-value="anxiety">😰 Anxiety</button>
+                        <button class="trigger-option" data-value="sadness">😢 Sadness</button>
+                        <button class="trigger-option" data-value="frustration">😤 Frustration</button>
+                        <button class="trigger-option" data-value="anger">😠 Anger</button>
+                        <button class="trigger-option" data-value="shame">😳 Shame</button>
+                        <button class="trigger-option" data-value="fear">😨 Fear</button>
+                        <button class="trigger-option" data-value="loneliness">🥺 Loneliness</button>
+                        <button class="trigger-option" data-value="overwhelm">🤯 Overwhelm</button>
+                    </div>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-4"></div>
+                </div>
+
+                <!-- Step 5: Behaviour -->
+                <div class="trigger-section" data-section="5">
+                    <div class="trigger-step-icon">🔄</div>
+                    <h4>Your Reaction</h4>
+                    <p class="trigger-question">What did you do next?</p>
+                    <textarea class="trigger-input" id="trigger-input-behaviour" placeholder="e.g. I didn't reply, I kept messaging them, I snapped, I shut down..." maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-5"></div>
+                </div>
+
+                <!-- Step 6: Pattern -->
+                <div class="trigger-section" data-section="6">
+                    <div class="trigger-step-icon">🔍</div>
+                    <h4>Pattern Check</h4>
+                    <p class="trigger-question">Does this situation feel familiar in any way?</p>
+                    <div class="trigger-pattern-options" id="trigger-pattern-options">
+                        <button class="trigger-option" data-value="yes">Yes, this feels familiar</button>
+                        <button class="trigger-option" data-value="no">No, this feels new</button>
+                    </div>
+                    <textarea class="trigger-input trigger-input-small hidden" id="trigger-input-pattern" placeholder="What does it remind you of?" maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-6"></div>
+                </div>
+
+                <!-- Step 7: Reframe -->
+                <div class="trigger-section" data-section="7">
+                    <div class="trigger-step-icon">🌱</div>
+                    <h4>A Different Lens</h4>
+                    <p class="trigger-question">Let's gently challenge the thought. Is there another way of looking at this situation?</p>
+                    <textarea class="trigger-input" id="trigger-input-reframe" placeholder="e.g. There could be many reasons for their behaviour that aren't about me..." maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-7"></div>
+                </div>
+
+                <!-- Step 8: Action -->
+                <div class="trigger-section" data-section="8">
+                    <div class="trigger-step-icon">⚡</div>
+                    <h4>Moving Forward</h4>
+                    <p class="trigger-question">What could you do differently next time this happens?</p>
+                    <textarea class="trigger-input" id="trigger-input-action" placeholder="e.g. Pause and breathe before reacting, limit to one message, take one small step..." maxlength="500"></textarea>
+                    <div class="trigger-guidance hidden" id="trigger-guidance-8"></div>
+                </div>
+
+                <!-- Step 9: Summary -->
+                <div class="trigger-section" data-section="9">
+                    <div class="trigger-step-icon">✨</div>
+                    <h4>Your Trigger Map</h4>
+                    <div class="trigger-summary" id="trigger-summary"></div>
+                    <p class="trigger-reflection">You're not your reactions. You're learning how they work — and that's where change begins.</p>
+                </div>
+            </div>
+            <div class="trigger-progress">
+                <span class="trigger-dot active"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+                <span class="trigger-dot"></span>
+            </div>
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-secondary" id="trigger-back" style="display: none;">← Back</button>
+                <button class="btn-exercise btn-exercise-primary" id="trigger-next" disabled>Next →</button>
+                <button class="btn-exercise btn-exercise-secondary" id="talk-about-trigger" style="display: none;">Talk to Mandy</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
