@@ -168,6 +168,18 @@ let weatherModal, socialModal, ladderModal;
 let bodyresetModal, tinywinsModal, nutritionModal, controlModal, playbreakModal, safetyModal;
 let promptButton, promptBanner, promptMessage;
 let promptAction, promptNew, promptDismiss;
+
+// Fixed thoughts for the cloud icon prompt
+const MANDY_THOUGHTS = [
+    "Your thoughts are not facts, you don't have to believe every thought you think.",
+    "When you are on the right track, resistance will show up. This is because the outcome matters to you - you are going the right way.",
+    "Worry is overrated, problem solving is where the real changes happen",
+    "Happy people don't feel the need to upset others. If someone is mean, they are briefly showing you their inner misery.",
+    "Don't take things personally, it's rarely about you",
+    "Be impeccable with your word. People will trust you more if you are kind",
+    "Silence your inner critic by regularly telling yourself \"I am safe\"; \"Life supports me\"; \"I am where I need to be\""
+];
+let currentThoughtIndex = 0;
 let confirmModal, confirmModalMessage, confirmCancelButton, confirmOkButton;
 
 function initChatDOM() {
@@ -1208,28 +1220,28 @@ function checkAndShowPrompt() {
 }
 
 function handlePromptButtonClick() {
-    // Get fresh on-demand prompt
-    if (!window.MandyPrompts) return;
-
-    const prompt = window.MandyPrompts.getOnDemandPrompt(conversationHistory);
-    if (prompt) {
-        showPromptBanner(prompt);
-        // Add a little animation to the button
-        promptButton.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            promptButton.style.transform = 'scale(1)';
-        }, 100);
-    }
+    currentThoughtIndex = 0;
+    const prompt = {
+        type: 'thought',
+        content: MANDY_THOUGHTS[currentThoughtIndex],
+        action: 'Start chatting'
+    };
+    showPromptBanner(prompt);
+    // Add a little animation to the button
+    promptButton.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        promptButton.style.transform = 'scale(1)';
+    }, 100);
 }
 
 function handlePromptNew() {
-    // Get another fresh prompt
-    if (!window.MandyPrompts) return;
-
-    const prompt = window.MandyPrompts.getOnDemandPrompt(conversationHistory);
-    if (prompt) {
-        showPromptBanner(prompt);
-    }
+    currentThoughtIndex = (currentThoughtIndex + 1) % MANDY_THOUGHTS.length;
+    const prompt = {
+        type: 'thought',
+        content: MANDY_THOUGHTS[currentThoughtIndex],
+        action: 'Start chatting'
+    };
+    showPromptBanner(prompt);
 }
 
 function handlePromptAction() {
