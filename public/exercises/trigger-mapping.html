@@ -621,6 +621,13 @@
             }
         }
 
+        // Debounce helper — waits until user stops typing for `delay` ms
+        var guidanceTimers = {};
+        function debounceGuidance(step, fn, delay) {
+            if (guidanceTimers[step]) clearTimeout(guidanceTimers[step]);
+            guidanceTimers[step] = setTimeout(fn, delay || 1500);
+        }
+
         function escapeHTML(str) {
             var div = document.createElement('div');
             div.textContent = str;
@@ -633,12 +640,14 @@
             data.trigger = val;
             document.getElementById('btn-1').disabled = !val.trim();
 
-            var text = val.toLowerCase();
-            if (text.length > 0 && text.length < 15) {
-                showGuidance(1, "That's okay. Let's narrow it down. Did something happen with a person, work, or a thought that came up?");
-            } else if (text.length >= 15) {
-                showGuidance(1, "Got it. That sounds uncomfortable. Let's look at what your mind did next.");
-            }
+            debounceGuidance(1, function() {
+                var text = data.trigger.toLowerCase();
+                if (text.length > 0 && text.length < 15) {
+                    showGuidance(1, "That's okay. Let's narrow it down. Did something happen with a person, work, or a thought that came up?");
+                } else if (text.length >= 15) {
+                    showGuidance(1, "Got it. That sounds uncomfortable. Let's look at what your mind did next.");
+                }
+            });
         }
 
         // Step 2: Thoughts
@@ -647,16 +656,18 @@
             data.thought = val;
             document.getElementById('btn-2').disabled = !val.trim();
 
-            var text = val.toLowerCase();
-            if (text.match(/don't like|hate me|reject|ignore|alone|nobody/)) {
-                showGuidance(2, "That's a really common automatic thought. When something feels off, the mind often jumps to self-blame. Let's explore it gently.");
-            } else if (text.match(/going to go badly|disaster|ruin|fail|worst|never/)) {
-                showGuidance(2, "It sounds like your mind is trying to predict a negative outcome. Let's slow that down and look at it more closely.");
-            } else if (text.match(/nothing|don't know|not sure|blank/)) {
-                showGuidance(2, "Sometimes thoughts are quick or hard to catch. If you rewind the moment, what might your mind have said, even briefly?");
-            } else if (text.length >= 15) {
-                showGuidance(2, "Thank you for sharing that. Noticing your thoughts is a really important first step.");
-            }
+            debounceGuidance(2, function() {
+                var text = data.thought.toLowerCase();
+                if (text.match(/don't like|hate me|reject|ignore|alone|nobody/)) {
+                    showGuidance(2, "That's a really common automatic thought. When something feels off, the mind often jumps to self-blame. Let's explore it gently.");
+                } else if (text.match(/going to go badly|disaster|ruin|fail|worst|never/)) {
+                    showGuidance(2, "It sounds like your mind is trying to predict a negative outcome. Let's slow that down and look at it more closely.");
+                } else if (text.match(/nothing|don't know|not sure|blank/)) {
+                    showGuidance(2, "Sometimes thoughts are quick or hard to catch. If you rewind the moment, what might your mind have said, even briefly?");
+                } else if (text.length >= 15) {
+                    showGuidance(2, "Thank you for sharing that. Noticing your thoughts is a really important first step.");
+                }
+            });
         }
 
         // Step 3: Body
@@ -704,16 +715,18 @@
             data.behaviour = val;
             document.getElementById('btn-5').disabled = !val.trim();
 
-            var text = val.toLowerCase();
-            if (text.match(/didn't reply|avoid|withdrew|shut down|hid|ran|left|ignored/)) {
-                showGuidance(5, "Avoiding can feel protective in the moment, but sometimes it keeps the cycle going. Let's notice that pattern.");
-            } else if (text.match(/kept messaging|checked|texted|called|asked|reassur/)) {
-                showGuidance(5, "That sounds like your mind was trying to reduce uncertainty. That urge is very human.");
-            } else if (text.match(/snapped|shouted|yelled|argued|lashed|angry|blew up/)) {
-                showGuidance(5, "That reaction often comes from feeling overwhelmed. Let's understand what led up to it.");
-            } else if (text.length >= 15) {
-                showGuidance(5, "Thank you for being honest about your reaction. Understanding it is what matters.");
-            }
+            debounceGuidance(5, function() {
+                var text = data.behaviour.toLowerCase();
+                if (text.match(/didn't reply|avoid|withdrew|shut down|hid|ran|left|ignored/)) {
+                    showGuidance(5, "Avoiding can feel protective in the moment, but sometimes it keeps the cycle going. Let's notice that pattern.");
+                } else if (text.match(/kept messaging|checked|texted|called|asked|reassur/)) {
+                    showGuidance(5, "That sounds like your mind was trying to reduce uncertainty. That urge is very human.");
+                } else if (text.match(/snapped|shouted|yelled|argued|lashed|angry|blew up/)) {
+                    showGuidance(5, "That reaction often comes from feeling overwhelmed. Let's understand what led up to it.");
+                } else if (text.length >= 15) {
+                    showGuidance(5, "Thank you for being honest about your reaction. Understanding it is what matters.");
+                }
+            });
         }
 
         // Step 6: Pattern
@@ -743,9 +756,11 @@
             data.reframe = val;
             document.getElementById('btn-7').disabled = !val.trim();
 
-            if (val.trim().length >= 15) {
-                showGuidance(7, "That's a much more balanced way of seeing it. Notice how that shifts the intensity slightly.");
-            }
+            debounceGuidance(7, function() {
+                if (data.reframe.trim().length >= 15) {
+                    showGuidance(7, "That's a much more balanced way of seeing it. Notice how that shifts the intensity slightly.");
+                }
+            });
         }
 
         // Step 8: Action
