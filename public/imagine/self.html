@@ -563,6 +563,10 @@
                         <label class="rating-label">What's one small thing you can do right now to improve your mood?</label>
                         <textarea id="minute-reset-text" placeholder="Write your thought here..."></textarea>
                     </div>
+
+                    <div class="suggestions-box hidden" id="minute-reset-response" style="margin-top: var(--space-md);">
+                        <p id="minute-reset-response-text" style="color: #e0e0e0; line-height: 1.6; margin: 0;"></p>
+                    </div>
                 </div>
             </article>
 
@@ -1042,6 +1046,41 @@
             const streak = parseInt(localStorage.getItem(STORAGE_KEYS.STREAK) || '0');
             document.getElementById('streakNumber').textContent = streak;
         }
+
+        // ============================================
+        // 1 Minute Reset Response
+        // ============================================
+
+        (function() {
+            const responses = [
+                "That's a wonderful start. Even the smallest step can shift your whole day.",
+                "Love that. Tiny actions create big ripples — you're already moving in the right direction.",
+                "That sounds like exactly what you need right now. Be proud of yourself for recognising it.",
+                "Beautiful. The fact that you thought of something means you already know how to take care of yourself.",
+                "Yes! Small wins build momentum. You've got this.",
+                "That's a really kind thing to do for yourself. You deserve it.",
+                "Perfect. Remember — you don't have to fix everything, just one small thing at a time.",
+                "What a great idea. Taking action, even a tiny one, is incredibly powerful."
+            ];
+
+            var resetTimer = null;
+            var resetTextarea = document.getElementById('minute-reset-text');
+            var resetResponse = document.getElementById('minute-reset-response');
+            var resetResponseText = document.getElementById('minute-reset-response-text');
+
+            resetTextarea.addEventListener('input', function() {
+                clearTimeout(resetTimer);
+                if (resetTextarea.value.trim().length > 0) {
+                    resetTimer = setTimeout(function() {
+                        var msg = responses[Math.floor(Math.random() * responses.length)];
+                        resetResponseText.textContent = msg;
+                        resetResponse.classList.remove('hidden');
+                    }, 1000);
+                } else {
+                    resetResponse.classList.add('hidden');
+                }
+            });
+        })();
 
         // ============================================
         // Initialization
