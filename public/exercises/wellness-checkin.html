@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Wellness Check-in | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .rating-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .rating-label {
+            font-size: 1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .rating-scale {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .rating-button {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rating-button:hover {
+            border-color: var(--coral);
+            transform: scale(1.1);
+        }
+
+        .rating-button.selected {
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-deep);
+            transform: scale(1.1);
+        }
+
+        .suggestions-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .suggestions-box.visible { display: block; }
+
+        .suggestions-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--coral);
+            margin-bottom: 0.8rem;
+        }
+
+        .suggestion-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .suggestion-tag {
+            background: var(--bg-deep);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .prompt-section {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-section label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .prompt-section textarea:focus { border-color: var(--coral); }
+        .prompt-section textarea::placeholder { color: var(--text-muted); }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: 3px solid;
+            border-radius: 10px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-deep);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 var(--coral-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .saved-message {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(212, 137, 106, 0.15);
+            border: 3px solid var(--coral);
+            border-radius: 10px;
+            font-weight: 700;
+            color: var(--coral);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .saved-message.visible { display: block; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .rating-button { width: 36px; height: 36px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/self.html" class="back-btn">← Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🩺</div>
+        <h1>Wellness Check-in</h1>
+        <p class="subtitle">How are you really doing?</p>
+
+        <div class="rating-card">
+            <label class="rating-label">How's your mood today? (1 = very low, 10 = very contented)</label>
+            <div class="rating-scale" id="mood-rating">
+                <button class="rating-button" data-value="1">1</button>
+                <button class="rating-button" data-value="2">2</button>
+                <button class="rating-button" data-value="3">3</button>
+                <button class="rating-button" data-value="4">4</button>
+                <button class="rating-button" data-value="5">5</button>
+                <button class="rating-button" data-value="6">6</button>
+                <button class="rating-button" data-value="7">7</button>
+                <button class="rating-button" data-value="8">8</button>
+                <button class="rating-button" data-value="9">9</button>
+                <button class="rating-button" data-value="10">10</button>
+            </div>
+            <div class="suggestions-box" id="mood-suggestions">
+                <div class="suggestions-title">Try one of these to lift your mood by just one point:</div>
+                <div class="suggestion-tags">
+                    <span class="suggestion-tag">Go for a walk</span>
+                    <span class="suggestion-tag">Listen to happy music</span>
+                    <span class="suggestion-tag">Call a friend</span>
+                    <span class="suggestion-tag">Play with a pet</span>
+                    <span class="suggestion-tag">Think of something that makes you smile</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="rating-card">
+            <label class="rating-label">How satisfied are you with your exercise routine?</label>
+            <div class="rating-scale" id="exercise-rating">
+                <button class="rating-button" data-value="1">1</button>
+                <button class="rating-button" data-value="2">2</button>
+                <button class="rating-button" data-value="3">3</button>
+                <button class="rating-button" data-value="4">4</button>
+                <button class="rating-button" data-value="5">5</button>
+                <button class="rating-button" data-value="6">6</button>
+                <button class="rating-button" data-value="7">7</button>
+                <button class="rating-button" data-value="8">8</button>
+                <button class="rating-button" data-value="9">9</button>
+                <button class="rating-button" data-value="10">10</button>
+            </div>
+        </div>
+
+        <div class="rating-card">
+            <label class="rating-label">How satisfied are you with your eating habits?</label>
+            <div class="rating-scale" id="diet-rating">
+                <button class="rating-button" data-value="1">1</button>
+                <button class="rating-button" data-value="2">2</button>
+                <button class="rating-button" data-value="3">3</button>
+                <button class="rating-button" data-value="4">4</button>
+                <button class="rating-button" data-value="5">5</button>
+                <button class="rating-button" data-value="6">6</button>
+                <button class="rating-button" data-value="7">7</button>
+                <button class="rating-button" data-value="8">8</button>
+                <button class="rating-button" data-value="9">9</button>
+                <button class="rating-button" data-value="10">10</button>
+            </div>
+        </div>
+
+        <div class="rating-card">
+            <label class="rating-label">How satisfied are you with your appearance & self-care?</label>
+            <div class="rating-scale" id="appearance-rating">
+                <button class="rating-button" data-value="1">1</button>
+                <button class="rating-button" data-value="2">2</button>
+                <button class="rating-button" data-value="3">3</button>
+                <button class="rating-button" data-value="4">4</button>
+                <button class="rating-button" data-value="5">5</button>
+                <button class="rating-button" data-value="6">6</button>
+                <button class="rating-button" data-value="7">7</button>
+                <button class="rating-button" data-value="8">8</button>
+                <button class="rating-button" data-value="9">9</button>
+                <button class="rating-button" data-value="10">10</button>
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <label>What can you do to improve in areas where you scored low?</label>
+            <textarea id="improvement-notes" placeholder="Write your thoughts here..."></textarea>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="clearWellness()">Clear</button>
+            <button class="btn btn-primary" onclick="saveWellness()">Save Check-in</button>
+        </div>
+
+        <div class="saved-message" id="saved-message">Wellness check-in saved! Great job taking care of yourself.</div>
+    </div>
+
+    <script>
+        var STORAGE_KEY = 'cowch_wellness_checkin';
+
+        // Setup rating buttons
+        var groups = ['mood-rating', 'exercise-rating', 'diet-rating', 'appearance-rating'];
+        groups.forEach(function(groupId) {
+            var buttons = document.querySelectorAll('#' + groupId + ' .rating-button');
+            buttons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    buttons.forEach(function(btn) { btn.classList.remove('selected'); });
+                    button.classList.add('selected');
+
+                    if (groupId === 'mood-rating' && parseInt(button.dataset.value) < 6) {
+                        document.getElementById('mood-suggestions').classList.add('visible');
+                    } else if (groupId === 'mood-rating') {
+                        document.getElementById('mood-suggestions').classList.remove('visible');
+                    }
+                });
+            });
+        });
+
+        function saveWellness() {
+            var moodBtn = document.querySelector('#mood-rating .rating-button.selected');
+            var exerciseBtn = document.querySelector('#exercise-rating .rating-button.selected');
+            var dietBtn = document.querySelector('#diet-rating .rating-button.selected');
+            var appearanceBtn = document.querySelector('#appearance-rating .rating-button.selected');
+            var improvementNotes = document.getElementById('improvement-notes').value;
+
+            if (!moodBtn || !exerciseBtn || !dietBtn || !appearanceBtn) {
+                alert('Please complete all ratings before saving.');
+                return;
+            }
+
+            var wellnessData = {
+                mood: parseInt(moodBtn.dataset.value),
+                exercise: parseInt(exerciseBtn.dataset.value),
+                diet: parseInt(dietBtn.dataset.value),
+                appearance: parseInt(appearanceBtn.dataset.value),
+                improvementNotes: improvementNotes,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(wellnessData));
+            document.getElementById('saved-message').classList.add('visible');
+            setTimeout(function() {
+                document.getElementById('saved-message').classList.remove('visible');
+            }, 3000);
+        }
+
+        function clearWellness() {
+            document.querySelectorAll('.rating-button.selected').forEach(function(btn) {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('improvement-notes').value = '';
+            document.getElementById('mood-suggestions').classList.remove('visible');
+        }
+
+        // Load saved data
+        (function() {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                var data = JSON.parse(saved);
+
+                if (data.mood) {
+                    var moodBtn = document.querySelector('#mood-rating .rating-button[data-value="' + data.mood + '"]');
+                    if (moodBtn) moodBtn.classList.add('selected');
+                }
+                if (data.exercise) {
+                    var exerciseBtn = document.querySelector('#exercise-rating .rating-button[data-value="' + data.exercise + '"]');
+                    if (exerciseBtn) exerciseBtn.classList.add('selected');
+                }
+                if (data.diet) {
+                    var dietBtn = document.querySelector('#diet-rating .rating-button[data-value="' + data.diet + '"]');
+                    if (dietBtn) dietBtn.classList.add('selected');
+                }
+                if (data.appearance) {
+                    var appearanceBtn = document.querySelector('#appearance-rating .rating-button[data-value="' + data.appearance + '"]');
+                    if (appearanceBtn) appearanceBtn.classList.add('selected');
+                }
+                if (data.improvementNotes) {
+                    document.getElementById('improvement-notes').value = data.improvementNotes;
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

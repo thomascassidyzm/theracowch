@@ -585,7 +585,7 @@
             </article>
 
             <!-- Wellness Check-in -->
-            <article class="exercise-card" id="wellness-card">
+            <article class="exercise-card" id="wellness-card" onclick="window.location.href='/exercises/wellness-checkin.html'" style="cursor: pointer;">
                 <div class="exercise-header">
                     <div>
                         <h2 class="exercise-title">Wellness Check-in</h2>
@@ -593,91 +593,8 @@
                     </div>
                     <div class="completion-badge">✓</div>
                 </div>
-
-                <div class="exercise-content">
-                    <div class="rating-group">
-                        <label class="rating-label">How's your mood today? (1 = very low, 10 = very contented)</label>
-                        <div class="rating-scale" id="mood-rating">
-                            <button class="rating-button" data-value="1">1</button>
-                            <button class="rating-button" data-value="2">2</button>
-                            <button class="rating-button" data-value="3">3</button>
-                            <button class="rating-button" data-value="4">4</button>
-                            <button class="rating-button" data-value="5">5</button>
-                            <button class="rating-button" data-value="6">6</button>
-                            <button class="rating-button" data-value="7">7</button>
-                            <button class="rating-button" data-value="8">8</button>
-                            <button class="rating-button" data-value="9">9</button>
-                            <button class="rating-button" data-value="10">10</button>
-                        </div>
-                        <div class="suggestions-box hidden" id="mood-suggestions">
-                            <div class="suggestions-title">Try one of these to lift your mood by just one point:</div>
-                            <div class="suggestion-tags">
-                                <span class="suggestion-tag">Go for a walk</span>
-                                <span class="suggestion-tag">Listen to happy music</span>
-                                <span class="suggestion-tag">Call a friend</span>
-                                <span class="suggestion-tag">Play with a pet</span>
-                                <span class="suggestion-tag">Think of something that makes you smile</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">How satisfied are you with your exercise routine?</label>
-                        <div class="rating-scale" id="exercise-rating">
-                            <button class="rating-button" data-value="1">1</button>
-                            <button class="rating-button" data-value="2">2</button>
-                            <button class="rating-button" data-value="3">3</button>
-                            <button class="rating-button" data-value="4">4</button>
-                            <button class="rating-button" data-value="5">5</button>
-                            <button class="rating-button" data-value="6">6</button>
-                            <button class="rating-button" data-value="7">7</button>
-                            <button class="rating-button" data-value="8">8</button>
-                            <button class="rating-button" data-value="9">9</button>
-                            <button class="rating-button" data-value="10">10</button>
-                        </div>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">How satisfied are you with your eating habits?</label>
-                        <div class="rating-scale" id="diet-rating">
-                            <button class="rating-button" data-value="1">1</button>
-                            <button class="rating-button" data-value="2">2</button>
-                            <button class="rating-button" data-value="3">3</button>
-                            <button class="rating-button" data-value="4">4</button>
-                            <button class="rating-button" data-value="5">5</button>
-                            <button class="rating-button" data-value="6">6</button>
-                            <button class="rating-button" data-value="7">7</button>
-                            <button class="rating-button" data-value="8">8</button>
-                            <button class="rating-button" data-value="9">9</button>
-                            <button class="rating-button" data-value="10">10</button>
-                        </div>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">How satisfied are you with your appearance & self-care?</label>
-                        <div class="rating-scale" id="appearance-rating">
-                            <button class="rating-button" data-value="1">1</button>
-                            <button class="rating-button" data-value="2">2</button>
-                            <button class="rating-button" data-value="3">3</button>
-                            <button class="rating-button" data-value="4">4</button>
-                            <button class="rating-button" data-value="5">5</button>
-                            <button class="rating-button" data-value="6">6</button>
-                            <button class="rating-button" data-value="7">7</button>
-                            <button class="rating-button" data-value="8">8</button>
-                            <button class="rating-button" data-value="9">9</button>
-                            <button class="rating-button" data-value="10">10</button>
-                        </div>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">What can you do to improve in areas where you scored low?</label>
-                        <textarea id="improvement-notes" placeholder="Write your thoughts here..."></textarea>
-                    </div>
-                </div>
-
                 <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="clearWellness()">Clear</button>
-                    <button class="btn btn-primary" onclick="saveWellness()">Save Check-in</button>
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); window.location.href='/exercises/wellness-checkin.html'">Try Exercise →</button>
                 </div>
             </article>
 
@@ -740,7 +657,6 @@
         // ============================================
 
         const STORAGE_KEYS = {
-            WELLNESS: 'cowch_wellness_checkin',
             ENERGY: 'cowch_energy_audit',
             STREAK: 'cowch_self_care_streak',
             LAST_COMPLETION: 'cowch_last_self_care_completion'
@@ -749,101 +665,6 @@
         // ============================================
         // Rating Scale Handlers
         // ============================================
-
-        function setupRatingScales() {
-            const ratingGroups = ['mood-rating', 'exercise-rating', 'diet-rating', 'appearance-rating'];
-
-            ratingGroups.forEach(groupId => {
-                const group = document.getElementById(groupId);
-                const buttons = group.querySelectorAll('.rating-button');
-
-                buttons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        // Clear previous selection
-                        buttons.forEach(btn => btn.classList.remove('selected'));
-                        // Select current
-                        button.classList.add('selected');
-
-                        // Show mood improvement suggestions if mood is below 6
-                        if (groupId === 'mood-rating' && parseInt(button.dataset.value) < 6) {
-                            document.getElementById('mood-suggestions').classList.remove('hidden');
-                        } else if (groupId === 'mood-rating') {
-                            document.getElementById('mood-suggestions').classList.add('hidden');
-                        }
-                    });
-                });
-            });
-        }
-
-        // ============================================
-        // Wellness Check-in Functions
-        // ============================================
-
-        function saveWellness() {
-            const moodBtn = document.querySelector('#mood-rating .rating-button.selected');
-            const exerciseBtn = document.querySelector('#exercise-rating .rating-button.selected');
-            const dietBtn = document.querySelector('#diet-rating .rating-button.selected');
-            const appearanceBtn = document.querySelector('#appearance-rating .rating-button.selected');
-            const improvementNotes = document.getElementById('improvement-notes').value;
-
-            if (!moodBtn || !exerciseBtn || !dietBtn || !appearanceBtn) {
-                alert('Please complete all ratings before saving.');
-                return;
-            }
-
-            const wellnessData = {
-                mood: parseInt(moodBtn.dataset.value),
-                exercise: parseInt(exerciseBtn.dataset.value),
-                diet: parseInt(dietBtn.dataset.value),
-                appearance: parseInt(appearanceBtn.dataset.value),
-                improvementNotes: improvementNotes,
-                timestamp: new Date().toISOString()
-            };
-
-            localStorage.setItem(STORAGE_KEYS.WELLNESS, JSON.stringify(wellnessData));
-            document.getElementById('wellness-card').classList.add('completed');
-            updateStreak();
-
-            alert('Wellness check-in saved! Great job taking care of yourself.');
-        }
-
-        function clearWellness() {
-            document.querySelectorAll('#wellness-card .rating-button.selected').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.getElementById('improvement-notes').value = '';
-            document.getElementById('mood-suggestions').classList.add('hidden');
-        }
-
-        function loadWellness() {
-            const saved = localStorage.getItem(STORAGE_KEYS.WELLNESS);
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('wellness-card').classList.add('completed');
-
-                // Restore ratings
-                if (data.mood) {
-                    const moodBtn = document.querySelector(`#mood-rating .rating-button[data-value="${data.mood}"]`);
-                    if (moodBtn) moodBtn.classList.add('selected');
-                }
-                if (data.exercise) {
-                    const exerciseBtn = document.querySelector(`#exercise-rating .rating-button[data-value="${data.exercise}"]`);
-                    if (exerciseBtn) exerciseBtn.classList.add('selected');
-                }
-                if (data.diet) {
-                    const dietBtn = document.querySelector(`#diet-rating .rating-button[data-value="${data.diet}"]`);
-                    if (dietBtn) dietBtn.classList.add('selected');
-                }
-                if (data.appearance) {
-                    const appearanceBtn = document.querySelector(`#appearance-rating .rating-button[data-value="${data.appearance}"]`);
-                    if (appearanceBtn) appearanceBtn.classList.add('selected');
-                }
-
-                if (data.improvementNotes) {
-                    document.getElementById('improvement-notes').value = data.improvementNotes;
-                }
-            }
-        }
 
         // ============================================
         // Energy Audit Functions
@@ -1038,8 +859,6 @@
         // ============================================
 
         function init() {
-            setupRatingScales();
-            loadWellness();
             loadEnergy();
             loadStreak();
 
