@@ -259,6 +259,25 @@
             font-weight: var(--font-weight-normal);
         }
 
+        .action-btn-text .helpline-item {
+            display: block;
+            margin-top: var(--space-xs);
+        }
+
+        .action-btn.primary .helpline-item {
+            color: var(--bg-primary);
+        }
+
+        .action-btn.primary .helpline-item a {
+            color: var(--bg-primary);
+            text-decoration: underline;
+            font-weight: var(--font-weight-bold);
+        }
+
+        .action-btn.primary .helpline-item a:hover {
+            opacity: 0.8;
+        }
+
         /* ============================================
            EXERCISES SECTION
            ============================================ */
@@ -2161,13 +2180,14 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="quick-actions">
-                        <button class="action-btn primary" id="need-help-now">
+                        <div class="action-btn primary" id="need-help-now">
                             <span class="action-btn-icon">🆘</span>
                             <div class="action-btn-text">
                                 <strong>Need help now?</strong>
-                                <span>Immediate support & resources</span>
+                                <span class="helpline-item"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</span>
+                                <span class="helpline-item">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</span>
                             </div>
-                        </button>
+                        </div>
 
                         <button class="action-btn primary" data-tab="chat">
                             <span class="action-btn-icon">💬</span>
