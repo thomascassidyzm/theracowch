@@ -137,8 +137,8 @@
             background: var(--bg-card);
             border: var(--border-thicc) solid var(--border-warm);
             border-radius: var(--radius-chunky);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
             position: relative;
             overflow: hidden;
             animation: slideUp 0.7s ease-out 0.2s both;
@@ -155,9 +155,9 @@
         .daily-thought::before {
             content: '"';
             position: absolute;
-            top: -20px;
-            left: 20px;
-            font-size: 150px;
+            top: -15px;
+            left: 15px;
+            font-size: 100px;
             font-weight: var(--font-weight-black);
             color: var(--coral);
             opacity: 0.15;
@@ -166,18 +166,18 @@
         }
 
         .daily-thought-label {
-            font-size: var(--font-size-sm);
+            font-size: var(--font-size-xs);
             font-weight: var(--font-weight-bold);
             color: var(--coral);
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-sm);
             position: relative;
             z-index: 1;
         }
 
         .daily-thought-text {
-            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
             font-weight: var(--font-weight-bold);
             color: var(--text-secondary);
             line-height: 1.4;
@@ -1979,7 +1979,7 @@
             }
 
             .daily-thought {
-                padding: var(--space-lg);
+                padding: var(--space-sm);
             }
 
             .imagine-mini-letter {
