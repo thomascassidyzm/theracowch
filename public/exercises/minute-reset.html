@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>1 Minute Reset - SuperHero Pose | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card h2 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .step-item:last-child { border-bottom: none; }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--coral);
+            color: var(--bg-deep);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-card strong {
+            color: var(--coral);
+        }
+
+        .prompt-section {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-section label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .prompt-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .prompt-section textarea:focus {
+            border-color: var(--coral);
+        }
+
+        .prompt-section textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .response-box {
+            margin-top: 1rem;
+            padding: 1.2rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .response-box.visible { display: block; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .steps-card, .prompt-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/self.html" class="back-btn">← Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🦸</div>
+        <h1>1 Minute Reset</h1>
+        <p class="subtitle">The SuperHero Pose</p>
+
+        <div class="steps-card">
+            <h2>Strike the pose</h2>
+            <div class="step-item">
+                <span class="step-number">1</span>
+                <span>Stand up</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">2</span>
+                <span>Shoulders back</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">3</span>
+                <span>Hands on hips</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">4</span>
+                <span>Legs standing apart</span>
+            </div>
+        </div>
+
+        <div class="info-card">
+            This is called the <strong>SuperHero Pose</strong> — research shows it can stimulate <strong>dopamine</strong> and <strong>serotonin</strong>, helping to improve your mood. Hold the pose for 60 seconds and notice how you feel.
+        </div>
+
+        <div class="prompt-section">
+            <label>What's one small thing you can do right now to improve your mood?</label>
+            <textarea id="reset-text" placeholder="Write your thought here..."></textarea>
+            <div class="response-box" id="response-box"></div>
+        </div>
+    </div>
+
+    <script>
+        var responses = [
+            "That's a wonderful start. Even the smallest step can shift your whole day.",
+            "Love that. Tiny actions create big ripples — you're already moving in the right direction.",
+            "That sounds like exactly what you need right now. Be proud of yourself for recognising it.",
+            "Beautiful. The fact that you thought of something means you already know how to take care of yourself.",
+            "Yes! Small wins build momentum. You've got this.",
+            "That's a really kind thing to do for yourself. You deserve it.",
+            "Perfect. Remember — you don't have to fix everything, just one small thing at a time.",
+            "What a great idea. Taking action, even a tiny one, is incredibly powerful."
+        ];
+
+        var timer = null;
+        var textarea = document.getElementById('reset-text');
+        var responseBox = document.getElementById('response-box');
+
+        textarea.addEventListener('input', function() {
+            clearTimeout(timer);
+            if (textarea.value.trim().length > 0) {
+                timer = setTimeout(function() {
+                    var msg = responses[Math.floor(Math.random() * responses.length)];
+                    responseBox.textContent = msg;
+                    responseBox.classList.add('visible');
+                }, 1000);
+            } else {
+                responseBox.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>
