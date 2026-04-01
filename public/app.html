@@ -259,22 +259,43 @@
             font-weight: var(--font-weight-normal);
         }
 
-        .action-btn-text .helpline-item {
-            display: block;
-            margin-top: var(--space-xs);
+        .helpline-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
         }
 
-        .action-btn.primary .helpline-item {
-            color: var(--bg-primary);
+        .helpline-panel.open {
+            max-height: 200px;
+            opacity: 1;
         }
 
-        .action-btn.primary .helpline-item a {
-            color: var(--bg-primary);
-            text-decoration: underline;
+        .helpline-panel-inner {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--coral);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+        }
+
+        .helpline-entry {
+            margin: 0 0 var(--space-sm) 0;
+            font-size: var(--font-size-base);
             font-weight: var(--font-weight-bold);
+            color: var(--text-secondary);
         }
 
-        .action-btn.primary .helpline-item a:hover {
+        .helpline-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .helpline-entry a {
+            color: var(--coral);
+            text-decoration: underline;
+            font-weight: var(--font-weight-black);
+        }
+
+        .helpline-entry a:hover {
             opacity: 0.8;
         }
 
@@ -2180,12 +2201,18 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="quick-actions">
-                        <div class="action-btn primary" id="need-help-now">
+                        <button class="action-btn primary" id="need-help-now">
                             <span class="action-btn-icon">🆘</span>
                             <div class="action-btn-text">
                                 <strong>Need help now?</strong>
-                                <span class="helpline-item"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</span>
-                                <span class="helpline-item">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</span>
+                                <span>Immediate support & resources</span>
+                            </div>
+                        </button>
+
+                        <div class="helpline-panel" id="helpline-panel">
+                            <div class="helpline-panel-inner">
+                                <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
+                                <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
                             </div>
                         </div>
 
@@ -3756,6 +3783,11 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
+
+        document.getElementById('need-help-now').addEventListener('click', function() {
+            var panel = document.getElementById('helpline-panel');
+            panel.classList.toggle('open');
+        });
     </script>
 </body>
 </html>
