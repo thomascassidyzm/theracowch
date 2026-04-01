@@ -617,6 +617,35 @@
             </div>
         </div>
 
+        <!-- Exercise 5: Boundary Setting -->
+        <div class="exercise-card" id="boundary-card">
+            <h2>Boundary Setting</h2>
+            <p class="exercise-description">
+                Healthy boundaries improve self-confidence and relationships. Practice saying no.
+            </p>
+
+            <div class="script-template">
+                <p style="color: #6B9AAF; font-weight: 700; margin-bottom: 20px;">
+                    <em>Reflect:</em> Can you think of people in your life who have overstepped your boundaries? Remember, self-care comes first — always.
+                </p>
+
+                <div class="script-line">
+                    <div class="script-label">Who has overstepped your boundaries recently?</div>
+                    <textarea class="script-input" id="boundary-people" placeholder="Write about the situation..." rows="3"></textarea>
+                </div>
+
+                <div class="script-line">
+                    <div class="script-label">What boundary do you need to set?</div>
+                    <textarea class="script-input" id="boundary-practice" placeholder="I need to say no to..." rows="3"></textarea>
+                </div>
+
+                <div class="script-line">
+                    <div class="script-label">How will you communicate this boundary?</div>
+                    <textarea class="script-input" id="boundary-communication" placeholder="I will say..." rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
         <!-- Progress Indicator -->
         <div class="progress-section">
             <h3>Your Interaction Practice Progress</h3>
@@ -669,7 +698,8 @@
                 'connectionWeb',
                 'dailyCheckin',
                 'comfortLadder',
-                'difficultConvo'
+                'difficultConvo',
+                'boundarySetting'
             ];
 
             let completed = 0;
@@ -701,6 +731,11 @@
 
         document.querySelector('.script-template').addEventListener('input', () => {
             localStorage.setItem('interactions_difficultConvo', 'true');
+            updateProgress();
+        });
+
+        document.getElementById('boundary-card').addEventListener('input', () => {
+            localStorage.setItem('interactions_boundarySetting', 'true');
             updateProgress();
         });
 

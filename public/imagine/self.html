@@ -667,45 +667,6 @@
                 </div>
             </article>
 
-            <!-- Boundary Setting -->
-            <article class="exercise-card" id="boundary-card">
-                <div class="exercise-header">
-                    <div>
-                        <h2 class="exercise-title">Boundary Setting</h2>
-                        <p class="exercise-description">Healthy boundaries improve self-confidence and relationships. Practice saying no.</p>
-                    </div>
-                    <div class="completion-badge">✓</div>
-                </div>
-
-                <div class="exercise-content">
-                    <div class="reflection-prompt">
-                        <p class="prompt-text">
-                            <span class="prompt-highlight">Reflect:</span> Can you think of people in your life who have overstepped your boundaries? Remember, self-care comes first — always.
-                        </p>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">Who has overstepped your boundaries recently?</label>
-                        <textarea id="boundary-people" placeholder="Write about the situation..."></textarea>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">Practice saying no: What boundary do you need to set?</label>
-                        <textarea id="boundary-practice" placeholder="I need to say no to..."></textarea>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">How will you communicate this boundary bravely and assertively?</label>
-                        <textarea id="boundary-communication" placeholder="I will say..."></textarea>
-                    </div>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="clearBoundary()">Clear</button>
-                    <button class="btn btn-primary" onclick="saveBoundary()">Save Boundary Work</button>
-                </div>
-            </article>
-
             <!-- Energy Audit -->
             <article class="exercise-card" id="energy-card">
                 <div class="exercise-header">
@@ -766,7 +727,6 @@
 
         const STORAGE_KEYS = {
             WELLNESS: 'cowch_wellness_checkin',
-            BOUNDARY: 'cowch_boundary_setting',
             ENERGY: 'cowch_energy_audit',
             STREAK: 'cowch_self_care_streak',
             LAST_COMPLETION: 'cowch_last_self_care_completion'
@@ -868,52 +828,6 @@
                 if (data.improvementNotes) {
                     document.getElementById('improvement-notes').value = data.improvementNotes;
                 }
-            }
-        }
-
-        // ============================================
-        // Boundary Setting Functions
-        // ============================================
-
-        function saveBoundary() {
-            const people = document.getElementById('boundary-people').value;
-            const practice = document.getElementById('boundary-practice').value;
-            const communication = document.getElementById('boundary-communication').value;
-
-            if (!people && !practice && !communication) {
-                alert('Please fill in at least one reflection before saving.');
-                return;
-            }
-
-            const boundaryData = {
-                people: people,
-                practice: practice,
-                communication: communication,
-                timestamp: new Date().toISOString()
-            };
-
-            localStorage.setItem(STORAGE_KEYS.BOUNDARY, JSON.stringify(boundaryData));
-            document.getElementById('boundary-card').classList.add('completed');
-            updateStreak();
-
-            alert('Boundary work saved! Remember: self-care comes first, always.');
-        }
-
-        function clearBoundary() {
-            document.getElementById('boundary-people').value = '';
-            document.getElementById('boundary-practice').value = '';
-            document.getElementById('boundary-communication').value = '';
-        }
-
-        function loadBoundary() {
-            const saved = localStorage.getItem(STORAGE_KEYS.BOUNDARY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('boundary-card').classList.add('completed');
-
-                if (data.people) document.getElementById('boundary-people').value = data.people;
-                if (data.practice) document.getElementById('boundary-practice').value = data.practice;
-                if (data.communication) document.getElementById('boundary-communication').value = data.communication;
             }
         }
 
@@ -1112,7 +1026,6 @@
         function init() {
             setupRatingScales();
             loadWellness();
-            loadBoundary();
             loadEnergy();
             loadStreak();
 
