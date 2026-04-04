@@ -447,33 +447,36 @@
 
         <!-- Progress Indicator -->
         <section class="progress-section">
-            <div class="progress-label">Your Acceptance Streak</div>
-            <div class="streak-display" id="streak-number">5</div>
-            <div class="streak-text">days of practice</div>
+            <div class="progress-label">Your Acceptance Practice</div>
+            <div class="streak-display" id="streak-number">0</div>
+            <div class="streak-text">exercises completed</div>
+            <button id="reset-streak" style="margin-top: 12px; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: inherit;">Reset</button>
         </section>
     </div>
 
     <script>
-        // Load streak from localStorage
-        const STORAGE_KEY = 'cowch_imagine_progress';
+        var STREAK_KEY = 'cowch_acceptance_completed';
 
-        function loadStreak() {
-            try {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    const progress = JSON.parse(stored);
-                    if (progress.acceptance_streak !== undefined) {
-                        document.getElementById('streak-number').textContent = progress.acceptance_streak;
-                    }
-                }
-            } catch (e) {
-                console.log('Could not load streak data');
-            }
+        function loadCount() {
+            var count = parseInt(localStorage.getItem(STREAK_KEY) || '0');
+            document.getElementById('streak-number').textContent = count;
         }
 
-        // Initialize
-        loadStreak();
-        console.log('Acceptance section initialized');
+        // Check if user just returned from an exercise
+        var referrer = document.referrer || '';
+        if (referrer.indexOf('/exercises/radical-acceptance') !== -1 ||
+            referrer.indexOf('/exercises/heal-framework') !== -1 ||
+            referrer.indexOf('/exercises/wave') !== -1) {
+            var count = parseInt(localStorage.getItem(STREAK_KEY) || '0') + 1;
+            localStorage.setItem(STREAK_KEY, count.toString());
+        }
+
+        document.getElementById('reset-streak').addEventListener('click', function() {
+            localStorage.removeItem(STREAK_KEY);
+            loadCount();
+        });
+
+        loadCount();
     </script>
 </body>
 </html>
