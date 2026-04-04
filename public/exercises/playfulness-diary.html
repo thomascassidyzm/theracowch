@@ -187,6 +187,32 @@
             font-size: 0.95rem;
         }
 
+        .response-box {
+            margin-top: 1rem;
+            padding: 1.2rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .response-box.visible { display: block; }
+
+        .response-emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 480px) {
             h1 { font-size: 1.6rem; }
             .prompt-section { padding: 1.5rem; }
@@ -209,12 +235,100 @@
             <label>What fun did you have today? What made you smile or laugh?</label>
             <textarea id="diaryInput" placeholder="Write about a fun moment..."></textarea>
             <button class="action-btn" onclick="saveDiaryEntry()">Save Entry</button>
+            <div class="response-box" id="response-box">
+                <span class="response-emoji" id="response-emoji"></span>
+                <span id="response-text"></span>
+            </div>
         </div>
 
         <div id="entriesContainer"></div>
     </div>
 
     <script>
+        var responses = {
+            laugh: [
+                { emoji: '😂', text: 'Laughter is literally medicine — it releases endorphins and reduces stress hormones. Keep finding those moments!' },
+                { emoji: '✨', text: '"A day without laughter is a day wasted." — Charlie Chaplin. Sounds like you didn\'t waste today!' }
+            ],
+            friend: [
+                { emoji: '💛', text: 'Connection is one of the greatest sources of joy. The people who make us laugh are treasures.' },
+                { emoji: '🤗', text: 'Shared fun creates bonds that last. Those moments with people we care about are what life is really about.' }
+            ],
+            nature: [
+                { emoji: '🌿', text: 'Being in nature is proven to reduce anxiety and boost mood. Keep getting outside — your mind will thank you.' },
+                { emoji: '🌞', text: '"In every walk with nature, one receives far more than they seek." — John Muir' }
+            ],
+            music: [
+                { emoji: '🎵', text: 'Music activates the same reward centres in the brain as food and connection. Keep dancing, keep singing!' },
+                { emoji: '🎶', text: '"Where words fail, music speaks." — Hans Christian Andersen. What a beautiful way to find joy.' }
+            ],
+            play: [
+                { emoji: '🎮', text: 'Play isn\'t just for children — it\'s how adults recharge creativity and resilience. Well done for making time for it!' },
+                { emoji: '🎨', text: '"We don\'t stop playing because we grow old; we grow old because we stop playing." — George Bernard Shaw' }
+            ],
+            food: [
+                { emoji: '🍰', text: 'Savouring good food is a form of mindfulness. You were fully present in that moment — that\'s beautiful.' },
+                { emoji: '☕', text: 'Finding joy in simple pleasures like food shows you\'re paying attention to the good stuff. Keep noticing!' }
+            ],
+            pet: [
+                { emoji: '🐾', text: 'Animals bring unconditional joy. Studies show spending time with pets lowers cortisol and boosts oxytocin!' },
+                { emoji: '❤️', text: 'The bond with a pet is pure and simple. What a wonderful source of daily happiness.' }
+            ],
+            general: [
+                { emoji: '🌟', text: 'The fact that you noticed this moment of joy is powerful. Gratitude for small pleasures rewires your brain for happiness.' },
+                { emoji: '💫', text: '"Happiness is not something ready-made. It comes from your own actions." — Dalai Lama. You\'re creating it right now.' },
+                { emoji: '🎉', text: 'Every fun moment you record is proof that joy exists in your life. On harder days, read these back — they\'re your evidence.' },
+                { emoji: '🌈', text: 'You\'re building a library of happy memories. Research shows that recalling positive experiences boosts mood just as much as the original event!' },
+                { emoji: '☀️', text: 'Noticing playfulness in your day is a skill — and you\'re getting better at it. That\'s something to celebrate.' },
+                { emoji: '🦋', text: '"Joy does not simply happen to us. We have to choose joy and keep choosing it every day." — Henri Nouwen. And you just did.' },
+                { emoji: '💖', text: 'This is self-care in its purest form — choosing to remember what made you smile. Beautiful.' },
+                { emoji: '🙌', text: 'Fun isn\'t frivolous — it\'s essential. You\'re recharging your emotional batteries right now.' }
+            ]
+        };
+
+        function getResponse(text) {
+            var lower = text.toLowerCase();
+
+            if (lower.match(/laugh|funny|hilarious|giggle|crack up|comedy/)) {
+                return pick(responses.laugh);
+            }
+            if (lower.match(/friend|mate|colleague|partner|family|mum|dad|sister|brother|kids|children/)) {
+                return pick(responses.friend);
+            }
+            if (lower.match(/walk|park|garden|nature|tree|beach|sun|outside|hike|fresh air/)) {
+                return pick(responses.nature);
+            }
+            if (lower.match(/music|song|dance|singing|playlist|concert|guitar|piano/)) {
+                return pick(responses.music);
+            }
+            if (lower.match(/game|play|sport|football|tennis|board game|puzzle|video game/)) {
+                return pick(responses.play);
+            }
+            if (lower.match(/food|cook|bake|eat|lunch|dinner|coffee|tea|cake|chocolate|restaurant/)) {
+                return pick(responses.food);
+            }
+            if (lower.match(/dog|cat|pet|puppy|kitten|animal/)) {
+                return pick(responses.pet);
+            }
+
+            return pick(responses.general);
+        }
+
+        function pick(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function showResponse(text) {
+            var resp = getResponse(text);
+            document.getElementById('response-emoji').textContent = resp.emoji;
+            document.getElementById('response-text').textContent = resp.text;
+            var box = document.getElementById('response-box');
+            box.classList.remove('visible');
+            // Force reflow for animation restart
+            void box.offsetWidth;
+            box.classList.add('visible');
+        }
+
         function saveDiaryEntry() {
             var input = document.getElementById('diaryInput');
             var content = input.value.trim();
@@ -231,6 +345,7 @@
             });
             localStorage.setItem('diaryEntries', JSON.stringify(entries));
 
+            showResponse(content);
             input.value = '';
             loadEntries();
         }
