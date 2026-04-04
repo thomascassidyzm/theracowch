@@ -679,18 +679,32 @@
                 ctx.stroke();
             });
 
+            // Group connections by circle for even spacing
+            var circleGroups = { inner: [], middle: [], outer: [] };
+            connections.forEach(function(person) {
+                circleGroups[person.circle].push(person);
+            });
+
+            // Assign evenly spaced angles per circle
+            Object.keys(circleGroups).forEach(function(circle) {
+                var group = circleGroups[circle];
+                var count = group.length;
+                if (count === 0) return;
+                var angleStep = (Math.PI * 2) / count;
+                // Offset each circle so they don't all start at the same angle
+                var offset = circle === 'inner' ? 0 : circle === 'middle' ? 0.5 : 1.0;
+                group.forEach(function(person, i) {
+                    person.assignedAngle = offset + i * angleStep;
+                });
+            });
+
             // Draw people
             connections.forEach(function(person, idx) {
-                if (!person.angle && person.angle !== 0) {
-                    // Assign a stable angle spread evenly
-                    person.angle = (idx * 2.399) + Math.random() * 0.5;
-                }
-
                 if (!person.placed) {
-                    // Position on their ring using the stored angle
                     var radius = maxRadius * RINGS[person.circle].radius;
-                    person.x = centerX + Math.cos(person.angle) * radius;
-                    person.y = centerY + Math.sin(person.angle) * radius;
+                    var angle = person.assignedAngle || 0;
+                    person.x = centerX + Math.cos(angle) * radius;
+                    person.y = centerY + Math.sin(angle) * radius;
                     person.targetX = person.x;
                     person.targetY = person.y;
                     person.placed = true;
