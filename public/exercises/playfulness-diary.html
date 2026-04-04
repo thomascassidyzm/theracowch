@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Playfulness Diary | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-card strong {
+            color: var(--coral);
+        }
+
+        .prompt-section {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-section label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        textarea:focus {
+            border-color: var(--coral);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .action-btn {
+            display: inline-block;
+            background: var(--coral);
+            color: var(--bg-deep);
+            padding: 0.8rem 1.6rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Gabarito', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover { opacity: 0.85; }
+
+        .diary-entry {
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .diary-date {
+            font-weight: 700;
+            color: var(--coral);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .diary-content {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .entries-header {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .prompt-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/nurturing.html" class="back-btn">&larr; Back</a>
+
+    <div class="container">
+        <div class="hero-icon">📔</div>
+        <h1>Playfulness Diary</h1>
+        <p class="subtitle">Log your fun moments</p>
+
+        <div class="info-card">
+            Tracking <strong>playfulness</strong> helps you notice joy in your daily life. Write about what made you smile, laugh, or feel light today. Over time you'll see patterns of what brings you the most fun.
+        </div>
+
+        <div class="prompt-section">
+            <label>What fun did you have today? What made you smile or laugh?</label>
+            <textarea id="diaryInput" placeholder="Write about a fun moment..."></textarea>
+            <button class="action-btn" onclick="saveDiaryEntry()">Save Entry</button>
+        </div>
+
+        <div id="entriesContainer"></div>
+    </div>
+
+    <script>
+        function saveDiaryEntry() {
+            var input = document.getElementById('diaryInput');
+            var content = input.value.trim();
+
+            if (!content) {
+                alert('Write something first!');
+                return;
+            }
+
+            var entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            entries.unshift({
+                date: new Date().toLocaleDateString(),
+                content: content
+            });
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+            input.value = '';
+            loadEntries();
+        }
+
+        function loadEntries() {
+            var entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            var container = document.getElementById('entriesContainer');
+
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">No entries yet. Write your first one above!</div>';
+                return;
+            }
+
+            container.innerHTML = '<div class="entries-header">Your Entries (' + entries.length + ')</div>' +
+                entries.slice(0, 10).map(function(entry) {
+                    return '<div class="diary-entry">' +
+                        '<div class="diary-date">' + entry.date + '</div>' +
+                        '<div class="diary-content">' + entry.content + '</div>' +
+                    '</div>';
+                }).join('');
+        }
+
+        loadEntries();
+    </script>
+</body>
+</html>

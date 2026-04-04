@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Boundary Setting | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-card strong {
+            color: var(--coral);
+        }
+
+        .script-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .script-card h2 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .reflect-note {
+            color: var(--coral);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            font-style: italic;
+        }
+
+        .script-line {
+            margin-bottom: 1.2rem;
+            padding: 1rem;
+            background: var(--bg-deep);
+            border-left: 5px solid var(--coral);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .script-label {
+            font-weight: 900;
+            color: var(--coral);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .script-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-card);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .script-input:focus {
+            border-color: var(--coral);
+        }
+
+        .script-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .feedback-box {
+            display: none;
+            margin-top: 1.2rem;
+            padding: 1.2rem;
+            background: var(--bg-deep);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+        }
+
+        .feedback-box strong {
+            color: var(--coral);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-text {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .suggestion-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 2px solid rgba(212, 137, 106, 0.3);
+            border-radius: 8px;
+        }
+
+        .suggestion-box strong {
+            color: var(--coral);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .suggestion-box p {
+            color: var(--text-primary);
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .script-card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/interactions.html" class="back-btn">← Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🛡</div>
+        <h1>Boundary Setting</h1>
+        <p class="subtitle">Practice Saying No With Confidence</p>
+
+        <div class="info-card">
+            Healthy boundaries improve self-confidence and relationships. Practice saying no.
+        </div>
+
+        <div class="script-card">
+            <h2>Set Your Boundary</h2>
+
+            <p class="reflect-note">Reflect: Can you think of people in your life who have overstepped your boundaries? Remember, self-care comes first — always.</p>
+
+            <div class="script-line">
+                <div class="script-label">Who has overstepped your boundaries recently?</div>
+                <textarea class="script-input" id="boundary-people" placeholder="Write about the situation..." rows="3"></textarea>
+            </div>
+
+            <div class="script-line">
+                <div class="script-label">What boundary do you need to set?</div>
+                <textarea class="script-input" id="boundary-practice" placeholder="I need to say no to..." rows="3"></textarea>
+            </div>
+
+            <div class="script-line">
+                <div class="script-label">How will you communicate this boundary?</div>
+                <textarea class="script-input" id="boundary-communication" placeholder="I will say..." rows="3"></textarea>
+            </div>
+
+            <div class="feedback-box" id="boundary-feedback">
+                <strong>Feedback on your response:</strong>
+                <div class="feedback-text" id="boundary-feedback-text"></div>
+                <div class="suggestion-box" id="boundary-suggestion">
+                    <strong>A stronger version might sound like:</strong>
+                    <p id="boundary-suggestion-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Boundary communication feedback
+        (function() {
+            var commBox = document.getElementById('boundary-communication');
+            var feedbackEl = document.getElementById('boundary-feedback');
+            var feedbackText = document.getElementById('boundary-feedback-text');
+            var suggestionText = document.getElementById('boundary-suggestion-text');
+            var timer = null;
+
+            commBox.addEventListener('input', function() {
+                clearTimeout(timer);
+                var text = commBox.value.trim();
+                if (text.length < 10) {
+                    feedbackEl.style.display = 'none';
+                    return;
+                }
+                timer = setTimeout(function() {
+                    analyseBoundary(text);
+                }, 1000);
+            });
+
+            function analyseBoundary(text) {
+                var tips = [];
+                var lower = text.toLowerCase();
+                var boundaryText = document.getElementById('boundary-practice').value.trim();
+
+                // Check for "I" statements
+                if (lower.indexOf('i feel') !== -1 || lower.indexOf('i need') !== -1 || lower.indexOf("i'd") !== -1) {
+                    tips.push('<span style="color:#7EA88B;">✓ Great use of "I" statements</span> — this keeps it about your needs, not blame.');
+                } else {
+                    tips.push('<span style="color:#E8A84A;">⚡ Try starting with "I feel..." or "I need..."</span> — this makes it about your experience rather than accusing the other person.');
+                }
+
+                // Check for "you always/never"
+                if (lower.indexOf('you always') !== -1 || lower.indexOf('you never') !== -1) {
+                    tips.push('<span style="color:#D9363E;">⚠ Avoid "You always" or "You never"</span> — these generalisations make people defensive. Try being specific about the situation.');
+                }
+
+                // Check for a clear request
+                if (lower.indexOf('could you') !== -1 || lower.indexOf('would you') !== -1 || lower.indexOf('i need you to') !== -1 || lower.indexOf('i would like') !== -1 || lower.indexOf("i'd like") !== -1 || lower.indexOf('please') !== -1) {
+                    tips.push('<span style="color:#7EA88B;">✓ Clear request included</span> — you\'re telling them what you need, which is great.');
+                } else {
+                    tips.push('<span style="color:#E8A84A;">⚡ Try including a clear request</span> — e.g. "I would like..." or "Could you please..." so they know exactly what you need.');
+                }
+
+                // Check tone - aggressive language
+                if (lower.indexOf('shut up') !== -1 || lower.indexOf('stupid') !== -1 || lower.indexOf('hate you') !== -1 || lower.indexOf('don\'t care') !== -1) {
+                    tips.push('<span style="color:#D9363E;">⚠ Watch the tone</span> — assertive is different from aggressive. Aim for firm but respectful.');
+                } else {
+                    tips.push('<span style="color:#7EA88B;">✓ Respectful tone</span> — you\'re being assertive without being aggressive.');
+                }
+
+                // Check if too apologetic
+                if (lower.indexOf('sorry') !== -1 || lower.indexOf('i know this is silly') !== -1 || lower.indexOf('it\'s probably nothing') !== -1) {
+                    tips.push('<span style="color:#E8A84A;">⚡ You don\'t need to apologise for setting a boundary</span> — your needs are valid. Remove "sorry" and state it with confidence.');
+                }
+
+                feedbackText.innerHTML = '<ul style="padding-left: 20px; list-style: none;">' + tips.map(function(t) { return '<li style="margin-bottom: 8px;">' + t + '</li>'; }).join('') + '</ul>';
+
+                // Build a suggested stronger version
+                var situation = boundaryText || 'this situation';
+                suggestionText.textContent = '"I feel uncomfortable when ' + situation.toLowerCase().replace(/^i need to say no to\s*/i, '') + '. I need you to respect that this is my boundary. I value our relationship, and I hope we can find a way forward that works for both of us."';
+
+                feedbackEl.style.display = 'block';
+            }
+        })();
+    </script>
+</body>
+</html>

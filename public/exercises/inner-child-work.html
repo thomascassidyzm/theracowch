@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Inner Child Work | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-card strong {
+            color: var(--coral);
+        }
+
+        .joy-link {
+            display: block;
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: opacity 0.2s;
+        }
+
+        .joy-link:hover { opacity: 0.85; }
+
+        .joy-link span {
+            color: var(--coral);
+        }
+
+        .prompts-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompts-card h2 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .prompt-item {
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-item:hover {
+            border-color: var(--coral);
+            transform: translateX(4px);
+        }
+
+        .prompt-item.completed {
+            border-color: rgba(255,255,255,0.08);
+            opacity: 0.5;
+        }
+
+        .prompt-item-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .checkmark {
+            color: var(--coral);
+            font-size: 1.2rem;
+            font-weight: 900;
+            display: none;
+            flex-shrink: 0;
+            margin-left: 0.8rem;
+        }
+
+        .prompt-item.completed .checkmark {
+            display: block;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .progress-text strong {
+            color: var(--coral);
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .prompts-card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/nurturing.html" class="back-btn">&larr; Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🧒</div>
+        <h1>Inner Child Work</h1>
+        <p class="subtitle">Reconnect with your playful self</p>
+
+        <div class="info-card">
+            Explore these prompts to reconnect with your <strong>playful, creative inner child</strong>. No pressure, no judgment. Tap a prompt to mark it complete.
+        </div>
+
+        <a href="/exercises/joy.html" class="joy-link">
+            <span>Try Joy Bubbles Exercise &rarr;</span>
+        </a>
+
+        <div class="prompts-card">
+            <h2>Reflection Prompts</h2>
+            <div id="innerChildPrompts">
+                <div class="prompt-item" onclick="togglePrompt(this, 0)">
+                    <span class="prompt-item-text">What was your favorite childhood game or activity?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 1)">
+                    <span class="prompt-item-text">What would 8-year-old you want to do this weekend?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 2)">
+                    <span class="prompt-item-text">What silly thing makes you laugh every time?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 3)">
+                    <span class="prompt-item-text">When was the last time you played just for fun?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 4)">
+                    <span class="prompt-item-text">What creative activity did you love as a child?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 5)">
+                    <span class="prompt-item-text">What would you do if you had a whole day with no responsibilities?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 6)">
+                    <span class="prompt-item-text">What's something playful you've been wanting to try?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 7)">
+                    <span class="prompt-item-text">How do you feel when you allow yourself to be playful?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 8)">
+                    <span class="prompt-item-text">What permission does your inner child need from you?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+                <div class="prompt-item" onclick="togglePrompt(this, 9)">
+                    <span class="prompt-item-text">What small act of play can you do today?</span>
+                    <span class="checkmark">&#10003;</span>
+                </div>
+            </div>
+            <div class="progress-text" id="progressText"><strong>0</strong> of 10 completed</div>
+        </div>
+    </div>
+
+    <script>
+        function togglePrompt(element, index) {
+            var completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
+
+            if (completed.includes(index)) {
+                completed.splice(completed.indexOf(index), 1);
+                element.classList.remove('completed');
+            } else {
+                completed.push(index);
+                element.classList.add('completed');
+            }
+
+            localStorage.setItem('innerChildCompleted', JSON.stringify(completed));
+            updateCount(completed.length);
+        }
+
+        function updateCount(count) {
+            document.getElementById('progressText').innerHTML = '<strong>' + count + '</strong> of 10 completed';
+        }
+
+        function loadProgress() {
+            var completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
+            var prompts = document.querySelectorAll('#innerChildPrompts .prompt-item');
+
+            completed.forEach(function(index) {
+                if (prompts[index]) {
+                    prompts[index].classList.add('completed');
+                }
+            });
+
+            updateCount(completed.length);
+        }
+
+        loadProgress();
+    </script>
+</body>
+</html>

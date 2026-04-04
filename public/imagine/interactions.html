@@ -188,145 +188,6 @@
             margin-bottom: 5px;
         }
 
-        /* Daily Check-in Prompt */
-        .checkin-prompt {
-            background: #1a1512;
-            padding: 25px;
-            border: 3px solid #6B9AAF;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .checkin-prompt p {
-            font-size: 20px;
-            font-weight: 700;
-            color: #6B9AAF;
-            margin-bottom: 15px;
-        }
-
-        .checkin-suggestions {
-            display: grid;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .suggestion-item {
-            padding: 15px;
-            background: #2d2825;
-            border: 3px solid #6B9AAF;
-            font-size: 15px;
-            color: #e0e0e0;
-        }
-
-        /* Comfort Zone Ladder */
-        .ladder {
-            display: grid;
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .ladder-step {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: #1a1512;
-            border: 3px solid #6B9AAF;
-            transition: all 0.2s;
-        }
-
-        .ladder-step:hover {
-            background: rgba(107, 154, 175, 0.1);
-            transform: translateX(5px);
-        }
-
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: #6B9AAF;
-            color: #1a1512;
-            font-size: 24px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .step-content {
-            flex: 1;
-        }
-
-        .step-title {
-            font-weight: 700;
-            color: #6B9AAF;
-            margin-bottom: 5px;
-        }
-
-        .step-description {
-            color: #c0c0c0;
-            font-size: 14px;
-        }
-
-        /* Good Communication Script */
-        .script-template {
-            background: #1a1512;
-            padding: 30px;
-            border: 3px solid #6B9AAF;
-            margin: 25px 0;
-        }
-
-        .script-line {
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #2d2825;
-            border-left: 6px solid #6B9AAF;
-        }
-
-        .script-label {
-            font-weight: 900;
-            color: #6B9AAF;
-            font-size: 14px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .script-input {
-            width: 100%;
-            padding: 12px;
-            background: #1a1512;
-            border: 3px solid #6B9AAF;
-            color: #fff;
-            font-family: 'Gabarito', sans-serif;
-            font-size: 16px;
-            outline: none;
-        }
-
-        .script-input:focus {
-            box-shadow: 0 0 0 3px rgba(107, 154, 175, 0.3);
-        }
-
-        .script-preview {
-            margin-top: 25px;
-            padding: 25px;
-            background: #2d2825;
-            border: 4px solid #6B9AAF;
-            box-shadow: 8px 8px 0 rgba(107, 154, 175, 0.2);
-        }
-
-        .script-preview h3 {
-            color: #6B9AAF;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .script-preview p {
-            color: #e0e0e0;
-            line-height: 1.8;
-            font-size: 16px;
-        }
-
         /* Progress Indicator */
         .progress-section {
             margin-top: 50px;
@@ -475,84 +336,18 @@
         </a>
 
         <!-- Exercise 4: Good Communication -->
-        <div class="exercise-card">
+        <a href="/exercises/good-communication.html" class="exercise-card" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
             <h2>Good Communication</h2>
-            <p class="exercise-description">
-                Use this assertive communication template to express your needs clearly without aggression or avoidance. Structure helps when emotions run high.
-            </p>
-
-            <div class="script-template">
-                <div class="script-line">
-                    <div class="script-label">I feel...</div>
-                    <input type="text" class="script-input" id="feeling" placeholder="(name the emotion: hurt, frustrated, overwhelmed, dismissed)">
-                </div>
-
-                <div class="script-line">
-                    <div class="script-label">When...</div>
-                    <input type="text" class="script-input" id="when" placeholder="(describe the specific behavior, not the person: 'when plans change last minute' not 'when you're flaky')">
-                </div>
-
-                <div class="script-line">
-                    <div class="script-label">I would appreciate...</div>
-                    <input type="text" class="script-input" id="appreciate" placeholder="(make a clear request: 'if you could let me know earlier when things change')">
-                </div>
-
-                <div class="script-preview">
-                    <h3>Your Script Preview:</h3>
-                    <p id="preview-text">Fill in the fields above to see your full assertive statement...</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 25px; padding: 20px; background: #1a1512; border: 3px solid #6B9AAF;">
-                <strong style="color: #6B9AAF; display: block; margin-bottom: 10px;">Tips for Delivery:</strong>
-                <ul style="color: #c0c0c0; padding-left: 20px; line-height: 1.8;">
-                    <li>Pick the right time - not during an argument or when rushed</li>
-                    <li>Use "I" statements, not "You" accusations</li>
-                    <li>Stay specific - don't bring up old issues</li>
-                    <li>Listen to their response without interrupting</li>
-                    <li>Be prepared to compromise, but hold your boundary</li>
-                    <li>Avoid using "You always..." or "You never..." as this encourages defensiveness in the other person</li>
-                </ul>
-            </div>
-        </div>
+            <p class="exercise-description">Use this assertive communication template to express your needs clearly without aggression or avoidance. Structure helps when emotions run high.</p>
+            <button class="action-button" style="width: 100%; margin-top: 20px;" onclick="event.preventDefault(); window.location.href='/exercises/good-communication.html'">Try Exercise →</button>
+        </a>
 
         <!-- Exercise 5: Boundary Setting -->
-        <div class="exercise-card" id="boundary-card">
+        <a href="/exercises/boundary-setting.html" class="exercise-card" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
             <h2>Boundary Setting</h2>
-            <p class="exercise-description">
-                Healthy boundaries improve self-confidence and relationships. Practice saying no.
-            </p>
-
-            <div class="script-template">
-                <p style="color: #6B9AAF; font-weight: 700; margin-bottom: 20px;">
-                    <em>Reflect:</em> Can you think of people in your life who have overstepped your boundaries? Remember, self-care comes first — always.
-                </p>
-
-                <div class="script-line">
-                    <div class="script-label">Who has overstepped your boundaries recently?</div>
-                    <textarea class="script-input" id="boundary-people" placeholder="Write about the situation..." rows="3"></textarea>
-                </div>
-
-                <div class="script-line">
-                    <div class="script-label">What boundary do you need to set?</div>
-                    <textarea class="script-input" id="boundary-practice" placeholder="I need to say no to..." rows="3"></textarea>
-                </div>
-
-                <div class="script-line">
-                    <div class="script-label">How will you communicate this boundary?</div>
-                    <textarea class="script-input" id="boundary-communication" placeholder="I will say..." rows="3"></textarea>
-                </div>
-
-                <div id="boundary-feedback" style="display:none; margin-top: 20px; padding: 20px; background: #1a1512; border: 3px solid #6B9AAF;">
-                    <strong style="color: #6B9AAF; display: block; margin-bottom: 10px;">Feedback on your response:</strong>
-                    <div id="boundary-feedback-text" style="color: #c0c0c0; line-height: 1.8;"></div>
-                    <div id="boundary-suggestion" style="margin-top: 15px; padding: 15px; background: rgba(107, 154, 175, 0.1); border: 2px solid rgba(107, 154, 175, 0.3);">
-                        <strong style="color: #6B9AAF; display: block; margin-bottom: 8px;">A stronger version might sound like:</strong>
-                        <p id="boundary-suggestion-text" style="color: #e0e0e0; font-style: italic; line-height: 1.6;"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <p class="exercise-description">Healthy boundaries improve self-confidence and relationships. Practice saying no.</p>
+            <button class="action-button" style="width: 100%; margin-top: 20px;" onclick="event.preventDefault(); window.location.href='/exercises/boundary-setting.html'">Try Exercise →</button>
+        </a>
 
         <!-- Progress Indicator -->
         <div class="progress-section">
@@ -567,38 +362,9 @@
     </div>
 
     <script>
-        // Good Communication Script Builder
-        const feeling = document.getElementById('feeling');
-        const when = document.getElementById('when');
-        const appreciate = document.getElementById('appreciate');
-        const previewText = document.getElementById('preview-text');
-
-        function updatePreview() {
-            const feelingVal = feeling.value.trim();
-            const whenVal = when.value.trim();
-            const appreciateVal = appreciate.value.trim();
-
-            if (feelingVal || whenVal || appreciateVal) {
-                let script = '';
-                if (feelingVal) script += `I feel ${feelingVal}`;
-                if (whenVal) script += ` when ${whenVal}`;
-                if (appreciateVal) script += `. I would appreciate ${appreciateVal}`;
-
-                if (!script.endsWith('.')) script += '.';
-
-                previewText.textContent = script;
-            } else {
-                previewText.textContent = 'Fill in the fields above to see your full assertive statement...';
-            }
-        }
-
-        feeling.addEventListener('input', updatePreview);
-        when.addEventListener('input', updatePreview);
-        appreciate.addEventListener('input', updatePreview);
-
         // Simple Progress Tracking (localStorage)
         function updateProgress() {
-            const exercises = [
+            var exercises = [
                 'connectionWeb',
                 'dailyCheckin',
                 'comfortLadder',
@@ -606,101 +372,19 @@
                 'boundarySetting'
             ];
 
-            let completed = 0;
-            exercises.forEach(ex => {
-                if (localStorage.getItem(`interactions_${ex}`)) {
+            var completed = 0;
+            exercises.forEach(function(ex) {
+                if (localStorage.getItem('interactions_' + ex)) {
                     completed++;
                 }
             });
 
-            const percentage = (completed / exercises.length) * 100;
+            var percentage = (completed / exercises.length) * 100;
             document.getElementById('progress-fill').style.width = percentage + '%';
         }
 
-        // Mark exercises as interacted with
-        document.querySelector('.connection-web-container').addEventListener('click', () => {
-            localStorage.setItem('interactions_connectionWeb', 'true');
-            updateProgress();
-        });
-
-        document.querySelector('.script-template').addEventListener('input', () => {
-            localStorage.setItem('interactions_difficultConvo', 'true');
-            updateProgress();
-        });
-
-        document.getElementById('boundary-card').addEventListener('input', () => {
-            localStorage.setItem('interactions_boundarySetting', 'true');
-            updateProgress();
-        });
-
         // Initialize progress on load
         updateProgress();
-
-        // Boundary communication feedback
-        (function() {
-            var commBox = document.getElementById('boundary-communication');
-            var feedbackEl = document.getElementById('boundary-feedback');
-            var feedbackText = document.getElementById('boundary-feedback-text');
-            var suggestionText = document.getElementById('boundary-suggestion-text');
-            var timer = null;
-
-            commBox.addEventListener('input', function() {
-                clearTimeout(timer);
-                var text = commBox.value.trim();
-                if (text.length < 10) {
-                    feedbackEl.style.display = 'none';
-                    return;
-                }
-                timer = setTimeout(function() {
-                    analyseBoundary(text);
-                }, 1000);
-            });
-
-            function analyseBoundary(text) {
-                var tips = [];
-                var lower = text.toLowerCase();
-                var boundaryText = document.getElementById('boundary-practice').value.trim();
-
-                // Check for "I" statements
-                if (lower.indexOf('i feel') !== -1 || lower.indexOf('i need') !== -1 || lower.indexOf("i'd") !== -1) {
-                    tips.push('<span style="color:#7EA88B;">✓ Great use of "I" statements</span> — this keeps it about your needs, not blame.');
-                } else {
-                    tips.push('<span style="color:#E8A84A;">⚡ Try starting with "I feel..." or "I need..."</span> — this makes it about your experience rather than accusing the other person.');
-                }
-
-                // Check for "you always/never"
-                if (lower.indexOf('you always') !== -1 || lower.indexOf('you never') !== -1) {
-                    tips.push('<span style="color:#D9363E;">⚠ Avoid "You always" or "You never"</span> — these generalisations make people defensive. Try being specific about the situation.');
-                }
-
-                // Check for a clear request
-                if (lower.indexOf('could you') !== -1 || lower.indexOf('would you') !== -1 || lower.indexOf('i need you to') !== -1 || lower.indexOf('i would like') !== -1 || lower.indexOf("i'd like") !== -1 || lower.indexOf('please') !== -1) {
-                    tips.push('<span style="color:#7EA88B;">✓ Clear request included</span> — you\'re telling them what you need, which is great.');
-                } else {
-                    tips.push('<span style="color:#E8A84A;">⚡ Try including a clear request</span> — e.g. "I would like..." or "Could you please..." so they know exactly what you need.');
-                }
-
-                // Check tone - aggressive language
-                if (lower.indexOf('shut up') !== -1 || lower.indexOf('stupid') !== -1 || lower.indexOf('hate you') !== -1 || lower.indexOf('don\'t care') !== -1) {
-                    tips.push('<span style="color:#D9363E;">⚠ Watch the tone</span> — assertive is different from aggressive. Aim for firm but respectful.');
-                } else {
-                    tips.push('<span style="color:#7EA88B;">✓ Respectful tone</span> — you\'re being assertive without being aggressive.');
-                }
-
-                // Check if too apologetic
-                if (lower.indexOf('sorry') !== -1 || lower.indexOf('i know this is silly') !== -1 || lower.indexOf('it\'s probably nothing') !== -1) {
-                    tips.push('<span style="color:#E8A84A;">⚡ You don\'t need to apologise for setting a boundary</span> — your needs are valid. Remove "sorry" and state it with confidence.');
-                }
-
-                feedbackText.innerHTML = '<ul style="padding-left: 20px; list-style: none;">' + tips.map(function(t) { return '<li style="margin-bottom: 8px;">' + t + '</li>'; }).join('') + '</ul>';
-
-                // Build a suggested stronger version
-                var situation = boundaryText || 'this situation';
-                suggestionText.textContent = '"I feel uncomfortable when ' + situation.toLowerCase().replace(/^i need to say no to\s*/i, '') + '. I need you to respect that this is my boundary. I value our relationship, and I hope we can find a way forward that works for both of us."';
-
-                feedbackEl.style.display = 'block';
-            }
-        })();
     </script>
 </body>
 </html>
