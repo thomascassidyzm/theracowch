@@ -116,7 +116,7 @@
             color: var(--coral);
         }
 
-        .prompts-card {
+        .question-card {
             background: var(--bg-card);
             border: 4px solid var(--coral);
             border-radius: 12px;
@@ -124,65 +124,60 @@
             margin-bottom: 1.5rem;
         }
 
-        .prompts-card h2 {
+        .question-card h2 {
             font-size: 1.2rem;
             font-weight: 900;
-            color: var(--coral);
-            text-transform: uppercase;
+            color: var(--text-primary);
             margin-bottom: 1.2rem;
+            text-align: center;
         }
 
-        .prompt-item {
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 0.6rem;
             background: var(--bg-deep);
             border: 3px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.6rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .prompt-item:hover {
-            border-color: var(--coral);
-            transform: translateX(4px);
-        }
-
-        .prompt-item.completed {
-            border-color: rgba(255,255,255,0.08);
-            opacity: 0.5;
-        }
-
-        .prompt-item-text {
+            border-radius: 10px;
             color: var(--text-muted);
+            font-family: 'Gabarito', sans-serif;
             font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        .checkmark {
-            color: var(--coral);
-            font-size: 1.2rem;
-            font-weight: 900;
-            display: none;
-            flex-shrink: 0;
-            margin-left: 0.8rem;
-        }
-
-        .prompt-item.completed .checkmark {
-            display: block;
-        }
-
-        .progress-text {
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 1rem;
         }
 
-        .progress-text strong {
+        .option-btn:hover {
+            border-color: var(--coral);
+            color: var(--text-primary);
+        }
+
+        .option-btn.selected {
+            border-color: var(--coral);
+            background: rgba(212, 137, 106, 0.15);
             color: var(--coral);
+        }
+
+        .response-box {
+            margin-top: 1.2rem;
+            padding: 1.2rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .response-box.visible { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 480px) {
@@ -207,88 +202,65 @@
             <span>Try Joy Bubbles Exercise &rarr;</span>
         </a>
 
-        <div class="prompts-card">
-            <h2>Reflection Prompts</h2>
-            <div id="innerChildPrompts">
-                <div class="prompt-item" onclick="togglePrompt(this, 0)">
-                    <span class="prompt-item-text">What was your favorite childhood game or activity?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 1)">
-                    <span class="prompt-item-text">What would 8-year-old you want to do this weekend?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 2)">
-                    <span class="prompt-item-text">What silly thing makes you laugh every time?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 3)">
-                    <span class="prompt-item-text">When was the last time you played just for fun?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 4)">
-                    <span class="prompt-item-text">What creative activity did you love as a child?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 5)">
-                    <span class="prompt-item-text">What would you do if you had a whole day with no responsibilities?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 6)">
-                    <span class="prompt-item-text">What's something playful you've been wanting to try?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 7)">
-                    <span class="prompt-item-text">How do you feel when you allow yourself to be playful?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 8)">
-                    <span class="prompt-item-text">What permission does your inner child need from you?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-                <div class="prompt-item" onclick="togglePrompt(this, 9)">
-                    <span class="prompt-item-text">What small act of play can you do today?</span>
-                    <span class="checkmark">&#10003;</span>
-                </div>
-            </div>
-            <div class="progress-text" id="progressText"><strong>0</strong> of 10 completed</div>
+        <div class="question-card">
+            <h2>How in tune are you with your inner child?</h2>
+            <button class="option-btn" onclick="selectOption(this, 'not-at-all')">Not at all</button>
+            <button class="option-btn" onclick="selectOption(this, 'somewhat')">Somewhat</button>
+            <button class="option-btn" onclick="selectOption(this, 'very-much')">Very much so</button>
+            <div class="response-box" id="response-box"></div>
         </div>
     </div>
 
     <script>
-        function togglePrompt(element, index) {
-            var completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
+        var responses = {
+            'not-at-all': [
+                "That's completely okay — and honestly, really common. Many of us lose touch with our inner child as we take on adult responsibilities. The fact that you're here exploring this is already a step back towards that playful part of yourself. Start small: what's one thing that made you laugh as a kid?",
+                "No judgment at all. Life has a way of burying our playful side under stress and expectations. But your inner child is still there, waiting. Try doing one tiny silly thing today — even if it feels strange. That's where reconnection begins.",
+                "Most adults feel this way. We're taught to be serious, productive, responsible. But play isn't childish — it's essential for creativity and wellbeing. You don't need to feel in tune yet. Just be curious about what fun might look like for you."
+            ],
+            'somewhat': [
+                "That's a great place to be! You haven't lost the connection entirely — you just need to nurture it. Think about the moments when you feel most free and light. Those are your inner child speaking. Can you create more of those moments this week?",
+                "You're already halfway there. 'Somewhat' means there are moments when your playful side comes through. Pay attention to when that happens — what triggers it? Those are clues to what your inner child needs more of.",
+                "That awareness is really valuable. Many people don't even notice their inner child. The next step is giving yourself permission to play without guilt. Schedule fun the same way you schedule work — it's that important."
+            ],
+            'very-much': [
+                "That's wonderful! Being connected to your inner child means you have access to creativity, spontaneity, and joy that many adults struggle to find. Keep protecting that part of yourself — it's one of your greatest strengths.",
+                "Amazing. People who stay connected to their playful side tend to be more resilient, more creative, and more emotionally flexible. You're doing something right — keep playing, keep laughing, keep being you.",
+                "What a gift. Your inner child is alive and well, and that means you have a natural source of joy and wonder. Share that energy with others — playfulness is contagious, and the world needs more of it."
+            ]
+        };
 
-            if (completed.includes(index)) {
-                completed.splice(completed.indexOf(index), 1);
-                element.classList.remove('completed');
-            } else {
-                completed.push(index);
-                element.classList.add('completed');
-            }
-
-            localStorage.setItem('innerChildCompleted', JSON.stringify(completed));
-            updateCount(completed.length);
-        }
-
-        function updateCount(count) {
-            document.getElementById('progressText').innerHTML = '<strong>' + count + '</strong> of 10 completed';
-        }
-
-        function loadProgress() {
-            var completed = JSON.parse(localStorage.getItem('innerChildCompleted') || '[]');
-            var prompts = document.querySelectorAll('#innerChildPrompts .prompt-item');
-
-            completed.forEach(function(index) {
-                if (prompts[index]) {
-                    prompts[index].classList.add('completed');
-                }
+        function selectOption(btn, choice) {
+            // Clear previous selection
+            document.querySelectorAll('.option-btn').forEach(function(b) {
+                b.classList.remove('selected');
             });
+            btn.classList.add('selected');
 
-            updateCount(completed.length);
+            // Pick a random response
+            var pool = responses[choice];
+            var text = pool[Math.floor(Math.random() * pool.length)];
+
+            var box = document.getElementById('response-box');
+            box.textContent = text;
+            box.classList.remove('visible');
+            void box.offsetWidth;
+            box.classList.add('visible');
+
+            localStorage.setItem('innerChildChoice', choice);
         }
 
-        loadProgress();
+        // Load saved choice
+        (function() {
+            var saved = localStorage.getItem('innerChildChoice');
+            if (saved) {
+                var btns = document.querySelectorAll('.option-btn');
+                var map = { 'not-at-all': 0, 'somewhat': 1, 'very-much': 2 };
+                if (map[saved] !== undefined && btns[map[saved]]) {
+                    btns[map[saved]].classList.add('selected');
+                }
+            }
+        })();
     </script>
 </body>
 </html>
