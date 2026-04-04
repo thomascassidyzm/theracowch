@@ -649,12 +649,14 @@
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Ring label at bottom of each circle
-                ctx.fillStyle = '#8a7a6a';
-                ctx.font = '11px Gabarito, -apple-system, BlinkMacSystemFont, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText(ring.label, centerX, centerY + ringRadius - 6);
+                // Ring label at bottom of each circle (skip inner)
+                if (key !== 'inner') {
+                    ctx.fillStyle = '#8a7a6a';
+                    ctx.font = '11px Gabarito, -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(ring.label, centerX, centerY + ringRadius - 6);
+                }
             });
 
             // Draw connections (lines)
