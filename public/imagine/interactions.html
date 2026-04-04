@@ -351,40 +351,46 @@
 
         <!-- Progress Indicator -->
         <div class="progress-section">
-            <h3>Your Interaction Practice Progress</h3>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            <div class="progress-text">
-                Complete exercises to track your progress. Every small step counts.
-            </div>
+            <h3>Your Interaction Practice</h3>
+            <div style="font-size: 48px; font-weight: 900; color: #6B9AAF; text-align: center; margin: 10px 0;" id="exercise-count">0</div>
+            <div class="progress-text">exercises completed</div>
+            <button id="reset-progress" style="margin-top: 12px; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: 'Gabarito', sans-serif; display: block; margin-left: auto; margin-right: auto;">Reset</button>
         </div>
     </div>
 
     <script>
-        // Simple Progress Tracking (localStorage)
-        function updateProgress() {
-            var exercises = [
-                'connectionWeb',
-                'dailyCheckin',
-                'comfortLadder',
-                'difficultConvo',
-                'boundarySetting'
-            ];
+        var COUNT_KEY = 'cowch_interactions_completed';
 
-            var completed = 0;
-            exercises.forEach(function(ex) {
-                if (localStorage.getItem('interactions_' + ex)) {
-                    completed++;
-                }
-            });
-
-            var percentage = (completed / exercises.length) * 100;
-            document.getElementById('progress-fill').style.width = percentage + '%';
+        function loadCount() {
+            var count = parseInt(localStorage.getItem(COUNT_KEY) || '0');
+            document.getElementById('exercise-count').textContent = count;
         }
 
-        // Initialize progress on load
-        updateProgress();
+        // Check if user just returned from an exercise
+        var referrer = document.referrer || '';
+        var exercisePages = [
+            '/exercises/connection-web',
+            '/exercises/comfort-ladder',
+            '/exercises/good-communication',
+            '/exercises/boundary-setting',
+            '/exercises/kindness'
+        ];
+
+        var cameFromExercise = exercisePages.some(function(page) {
+            return referrer.indexOf(page) !== -1;
+        });
+
+        if (cameFromExercise) {
+            var count = parseInt(localStorage.getItem(COUNT_KEY) || '0') + 1;
+            localStorage.setItem(COUNT_KEY, count.toString());
+        }
+
+        document.getElementById('reset-progress').addEventListener('click', function() {
+            localStorage.removeItem(COUNT_KEY);
+            loadCount();
+        });
+
+        loadCount();
     </script>
 </body>
 </html>
