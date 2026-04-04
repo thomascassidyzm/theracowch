@@ -450,21 +450,6 @@
             <button class="btn" style="margin-top: 20px;" onclick="event.preventDefault(); window.location.href='/exercises/gratitude-journal.html'">Try Exercise →</button>
         </a>
 
-        <!-- Daily Gratitude Exercise -->
-        <div class="exercise-card">
-            <h2>Daily Gratitude Exercise</h2>
-            <p>A quick 30-60 second guided practice to build calm and self-appreciation. Just press start and follow along.</p>
-
-            <div class="exercise-timer">
-                <div class="timer-display" id="timerDisplay">0:00</div>
-                <div class="exercise-prompt" id="exercisePrompt">Ready when you are.</div>
-                <div class="timer-controls">
-                    <button id="startBtn" class="timer-btn">Start Exercise</button>
-                    <button id="resetBtn" class="timer-btn secondary" style="display: none;">Reset</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Progress Indicator -->
         <div class="progress-section">
             <h3>Your Gratitude Practice</h3>
@@ -522,83 +507,6 @@
                 }, 3000);
             }
         });
-
-        // Daily Gratitude Exercise
-        const exercisePrompts = [
-            { time: 0, text: "Take a deep breath in... and out..." },
-            { time: 5, text: "Think of one thing you're grateful for today..." },
-            { time: 15, text: "Picture it clearly in your mind..." },
-            { time: 25, text: "Notice how it makes you feel..." },
-            { time: 35, text: "Think of something you appreciate about yourself..." },
-            { time: 45, text: "Let that appreciation sink in..." },
-            { time: 55, text: "Take one more deep breath..." },
-            { time: 60, text: "Exercise complete. Well done!" }
-        ];
-
-        let timerInterval = null;
-        let currentTime = 0;
-        let exerciseRunning = false;
-
-        function updateTimer() {
-            const display = document.getElementById('timerDisplay');
-            const minutes = Math.floor(currentTime / 60);
-            const seconds = currentTime % 60;
-            display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function updatePrompt() {
-            const prompt = document.getElementById('exercisePrompt');
-            // Find the most recent prompt that should be showing
-            for (let i = exercisePrompts.length - 1; i >= 0; i--) {
-                if (currentTime >= exercisePrompts[i].time) {
-                    prompt.textContent = exercisePrompts[i].text;
-                    break;
-                }
-            }
-        }
-
-        function startExercise() {
-            exerciseRunning = true;
-            currentTime = 0;
-            updateTimer();
-            updatePrompt();
-
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('resetBtn').style.display = 'inline-block';
-
-            timerInterval = setInterval(() => {
-                currentTime++;
-                updateTimer();
-                updatePrompt();
-
-                if (currentTime >= 60) {
-                    stopExercise(true);
-                }
-            }, 1000);
-        }
-
-        function stopExercise(completed = false) {
-            clearInterval(timerInterval);
-            exerciseRunning = false;
-
-            if (completed) {
-                // Increment exercise count
-                const count = parseInt(localStorage.getItem(STORAGE_KEYS.exercises) || 0) + 1;
-                localStorage.setItem(STORAGE_KEYS.exercises, count);
-                document.getElementById('exerciseCount').textContent = count;
-            }
-
-            document.getElementById('startBtn').style.display = 'inline-block';
-            document.getElementById('resetBtn').style.display = 'none';
-
-            currentTime = 0;
-            updateTimer();
-            document.getElementById('exercisePrompt').textContent = completed ?
-                "Exercise complete. Well done!" : "Ready when you are.";
-        }
-
-        document.getElementById('startBtn').addEventListener('click', startExercise);
-        document.getElementById('resetBtn').addEventListener('click', () => stopExercise(false));
 
         // Load progress on page load
         loadProgress();
