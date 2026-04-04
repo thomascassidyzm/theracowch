@@ -491,7 +491,8 @@
         function loadProgress() {
             document.getElementById('winsCount').textContent = localStorage.getItem(STORAGE_KEYS.wins) || 0;
             document.getElementById('exerciseCount').textContent = localStorage.getItem(STORAGE_KEYS.exercises) || 0;
-            loadJournalEntries();
+            var journalEntries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
+            document.getElementById('journalCount').textContent = journalEntries.length;
         }
 
         // Small Wins Celebration
@@ -504,69 +505,6 @@
                 const count = parseInt(localStorage.getItem(STORAGE_KEYS.wins) || 0) + 1;
                 localStorage.setItem(STORAGE_KEYS.wins, count);
                 document.getElementById('winsCount').textContent = count;
-
-                // Show success
-                success.classList.add('show');
-                input.value = '';
-
-                // Hide success after 3 seconds
-                setTimeout(() => {
-                    success.classList.remove('show');
-                }, 3000);
-            }
-        });
-
-        // Gratitude Journal
-        function loadJournalEntries() {
-            const entries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
-            const container = document.getElementById('journalEntries');
-
-            document.getElementById('journalCount').textContent = entries.length;
-
-            if (entries.length === 0) {
-                container.innerHTML = '<div class="no-entries">No entries yet. Start by writing something you\'re grateful for.</div>';
-                return;
-            }
-
-            // Show most recent entries first
-            container.innerHTML = entries.reverse().map(entry => `
-                <div class="journal-entry">
-                    <div class="journal-entry-date">${new Date(entry.date).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })}</div>
-                    <div class="journal-entry-text">${escapeHtml(entry.text)}</div>
-                </div>
-            `).join('');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        document.getElementById('journalBtn').addEventListener('click', function() {
-            const input = document.getElementById('journalInput');
-            const success = document.getElementById('journalSuccess');
-
-            if (input.value.trim()) {
-                // Get existing entries
-                const entries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
-
-                // Add new entry
-                entries.push({
-                    date: new Date().toISOString(),
-                    text: input.value.trim()
-                });
-
-                // Save
-                localStorage.setItem(STORAGE_KEYS.journal, JSON.stringify(entries));
-
-                // Reload display
-                loadJournalEntries();
 
                 // Show success
                 success.classList.add('show');
