@@ -1,5 +1,6 @@
 .vercel
 .env*.local
+.claude/
 node_modules/
 package-lock.json
 *.log
