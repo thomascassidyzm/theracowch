@@ -339,7 +339,7 @@
 
         // Funny side of life
         var funnyResponses = {
-            'very-much': "Well done! That's a brilliant quality to have. Humour is one of the most powerful tools for resilience — it helps you bounce back, stay flexible, and keep perspective when life gets tough. Keep laughing!",
+            'very-much': "Great — keep up the good work! Here are even more ideas just in case you need inspiration:",
             'somewhat': "That's a good start — and something you can build on. Life doesn't have to be so serious all the time. Here are some ways to bring more lightness in:",
             'not-at-all': "That's okay — many people feel this way, especially during tough times. But humour and playfulness can be rediscovered. Here are some ideas to help you reconnect with the lighter side of life:"
         };
@@ -365,13 +365,11 @@
 
             var html = '<p style="margin-bottom:1rem;">' + funnyResponses[choice] + '</p>';
 
-            if (choice !== 'very-much') {
-                html += '<ul style="list-style:none;padding:0;">';
-                funnyIdeas.forEach(function(idea) {
-                    html += '<li style="margin-bottom:0.8rem;line-height:1.6;">' + idea + '</li>';
-                });
-                html += '</ul>';
-            }
+            html += '<ul style="list-style:none;padding:0;">';
+            funnyIdeas.forEach(function(idea) {
+                html += '<li style="margin-bottom:0.8rem;line-height:1.6;">' + idea + '</li>';
+            });
+            html += '</ul>';
 
             var box = document.getElementById('funny-response');
             box.innerHTML = html;
