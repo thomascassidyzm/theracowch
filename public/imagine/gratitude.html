@@ -417,26 +417,11 @@
         </a>
 
         <!-- Small Wins Celebration -->
-        <div class="exercise-card">
+        <a href="/exercises/small-wins.html" class="exercise-card" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
             <h2>Small Wins Celebration</h2>
-            <p>Acknowledge one small win from today. It doesn't have to be huge—just something you did that moved you forward.</p>
-
-            <div class="steps">
-                <ol>
-                    <li><strong>Pause:</strong> Stop what you're doing</li>
-                    <li><strong>Reflect:</strong> What's one small thing you did today?</li>
-                    <li><strong>Acknowledge:</strong> Write it down below</li>
-                    <li><strong>Feel:</strong> Notice how it feels to recognize this</li>
-                    <li><strong>Lock it in:</strong> Take a breath and let it sink in</li>
-                </ol>
-            </div>
-
-            <textarea id="winInput" class="win-input" placeholder="I made progress today by..."></textarea>
-            <button id="winBtn" class="btn">Celebrate This Win</button>
-            <div id="winSuccess" class="success-message">
-                Win celebrated! You're making progress. 🎉
-            </div>
-        </div>
+            <p>Acknowledge one small win from today. It doesn't have to be huge — just something you did that moved you forward.</p>
+            <button class="btn" style="margin-top: 20px;" onclick="event.preventDefault(); window.location.href='/exercises/small-wins.html'">Try Exercise →</button>
+        </a>
 
         <!-- Gratitude Journal -->
         <a href="/exercises/gratitude-journal.html" class="exercise-card" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
@@ -485,28 +470,6 @@
             var journalEntries = JSON.parse(localStorage.getItem(STORAGE_KEYS.journal) || '[]');
             document.getElementById('journalCount').textContent = journalEntries.length;
         }
-
-        // Small Wins Celebration
-        document.getElementById('winBtn').addEventListener('click', function() {
-            const input = document.getElementById('winInput');
-            const success = document.getElementById('winSuccess');
-
-            if (input.value.trim()) {
-                // Increment count
-                const count = parseInt(localStorage.getItem(STORAGE_KEYS.wins) || 0) + 1;
-                localStorage.setItem(STORAGE_KEYS.wins, count);
-                document.getElementById('winsCount').textContent = count;
-
-                // Show success
-                success.classList.add('show');
-                input.value = '';
-
-                // Hide success after 3 seconds
-                setTimeout(() => {
-                    success.classList.remove('show');
-                }, 3000);
-            }
-        });
 
         // Load progress on page load
         loadProgress();

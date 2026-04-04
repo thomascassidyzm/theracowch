@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Small Wins Celebration | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card h2 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .step-item:last-child { border-bottom: none; }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--coral);
+            color: var(--bg-deep);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-card strong {
+            color: var(--coral);
+        }
+
+        .prompt-section {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-section label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .prompt-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .prompt-section textarea:focus {
+            border-color: var(--coral);
+        }
+
+        .prompt-section textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .celebrate-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            background: var(--coral);
+            color: var(--bg-deep);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+            transition: all 0.1s;
+        }
+
+        .celebrate-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+        }
+
+        .celebrate-btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.4);
+        }
+
+        .success-message {
+            margin-top: 1rem;
+            padding: 1.2rem;
+            background: rgba(212, 137, 106, 0.1);
+            border: 3px solid var(--coral);
+            border-radius: 8px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show { display: block; }
+
+        .stats-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--coral);
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .steps-card, .prompt-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/gratitude.html" class="back-btn">&larr; Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🏆</div>
+        <h1>Small Wins Celebration</h1>
+        <p class="subtitle">Acknowledge one small win from today</p>
+
+        <div class="info-card">
+            It doesn't have to be huge — just something you did that moved you forward. Recognising small wins trains your brain to notice <strong>progress</strong> instead of only seeing what's left to do.
+        </div>
+
+        <div class="steps-card">
+            <h2>How it works</h2>
+            <div class="step-item">
+                <span class="step-number">1</span>
+                <span><strong>Pause:</strong> Stop what you're doing</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">2</span>
+                <span><strong>Reflect:</strong> What's one small thing you did today?</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">3</span>
+                <span><strong>Acknowledge:</strong> Write it down below</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">4</span>
+                <span><strong>Feel:</strong> Notice how it feels to recognize this</span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">5</span>
+                <span><strong>Lock it in:</strong> Take a breath and let it sink in</span>
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <label>What's your small win today?</label>
+            <textarea id="winInput" placeholder="I made progress today by..."></textarea>
+            <button class="celebrate-btn" id="winBtn">Celebrate This Win</button>
+            <div class="success-message" id="winSuccess">
+                Win celebrated! You're making progress. 🎉
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-number" id="winsCount">0</div>
+            <div class="stats-label">Wins Celebrated</div>
+        </div>
+    </div>
+
+    <script>
+        var WINS_KEY = 'gratitude_wins_count';
+
+        function loadWins() {
+            document.getElementById('winsCount').textContent = localStorage.getItem(WINS_KEY) || 0;
+        }
+
+        document.getElementById('winBtn').addEventListener('click', function() {
+            var input = document.getElementById('winInput');
+            var success = document.getElementById('winSuccess');
+
+            if (input.value.trim()) {
+                var count = parseInt(localStorage.getItem(WINS_KEY) || 0) + 1;
+                localStorage.setItem(WINS_KEY, count);
+                document.getElementById('winsCount').textContent = count;
+
+                success.classList.add('show');
+                input.value = '';
+
+                setTimeout(function() {
+                    success.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        loadWins();
+    </script>
+</body>
+</html>
