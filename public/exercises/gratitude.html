@@ -122,6 +122,35 @@
             to { opacity: 1; }
         }
 
+        .gratitude-star.deletable {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .gratitude-star .delete-hint {
+            display: none;
+            font-size: 0.65rem;
+            color: #ff6b6b;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .gratitude-star.deletable:hover .delete-hint {
+            display: block;
+        }
+
+        .gratitude-star.loaded svg {
+            animation: none;
+            opacity: 1;
+            transform: scale(1);
+            filter: drop-shadow(0 0 10px var(--star-gold)) drop-shadow(0 0 20px var(--star-gold));
+        }
+
+        .gratitude-star.loaded .gratitude-star-label {
+            animation: none;
+            opacity: 1;
+        }
+
         .gratitude-star svg {
             filter: drop-shadow(0 0 10px var(--star-gold)) drop-shadow(0 0 20px var(--star-gold));
             animation: starAppear 1s ease-out forwards, starGlow 3s ease-in-out infinite 1s;
@@ -452,112 +481,143 @@
     </div>
 
     <script>
-        // State
-        let starCount = 0;
-        const maxStars = 20;
-        const gratitudeItems = [];
+        var STORAGE_KEY = 'cowch_gratitude_stars';
+        var maxStars = 20;
+        var starData = []; // Array of { text, x, y, size, color }
 
-        // DOM elements
-        const starsCanvas = document.getElementById('stars-canvas');
-        const input = document.getElementById('gratitude-input');
-        const addBtn = document.getElementById('add-btn');
-        const countDisplay = document.getElementById('star-count');
+        var starsCanvas = document.getElementById('stars-canvas');
+        var input = document.getElementById('gratitude-input');
+        var addBtn = document.getElementById('add-btn');
+        var countDisplay = document.getElementById('star-count');
 
-        // Create background stars
-        function createBackgroundStars() {
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'bg-star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                star.style.width = (Math.random() * 2 + 1) + 'px';
-                star.style.height = star.style.width;
-                starsCanvas.appendChild(star);
-            }
+        function saveStars() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(starData));
+        }
 
-            // Add occasional shooting stars
-            for (let i = 0; i < 3; i++) {
-                const shooting = document.createElement('div');
-                shooting.className = 'shooting-star';
-                shooting.style.top = (Math.random() * 40 + 10) + '%';
-                shooting.style.left = Math.random() * 50 + '%';
-                shooting.style.animationDelay = (Math.random() * 10 + i * 5) + 's';
-                shooting.style.transform = `rotate(${Math.random() * 30 + 15}deg)`;
-                starsCanvas.appendChild(shooting);
+        function loadStars() {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try { starData = JSON.parse(saved); } catch(e) { starData = []; }
             }
         }
 
-        // Create a gratitude star
-        function createGratitudeStar(text) {
-            const star = document.createElement('div');
-            star.className = 'gratitude-star';
+        function createBackgroundStars() {
+            for (var i = 0; i < 100; i++) {
+                var s = document.createElement('div');
+                s.className = 'bg-star';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = Math.random() * 3 + 's';
+                s.style.width = (Math.random() * 2 + 1) + 'px';
+                s.style.height = s.style.width;
+                starsCanvas.appendChild(s);
+            }
 
-            // Position in upper 70% of screen, avoiding edges
-            const x = 10 + Math.random() * 80;
-            const y = 10 + Math.random() * 60;
-            star.style.left = x + '%';
-            star.style.top = y + '%';
+            for (var j = 0; j < 3; j++) {
+                var sh = document.createElement('div');
+                sh.className = 'shooting-star';
+                sh.style.top = (Math.random() * 40 + 10) + '%';
+                sh.style.left = Math.random() * 50 + '%';
+                sh.style.animationDelay = (Math.random() * 10 + j * 5) + 's';
+                sh.style.transform = 'rotate(' + (Math.random() * 30 + 15) + 'deg)';
+                starsCanvas.appendChild(sh);
+            }
+        }
 
-            // Random size
-            const size = 24 + Math.random() * 20;
+        function renderStar(data, index, animate) {
+            var star = document.createElement('div');
+            star.className = 'gratitude-star deletable' + (animate ? '' : ' loaded');
+            star.style.left = data.x + '%';
+            star.style.top = data.y + '%';
+            star.setAttribute('data-index', index);
 
-            // Random color variation
-            const colors = ['#ffd700', '#fff8e7', '#ffe066', '#ffec8b'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
+            star.innerHTML =
+                '<svg width="' + data.size + '" height="' + data.size + '" viewBox="0 0 24 24" fill="' + data.color + '">' +
+                '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' +
+                '</svg>' +
+                '<span class="gratitude-star-label">' + data.text + '</span>' +
+                '<span class="delete-hint">tap to remove</span>';
 
-            star.innerHTML = `
-                <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${color}">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                <span class="gratitude-star-label">${text}</span>
-            `;
+            star.addEventListener('click', function() {
+                var idx = parseInt(star.getAttribute('data-index'));
+                starData.splice(idx, 1);
+                saveStars();
+                renderAllStars();
+            });
 
             starsCanvas.appendChild(star);
-            starCount++;
-            countDisplay.textContent = starCount;
-            gratitudeItems.push(text);
         }
 
-        // Add gratitude
+        function renderAllStars() {
+            // Remove existing gratitude stars but keep bg stars
+            var existing = starsCanvas.querySelectorAll('.gratitude-star');
+            for (var i = 0; i < existing.length; i++) {
+                existing[i].remove();
+            }
+
+            for (var j = 0; j < starData.length; j++) {
+                renderStar(starData[j], j, false);
+            }
+
+            countDisplay.textContent = starData.length;
+        }
+
         function addGratitude() {
-            const text = input.value.trim();
-            if (text && starCount < maxStars) {
-                createGratitudeStar(text);
+            var text = input.value.trim();
+            if (text && starData.length < maxStars) {
+                var colors = ['#ffd700', '#fff8e7', '#ffe066', '#ffec8b'];
+                var data = {
+                    text: text,
+                    x: 10 + Math.random() * 80,
+                    y: 10 + Math.random() * 60,
+                    size: 24 + Math.random() * 20,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                };
+
+                starData.push(data);
+                saveStars();
+                renderStar(data, starData.length - 1, true);
+                countDisplay.textContent = starData.length;
+
                 input.value = '';
                 addBtn.disabled = true;
 
-                if (starCount >= maxStars) {
+                if (starData.length >= maxStars) {
                     completeExercise();
                 }
             }
         }
 
-        // Start exercise
         function startExercise() {
             document.getElementById('intro-screen').classList.remove('active');
             document.getElementById('main-screen').classList.add('active');
             input.focus();
         }
 
-        // Complete exercise
         function completeExercise() {
-            document.getElementById('complete-stat').textContent = `${starCount} star${starCount !== 1 ? 's' : ''} shining`;
+            document.getElementById('complete-stat').textContent = starData.length + ' star' + (starData.length !== 1 ? 's' : '') + ' shining';
             document.getElementById('main-screen').classList.remove('active');
             document.getElementById('complete-screen').classList.add('active');
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             createBackgroundStars();
+            loadStars();
+
+            // If there are saved stars, skip intro and go straight to main
+            if (starData.length > 0) {
+                renderAllStars();
+                document.getElementById('intro-screen').classList.remove('active');
+                document.getElementById('main-screen').classList.add('active');
+            }
 
             document.getElementById('start-btn').addEventListener('click', startExercise);
 
-            input.addEventListener('input', () => {
+            input.addEventListener('input', function() {
                 addBtn.disabled = !input.value.trim();
             });
 
-            input.addEventListener('keypress', (e) => {
+            input.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && input.value.trim()) {
                     addGratitude();
                 }
@@ -565,16 +625,16 @@
 
             addBtn.addEventListener('click', addGratitude);
 
-            document.getElementById('done-link').addEventListener('click', (e) => {
+            document.getElementById('done-link').addEventListener('click', function(e) {
                 e.preventDefault();
-                if (starCount > 0) {
+                if (starData.length > 0) {
                     completeExercise();
                 } else {
                     window.location.href = '/imagine/gratitude.html';
                 }
             });
 
-            document.getElementById('finish-btn').addEventListener('click', () => {
+            document.getElementById('finish-btn').addEventListener('click', function() {
                 window.location.href = '/imagine/gratitude.html';
             });
         });
