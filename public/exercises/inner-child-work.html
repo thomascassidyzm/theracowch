@@ -209,6 +209,16 @@
             <button class="option-btn" onclick="selectOption(this, 'very-much')">Very much so</button>
             <div class="response-box" id="response-box"></div>
         </div>
+
+        <div class="question-card">
+            <h2>What did you love to do as a child? What made the time pass quickly?</h2>
+            <textarea id="childhood-love" placeholder="e.g. Drawing, climbing trees, making up stories, playing football..." style="width:100%;min-height:100px;padding:1rem;background:var(--bg-deep);border:3px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-family:'Gabarito',sans-serif;font-size:1rem;resize:vertical;outline:none;"></textarea>
+            <div class="response-box" id="followup-box" style="margin-top:1rem;">
+                Can you make more time for this — or something similar — in your life now?
+            </div>
+            <textarea id="action-plan" placeholder="e.g. I could start sketching again on weekends, or join a casual football group..." style="width:100%;min-height:100px;padding:1rem;background:var(--bg-deep);border:3px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-family:'Gabarito',sans-serif;font-size:1rem;resize:vertical;outline:none;margin-top:1rem;display:none;"></textarea>
+            <div class="response-box" id="final-response" style="margin-top:1rem;"></div>
+        </div>
     </div>
 
     <script>
@@ -259,6 +269,63 @@
                 if (map[saved] !== undefined && btns[map[saved]]) {
                     btns[map[saved]].classList.add('selected');
                 }
+            }
+        })();
+
+        // Childhood love section
+        var childhoodInput = document.getElementById('childhood-love');
+        var followupBox = document.getElementById('followup-box');
+        var actionPlan = document.getElementById('action-plan');
+        var finalResponse = document.getElementById('final-response');
+        var childhoodTimer = null;
+        var actionTimer = null;
+
+        var finalResponses = [
+            "That sounds like a wonderful plan. Your inner child would be proud of you for making space for joy again.",
+            "Even small steps towards play can make a big difference. You're choosing to bring more lightness into your life — that takes courage.",
+            "Brilliant. Scheduling fun is just as important as scheduling work. You deserve to enjoy yourself.",
+            "What a great idea. Remember — it doesn't have to be perfect or productive. Just enjoyable. That's enough.",
+            "Love it. When we reconnect with what brought us joy as children, we often find it still works its magic as adults."
+        ];
+
+        childhoodInput.addEventListener('input', function() {
+            clearTimeout(childhoodTimer);
+            if (childhoodInput.value.trim().length > 5) {
+                childhoodTimer = setTimeout(function() {
+                    followupBox.classList.remove('visible');
+                    void followupBox.offsetWidth;
+                    followupBox.classList.add('visible');
+                    actionPlan.style.display = 'block';
+                    localStorage.setItem('innerChildLove', childhoodInput.value);
+                }, 1000);
+            }
+        });
+
+        actionPlan.addEventListener('input', function() {
+            clearTimeout(actionTimer);
+            if (actionPlan.value.trim().length > 5) {
+                actionTimer = setTimeout(function() {
+                    var msg = finalResponses[Math.floor(Math.random() * finalResponses.length)];
+                    finalResponse.textContent = msg;
+                    finalResponse.classList.remove('visible');
+                    void finalResponse.offsetWidth;
+                    finalResponse.classList.add('visible');
+                    localStorage.setItem('innerChildAction', actionPlan.value);
+                }, 1000);
+            }
+        });
+
+        // Load saved data
+        (function() {
+            var savedLove = localStorage.getItem('innerChildLove');
+            var savedAction = localStorage.getItem('innerChildAction');
+            if (savedLove) {
+                childhoodInput.value = savedLove;
+                followupBox.classList.add('visible');
+                actionPlan.style.display = 'block';
+            }
+            if (savedAction) {
+                actionPlan.value = savedAction;
             }
         })();
     </script>
