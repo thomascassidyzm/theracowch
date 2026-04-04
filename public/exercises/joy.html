@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-    <title>Joy Bubbles | Cowch</title>
+    <title>Joy Bubbles - Memory Match | Cowch</title>
     <meta name="theme-color" content="#fef3e2">
     <link rel="icon" href="/icons/cowch-icon.svg">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,45 +14,37 @@
 
         :root {
             --bg-warm: #fef3e2;
-            --bg-gradient: linear-gradient(180deg, #fef3e2 0%, #fde4c4 50%, #fcd5a5 100%);
-            --bubble-pink: #ff9ecd;
-            --bubble-blue: #87d3f8;
-            --bubble-purple: #c4a7e7;
-            --bubble-yellow: #ffe066;
-            --bubble-green: #98d8aa;
-            --bubble-orange: #ffb366;
             --text-dark: #4a3f35;
             --text-muted: #8a7a6a;
             --coral: #D4896A;
+            --green: #7EA88B;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Gabarito', sans-serif;
-            background: var(--bg-gradient);
+            background: linear-gradient(180deg, #fef3e2 0%, #fde4c4 50%, #fcd5a5 100%);
             color: var(--text-dark);
             min-height: 100vh;
             min-height: 100dvh;
-            overflow: hidden;
             -webkit-font-smoothing: antialiased;
             touch-action: manipulation;
+            overflow: hidden;
         }
 
-        .exercise-container {
+        .container {
             position: relative;
             width: 100%;
             height: 100vh;
             height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Back button */
         .back-btn {
-            position: absolute;
+            position: fixed;
             top: max(1rem, env(safe-area-inset-top));
             left: 1rem;
             background: rgba(255,255,255,0.7);
@@ -66,32 +58,134 @@
             cursor: pointer;
             text-decoration: none;
             z-index: 100;
-            transition: all 0.2s ease;
         }
 
-        .back-btn:hover {
-            background: rgba(255,255,255,0.9);
-        }
+        .back-btn:hover { background: rgba(255,255,255,0.9); }
 
-        /* Bubble canvas */
-        .bubble-canvas {
+        /* Screens */
+        .screen {
             position: absolute;
             inset: 0;
-            z-index: 1;
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 50;
         }
 
-        /* Bubbles */
+        .screen.active { opacity: 1; pointer-events: auto; }
+
+        .intro-screen { background: rgba(254, 243, 226, 0.95); text-align: center; }
+
+        .intro-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .intro-title {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ff9ecd, #c4a7e7, #87d3f8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .start-btn {
+            background: var(--coral);
+            border: none;
+            color: white;
+            padding: 1.25rem 3rem;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 0 8px 32px rgba(212, 137, 106, 0.3);
+        }
+
+        .start-btn:hover { transform: translateY(-2px); }
+
+        /* Game area */
+        .game-header {
+            width: 100%;
+            padding: max(4.5rem, env(safe-area-inset-top) + 3rem) 1.5rem 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .game-status {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--coral);
+        }
+
+        .game-moves {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .game-message {
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--coral);
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 0.5rem 1rem;
+            max-width: 400px;
+            width: 100%;
+            flex: 1;
+            align-content: center;
+        }
+
         .bubble {
-            position: absolute;
+            aspect-ratio: 1;
             border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.1s ease;
-            animation: bubbleFloat 6s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            transition: all 0.3s ease;
+            position: relative;
             background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8) 0%, transparent 50%);
-            box-shadow:
-                inset 0 0 20px rgba(255,255,255,0.5),
-                0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.5), 0 4px 15px rgba(0,0,0,0.1);
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .bubble::before {
@@ -106,231 +200,87 @@
             transform: rotate(-30deg);
         }
 
-        .bubble:hover {
-            transform: scale(1.1);
-        }
-
-        .bubble:active {
-            transform: scale(0.95);
-        }
-
-        @keyframes bubbleFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-15px) rotate(2deg); }
-            50% { transform: translateY(-5px) rotate(-1deg); }
-            75% { transform: translateY(-20px) rotate(1deg); }
-        }
-
-        /* Pop effect */
-        .pop-effect {
-            position: absolute;
+        .bubble.hidden-symbol .bubble-symbol { visibility: hidden; }
+        .bubble.revealed .bubble-symbol { visibility: visible; }
+        .bubble.matched {
+            opacity: 0.3;
             pointer-events: none;
-            z-index: 50;
+            transform: scale(0.8);
         }
 
-        .pop-particle {
-            position: absolute;
-            border-radius: 50%;
-            animation: popBurst 0.6s ease-out forwards;
+        .bubble.wrong {
+            animation: shake 0.4s ease;
         }
 
-        @keyframes popBurst {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty)) scale(0);
-            }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
-        .pop-emoji {
-            position: absolute;
-            font-size: 2rem;
-            animation: emojiPop 0.8s ease-out forwards;
-            pointer-events: none;
+        .bubble.peek .bubble-symbol { visibility: visible; }
+
+        .bubble:active { transform: scale(0.9); }
+
+        .bubble-symbol {
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes emojiPop {
-            0% {
-                opacity: 0;
-                transform: scale(0) translateY(0);
-            }
-            30% {
-                opacity: 1;
-                transform: scale(1.3) translateY(-10px);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.8) translateY(-60px);
-            }
-        }
-
-        /* Screens */
-        .screen {
-            position: absolute;
-            inset: 0;
+        .game-footer {
+            padding: 1rem;
+            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            padding-top: max(4rem, env(safe-area-inset-top));
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease;
-            z-index: 50;
-        }
-
-        .screen.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Intro screen */
-        .intro-screen {
-            text-align: center;
-            background: rgba(254, 243, 226, 0.95);
-        }
-
-        .intro-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .intro-title {
-            font-size: clamp(2rem, 8vw, 3rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--bubble-pink), var(--bubble-purple), var(--bubble-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .intro-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 320px;
-            line-height: 1.7;
-            margin-bottom: 2.5rem;
-        }
-
-        .start-btn {
-            background: var(--coral);
-            border: 4px solid rgba(0,0,0,0.1);
-            color: white;
-            padding: 1.25rem 3rem;
-            border-radius: 25px;
-            font-size: 1.2rem;
-            font-weight: 900;
-            font-family: inherit;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 32px rgba(212, 137, 106, 0.3);
-        }
-
-        .start-btn:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 12px 40px rgba(212, 137, 106, 0.4);
-        }
-
-        /* Play screen */
-        .play-screen {
-            background: transparent;
+            gap: 0.75rem;
             z-index: 10;
-            pointer-events: none;
         }
 
-        .play-screen.active {
-            pointer-events: none; /* Let bubbles be clickable */
-        }
-
-        .score-display {
-            position: absolute;
-            top: max(1.5rem, env(safe-area-inset-top));
-            right: 1.5rem;
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--coral);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            pointer-events: auto;
-        }
-
-        .play-hint {
-            position: absolute;
-            bottom: max(6rem, env(safe-area-inset-bottom) + 4rem);
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1rem;
-            color: var(--text-muted);
-            text-align: center;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .done-btn {
-            position: absolute;
-            bottom: max(2rem, env(safe-area-inset-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.8);
-            border: 2px solid rgba(0,0,0,0.1);
-            color: var(--text-dark);
-            padding: 0.75rem 2rem;
+        .btn {
+            padding: 0.75rem 1.5rem;
             border-radius: 12px;
+            font-family: inherit;
             font-size: 0.9rem;
             font-weight: 700;
-            font-family: inherit;
             cursor: pointer;
-            transition: all 0.2s ease;
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0,0,0,0.1);
+            transition: all 0.2s;
         }
 
-        .done-btn:hover {
-            background: rgba(255,255,255,1);
+        .btn-play-again {
+            background: var(--coral);
+            color: white;
+            border-color: var(--coral);
+        }
+
+        .btn-done {
+            background: rgba(255,255,255,0.7);
+            color: var(--text-dark);
         }
 
         /* Complete screen */
-        .complete-screen {
-            text-align: center;
-            background: rgba(254, 243, 226, 0.95);
-        }
+        .complete-screen { background: rgba(254, 243, 226, 0.95); text-align: center; }
 
-        .complete-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-        }
+        .complete-icon { font-size: 4rem; margin-bottom: 1rem; }
 
         .complete-title {
             font-size: clamp(1.8rem, 6vw, 2.5rem);
             font-weight: 900;
-            margin-bottom: 1rem;
             color: var(--coral);
+            margin-bottom: 0.5rem;
         }
 
         .complete-message {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-muted);
-            max-width: 320px;
-            line-height: 1.7;
+            max-width: 300px;
+            line-height: 1.6;
             margin-bottom: 0.5rem;
         }
 
         .complete-stat {
-            font-size: 1.2rem;
-            color: var(--bubble-purple);
+            font-size: 1.1rem;
             font-weight: 700;
+            color: #c4a7e7;
             margin-bottom: 2rem;
         }
 
@@ -345,219 +295,212 @@
             font-family: inherit;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.2s ease;
+            margin-bottom: 0.75rem;
         }
 
-        .finish-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(212, 137, 106, 0.4);
+        .play-again-btn {
+            background: transparent;
+            border: 2px solid var(--coral);
+            color: var(--coral);
+            padding: 0.75rem 2rem;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="exercise-container">
-        <a href="/imagine/nurturing.html" class="back-btn">← Back</a>
+    <a href="/imagine/nurturing.html" class="back-btn">← Back</a>
 
-        <!-- Bubble canvas -->
-        <div class="bubble-canvas" id="bubble-canvas"></div>
-
-        <!-- INTRO SCREEN -->
+    <div class="container">
+        <!-- INTRO -->
         <div class="screen intro-screen active" id="intro-screen">
             <div class="intro-icon">🫧</div>
             <h1 class="intro-title">Joy Bubbles</h1>
-            <p class="intro-subtitle">Pop the bubbles. That's it. No goals, no pressure. Just play.</p>
+            <p class="intro-subtitle">A memory matching game! Symbols appear in bubbles for 7 seconds — memorise them, then find the matching pairs.</p>
             <button class="start-btn" id="start-btn">Let's Play!</button>
         </div>
 
-        <!-- PLAY SCREEN -->
-        <div class="screen play-screen" id="play-screen">
-            <div class="score-display">
-                <span id="pop-count">0</span> 🫧
+        <!-- GAME -->
+        <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center;">
+            <div class="game-header">
+                <div class="game-status">Pairs: <span id="pairs-found">0</span>/8</div>
+                <div class="game-moves">Moves: <span id="move-count">0</span></div>
             </div>
-            <div class="play-hint">Tap the bubbles!</div>
-            <button class="done-btn" id="done-btn">I'm Done Playing</button>
+            <div class="game-message" id="game-message">Memorise the symbols!</div>
+            <div class="grid" id="grid"></div>
+            <div class="game-footer">
+                <button class="btn btn-done" id="quit-btn">I'm Done</button>
+            </div>
         </div>
 
-        <!-- COMPLETE SCREEN -->
+        <!-- COMPLETE -->
         <div class="screen complete-screen" id="complete-screen">
             <div class="complete-icon">🎉</div>
-            <h2 class="complete-title">That Was Fun!</h2>
-            <p class="complete-message">Play is essential. You just gave yourself permission to enjoy something simple. That's self-care.</p>
-            <div class="complete-stat" id="complete-stat">You popped 0 bubbles!</div>
+            <h2 class="complete-title">Well Done!</h2>
+            <p class="complete-message">Play is essential. You just gave yourself permission to enjoy something fun. That's self-care.</p>
+            <div class="complete-stat" id="complete-stat"></div>
             <button class="finish-btn" id="finish-btn">Done</button>
+            <button class="play-again-btn" id="play-again-btn">Play Again</button>
         </div>
     </div>
 
     <script>
-        // State
-        let popCount = 0;
-        let isPlaying = false;
-        let bubbleInterval;
-        const bubbles = [];
-        const maxBubbles = 15;
-
-        // Colors
-        const bubbleColors = [
-            'rgba(255, 158, 205, 0.7)', // pink
-            'rgba(135, 211, 248, 0.7)', // blue
-            'rgba(196, 167, 231, 0.7)', // purple
-            'rgba(255, 224, 102, 0.7)', // yellow
-            'rgba(152, 216, 170, 0.7)', // green
-            'rgba(255, 179, 102, 0.7)'  // orange
+        var symbols = ['🌸', '🦋', '⭐', '🌈', '🎵', '💎', '🔥', '🍀', '🎯', '🌙', '❄️', '🎪'];
+        var bubbleColors = [
+            'rgba(255, 158, 205, 0.6)',
+            'rgba(135, 211, 248, 0.6)',
+            'rgba(196, 167, 231, 0.6)',
+            'rgba(255, 224, 102, 0.6)',
+            'rgba(152, 216, 170, 0.6)',
+            'rgba(255, 179, 102, 0.6)'
         ];
 
-        const joyEmojis = ['✨', '🎉', '💫', '⭐', '🌟', '💖', '🎊', '🌈', '🦋', '🌸'];
+        var cards = [];
+        var flipped = [];
+        var matched = 0;
+        var moves = 0;
+        var locked = true;
 
-        // DOM
-        const bubbleCanvas = document.getElementById('bubble-canvas');
-        const popCountDisplay = document.getElementById('pop-count');
+        function shuffle(arr) {
+            for (var i = arr.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+            }
+            return arr;
+        }
 
-        // Create a bubble
-        function createBubble() {
-            if (bubbles.length >= maxBubbles || !isPlaying) return;
+        function createGame() {
+            var grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            cards = [];
+            flipped = [];
+            matched = 0;
+            moves = 0;
+            locked = true;
 
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
+            document.getElementById('pairs-found').textContent = '0';
+            document.getElementById('move-count').textContent = '0';
+            document.getElementById('game-message').textContent = 'Memorise the symbols!';
 
-            // Random size
-            const size = 50 + Math.random() * 60;
-            bubble.style.width = size + 'px';
-            bubble.style.height = size + 'px';
+            // Pick 8 random symbols for 16 cards (4x4)
+            var picked = shuffle(symbols.slice()).slice(0, 8);
+            var deck = shuffle(picked.concat(picked));
 
-            // Random position
-            const x = Math.random() * (window.innerWidth - size);
-            const y = Math.random() * (window.innerHeight - size - 150) + 100;
-            bubble.style.left = x + 'px';
-            bubble.style.top = y + 'px';
+            deck.forEach(function(symbol, i) {
+                var bubble = document.createElement('div');
+                bubble.className = 'bubble peek';
+                bubble.style.backgroundColor = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+                bubble.setAttribute('data-index', i);
+                bubble.setAttribute('data-symbol', symbol);
 
-            // Random color
-            const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
-            bubble.style.backgroundColor = color;
+                bubble.innerHTML = '<span class="bubble-symbol">' + symbol + '</span>';
 
-            // Random float animation delay
-            bubble.style.animationDelay = Math.random() * 3 + 's';
+                bubble.addEventListener('click', function() { handleTap(i); });
+                bubble.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    handleTap(i);
+                }, { passive: false });
 
-            // Click handler
-            bubble.addEventListener('click', (e) => {
-                e.stopPropagation();
-                popBubble(bubble, e.clientX, e.clientY, color);
+                grid.appendChild(bubble);
+                cards.push(bubble);
             });
 
-            // Touch handler
-            bubble.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                popBubble(bubble, touch.clientX, touch.clientY, color);
-            }, { passive: false });
-
-            bubbleCanvas.appendChild(bubble);
-            bubbles.push(bubble);
-
-            // Animate in
-            bubble.style.transform = 'scale(0)';
-            bubble.style.transition = 'transform 0.3s ease-out';
-            requestAnimationFrame(() => {
-                bubble.style.transform = 'scale(1)';
-            });
+            // Show symbols for 7 seconds then hide
+            setTimeout(function() {
+                cards.forEach(function(card) {
+                    card.classList.remove('peek');
+                    card.classList.add('hidden-symbol');
+                });
+                locked = false;
+                document.getElementById('game-message').textContent = 'Find the matching pairs!';
+            }, 7000);
         }
 
-        // Pop a bubble
-        function popBubble(bubble, x, y, color) {
-            // Remove from array
-            const index = bubbles.indexOf(bubble);
-            if (index > -1) bubbles.splice(index, 1);
+        function handleTap(index) {
+            if (locked) return;
+            var card = cards[index];
+            if (card.classList.contains('matched')) return;
+            if (card.classList.contains('revealed')) return;
+            if (flipped.length >= 2) return;
 
-            // Create pop effect
-            createPopEffect(x, y, color);
+            // Reveal
+            card.classList.remove('hidden-symbol');
+            card.classList.add('revealed');
+            flipped.push(index);
 
-            // Remove bubble
-            bubble.style.transform = 'scale(0)';
-            bubble.style.transition = 'transform 0.15s ease-in';
-            setTimeout(() => bubble.remove(), 150);
+            if (flipped.length === 2) {
+                moves++;
+                document.getElementById('move-count').textContent = moves;
 
-            // Update count
-            popCount++;
-            popCountDisplay.textContent = popCount;
+                var a = cards[flipped[0]];
+                var b = cards[flipped[1]];
 
-            // Create new bubble after a delay
-            setTimeout(createBubble, 500 + Math.random() * 500);
-        }
+                if (a.getAttribute('data-symbol') === b.getAttribute('data-symbol')) {
+                    // Match!
+                    matched++;
+                    document.getElementById('pairs-found').textContent = matched;
+                    document.getElementById('game-message').textContent = 'Nice match! 🎉';
 
-        // Create pop effect
-        function createPopEffect(x, y, color) {
-            // Particles
-            for (let i = 0; i < 8; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'pop-particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                particle.style.width = '10px';
-                particle.style.height = '10px';
-                particle.style.backgroundColor = color.replace('0.7', '1');
+                    setTimeout(function() {
+                        a.classList.add('matched');
+                        b.classList.add('matched');
+                        flipped = [];
 
-                const angle = (i / 8) * Math.PI * 2;
-                const distance = 40 + Math.random() * 30;
-                particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
-                particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                        if (matched === 8) {
+                            setTimeout(gameComplete, 500);
+                        }
+                    }, 500);
+                } else {
+                    // No match
+                    locked = true;
+                    document.getElementById('game-message').textContent = 'Not quite — try again!';
+                    a.classList.add('wrong');
+                    b.classList.add('wrong');
 
-                bubbleCanvas.appendChild(particle);
-                setTimeout(() => particle.remove(), 600);
-            }
-
-            // Emoji
-            const emoji = document.createElement('div');
-            emoji.className = 'pop-emoji';
-            emoji.textContent = joyEmojis[Math.floor(Math.random() * joyEmojis.length)];
-            emoji.style.left = (x - 16) + 'px';
-            emoji.style.top = (y - 16) + 'px';
-            bubbleCanvas.appendChild(emoji);
-            setTimeout(() => emoji.remove(), 800);
-        }
-
-        // Start playing
-        function startPlaying() {
-            document.getElementById('intro-screen').classList.remove('active');
-            document.getElementById('play-screen').classList.add('active');
-
-            isPlaying = true;
-            popCount = 0;
-
-            // Create initial bubbles
-            for (let i = 0; i < 8; i++) {
-                setTimeout(createBubble, i * 200);
-            }
-
-            // Keep creating bubbles
-            bubbleInterval = setInterval(() => {
-                if (bubbles.length < maxBubbles) {
-                    createBubble();
+                    setTimeout(function() {
+                        a.classList.remove('revealed', 'wrong');
+                        a.classList.add('hidden-symbol');
+                        b.classList.remove('revealed', 'wrong');
+                        b.classList.add('hidden-symbol');
+                        flipped = [];
+                        locked = false;
+                        document.getElementById('game-message').textContent = 'Find the matching pairs!';
+                    }, 800);
                 }
-            }, 1500);
+            }
         }
 
-        // Complete exercise
-        function completeExercise() {
-            isPlaying = false;
-            clearInterval(bubbleInterval);
-
-            // Remove remaining bubbles
-            bubbles.forEach(b => b.remove());
-            bubbles.length = 0;
-
-            document.getElementById('complete-stat').textContent = `You popped ${popCount} bubble${popCount !== 1 ? 's' : ''}!`;
-            document.getElementById('play-screen').classList.remove('active');
+        function gameComplete() {
+            document.getElementById('game-screen').style.display = 'none';
             document.getElementById('complete-screen').classList.add('active');
+            document.getElementById('complete-stat').textContent = 'All 8 pairs matched in ' + moves + ' moves!';
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('start-btn').addEventListener('click', startPlaying);
-            document.getElementById('done-btn').addEventListener('click', completeExercise);
-            document.getElementById('finish-btn').addEventListener('click', () => {
-                window.location.href = '/imagine/nurturing.html';
-            });
+        function startGame() {
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('game-screen').style.display = 'flex';
+            createGame();
+        }
+
+        function playAgain() {
+            document.getElementById('complete-screen').classList.remove('active');
+            document.getElementById('game-screen').style.display = 'flex';
+            createGame();
+        }
+
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('quit-btn').addEventListener('click', function() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('complete-stat').textContent = 'You matched ' + matched + ' pair' + (matched !== 1 ? 's' : '') + ' in ' + moves + ' moves!';
+            document.getElementById('complete-screen').classList.add('active');
         });
+        document.getElementById('finish-btn').addEventListener('click', function() {
+            window.location.href = '/imagine/nurturing.html';
+        });
+        document.getElementById('play-again-btn').addEventListener('click', playAgain);
     </script>
 </body>
 </html>
