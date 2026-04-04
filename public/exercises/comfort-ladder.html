@@ -238,6 +238,57 @@
 
         .saved-message.visible { display: block; }
 
+        .experiment-section {
+            background: var(--bg-card);
+            border: 3px solid var(--coral);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .experiment-section h2 {
+            color: var(--coral);
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .experiment-section p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .experiment-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        .experiment-textarea {
+            width: 100%;
+            min-height: 70px;
+            padding: 0.75rem;
+            background: var(--bg-deep);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        .experiment-textarea:focus { border-color: var(--coral); }
+        .experiment-textarea::placeholder { color: var(--text-muted); font-size: 0.85rem; }
+        .experiment-textarea:last-child { margin-bottom: 0; }
+
         .encouragement {
             background: var(--bg-card);
             border: 3px solid var(--coral);
@@ -280,6 +331,17 @@
 
         <div class="info-card">
             Start by practising situation <strong>1</strong> on repeat until it feels manageable, then move on to <strong>2</strong>, then <strong>3</strong>, and so on. Over time, <strong>repeated exposure leads to a decrease in anxiety</strong>. A small amount of anxiety is completely normal — it means you're growing.
+        </div>
+
+        <div class="experiment-section">
+            <h2>Behavioural Experiment</h2>
+            <p>Before you try a situation, write down what you <strong>predict</strong> will happen. Afterwards, write down what <strong>actually</strong> happened. This is how CBT helps shift negative predictions by reality-testing them.</p>
+
+            <label class="experiment-label">My prediction (before)</label>
+            <textarea class="experiment-textarea" id="prediction" placeholder="e.g. If I speak to a stranger, they will reject me or think I'm weird..."></textarea>
+
+            <label class="experiment-label">What actually happened (after)</label>
+            <textarea class="experiment-textarea" id="outcome" placeholder="e.g. I wasn't rejected — the stranger was friendly and we had a nice chat..."></textarea>
         </div>
 
         <div class="ladder" id="ladder">
@@ -369,6 +431,9 @@
                         check.classList.add('done');
                     }
                 });
+
+                if (data.prediction) document.getElementById('prediction').value = data.prediction;
+                if (data.outcome) document.getElementById('outcome').value = data.outcome;
             }
         }
 
@@ -381,7 +446,12 @@
             inputs.forEach(function(input) { items.push(input.value); });
             checks.forEach(function(check) { done.push(check.classList.contains('done')); });
 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: items, done: done }));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                items: items,
+                done: done,
+                prediction: document.getElementById('prediction').value,
+                outcome: document.getElementById('outcome').value
+            }));
 
             var msg = document.getElementById('saved-message');
             msg.classList.add('visible');
@@ -392,6 +462,8 @@
             if (confirm('Clear all entries and start fresh?')) {
                 document.querySelectorAll('.rung-input').forEach(function(input) { input.value = ''; });
                 document.querySelectorAll('.rung-check').forEach(function(check) { check.classList.remove('done'); });
+                document.getElementById('prediction').value = '';
+                document.getElementById('outcome').value = '';
                 localStorage.removeItem(STORAGE_KEY);
             }
         }
