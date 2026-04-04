@@ -125,17 +125,29 @@
         .gratitude-star.deletable {
             pointer-events: auto;
             cursor: pointer;
+            padding: 8px;
+            margin: -8px;
         }
 
-        .gratitude-star .delete-hint {
+        .gratitude-star .delete-x {
+            position: absolute;
+            top: 0;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 80, 80, 0.85);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 18px;
+            text-align: center;
             display: none;
-            font-size: 0.65rem;
-            color: #ff6b6b;
-            font-weight: 700;
-            margin-top: 2px;
         }
 
-        .gratitude-star.deletable:hover .delete-hint {
+        .gratitude-star.deletable:hover .delete-x,
+        .gratitude-star.deletable:active .delete-x,
+        .gratitude-star.deletable.tapped .delete-x {
             display: block;
         }
 
@@ -532,17 +544,28 @@
             star.setAttribute('data-index', index);
 
             star.innerHTML =
+                '<span class="delete-x">×</span>' +
                 '<svg width="' + data.size + '" height="' + data.size + '" viewBox="0 0 24 24" fill="' + data.color + '">' +
                 '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' +
                 '</svg>' +
-                '<span class="gratitude-star-label">' + data.text + '</span>' +
-                '<span class="delete-hint">tap to remove</span>';
+                '<span class="gratitude-star-label">' + data.text + '</span>';
 
-            star.addEventListener('click', function() {
-                var idx = parseInt(star.getAttribute('data-index'));
-                starData.splice(idx, 1);
-                saveStars();
-                renderAllStars();
+            // First tap reveals the X, second tap deletes
+            star.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (star.classList.contains('tapped')) {
+                    var idx = parseInt(star.getAttribute('data-index'));
+                    starData.splice(idx, 1);
+                    saveStars();
+                    renderAllStars();
+                } else {
+                    // Clear any other tapped stars
+                    var others = starsCanvas.querySelectorAll('.gratitude-star.tapped');
+                    for (var k = 0; k < others.length; k++) {
+                        others[k].classList.remove('tapped');
+                    }
+                    star.classList.add('tapped');
+                }
             });
 
             starsCanvas.appendChild(star);
@@ -612,6 +635,14 @@
             }
 
             document.getElementById('start-btn').addEventListener('click', startExercise);
+
+            // Tap elsewhere to dismiss delete X
+            document.addEventListener('click', function() {
+                var tapped = starsCanvas.querySelectorAll('.gratitude-star.tapped');
+                for (var k = 0; k < tapped.length; k++) {
+                    tapped[k].classList.remove('tapped');
+                }
+            });
 
             input.addEventListener('input', function() {
                 addBtn.disabled = !input.value.trim();
