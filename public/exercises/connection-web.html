@@ -476,6 +476,7 @@
 
         <div class="controls">
             <button class="btn" id="addBtn">+ Add Connection</button>
+            <button class="btn" id="saveBtn" style="background:#7EA88B;border-color:#7EA88B;display:none;">Saved ✓</button>
             <button class="btn btn-secondary" id="insightsBtn">View Insights</button>
         </div>
 
@@ -699,31 +700,20 @@
                 person.x += (person.targetX - person.x) * 0.1;
                 person.y += (person.targetY - person.y) * 0.1;
 
-                const color = COLORS[person.energy];
-                const size = person === draggedPerson ? 14 : 12;
+                var color = COLORS[person.energy];
 
-                // Glow effect
-                const gradient = ctx.createRadialGradient(person.x, person.y, 0, person.x, person.y, size * 2);
-                gradient.addColorStop(0, color + '40');
-                gradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(person.x - size * 2, person.y - size * 2, size * 4, size * 4);
+                // Draw name as small text
+                ctx.fillStyle = color;
+                ctx.font = '600 11px Gabarito, -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(person.name, person.x, person.y);
 
-                // Circle
+                // Small dot above text for tap target
                 ctx.beginPath();
-                ctx.arc(person.x, person.y, size, 0, Math.PI * 2);
+                ctx.arc(person.x, person.y - 10, 4, 0, Math.PI * 2);
                 ctx.fillStyle = color;
                 ctx.fill();
-                ctx.strokeStyle = COLORS.bg;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Name label
-                ctx.fillStyle = '#e8e3df';
-                ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillText(person.name, person.x, person.y + size + 6);
             });
 
             // Draw center (you)
@@ -900,6 +890,23 @@
         }
 
         // Modal
+        var saveBtn = document.getElementById('saveBtn');
+
+        function showSaveConfirmation() {
+            saveBtn.style.display = 'block';
+            saveBtn.textContent = 'Saved ✓';
+            saveBtn.style.background = '#7EA88B';
+            saveBtn.style.borderColor = '#7EA88B';
+            setTimeout(function() {
+                saveBtn.style.display = 'none';
+            }, 2000);
+        }
+
+        saveBtn.addEventListener('click', function() {
+            saveConnections();
+            showSaveConfirmation();
+        });
+
         addBtn.addEventListener('click', () => {
             connectionForm.reset();
             document.getElementById('modalTitle').textContent = 'Add Connection';
@@ -932,6 +939,7 @@
             connections.push(person);
             saveConnections();
             updateEmptyState();
+            showSaveConfirmation();
 
             modalOverlay.classList.remove('active');
 
@@ -951,6 +959,7 @@
                 saveConnections();
                 updateEmptyState();
                 hideTooltip();
+                showSaveConfirmation();
             }
         });
 
