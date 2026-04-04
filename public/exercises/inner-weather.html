@@ -622,9 +622,29 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary, #f5f3f0);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
     </style>
 </head>
 <body>
+    <a href="/imagine/self.html" class="back-btn">← Back</a>
+
     <!-- Sky Background -->
     <div class="sky-container default" id="skyContainer">
         <div class="weather-effects" id="weatherEffects"></div>
