@@ -480,6 +480,7 @@
             <button class="btn" id="addBtn">+ Add Connection</button>
             <button class="btn" id="saveBtn" style="background:#7EA88B;border-color:#7EA88B;display:none;">Saved ✓</button>
             <button class="btn btn-secondary" id="insightsBtn">View Insights</button>
+            <button class="btn btn-secondary" id="clearBtn" style="border-color:#C47A5D;color:#C47A5D;">Clear All</button>
         </div>
 
         <div class="insights" id="insights">
@@ -962,6 +963,16 @@
                 updateEmptyState();
                 hideTooltip();
                 showSaveConfirmation();
+            }
+        });
+
+        // Clear all
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            if (confirm('Clear all connections and start again?')) {
+                connections = [];
+                saveConnections();
+                updateEmptyState();
+                hideTooltip();
             }
         });
 
