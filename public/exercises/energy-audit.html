@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Energy Audit | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .list-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .list-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .list-icon { font-size: 1.4rem; }
+
+        .list-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .list-item {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .list-item input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: var(--bg-deep);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .list-item input:focus { border-color: var(--coral); }
+        .list-item input::placeholder { color: var(--text-muted); }
+
+        .remove-item {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .remove-item:hover {
+            border-color: #e55;
+            color: #e55;
+        }
+
+        .add-item-button {
+            background: transparent;
+            border: 3px dashed rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: var(--coral);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        .add-item-button:hover {
+            border-color: var(--coral);
+            background: rgba(212, 137, 106, 0.05);
+        }
+
+        .balance-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .balance-text {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--coral);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: 3px solid;
+            border-radius: 10px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-deep);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 var(--coral-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .saved-message {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(212, 137, 106, 0.15);
+            border: 3px solid var(--coral);
+            border-radius: 10px;
+            font-weight: 700;
+            color: var(--coral);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .saved-message.visible { display: block; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/self.html" class="back-btn">← Back</a>
+
+    <div class="container">
+        <div class="hero-icon">⚡</div>
+        <h1>Energy Audit</h1>
+        <p class="subtitle">What lifts you up and what drains you?</p>
+
+        <div class="list-card">
+            <div class="list-title">
+                <span class="list-icon">☀️</span>
+                <span>Positive Energy (things that lift you up)</span>
+            </div>
+            <div class="list-items" id="positive-list">
+                <div class="list-item">
+                    <input type="text" placeholder="e.g., Good friends, mentors, sleep, fun activities, music...">
+                    <button class="remove-item" onclick="removeItem(this)">×</button>
+                </div>
+            </div>
+            <button class="add-item-button" onclick="addPositiveItem()">+ Add Positive Energy Source</button>
+        </div>
+
+        <div class="list-card">
+            <div class="list-title">
+                <span class="list-icon">⚡</span>
+                <span>Negative Energy (things that drain you)</span>
+            </div>
+            <div class="list-items" id="negative-list">
+                <div class="list-item">
+                    <input type="text" placeholder="e.g., Toxic people, stressful job, lack of sleep, passivity...">
+                    <button class="remove-item" onclick="removeItem(this)">×</button>
+                </div>
+            </div>
+            <button class="add-item-button" onclick="addNegativeItem()">+ Add Energy Drainer</button>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-text">Your Energy Balance</div>
+            <div class="balance-score" id="energy-balance">0</div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="clearEnergy()">Clear</button>
+            <button class="btn btn-primary" onclick="saveEnergy()">Save Energy Audit</button>
+        </div>
+
+        <div class="saved-message" id="saved-message">Energy audit saved! Keep focusing on more positive than negative energy.</div>
+    </div>
+
+    <script>
+        var STORAGE_KEY = 'cowch_energy_audit';
+
+        function addPositiveItem() {
+            var list = document.getElementById('positive-list');
+            var item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = '<input type="text" placeholder="What brings you positive energy?"><button class="remove-item" onclick="removeItem(this)">×</button>';
+            list.appendChild(item);
+            updateEnergyBalance();
+        }
+
+        function addNegativeItem() {
+            var list = document.getElementById('negative-list');
+            var item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = '<input type="text" placeholder="What drains your energy?"><button class="remove-item" onclick="removeItem(this)">×</button>';
+            list.appendChild(item);
+            updateEnergyBalance();
+        }
+
+        function removeItem(button) {
+            button.parentElement.remove();
+            updateEnergyBalance();
+        }
+
+        function updateEnergyBalance() {
+            var positiveItems = document.querySelectorAll('#positive-list .list-item input');
+            var negativeItems = document.querySelectorAll('#negative-list .list-item input');
+            var positiveCount = 0;
+            var negativeCount = 0;
+
+            positiveItems.forEach(function(input) {
+                if (input.value.trim()) positiveCount++;
+            });
+            negativeItems.forEach(function(input) {
+                if (input.value.trim()) negativeCount++;
+            });
+
+            var balance = positiveCount - negativeCount;
+            document.getElementById('energy-balance').textContent = balance > 0 ? '+' + balance : balance;
+        }
+
+        function saveEnergy() {
+            var positiveItems = [];
+            var negativeItems = [];
+
+            document.querySelectorAll('#positive-list .list-item input').forEach(function(input) {
+                if (input.value.trim()) positiveItems.push(input.value.trim());
+            });
+            document.querySelectorAll('#negative-list .list-item input').forEach(function(input) {
+                if (input.value.trim()) negativeItems.push(input.value.trim());
+            });
+
+            if (positiveItems.length === 0 && negativeItems.length === 0) {
+                alert('Please add at least one energy source or drainer before saving.');
+                return;
+            }
+
+            var energyData = {
+                positive: positiveItems,
+                negative: negativeItems,
+                balance: positiveItems.length - negativeItems.length,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(energyData));
+            document.getElementById('saved-message').classList.add('visible');
+            setTimeout(function() {
+                document.getElementById('saved-message').classList.remove('visible');
+            }, 3000);
+        }
+
+        function clearEnergy() {
+            document.getElementById('positive-list').innerHTML = '<div class="list-item"><input type="text" placeholder="e.g., Good friends, mentors, sleep, fun activities, music..."><button class="remove-item" onclick="removeItem(this)">×</button></div>';
+            document.getElementById('negative-list').innerHTML = '<div class="list-item"><input type="text" placeholder="e.g., Toxic people, stressful job, lack of sleep, passivity..."><button class="remove-item" onclick="removeItem(this)">×</button></div>';
+            updateEnergyBalance();
+        }
+
+        // Listen for input changes to update balance
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('#positive-list input') || e.target.matches('#negative-list input')) {
+                updateEnergyBalance();
+            }
+        });
+
+        // Load saved data
+        (function() {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                var data = JSON.parse(saved);
+
+                document.getElementById('positive-list').innerHTML = '';
+                document.getElementById('negative-list').innerHTML = '';
+
+                if (data.positive && data.positive.length > 0) {
+                    data.positive.forEach(function(text) {
+                        var list = document.getElementById('positive-list');
+                        var item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = '<input type="text" value="' + text.replace(/"/g, '&quot;') + '"><button class="remove-item" onclick="removeItem(this)">×</button>';
+                        list.appendChild(item);
+                    });
+                } else {
+                    addPositiveItem();
+                }
+
+                if (data.negative && data.negative.length > 0) {
+                    data.negative.forEach(function(text) {
+                        var list = document.getElementById('negative-list');
+                        var item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = '<input type="text" value="' + text.replace(/"/g, '&quot;') + '"><button class="remove-item" onclick="removeItem(this)">×</button>';
+                        list.appendChild(item);
+                    });
+                } else {
+                    addNegativeItem();
+                }
+
+                updateEnergyBalance();
+            }
+        })();
+    </script>
+</body>
+</html>
