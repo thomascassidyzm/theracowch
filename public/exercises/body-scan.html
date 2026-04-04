@@ -313,7 +313,7 @@
 </head>
 <body>
 
-<button class="back-btn" onclick="goBack()">←</button>
+<a href="/imagine/mindfulness.html" class="back-btn">← Back</a>
 
 <!-- INTRO -->
 <div class="screen active" id="intro">
@@ -408,10 +408,6 @@
     let timeLeft = TENSE_SECS;
     let ticker = null;
     let paused = false;
-
-    function goBack() {
-        window.location.href = '/app.html';
-    }
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
