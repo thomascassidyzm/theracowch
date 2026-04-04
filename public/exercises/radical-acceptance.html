@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Radical Acceptance | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .intro-card {
+            background: var(--bg-card);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .intro-card strong {
+            color: var(--coral);
+        }
+
+        .prompt-text {
+            text-align: center;
+            color: var(--coral);
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .steps-card h2 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .step-item:last-child { border-bottom: none; }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: var(--coral);
+            color: var(--bg-deep);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-detail {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .reaffirm-list {
+            margin-top: 8px;
+            margin-left: 4px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .reaffirm-list li {
+            padding: 4px 0 4px 20px;
+            position: relative;
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        .reaffirm-list li::before {
+            content: '\2022';
+            position: absolute;
+            left: 4px;
+            color: var(--coral);
+        }
+
+        .quote-card {
+            background: var(--bg-card);
+            border-left: 6px solid var(--coral);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .steps-card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/acceptance.html" class="back-btn">&larr; Back</a>
+
+    <div class="container">
+        <div class="hero-icon">&#x1f54a;&#xfe0f;</div>
+        <h1>Radical Acceptance</h1>
+        <p class="subtitle">Letting Go of Extra Suffering</p>
+
+        <div class="intro-card">
+            Sometimes we hold on to situations we can't change — a relationship that's over, a job we lost, circumstances beyond our control. The self-pity and "why me?" dialogue only prolongs our suffering.
+        </div>
+
+        <p class="prompt-text">Ask yourself: What am I resisting?</p>
+
+        <div class="steps-card">
+            <h2>Exercise 1: Softening Into Reality</h2>
+            <div class="step-item">
+                <span class="step-number">1</span>
+                <span><strong>Notice the struggle:</strong> <span class="step-detail">Bring to mind an unfair, painful, or uncontrollable situation</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">2</span>
+                <span><strong>Name reality:</strong> <span class="step-detail">Silently say, "This is what's happening right now"</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">3</span>
+                <span><strong>Drop the fight:</strong> <span class="step-detail">Instead of "It shouldn't be this way," soften into acceptance</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">4</span>
+                <span><strong>Acceptance statement:</strong> <span class="step-detail">"I may not like it, but this is the reality I face"</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">5</span>
+                <span><strong>Breathe into it:</strong> <span class="step-detail">Take a slow breath and imagine making space around the pain</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">6</span>
+                <span><strong>Shift toward peace:</strong> <span class="step-detail">Remind yourself that accepting doesn't mean approving</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">7</span>
+                <span><strong>Freedom message:</strong> <span class="step-detail">"I'm freeing myself from extra suffering"</span></span>
+            </div>
+        </div>
+
+        <div class="steps-card">
+            <h2>Exercise 2: Reaffirmation Practice</h2>
+            <div class="step-item">
+                <span class="step-number">1</span>
+                <span><strong>Settle and breathe:</strong> <span class="step-detail">Sit comfortably, close your eyes, take slow breaths</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">2</span>
+                <span><strong>Recall struggle:</strong> <span class="step-detail">Think of recent resistance or holding on</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">3</span>
+                <span><strong>Whisper acceptance:</strong> <span class="step-detail">"I don't have to fight this. I can let go."</span></span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">4</span>
+                <span><strong>Reaffirm benefits:</strong>
+                    <ul class="reaffirm-list">
+                        <li>Acceptance helps me move forward</li>
+                        <li>Letting go brings peace</li>
+                        <li>When I accept, I feel lighter, calmer, centered</li>
+                        <li>Letting go of the uncontrollable helps me find contentment</li>
+                    </ul>
+                </span>
+            </div>
+            <div class="step-item">
+                <span class="step-number">5</span>
+                <span><strong>Rest in calm:</strong> <span class="step-detail">Place a hand on your heart, notice the warmth, sit quietly</span></span>
+            </div>
+        </div>
+
+        <div class="quote-card">
+            "Let go of what you can't control. You have power over your thoughts and behaviors — that's where your true power lives."
+        </div>
+    </div>
+</body>
+</html>
