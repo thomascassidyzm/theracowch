@@ -74,7 +74,8 @@
         .stars-canvas {
             position: absolute;
             inset: 0;
-            z-index: 1;
+            z-index: 60;
+            pointer-events: none;
         }
 
         /* Background stars (static) */
@@ -97,7 +98,7 @@
         .gratitude-star {
             position: absolute;
             pointer-events: none;
-            z-index: 60;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -131,21 +132,22 @@
 
         .gratitude-star .delete-x {
             position: absolute;
-            top: 0;
-            right: -4px;
-            width: 20px;
-            height: 20px;
-            background: rgba(212, 137, 106, 0.95);
+            top: -6px;
+            right: -6px;
+            width: 22px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.9);
             border: none;
             border-radius: 50%;
-            color: #fff;
-            font-size: 14px;
+            color: #1a1512;
+            font-size: 15px;
             font-weight: 900;
-            line-height: 20px;
+            line-height: 22px;
             text-align: center;
             cursor: pointer;
             pointer-events: auto;
             z-index: 20;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .gratitude-star.loaded svg {
@@ -562,13 +564,16 @@
             label.textContent = data.text;
             star.appendChild(label);
 
-            deleteBtn.addEventListener('click', function(e) {
+            function deleteStar(e) {
+                e.preventDefault();
                 e.stopPropagation();
                 var idx = parseInt(star.getAttribute('data-index'));
                 starData.splice(idx, 1);
                 saveStars();
                 renderAllStars();
-            });
+            }
+            deleteBtn.addEventListener('click', deleteStar);
+            deleteBtn.addEventListener('touchend', deleteStar);
 
             starsCanvas.appendChild(star);
         }
