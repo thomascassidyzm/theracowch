@@ -542,6 +542,15 @@
                     <div class="script-label">How will you communicate this boundary?</div>
                     <textarea class="script-input" id="boundary-communication" placeholder="I will say..." rows="3"></textarea>
                 </div>
+
+                <div id="boundary-feedback" style="display:none; margin-top: 20px; padding: 20px; background: #1a1512; border: 3px solid #6B9AAF;">
+                    <strong style="color: #6B9AAF; display: block; margin-bottom: 10px;">Feedback on your response:</strong>
+                    <div id="boundary-feedback-text" style="color: #c0c0c0; line-height: 1.8;"></div>
+                    <div id="boundary-suggestion" style="margin-top: 15px; padding: 15px; background: rgba(107, 154, 175, 0.1); border: 2px solid rgba(107, 154, 175, 0.3);">
+                        <strong style="color: #6B9AAF; display: block; margin-bottom: 8px;">A stronger version might sound like:</strong>
+                        <p id="boundary-suggestion-text" style="color: #e0e0e0; font-style: italic; line-height: 1.6;"></p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -614,16 +623,6 @@
             updateProgress();
         });
 
-        document.querySelector('.checkin-suggestions').addEventListener('click', () => {
-            localStorage.setItem('interactions_dailyCheckin', 'true');
-            updateProgress();
-        });
-
-        document.querySelector('.ladder').addEventListener('click', () => {
-            localStorage.setItem('interactions_comfortLadder', 'true');
-            updateProgress();
-        });
-
         document.querySelector('.script-template').addEventListener('input', () => {
             localStorage.setItem('interactions_difficultConvo', 'true');
             updateProgress();
@@ -636,6 +635,72 @@
 
         // Initialize progress on load
         updateProgress();
+
+        // Boundary communication feedback
+        (function() {
+            var commBox = document.getElementById('boundary-communication');
+            var feedbackEl = document.getElementById('boundary-feedback');
+            var feedbackText = document.getElementById('boundary-feedback-text');
+            var suggestionText = document.getElementById('boundary-suggestion-text');
+            var timer = null;
+
+            commBox.addEventListener('input', function() {
+                clearTimeout(timer);
+                var text = commBox.value.trim();
+                if (text.length < 10) {
+                    feedbackEl.style.display = 'none';
+                    return;
+                }
+                timer = setTimeout(function() {
+                    analyseBoundary(text);
+                }, 1000);
+            });
+
+            function analyseBoundary(text) {
+                var tips = [];
+                var lower = text.toLowerCase();
+                var boundaryText = document.getElementById('boundary-practice').value.trim();
+
+                // Check for "I" statements
+                if (lower.indexOf('i feel') !== -1 || lower.indexOf('i need') !== -1 || lower.indexOf("i'd") !== -1) {
+                    tips.push('<span style="color:#7EA88B;">✓ Great use of "I" statements</span> — this keeps it about your needs, not blame.');
+                } else {
+                    tips.push('<span style="color:#E8A84A;">⚡ Try starting with "I feel..." or "I need..."</span> — this makes it about your experience rather than accusing the other person.');
+                }
+
+                // Check for "you always/never"
+                if (lower.indexOf('you always') !== -1 || lower.indexOf('you never') !== -1) {
+                    tips.push('<span style="color:#D9363E;">⚠ Avoid "You always" or "You never"</span> — these generalisations make people defensive. Try being specific about the situation.');
+                }
+
+                // Check for a clear request
+                if (lower.indexOf('could you') !== -1 || lower.indexOf('would you') !== -1 || lower.indexOf('i need you to') !== -1 || lower.indexOf('i would like') !== -1 || lower.indexOf("i'd like") !== -1 || lower.indexOf('please') !== -1) {
+                    tips.push('<span style="color:#7EA88B;">✓ Clear request included</span> — you\'re telling them what you need, which is great.');
+                } else {
+                    tips.push('<span style="color:#E8A84A;">⚡ Try including a clear request</span> — e.g. "I would like..." or "Could you please..." so they know exactly what you need.');
+                }
+
+                // Check tone - aggressive language
+                if (lower.indexOf('shut up') !== -1 || lower.indexOf('stupid') !== -1 || lower.indexOf('hate you') !== -1 || lower.indexOf('don\'t care') !== -1) {
+                    tips.push('<span style="color:#D9363E;">⚠ Watch the tone</span> — assertive is different from aggressive. Aim for firm but respectful.');
+                } else {
+                    tips.push('<span style="color:#7EA88B;">✓ Respectful tone</span> — you\'re being assertive without being aggressive.');
+                }
+
+                // Check if too apologetic
+                if (lower.indexOf('sorry') !== -1 || lower.indexOf('i know this is silly') !== -1 || lower.indexOf('it\'s probably nothing') !== -1) {
+                    tips.push('<span style="color:#E8A84A;">⚡ You don\'t need to apologise for setting a boundary</span> — your needs are valid. Remove "sorry" and state it with confidence.');
+                }
+
+                feedbackText.innerHTML = '<ul style="padding-left: 20px; list-style: none;">' + tips.map(function(t) { return '<li style="margin-bottom: 8px;">' + t + '</li>'; }).join('') + '</ul>';
+
+                // Build a suggested stronger version
+                var situation = boundaryText || 'this situation';
+                suggestionText.textContent = '"I feel uncomfortable when ' + situation.toLowerCase().replace(/^i need to say no to\s*/i, '') + '. I need you to respect that this is my boundary. I value our relationship, and I hope we can find a way forward that works for both of us."';
+
+                feedbackEl.style.display = 'block';
+            }
+        })();
     </script>
 </body>
 </html>
