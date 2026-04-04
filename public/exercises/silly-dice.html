@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Silly Dice | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+            --green: #7EA88B;
+            --purple: #c4a7e7;
+            --blue: #87d3f8;
+            --yellow: #ffe066;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+            text-align: center;
+        }
+
+        .hero-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Board */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .square {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+            border: 2px solid rgba(255,255,255,0.08);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .square.visited {
+            opacity: 0.4;
+        }
+
+        .square.current {
+            border-color: var(--coral);
+            background: rgba(212, 137, 106, 0.2);
+            color: var(--coral);
+            transform: scale(1.1);
+            z-index: 2;
+            box-shadow: 0 0 15px rgba(212, 137, 106, 0.4);
+        }
+
+        .square.joke { border-color: rgba(255, 224, 102, 0.3); }
+        .square.challenge { border-color: rgba(196, 167, 231, 0.3); }
+        .square.fact { border-color: rgba(135, 211, 248, 0.3); }
+        .square.bonus { border-color: rgba(126, 168, 139, 0.3); }
+
+        .square-icon { font-size: 1.2rem; }
+
+        /* Dice */
+        .dice-area {
+            margin-bottom: 1.5rem;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            background: var(--text-primary);
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--bg-deep);
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .dice:hover { transform: scale(1.05); }
+        .dice:active { transform: scale(0.95); }
+
+        .dice.rolling {
+            animation: diceRoll 0.6s ease;
+        }
+
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(0.9); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .roll-instruction {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+        }
+
+        /* Result card */
+        .result-card {
+            background: var(--bg-card);
+            border: 4px solid var(--coral);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-type {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .result-type.joke { background: rgba(255, 224, 102, 0.2); color: var(--yellow); }
+        .result-type.challenge { background: rgba(196, 167, 231, 0.2); color: var(--purple); }
+        .result-type.fact { background: rgba(135, 211, 248, 0.2); color: var(--blue); }
+        .result-type.bonus { background: rgba(126, 168, 139, 0.2); color: var(--green); }
+
+        .result-emoji { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+        .result-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-punchline {
+            font-size: 1rem;
+            color: var(--coral);
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .result-punchline.hidden {
+            filter: blur(8px);
+            user-select: none;
+        }
+
+        .tap-reveal {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .position-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 380px) {
+            .board { gap: 4px; }
+            .square { font-size: 0.75rem; }
+            .square-icon { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/imagine/nurturing.html" class="back-btn">&larr; Back</a>
+
+    <div class="container">
+        <div class="hero-icon">🎲</div>
+        <h1>Silly Dice</h1>
+        <p class="subtitle">Roll the dice, land on laughs</p>
+
+        <div class="board" id="board"></div>
+
+        <div class="position-text" id="position-text">Square 1 of 30</div>
+
+        <div class="dice-area">
+            <div class="dice" id="dice" onclick="rollDice()">🎲</div>
+            <div class="roll-instruction">Tap to roll!</div>
+        </div>
+
+        <div id="result-area"></div>
+
+        <button class="reset-btn" onclick="resetGame()">Start Over</button>
+    </div>
+
+    <script>
+        var squares = [
+            { type: 'joke', icon: '😂', q: 'Why don\'t scientists trust atoms?', a: 'Because they make up everything!' },
+            { type: 'fact', icon: '🤯', text: 'Octopuses have three hearts and blue blood. You think YOUR life is complicated.' },
+            { type: 'joke', icon: '🐔', q: 'Why did the scarecrow win an award?', a: 'Because he was outstanding in his field!' },
+            { type: 'challenge', icon: '🕺', text: 'Do your best impression of a penguin trying to hail a taxi. Right now. No excuses.' },
+            { type: 'joke', icon: '😄', q: 'What do you call a fake noodle?', a: 'An impasta!' },
+            { type: 'bonus', icon: '🌟', text: 'BONUS: Text someone a compliment right now. Something specific and genuine. Watch how good it makes you both feel.' },
+            { type: 'fact', icon: '🦩', text: 'Flamingos can only eat with their heads upside down. Imagine trying that with your cereal.' },
+            { type: 'joke', icon: '🐻', q: 'What do you call a bear with no teeth?', a: 'A gummy bear!' },
+            { type: 'challenge', icon: '🎤', text: 'Sing the next sentence you say out loud. Doesn\'t matter who\'s around. Commit to it.' },
+            { type: 'joke', icon: '🌊', q: 'What did the ocean say to the beach?', a: 'Nothing, it just waved.' },
+            { type: 'fact', icon: '🐄', text: 'Cows have best friends and get stressed when separated. Even cows need their mates.' },
+            { type: 'challenge', icon: '🤪', text: 'Make the silliest face you can and hold it for 10 seconds. Bonus: take a selfie.' },
+            { type: 'joke', icon: '📚', q: 'Why don\'t eggs tell jokes?', a: 'They\'d crack each other up!' },
+            { type: 'bonus', icon: '💃', text: 'BONUS: Put on your favourite song and dance like absolutely nobody is watching. Full commitment.' },
+            { type: 'fact', icon: '🦦', text: 'Sea otters hold hands while they sleep so they don\'t drift apart. The cutest thing you\'ll hear today.' },
+            { type: 'joke', icon: '🧀', q: 'What type of cheese is made backwards?', a: 'Edam!' },
+            { type: 'challenge', icon: '🗣️', text: 'Tell someone nearby the worst joke you know. If you\'re alone, tell it to yourself in the mirror.' },
+            { type: 'joke', icon: '🎸', q: 'What\'s the best thing about Switzerland?', a: 'I don\'t know, but the flag is a big plus!' },
+            { type: 'fact', icon: '🐝', text: 'Honey never spoils. Archaeologists found 3,000-year-old honey in Egyptian tombs that was still edible. Unlike that thing in the back of your fridge.' },
+            { type: 'challenge', icon: '😜', text: 'Speak in an accent (any accent) for the next 60 seconds. Apologise to no one.' },
+            { type: 'joke', icon: '🐕', q: 'Why do dogs always race to the door when the doorbell rings?', a: 'It\'s hardly ever for them!' },
+            { type: 'bonus', icon: '🎁', text: 'BONUS: Write down 3 things that made you smile this week. Small things count the most.' },
+            { type: 'fact', icon: '🦔', text: 'A group of hedgehogs is called a prickle. A group of flamingos is called a flamboyance. Nature has the best naming team.' },
+            { type: 'joke', icon: '👻', q: 'What\'s a ghost\'s favourite dessert?', a: 'I scream!' },
+            { type: 'challenge', icon: '🎭', text: 'Walk around your room like you\'re on a fashion runway. Give the camera your best pose at the end.' },
+            { type: 'joke', icon: '🦆', q: 'What do you call a duck that gets all A\'s?', a: 'A wise quacker!' },
+            { type: 'fact', icon: '😸', text: 'Cats spend 70% of their lives sleeping. Sometimes the best self-care role model is your cat.' },
+            { type: 'challenge', icon: '🤗', text: 'Give yourself a proper hug right now. Arms crossed, squeeze tight. You deserve it.' },
+            { type: 'joke', icon: '🌮', q: 'Why did the tomato turn red?', a: 'Because it saw the salad dressing!' },
+            { type: 'bonus', icon: '🏆', text: 'You made it to the end! CHAMPION! You just proved that fun doesn\'t need to be complicated. Carry this energy into the rest of your day.' }
+        ];
+
+        var position = 0;
+        var rolling = false;
+
+        function createBoard() {
+            var board = document.getElementById('board');
+            board.innerHTML = '';
+            for (var i = 0; i < 30; i++) {
+                var sq = document.createElement('div');
+                var s = squares[i];
+                sq.className = 'square ' + s.type;
+                if (i === position) sq.classList.add('current');
+                if (i < position) sq.classList.add('visited');
+                sq.innerHTML = '<span class="square-icon">' + s.icon + '</span>';
+                board.appendChild(sq);
+            }
+            document.getElementById('position-text').textContent = 'Square ' + (position + 1) + ' of 30';
+        }
+
+        function rollDice() {
+            if (rolling) return;
+            if (position >= 29) {
+                showResult(squares[29]);
+                return;
+            }
+
+            rolling = true;
+            var dice = document.getElementById('dice');
+            dice.classList.add('rolling');
+
+            // Animate random numbers
+            var count = 0;
+            var animInterval = setInterval(function() {
+                dice.textContent = Math.floor(Math.random() * 6) + 1;
+                count++;
+                if (count > 8) {
+                    clearInterval(animInterval);
+
+                    var roll = Math.floor(Math.random() * 6) + 1;
+                    dice.textContent = roll;
+                    dice.classList.remove('rolling');
+
+                    // Move position
+                    position = Math.min(position + roll, 29);
+                    createBoard();
+                    showResult(squares[position]);
+
+                    localStorage.setItem('sillyDicePosition', position);
+                    rolling = false;
+                }
+            }, 80);
+        }
+
+        function showResult(square) {
+            var area = document.getElementById('result-area');
+            var html = '<div class="result-card" style="border-color: ' + getColor(square.type) + ';">';
+            html += '<span class="result-type ' + square.type + '">' + getLabel(square.type) + '</span>';
+            html += '<div class="result-emoji">' + square.icon + '</div>';
+
+            if (square.q) {
+                html += '<div class="result-text">' + square.q + '</div>';
+                html += '<div class="result-punchline hidden" onclick="this.classList.remove(\'hidden\'); this.nextElementSibling.style.display=\'none\';">' + square.a + '</div>';
+                html += '<div class="tap-reveal">Tap to reveal punchline</div>';
+            } else {
+                html += '<div class="result-text">' + square.text + '</div>';
+            }
+
+            html += '</div>';
+            area.innerHTML = html;
+        }
+
+        function getColor(type) {
+            var colors = { joke: '#ffe066', challenge: '#c4a7e7', fact: '#87d3f8', bonus: '#7EA88B' };
+            return colors[type] || '#D4896A';
+        }
+
+        function getLabel(type) {
+            var labels = { joke: '😂 Joke', challenge: '🎯 Silly Challenge', fact: '🤯 Fun Fact', bonus: '🌟 Bonus' };
+            return labels[type] || type;
+        }
+
+        function resetGame() {
+            position = 0;
+            localStorage.removeItem('sillyDicePosition');
+            createBoard();
+            document.getElementById('result-area').innerHTML = '';
+        }
+
+        // Load saved position
+        var saved = localStorage.getItem('sillyDicePosition');
+        if (saved) position = parseInt(saved);
+
+        createBoard();
+        if (position > 0) showResult(squares[position]);
+    </script>
+</body>
+</html>
