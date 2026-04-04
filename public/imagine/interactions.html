@@ -493,11 +493,6 @@
                 </div>
 
                 <div class="script-line">
-                    <div class="script-label">Because...</div>
-                    <input type="text" class="script-input" id="because" placeholder="(explain the impact: 'it makes me feel like my time isn't valued')">
-                </div>
-
-                <div class="script-line">
                     <div class="script-label">I would appreciate...</div>
                     <input type="text" class="script-input" id="appreciate" placeholder="(make a clear request: 'if you could let me know earlier when things change')">
                 </div>
@@ -565,21 +560,18 @@
         // Good Communication Script Builder
         const feeling = document.getElementById('feeling');
         const when = document.getElementById('when');
-        const because = document.getElementById('because');
         const appreciate = document.getElementById('appreciate');
         const previewText = document.getElementById('preview-text');
 
         function updatePreview() {
             const feelingVal = feeling.value.trim();
             const whenVal = when.value.trim();
-            const becauseVal = because.value.trim();
             const appreciateVal = appreciate.value.trim();
 
-            if (feelingVal || whenVal || becauseVal || appreciateVal) {
+            if (feelingVal || whenVal || appreciateVal) {
                 let script = '';
                 if (feelingVal) script += `I feel ${feelingVal}`;
                 if (whenVal) script += ` when ${whenVal}`;
-                if (becauseVal) script += ` because ${becauseVal}`;
                 if (appreciateVal) script += `. I would appreciate ${appreciateVal}`;
 
                 if (!script.endsWith('.')) script += '.';
@@ -592,7 +584,6 @@
 
         feeling.addEventListener('input', updatePreview);
         when.addEventListener('input', updatePreview);
-        because.addEventListener('input', updatePreview);
         appreciate.addEventListener('input', updatePreview);
 
         // Simple Progress Tracking (localStorage)
