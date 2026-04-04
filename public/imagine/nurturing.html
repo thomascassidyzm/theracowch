@@ -216,6 +216,47 @@
             <p class="exercise-description">Choose a hobby or creative activity, schedule time for it, and track your achievements.</p>
             <button class="action-button" style="width: 100%; margin-top: 20px;" onclick="event.preventDefault(); window.location.href='/exercises/creative-expression.html'">Try Exercise &rarr;</button>
         </a>
+        <!-- Progress Indicator -->
+        <div class="exercise-card" style="text-align: center;">
+            <h3 style="color: #E8A86A; margin-bottom: 10px;">Your Nurturing Practice</h3>
+            <div style="font-size: 48px; font-weight: 900; color: #E8A86A;" id="exercise-count">0</div>
+            <p class="exercise-description">exercises completed</p>
+            <button id="reset-progress" style="margin-top: 12px; background: transparent; border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: 'Gabarito', sans-serif;">Reset</button>
+        </div>
     </div>
+
+    <script>
+        var COUNT_KEY = 'cowch_nurturing_completed';
+
+        function loadCount() {
+            var count = parseInt(localStorage.getItem(COUNT_KEY) || '0');
+            document.getElementById('exercise-count').textContent = count;
+        }
+
+        var referrer = document.referrer || '';
+        var exercisePages = [
+            '/exercises/fun-prompts',
+            '/exercises/playfulness-diary',
+            '/exercises/inner-child-work',
+            '/exercises/creative-expression',
+            '/exercises/joy'
+        ];
+
+        var cameFromExercise = exercisePages.some(function(page) {
+            return referrer.indexOf(page) !== -1;
+        });
+
+        if (cameFromExercise) {
+            var count = parseInt(localStorage.getItem(COUNT_KEY) || '0') + 1;
+            localStorage.setItem(COUNT_KEY, count.toString());
+        }
+
+        document.getElementById('reset-progress').addEventListener('click', function() {
+            localStorage.removeItem(COUNT_KEY);
+            loadCount();
+        });
+
+        loadCount();
+    </script>
 </body>
 </html>
