@@ -219,6 +219,14 @@
             <textarea id="action-plan" placeholder="e.g. I could start sketching again on weekends, or join a casual football group..." style="width:100%;min-height:100px;padding:1rem;background:var(--bg-deep);border:3px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-family:'Gabarito',sans-serif;font-size:1rem;resize:vertical;outline:none;margin-top:1rem;display:none;"></textarea>
             <div class="response-box" id="final-response" style="margin-top:1rem;"></div>
         </div>
+
+        <div class="question-card">
+            <h2>Do you see the funny side of life?</h2>
+            <button class="option-btn funny-btn" onclick="selectFunny(this, 'not-at-all')">Not at all</button>
+            <button class="option-btn funny-btn" onclick="selectFunny(this, 'somewhat')">Somewhat</button>
+            <button class="option-btn funny-btn" onclick="selectFunny(this, 'very-much')">Very much so</button>
+            <div class="response-box" id="funny-response"></div>
+        </div>
     </div>
 
     <script>
@@ -326,6 +334,63 @@
             }
             if (savedAction) {
                 actionPlan.value = savedAction;
+            }
+        })();
+
+        // Funny side of life
+        var funnyResponses = {
+            'very-much': "Well done! That's a brilliant quality to have. Humour is one of the most powerful tools for resilience — it helps you bounce back, stay flexible, and keep perspective when life gets tough. Keep laughing!",
+            'somewhat': "That's a good start — and something you can build on. Life doesn't have to be so serious all the time. Here are some ways to bring more lightness in:",
+            'not-at-all': "That's okay — many people feel this way, especially during tough times. But humour and playfulness can be rediscovered. Here are some ideas to help you reconnect with the lighter side of life:"
+        };
+
+        var funnyIdeas = [
+            "🎨 <strong>Get messy</strong> — paint, bake, garden, play in the mud. Perfection is overrated.",
+            "⚽ <strong>Try a sport or physical play</strong> — kick a ball around, dance in your kitchen, have a pillow fight.",
+            "😂 <strong>Seek out laughter</strong> — watch a comedy, share jokes, spend time with people who make you laugh.",
+            "🙅 <strong>Practice less judgement</strong> — of yourself and others. Lighten up on the rules you've set for how things 'should' be.",
+            "🌊 <strong>Enjoy life as it comes</strong> — stop waiting for the perfect moment. This is it.",
+            "🤪 <strong>Be silly on purpose</strong> — pull a funny face, do a daft voice, skip instead of walk.",
+            "🎭 <strong>Don't take yourself so seriously</strong> — laugh at your mistakes. Everyone makes them.",
+            "👶 <strong>Hang out with children</strong> — they'll remind you how to play without overthinking.",
+            "📵 <strong>Put your phone down</strong> — be present and notice the absurd, beautiful, funny things around you.",
+            "🎲 <strong>Say yes to something spontaneous</strong> — break the routine. Surprise yourself."
+        ];
+
+        function selectFunny(btn, choice) {
+            document.querySelectorAll('.funny-btn').forEach(function(b) {
+                b.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+
+            var html = '<p style="margin-bottom:1rem;">' + funnyResponses[choice] + '</p>';
+
+            if (choice !== 'very-much') {
+                html += '<ul style="list-style:none;padding:0;">';
+                funnyIdeas.forEach(function(idea) {
+                    html += '<li style="margin-bottom:0.8rem;line-height:1.6;">' + idea + '</li>';
+                });
+                html += '</ul>';
+            }
+
+            var box = document.getElementById('funny-response');
+            box.innerHTML = html;
+            box.classList.remove('visible');
+            void box.offsetWidth;
+            box.classList.add('visible');
+
+            localStorage.setItem('innerChildFunny', choice);
+        }
+
+        // Load saved funny choice
+        (function() {
+            var saved = localStorage.getItem('innerChildFunny');
+            if (saved) {
+                var btns = document.querySelectorAll('.funny-btn');
+                var map = { 'not-at-all': 0, 'somewhat': 1, 'very-much': 2 };
+                if (map[saved] !== undefined && btns[map[saved]]) {
+                    btns[map[saved]].classList.add('selected');
+                }
             }
         })();
     </script>
