@@ -640,6 +640,89 @@
         }
 
         .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        /* Calendar View */
+        .calendar-view {
+            display: none;
+            padding-top: 20px;
+        }
+
+        .calendar-view.visible { display: block; }
+
+        .calendar-view h2 {
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-day-label {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            padding: 4px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+        }
+
+        .calendar-day.today {
+            border-color: var(--accent, #ff6b35);
+            border-width: 2px;
+        }
+
+        .calendar-day .day-number {
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.65rem;
+        }
+
+        .calendar-day .day-weather {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .calendar-day.has-checkin {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .calendar-back-btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: var(--text-primary, #f5f3f0);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -743,6 +826,12 @@
                     Back to Check-In
                 </button>
             </div>
+        </div>
+        <!-- Calendar View -->
+        <div class="calendar-view" id="calendarView">
+            <h2>Your Last 30 Days</h2>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <button class="calendar-back-btn" id="calendarBackBtn">Back to Check-In</button>
         </div>
     </div>
 
@@ -977,11 +1066,10 @@
             saveBtn.classList.add('hidden');
             selectedWeather = null;
 
-            // Reset to default sky after a moment
+            // Show calendar after a brief delay
             setTimeout(() => {
-                skyContainer.className = 'sky-container default';
-                clearEffects();
-            }, 2000);
+                showCalendar();
+            }, 1500);
         }
 
         // Update stats
@@ -1124,6 +1212,92 @@
             mainView.style.display = 'block';
             historyView.classList.remove('visible');
         }
+
+        // Calendar view
+        var calendarView = document.getElementById('calendarView');
+        var calendarGrid = document.getElementById('calendarGrid');
+        var calendarBackBtn = document.getElementById('calendarBackBtn');
+
+        function showCalendar() {
+            mainView.style.display = 'none';
+            historyView.classList.remove('visible');
+            calendarView.classList.add('visible');
+            renderCalendar();
+        }
+
+        function hideCalendar() {
+            calendarView.classList.remove('visible');
+            mainView.style.display = '';
+            skyContainer.className = 'sky-container default';
+            clearEffects();
+        }
+
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+
+            // Day labels
+            var dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dayLabels.forEach(function(label) {
+                var el = document.createElement('div');
+                el.className = 'calendar-day-label';
+                el.textContent = label;
+                calendarGrid.appendChild(el);
+            });
+
+            // Build last 30 days
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var days = [];
+            for (var i = 29; i >= 0; i--) {
+                var d = new Date(today);
+                d.setDate(d.getDate() - i);
+                days.push(d);
+            }
+
+            // Map check-ins by date string
+            var checkinMap = {};
+            weatherHistory.forEach(function(entry) {
+                var entryDate = new Date(entry.timestamp);
+                var key = entryDate.getFullYear() + '-' + (entryDate.getMonth() + 1) + '-' + entryDate.getDate();
+                // Keep the latest check-in for each day
+                if (!checkinMap[key]) {
+                    checkinMap[key] = entry;
+                }
+            });
+
+            // Pad start to align with day of week (Mon=0)
+            var firstDay = days[0].getDay();
+            var startPad = (firstDay + 6) % 7; // Convert Sun=0 to Mon=0
+            for (var p = 0; p < startPad; p++) {
+                var empty = document.createElement('div');
+                empty.className = 'calendar-day empty';
+                calendarGrid.appendChild(empty);
+            }
+
+            // Render days
+            days.forEach(function(date) {
+                var el = document.createElement('div');
+                el.className = 'calendar-day';
+
+                var key = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                var isToday = date.getTime() === today.getTime();
+
+                if (isToday) el.classList.add('today');
+
+                var checkin = checkinMap[key];
+                if (checkin) {
+                    el.classList.add('has-checkin');
+                    var config = weatherConfig[checkin.weather];
+                    el.innerHTML = '<span class="day-weather">' + config.icon + '</span><span class="day-number">' + date.getDate() + '</span>';
+                } else {
+                    el.innerHTML = '<span class="day-number">' + date.getDate() + '</span>';
+                }
+
+                calendarGrid.appendChild(el);
+            });
+        }
+
+        calendarBackBtn.addEventListener('click', hideCalendar);
 
         // Event listeners
         weatherOptions.forEach(option => {
