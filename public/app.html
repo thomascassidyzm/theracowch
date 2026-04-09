@@ -3859,6 +3859,9 @@
             <h2 class="mood-calendar-title" style="font-size:1.3rem;margin-bottom:0.3rem;">Your Mood</h2>
             <p style="text-align:center;color:var(--text-muted);font-size:var(--font-size-sm);margin-bottom:1.2rem;">Last 30 days</p>
             <div class="mood-calendar-grid" id="mood-calendar-grid"></div>
+            <div id="mood-alert" style="display:none;margin-top:1.2rem;padding:1.2rem;background:rgba(212,137,106,0.12);border:2px solid var(--coral);border-radius:var(--radius-medium);text-align:center;line-height:1.6;font-size:var(--font-size-sm);color:var(--text-secondary);">
+                You have had a few consecutive days of low mood. Think about what might be causing this and problem solve ways to improve or <a href="/app.html" style="color:var(--coral);font-weight:700;text-decoration:underline;" onclick="document.getElementById('mood-calendar-overlay').style.display='none';">Chat to Mandy</a>.
+            </div>
             <button id="mood-calendar-close" style="display:block;width:100%;margin-top:1.5rem;padding:1rem;background:var(--coral);border:none;border-radius:var(--radius-medium);color:var(--bg-primary);font-family:'Gabarito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;text-transform:uppercase;">Back to Home</button>
         </div>
     </div>
@@ -3937,6 +3940,28 @@
                 }
                 grid.appendChild(el);
             });
+
+            // Check for 3+ consecutive low mood days
+            var lowMoods = ['partly-cloudy', 'cloudy', 'overcast', 'rainy', 'stormy', 'foggy'];
+            var alert = document.getElementById('mood-alert');
+            var consecutive = 0;
+
+            for (var c = 0; c < days.length; c++) {
+                var d = days[days.length - 1 - c]; // start from today going back
+                var k = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                var ci = checkinMap[k];
+                if (ci && lowMoods.indexOf(ci.weather) !== -1) {
+                    consecutive++;
+                } else {
+                    break;
+                }
+            }
+
+            if (consecutive >= 3) {
+                alert.style.display = 'block';
+            } else {
+                alert.style.display = 'none';
+            }
         }
 
         function showMoodCalendar() {
