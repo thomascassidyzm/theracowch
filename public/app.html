@@ -3862,6 +3862,8 @@
             <div id="mood-alert" style="display:none;margin-top:1.2rem;padding:1.2rem;background:rgba(212,137,106,0.12);border:2px solid var(--coral);border-radius:var(--radius-medium);text-align:center;line-height:1.6;font-size:var(--font-size-sm);color:var(--text-secondary);">
                 You have had a few consecutive days of low mood. Think about what might be causing this and problem solve ways to improve or <a href="/app.html" style="color:var(--coral);font-weight:700;text-decoration:underline;" onclick="document.getElementById('mood-calendar-overlay').style.display='none';">Chat to Mandy</a>.
             </div>
+            <div id="mood-day-alert" style="display:none;margin-top:0.75rem;padding:1.2rem;background:rgba(155,114,176,0.12);border:2px solid #9B72B0;border-radius:var(--radius-medium);text-align:center;line-height:1.6;font-size:var(--font-size-sm);color:var(--text-secondary);">
+            </div>
             <button id="mood-calendar-close" style="display:block;width:100%;margin-top:1.5rem;padding:1rem;background:var(--coral);border:none;border-radius:var(--radius-medium);color:var(--bg-primary);font-family:'Gabarito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;text-transform:uppercase;">Back to Home</button>
         </div>
     </div>
@@ -3961,6 +3963,39 @@
                 alert.style.display = 'block';
             } else {
                 alert.style.display = 'none';
+            }
+
+            // Check for day-of-week pattern
+            var dayAlert = document.getElementById('mood-day-alert');
+            var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var dayLowCount = [0, 0, 0, 0, 0, 0, 0];
+            var dayTotalCount = [0, 0, 0, 0, 0, 0, 0];
+
+            days.forEach(function(date) {
+                var k = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                var ci = checkinMap[k];
+                if (ci) {
+                    var dow = date.getDay();
+                    dayTotalCount[dow]++;
+                    if (lowMoods.indexOf(ci.weather) !== -1) {
+                        dayLowCount[dow]++;
+                    }
+                }
+            });
+
+            var patternDay = null;
+            for (var pd = 0; pd < 7; pd++) {
+                if (dayTotalCount[pd] >= 2 && dayLowCount[pd] === dayTotalCount[pd]) {
+                    patternDay = pd;
+                    break;
+                }
+            }
+
+            if (patternDay !== null) {
+                dayAlert.innerHTML = 'You tend to dip on a <strong>' + dayNames[patternDay] + '</strong>. What might be causing this? <a href="/app.html" style="color:#9B72B0;font-weight:700;text-decoration:underline;" onclick="document.getElementById(\'mood-calendar-overlay\').style.display=\'none\';">Chat to Mandy</a>';
+                dayAlert.style.display = 'block';
+            } else {
+                dayAlert.style.display = 'none';
             }
         }
 
