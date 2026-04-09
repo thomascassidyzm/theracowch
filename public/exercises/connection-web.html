@@ -3,1107 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-    <title>Connection Web - cowch.app</title>
-    <link rel="icon" href="/icons/cowch-icon.svg" type="image/svg+xml">
+    <title>Connection Web | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --coral-dark: #b86d4e;
+            --green: #7EA88B;
+            --red: #D9363E;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Gabarito', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1512;
-            color: #e8e3df;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        header {
-            padding: 1.5rem 2rem;
-            border-bottom: 2px solid #3a3533;
-            background: #1a1512;
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
             z-index: 100;
         }
 
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+        }
+
+        .hero-icon { font-size: 4rem; text-align: center; margin-bottom: 1.5rem; }
+
         h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #D4896A;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
             margin-bottom: 0.5rem;
         }
 
         .subtitle {
-            color: #8a7a6a;
+            text-align: center;
+            color: var(--coral);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
 
-        .container {
-            flex: 1;
+        .info-card strong { color: var(--coral); }
+
+        /* Circle groups */
+        .circle-group {
+            background: var(--bg-card);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .circle-header {
             display: flex;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
         }
 
-        #canvas {
-            width: 100%;
-            height: 100%;
-            cursor: grab;
-        }
-
-        #canvas.dragging {
-            cursor: grabbing;
-        }
-
-        .controls {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
+        .circle-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--coral);
+            color: var(--bg-deep);
             display: flex;
-            gap: 1rem;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .btn {
-            background: #D4896A;
-            color: #1a1512;
-            border: none;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 2px solid #D4896A;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn:hover {
-            background: transparent;
-            color: #D4896A;
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #8a7a6a;
-            border-color: #3a3533;
-            font-size: 0.85rem;
-            padding: 0.75rem 1rem;
-        }
-
-        .btn-secondary:hover {
-            color: #e8e3df;
-            border-color: #8a7a6a;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 21, 18, 0.95);
-            display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.2s ease;
+            font-weight: 900;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
-        .modal-overlay.active {
+        .circle-title {
+            font-weight: 900;
+            font-size: 1rem;
+        }
+
+        .circle-desc {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .person-list { list-style: none; }
+
+        .person-item {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .person-item:last-child { border-bottom: none; }
+
+        .person-info { flex: 1; }
+
+        .person-name {
+            font-weight: 700;
+            font-size: 0.95rem;
         }
 
-        .modal {
-            background: #242019;
-            border: 2px solid #3a3533;
+        .person-relationship {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .person-energy {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-right: 0.5rem;
+        }
+
+        .person-energy.supportive { background: rgba(126,168,139,0.2); color: var(--green); }
+        .person-energy.neutral { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+        .person-energy.draining { background: rgba(217,54,62,0.2); color: var(--red); }
+
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.3rem;
+            opacity: 0.5;
+        }
+
+        .remove-btn:hover { opacity: 1; color: var(--red); }
+
+        .empty-circle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
+
+        /* Add form */
+        .add-section {
+            background: var(--bg-card);
+            border: 3px solid var(--coral);
+            border-radius: 12px;
             padding: 1.5rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal h2 {
-            color: #D4896A;
             margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+        }
+
+        .add-section h2 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
         }
 
         .form-group {
             margin-bottom: 1rem;
         }
 
-        label {
+        .form-label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #8a7a6a;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
         }
 
-        input, select {
+        .form-input {
             width: 100%;
-            padding: 0.75rem;
-            background: #1a1512;
-            border: 2px solid #3a3533;
-            color: #e8e3df;
-            font-size: 1rem;
-            transition: border-color 0.2s ease;
-        }
-
-        input:focus, select:focus {
+            padding: 0.7rem;
+            background: var(--bg-deep);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.95rem;
             outline: none;
-            border-color: #D4896A;
         }
 
-        .radio-group {
+        .form-input:focus { border-color: var(--coral); }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        .radio-row {
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .radio-option {
             flex: 1;
-            min-width: 120px;
+            text-align: center;
         }
 
-        .radio-option input[type="radio"] {
-            display: none;
-        }
+        .radio-option input { display: none; }
 
         .radio-option label {
             display: block;
-            padding: 0.75rem;
-            background: #1a1512;
-            border: 2px solid #3a3533;
+            padding: 0.6rem 0.3rem;
+            background: var(--bg-deep);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
             cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            text-transform: none;
+            transition: all 0.2s;
         }
 
-        .radio-option input[type="radio"]:checked + label {
-            border-color: #D4896A;
+        .radio-option input:checked + label {
+            border-color: var(--coral);
             background: rgba(212, 137, 106, 0.1);
+            color: var(--coral);
         }
 
-        .radio-option.supportive input[type="radio"]:checked + label {
-            border-color: #7EA88B;
-            background: rgba(126, 168, 139, 0.1);
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid;
+            border-radius: 10px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
         }
 
-        .radio-option.draining input[type="radio"]:checked + label {
-            border-color: #D9363E;
-            background: rgba(196, 122, 93, 0.1);
+        .btn-primary {
+            background: var(--coral);
+            border-color: var(--coral-dark);
+            color: var(--bg-deep);
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 var(--coral-dark);
         }
 
-        .modal-actions .btn {
-            flex: 1;
+        .btn-secondary {
+            background: transparent;
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text-muted);
+            margin-top: 0.75rem;
         }
 
-        .insights {
-            position: absolute;
-            bottom: 2rem;
-            left: 2rem;
-            max-width: 400px;
-            max-height: 60vh;
-            overflow-y: auto;
-            background: rgba(36, 32, 25, 0.95);
-            border: 2px solid #3a3533;
-            padding: 1.5rem;
-            display: none;
+        /* Insights */
+        .insights-card {
+            background: var(--bg-card);
+            border: 3px solid var(--coral);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        .insights.active {
-            display: block;
-            animation: slideUp 0.3s ease;
-        }
-
-        .insights h3 {
-            color: #D4896A;
-            margin-bottom: 1rem;
+        .insights-card h2 {
             font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
         }
 
         .insight-item {
-            margin-bottom: 0.75rem;
-            color: #8a7a6a;
+            color: var(--text-muted);
             font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .stat {
-            color: #D4896A;
-            font-weight: 600;
-        }
-
-        .legend {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: rgba(36, 32, 25, 0.95);
-            border: 1px solid #3a3533;
-            padding: 0.5rem 0.6rem;
-            font-size: 0.65rem;
-            line-height: 1.4;
-        }
-
-        .legend-title {
-            color: #D4896A;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.6rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            margin-bottom: 0.25rem;
-            color: #8a7a6a;
-        }
-
-        .legend-color {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 2px solid currentColor;
-        }
-
-        .empty-state {
-            position: absolute;
-            top: 65%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            max-width: 400px;
-            pointer-events: none;
-        }
-
-        .empty-state h2 {
-            color: #D4896A;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .empty-state p {
-            color: #8a7a6a;
             line-height: 1.6;
-        }
-
-        .person-tooltip {
-            position: absolute;
-            background: #242019;
-            border: 2px solid #3a3533;
-            padding: 1rem;
-            pointer-events: none;
-            display: none;
-            z-index: 500;
-            min-width: 200px;
-        }
-
-        .person-tooltip.active {
-            display: block;
-        }
-
-        .person-tooltip h4 {
-            color: #D4896A;
             margin-bottom: 0.5rem;
         }
 
-        .person-tooltip p {
-            color: #8a7a6a;
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
+        .stat { color: var(--coral); font-weight: 900; }
+
+        .saved-msg {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(126, 168, 139, 0.15);
+            border: 2px solid var(--green);
+            border-radius: 10px;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 1rem;
+            display: none;
         }
 
-        .delete-btn {
-            margin-top: 0.75rem;
-            padding: 0.5rem 1rem;
-            background: transparent;
-            border: 2px solid #D9363E;
-            color: #D9363E;
-            cursor: pointer;
-            font-size: 0.85rem;
-            width: 100%;
-            pointer-events: auto;
-        }
+        .saved-msg.visible { display: block; }
 
-        .delete-btn:hover {
-            background: rgba(196, 122, 93, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            header {
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 1.25rem;
-            }
-
-            .controls {
-                top: 1rem;
-                right: 1rem;
-            }
-
-            .btn {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-
-            .legend, .insights {
-                left: 1rem;
-                right: 1rem;
-                max-width: none;
-            }
-
-            .modal {
-                padding: 1.5rem;
-            }
-        }
-    
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #2a2320;
-            border-top: 3px solid #3a3533;
-            padding: 0.75rem 1rem;
-            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            text-decoration: none;
-            color: #9a8f85;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            padding: 0.5rem;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: #D4896A;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .radio-option label { font-size: 0.7rem; padding: 0.5rem 0.2rem; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <a href="/imagine/interactions.html" style="display:inline-block;margin-bottom:0.75rem;color:#D4896A;text-decoration:none;font-weight:700;font-size:0.9rem;">← Back</a>
-        <h1>Connection Web</h1>
-        <p class="subtitle">Map your social connections and understand your support network</p>
-    </header>
+    <a href="/imagine/interactions.html" class="back-btn">&larr; Back</a>
 
     <div class="container">
-        <canvas id="canvas"></canvas>
+        <div class="hero-icon">🕸️</div>
+        <h1>Connection Web</h1>
+        <p class="subtitle">Map your support network</p>
 
-        <div class="empty-state" id="emptyState">
-            <h2>Your Connection Web</h2>
-            <p>Start by adding the people in your life. Watch your support network come alive as you map out your connections.</p>
+        <div class="info-card">
+            Visualise your relationships as <strong>three concentric circles</strong>. Understanding who's in your inner, middle, and outer circles helps you set appropriate boundaries and invest energy wisely.
         </div>
 
-        <div class="legend">
-            <div class="legend-title">Circles</div>
-            <div class="legend-item"><span><strong>1</strong> Inner — Closest support</span></div>
-            <div class="legend-item"><span><strong>2</strong> Middle — Regular connections</span></div>
-            <div class="legend-item"><span><strong>3</strong> Outer — Acquaintances</span></div>
-            <div class="legend-title" style="margin-top: 0.75rem;">Energy Types</div>
-            <div class="legend-item">
-                <div class="legend-color" style="color: #7EA88B;"></div>
-                <span>Supportive</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="color: #8a7a6a;"></div>
-                <span>Neutral</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="color: #D9363E;"></div>
-                <span>Draining</span>
-            </div>
-        </div>
+        <div class="saved-msg" id="saved-msg">Saved ✓</div>
 
-        <div class="controls">
-            <button class="btn" id="addBtn">+ Add Connection</button>
-            <button class="btn" id="saveBtn" style="background:#7EA88B;border-color:#7EA88B;display:none;">Saved ✓</button>
-            <button class="btn btn-secondary" id="insightsBtn">View Insights</button>
-            <button class="btn btn-secondary" id="clearBtn" style="border-color:#D9363E;color:#D9363E;">Clear All</button>
-        </div>
-
-        <div class="insights" id="insights">
-            <h3>Your Network Insights</h3>
-            <div id="insightContent"></div>
-        </div>
-
-        <div class="person-tooltip" id="tooltip">
-            <h4 id="tooltipName"></h4>
-            <p id="tooltipRelation"></p>
-            <p id="tooltipCircle"></p>
-            <button class="delete-btn" id="deleteBtn">Remove Connection</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <h2 id="modalTitle">Add Connection</h2>
-            <form id="connectionForm">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Enter their name">
+        <!-- Circle 1: Inner -->
+        <div class="circle-group">
+            <div class="circle-header">
+                <span class="circle-number">1</span>
+                <div>
+                    <div class="circle-title">Inner Circle</div>
+                    <div class="circle-desc">Closest support — you can call them at 3am</div>
                 </div>
+            </div>
+            <ul class="person-list" id="inner-list">
+                <li class="empty-circle">No connections yet</li>
+            </ul>
+        </div>
 
-                <div class="form-group">
-                    <label for="relationship">Relationship</label>
-                    <input type="text" id="relationship" required placeholder="e.g., Friend, Partner, Colleague">
+        <!-- Circle 2: Middle -->
+        <div class="circle-group">
+            <div class="circle-header">
+                <span class="circle-number">2</span>
+                <div>
+                    <div class="circle-title">Middle Circle</div>
+                    <div class="circle-desc">Regular connections — friends, colleagues, family</div>
                 </div>
+            </div>
+            <ul class="person-list" id="middle-list">
+                <li class="empty-circle">No connections yet</li>
+            </ul>
+        </div>
 
+        <!-- Circle 3: Outer -->
+        <div class="circle-group">
+            <div class="circle-header">
+                <span class="circle-number">3</span>
+                <div>
+                    <div class="circle-title">Outer Circle</div>
+                    <div class="circle-desc">Acquaintances — pleasant but limited emotional investment</div>
+                </div>
+            </div>
+            <ul class="person-list" id="outer-list">
+                <li class="empty-circle">No connections yet</li>
+            </ul>
+        </div>
+
+        <!-- Add Connection -->
+        <div class="add-section">
+            <h2>Add Connection</h2>
+            <form id="add-form">
                 <div class="form-group">
-                    <label>Circle</label>
-                    <div class="radio-group">
+                    <label class="form-label" for="name">Name</label>
+                    <input class="form-input" type="text" id="name" name="name" required placeholder="Enter their name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="relationship">Relationship</label>
+                    <input class="form-input" type="text" id="relationship" placeholder="e.g. Friend, Partner, Colleague">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Circle</label>
+                    <div class="radio-row">
                         <div class="radio-option">
-                            <input type="radio" id="inner" name="circle" value="inner" checked>
-                            <label for="inner">Inner<br><small>Closest support</small></label>
+                            <input type="radio" id="c-inner" name="circle" value="inner" checked>
+                            <label for="c-inner">1 Inner</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="middle" name="circle" value="middle">
-                            <label for="middle">Middle<br><small>Regular connections</small></label>
+                            <input type="radio" id="c-middle" name="circle" value="middle">
+                            <label for="c-middle">2 Middle</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="outer" name="circle" value="outer">
-                            <label for="outer">Outer<br><small>Acquaintances</small></label>
+                            <input type="radio" id="c-outer" name="circle" value="outer">
+                            <label for="c-outer">3 Outer</label>
                         </div>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label>Energy</label>
-                    <div class="radio-group">
-                        <div class="radio-option supportive">
-                            <input type="radio" id="supportive" name="energy" value="supportive" checked>
-                            <label for="supportive">Supportive<br><small>Lifts you up</small></label>
+                    <label class="form-label">Energy</label>
+                    <div class="radio-row">
+                        <div class="radio-option">
+                            <input type="radio" id="e-supportive" name="energy" value="supportive" checked>
+                            <label for="e-supportive" style="border-color:rgba(126,168,139,0.4);">Supportive</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="neutral" name="energy" value="neutral">
-                            <label for="neutral">Neutral<br><small>Balanced</small></label>
+                            <input type="radio" id="e-neutral" name="energy" value="neutral">
+                            <label for="e-neutral">Neutral</label>
                         </div>
-                        <div class="radio-option draining">
-                            <input type="radio" id="draining" name="energy" value="draining">
-                            <label for="draining">Draining<br><small>Takes energy</small></label>
+                        <div class="radio-option">
+                            <input type="radio" id="e-draining" name="energy" value="draining">
+                            <label for="e-draining" style="border-color:rgba(217,54,62,0.4);">Draining</label>
                         </div>
                     </div>
                 </div>
-
-                <div class="modal-actions" style="flex-direction: column;">
-                    <button type="submit" class="btn" style="width:100%;padding:1.25rem;font-size:1.1rem;">Add Connection</button>
-                    <button type="button" class="btn btn-secondary" id="cancelBtn" style="width:100%;">Cancel</button>
-                </div>
+                <button type="submit" class="btn btn-primary">Add Connection</button>
             </form>
         </div>
+
+        <!-- Insights -->
+        <div class="insights-card">
+            <h2>Your Network Insights</h2>
+            <div id="insights-content">
+                <div class="insight-item">Add some connections to see insights about your network.</div>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const addBtn = document.getElementById('addBtn');
-        const insightsBtn = document.getElementById('insightsBtn');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const connectionForm = document.getElementById('connectionForm');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const emptyState = document.getElementById('emptyState');
-        const insights = document.getElementById('insights');
-        const tooltip = document.getElementById('tooltip');
-        const deleteBtn = document.getElementById('deleteBtn');
+        var STORAGE_KEY = 'cowch_connections';
+        var connections = [];
 
-        let connections = [];
-        let selectedPerson = null;
-        let draggedPerson = null;
-        let centerX, centerY;
-        let animationFrame;
-
-        const COLORS = {
-            bg: '#1a1512',
-            ring: '#3a3533',
-            center: '#D4896A',
-            supportive: '#7EA88B',
-            neutral: '#8a7a6a',
-            draining: '#D9363E',
-            line: 'rgba(232, 227, 223, 0.2)'
-        };
-
-        const RINGS = {
-            inner: { radius: 0.2, label: 'Inner Circle' },
-            middle: { radius: 0.4, label: 'Middle Circle' },
-            outer: { radius: 0.6, label: 'Outer Circle' }
-        };
-
-        // Initialize
-        function init() {
-            resizeCanvas();
-            loadConnections();
-            render();
-
-            window.addEventListener('resize', () => {
-                resizeCanvas();
-                render();
-            });
-
-            canvas.addEventListener('mousedown', handleMouseDown);
-            canvas.addEventListener('mousemove', handleMouseMove);
-            canvas.addEventListener('mouseup', handleMouseUp);
-            canvas.addEventListener('mouseleave', handleMouseUp);
-
-            // Touch events
-            canvas.addEventListener('touchstart', handleTouchStart);
-            canvas.addEventListener('touchmove', handleTouchMove);
-            canvas.addEventListener('touchend', handleTouchEnd);
+        function load() {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) connections = JSON.parse(saved);
         }
 
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            centerX = canvas.width / 2;
-            centerY = canvas.height / 2;
-
-            // Reset placement so nodes reposition to correct rings
-            connections.forEach(function(person) {
-                person.placed = false;
-            });
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(connections));
+            var msg = document.getElementById('saved-msg');
+            msg.classList.add('visible');
+            setTimeout(function() { msg.classList.remove('visible'); }, 2000);
         }
 
-        function loadConnections() {
-            const saved = localStorage.getItem('cowch_connections');
-            if (saved) {
-                connections = JSON.parse(saved);
-                updateEmptyState();
-            }
-        }
-
-        function saveConnections() {
-            localStorage.setItem('cowch_connections', JSON.stringify(connections));
-        }
-
-        function updateEmptyState() {
-            emptyState.style.display = connections.length === 0 ? 'block' : 'none';
-        }
-
-        // Rendering
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const maxRadius = Math.min(canvas.width, canvas.height) * 0.47;
-
-            // Draw rings
-            Object.entries(RINGS).forEach(function(entry) {
-                var key = entry[0];
-                var ring = entry[1];
-                var ringRadius = maxRadius * ring.radius;
-
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
-                ctx.strokeStyle = COLORS.ring;
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Number at 12 o'clock position on each ring
-                var ringNumber = key === 'inner' ? '1' : key === 'middle' ? '2' : '3';
-                ctx.fillStyle = '#8a7a6a';
-                ctx.font = 'bold 13px Gabarito, -apple-system, BlinkMacSystemFont, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(ringNumber, centerX, centerY - ringRadius);
+        function renderLists() {
+            var groups = { inner: [], middle: [], outer: [] };
+            connections.forEach(function(p) {
+                groups[p.circle].push(p);
             });
 
-            // Draw connections (lines)
-            connections.forEach(person => {
-                if (!person.x || !person.y) return;
+            ['inner', 'middle', 'outer'].forEach(function(circle) {
+                var list = document.getElementById(circle + '-list');
+                var people = groups[circle];
 
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(person.x, person.y);
-                ctx.strokeStyle = COLORS.line;
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            });
-
-            // Group connections by circle for even spacing
-            var circleGroups = { inner: [], middle: [], outer: [] };
-            connections.forEach(function(person) {
-                circleGroups[person.circle].push(person);
-            });
-
-            // Assign evenly spaced angles per circle
-            Object.keys(circleGroups).forEach(function(circle) {
-                var group = circleGroups[circle];
-                var count = group.length;
-                if (count === 0) return;
-                var angleStep = (Math.PI * 2) / count;
-                // Offset each circle so they don't all start at the same angle
-                var offset = circle === 'inner' ? 0 : circle === 'middle' ? 0.5 : 1.0;
-                group.forEach(function(person, i) {
-                    person.assignedAngle = offset + i * angleStep;
-                });
-            });
-
-            // Draw people
-            connections.forEach(function(person, idx) {
-                if (!person.placed) {
-                    var radius = maxRadius * RINGS[person.circle].radius;
-                    var angle = person.assignedAngle || 0;
-                    person.x = centerX + Math.cos(angle) * radius;
-                    person.y = centerY + Math.sin(angle) * radius;
-                    person.targetX = person.x;
-                    person.targetY = person.y;
-                    person.placed = true;
+                if (people.length === 0) {
+                    list.innerHTML = '<li class="empty-circle">No connections yet</li>';
+                    return;
                 }
 
-                // Smooth animation
-                if (!person.targetX) person.targetX = person.x;
-                if (!person.targetY) person.targetY = person.y;
-
-                person.x += (person.targetX - person.x) * 0.1;
-                person.y += (person.targetY - person.y) * 0.1;
-
-                var color = COLORS[person.energy];
-
-                // Draw name as small text
-                ctx.fillStyle = color;
-                ctx.font = '600 11px Gabarito, -apple-system, BlinkMacSystemFont, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(person.name, person.x, person.y);
-
-                // Small dot above text for tap target
-                ctx.beginPath();
-                ctx.arc(person.x, person.y - 10, 4, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
+                list.innerHTML = people.map(function(p) {
+                    return '<li class="person-item">' +
+                        '<div class="person-info">' +
+                            '<div class="person-name">' + escapeHtml(p.name) + '</div>' +
+                            (p.relationship ? '<div class="person-relationship">' + escapeHtml(p.relationship) + '</div>' : '') +
+                        '</div>' +
+                        '<span class="person-energy ' + p.energy + '">' + p.energy + '</span>' +
+                        '<button class="remove-btn" onclick="removePerson(' + p.id + ')" aria-label="Remove">&times;</button>' +
+                    '</li>';
+                }).join('');
             });
 
-            // Draw center (you)
-            const centerSize = 16;
-            const centerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, centerSize * 2);
-            centerGradient.addColorStop(0, COLORS.center + '60');
-            centerGradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = centerGradient;
-            ctx.fillRect(centerX - centerSize * 2, centerY - centerSize * 2, centerSize * 4, centerSize * 4);
-
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, centerSize, 0, Math.PI * 2);
-            ctx.fillStyle = COLORS.center;
-            ctx.fill();
-            ctx.strokeStyle = COLORS.bg;
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            ctx.fillStyle = '#1a1512';
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('YOU', centerX, centerY);
-
-            animationFrame = requestAnimationFrame(render);
+            updateInsights();
         }
 
-        // Interaction
-        function getPersonAtPoint(x, y) {
-            return connections.find(person => {
-                const dx = person.x - x;
-                const dy = person.y - y;
-                return Math.sqrt(dx * dx + dy * dy) < 12;
-            });
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        function handleMouseDown(e) {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const person = getPersonAtPoint(x, y);
-            if (person) {
-                draggedPerson = person;
-                canvas.style.cursor = 'grabbing';
-                hideTooltip();
-            }
+        function removePerson(id) {
+            connections = connections.filter(function(p) { return p.id !== id; });
+            save();
+            renderLists();
         }
 
-        function handleMouseMove(e) {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            if (draggedPerson) {
-                draggedPerson.targetX = x;
-                draggedPerson.targetY = y;
-                draggedPerson.placed = true;
-
-                // Update angle based on dragged position
-                draggedPerson.angle = Math.atan2(y - centerY, x - centerX);
-
-                // Determine which circle they're in
-                const dx = x - centerX;
-                const dy = y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                const maxRadius = Math.min(canvas.width, canvas.height) * 0.47;
-
-                if (distance < maxRadius * 0.3) {
-                    draggedPerson.circle = 'inner';
-                } else if (distance < maxRadius * 0.5) {
-                    draggedPerson.circle = 'middle';
-                } else {
-                    draggedPerson.circle = 'outer';
-                }
-            } else {
-                const person = getPersonAtPoint(x, y);
-                if (person) {
-                    canvas.style.cursor = 'pointer';
-                } else {
-                    canvas.style.cursor = 'grab';
-                }
-            }
-        }
-
-        function handleMouseUp(e) {
-            if (draggedPerson) {
-                saveConnections();
-
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                // Show tooltip if not dragged far
-                const dx = draggedPerson.x - x;
-                const dy = draggedPerson.y - y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < 5) {
-                    showTooltip(draggedPerson, e.clientX, e.clientY);
-                }
-            }
-
-            draggedPerson = null;
-            canvas.style.cursor = 'grab';
-        }
-
-        function handleTouchStart(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-
-            const person = getPersonAtPoint(x, y);
-            if (person) {
-                draggedPerson = person;
-                hideTooltip();
-            }
-        }
-
-        function handleTouchMove(e) {
-            e.preventDefault();
-            if (!draggedPerson) return;
-
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-
-            draggedPerson.targetX = x;
-            draggedPerson.targetY = y;
-
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxRadius = Math.min(canvas.width, canvas.height) * 0.47;
-
-            if (distance < maxRadius * 0.3) {
-                draggedPerson.circle = 'inner';
-            } else if (distance < maxRadius * 0.5) {
-                draggedPerson.circle = 'middle';
-            } else {
-                draggedPerson.circle = 'outer';
-            }
-        }
-
-        function handleTouchEnd(e) {
-            e.preventDefault();
-            if (draggedPerson) {
-                saveConnections();
-
-                const touch = e.changedTouches[0];
-                showTooltip(draggedPerson, touch.clientX, touch.clientY);
-            }
-            draggedPerson = null;
-        }
-
-        function showTooltip(person, x, y) {
-            selectedPerson = person;
-            document.getElementById('tooltipName').textContent = person.name;
-            document.getElementById('tooltipRelation').textContent = person.relationship;
-            document.getElementById('tooltipCircle').textContent = RINGS[person.circle].label + ' - ' +
-                person.energy.charAt(0).toUpperCase() + person.energy.slice(1);
-
-            tooltip.style.left = x + 10 + 'px';
-            tooltip.style.top = y + 10 + 'px';
-            tooltip.classList.add('active');
-        }
-
-        function hideTooltip() {
-            tooltip.classList.remove('active');
-            selectedPerson = null;
-        }
-
-        // Modal
-        var saveBtn = document.getElementById('saveBtn');
-
-        function showSaveConfirmation() {
-            saveBtn.style.display = 'block';
-            saveBtn.textContent = 'Saved ✓';
-            saveBtn.style.background = '#7EA88B';
-            saveBtn.style.borderColor = '#7EA88B';
-            setTimeout(function() {
-                saveBtn.style.display = 'none';
-            }, 2000);
-        }
-
-        saveBtn.addEventListener('click', function() {
-            saveConnections();
-            showSaveConfirmation();
-        });
-
-        addBtn.addEventListener('click', () => {
-            connectionForm.reset();
-            document.getElementById('modalTitle').textContent = 'Add Connection';
-            modalOverlay.classList.add('active');
-            setTimeout(() => document.getElementById('name').focus(), 100);
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-        });
-
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-            }
-        });
-
-        connectionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(connectionForm);
-            const person = {
-                id: Date.now(),
-                name: formData.get('name'),
-                relationship: document.getElementById('relationship').value,
-                circle: formData.get('circle'),
-                energy: formData.get('energy')
-            };
-
-            connections.push(person);
-            saveConnections();
-            updateEmptyState();
-            showSaveConfirmation();
-
-            modalOverlay.classList.remove('active');
-
-            // Animate in
-            setTimeout(() => {
-                const maxRadius = Math.min(canvas.width, canvas.height) * 0.47;
-                const angle = Math.random() * Math.PI * 2;
-                const radius = maxRadius * RINGS[person.circle].radius;
-                person.targetX = centerX + Math.cos(angle) * radius;
-                person.targetY = centerY + Math.sin(angle) * radius;
-            }, 50);
-        });
-
-        deleteBtn.addEventListener('click', () => {
-            if (selectedPerson) {
-                connections = connections.filter(p => p.id !== selectedPerson.id);
-                saveConnections();
-                updateEmptyState();
-                hideTooltip();
-                showSaveConfirmation();
-            }
-        });
-
-        // Clear all
-        document.getElementById('clearBtn').addEventListener('click', function() {
+        function clearAll() {
             if (confirm('Clear all connections and start again?')) {
                 connections = [];
-                saveConnections();
-                updateEmptyState();
-                hideTooltip();
+                save();
+                renderLists();
             }
-        });
-
-        // Insights
-        insightsBtn.addEventListener('click', () => {
-            const isActive = insights.classList.contains('active');
-            insights.classList.toggle('active');
-
-            if (!isActive) {
-                updateInsights();
-            }
-        });
+        }
 
         function updateInsights() {
-            const total = connections.length;
-            const supportive = connections.filter(p => p.energy === 'supportive').length;
-            const neutral = connections.filter(p => p.energy === 'neutral').length;
-            const draining = connections.filter(p => p.energy === 'draining').length;
-
-            const inner = connections.filter(p => p.circle === 'inner').length;
-            const middle = connections.filter(p => p.circle === 'middle').length;
-            const outer = connections.filter(p => p.circle === 'outer').length;
-
-            const content = document.getElementById('insightContent');
+            var total = connections.length;
+            var content = document.getElementById('insights-content');
 
             if (total === 0) {
                 content.innerHTML = '<div class="insight-item">Add some connections to see insights about your network.</div>';
                 return;
             }
 
-            let html = `
-                <div class="insight-item">
-                    You have <span class="stat">${total}</span> connection${total !== 1 ? 's' : ''} in your network.
-                </div>
-            `;
+            var supportive = connections.filter(function(p) { return p.energy === 'supportive'; }).length;
+            var neutral = connections.filter(function(p) { return p.energy === 'neutral'; }).length;
+            var draining = connections.filter(function(p) { return p.energy === 'draining'; }).length;
+            var inner = connections.filter(function(p) { return p.circle === 'inner'; }).length;
+            var middle = connections.filter(function(p) { return p.circle === 'middle'; }).length;
+            var outer = connections.filter(function(p) { return p.circle === 'outer'; }).length;
+
+            var html = '<div class="insight-item">You have <span class="stat">' + total + '</span> connection' + (total !== 1 ? 's' : '') + ' in your network.</div>';
+
+            html += '<div class="insight-item">Inner: <span class="stat">' + inner + '</span> · Middle: <span class="stat">' + middle + '</span> · Outer: <span class="stat">' + outer + '</span></div>';
 
             if (supportive > 0) {
-                html += `
-                    <div class="insight-item">
-                        <span class="stat">${supportive}</span> ${supportive === 1 ? 'person lifts' : 'people lift'} you up.
-                        ${supportive > draining ? 'Your network is mostly supportive!' : ''}
-                    </div>
-                `;
+                html += '<div class="insight-item"><span class="stat">' + supportive + '</span> ' + (supportive === 1 ? 'person lifts' : 'people lift') + ' you up.' + (supportive > draining ? ' Your network is mostly supportive!' : '') + '</div>';
             }
 
             if (draining > 0) {
-                const percentage = Math.round((draining / total) * 100);
-                html += `
-                    <div class="insight-item">
-                        <span class="stat">${draining}</span> ${draining === 1 ? 'connection' : 'connections'} drain your energy (${percentage}%).
-                        ${percentage > 30 ? 'Consider setting boundaries with draining connections.' : ''}
-                    </div>
-                `;
+                var pct = Math.round((draining / total) * 100);
+                html += '<div class="insight-item"><span class="stat">' + draining + '</span> ' + (draining === 1 ? 'connection drains' : 'connections drain') + ' your energy (' + pct + '%).' + (pct > 30 ? ' Consider setting boundaries with draining connections.' : '') + '</div>';
             }
 
-            if (inner > 0) {
-                html += `
-                    <div class="insight-item">
-                        Your inner circle has <span class="stat">${inner}</span> ${inner === 1 ? 'person' : 'people'}.
-                        ${inner < 3 ? 'A small, tight-knit group.' : 'A strong support system.'}
-                    </div>
-                `;
-            }
-
-            const supportiveInner = connections.filter(p => p.circle === 'inner' && p.energy === 'supportive').length;
-            if (supportiveInner > 0) {
-                html += `
-                    <div class="insight-item">
-                        You have <span class="stat">${supportiveInner}</span> supportive ${supportiveInner === 1 ? 'person' : 'people'}
-                        in your inner circle. These are your core supporters.
-                    </div>
-                `;
-            }
-
-            if (total > 5) {
-                html += `
-                    <div class="insight-item">
-                        Reflection: Who in your network do you want to connect with more? Who brings out the best in you?
-                    </div>
-                `;
+            if (inner === 0) {
+                html += '<div class="insight-item">Your inner circle is empty. Who could you let in closer?</div>';
             }
 
             content.innerHTML = html;
         }
 
-        // Click outside tooltip to close
-        document.addEventListener('click', (e) => {
-            if (!tooltip.contains(e.target) && !canvas.contains(e.target)) {
-                hideTooltip();
-            }
+        // Form submit
+        document.getElementById('add-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var form = new FormData(this);
+            connections.push({
+                id: Date.now(),
+                name: form.get('name'),
+                relationship: document.getElementById('relationship').value,
+                circle: form.get('circle'),
+                energy: form.get('energy')
+            });
+            save();
+            renderLists();
+            this.reset();
         });
 
-        init();
+        load();
+        renderLists();
     </script>
-
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="/app.html" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="/app.html#imagine" class="nav-item">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            <span>IMAGINE</span>
-        </a>
-        <a href="/app.html#chat" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span>Chat</span>
-        </a>
-        <a href="/app.html#you" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>You</span>
-        </a>
-    </nav>
 </body>
 </html>
