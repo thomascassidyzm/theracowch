@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Oracle Cards | Cowch</title>
+    <meta name="theme-color" content="#1a1512">
+    <link rel="icon" href="/icons/cowch-icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-deep: #1a1512;
+            --bg-card: #2a2320;
+            --text-primary: #F5F0E8;
+            --text-muted: rgba(245, 240, 232, 0.6);
+            --coral: #D4896A;
+            --gold: #C9A84C;
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --purple: #9B72B0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: max(1rem, env(safe-area-inset-top));
+            left: 1rem;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .back-btn:hover { background: rgba(0,0,0,0.7); }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom));
+            text-align: center;
+        }
+
+        .hero-icon { font-size: 4rem; margin-bottom: 1rem; }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--gold), #E8D5A3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .info-card strong { color: var(--gold); }
+
+        /* Question input */
+        .question-section {
+            background: var(--bg-card);
+            border: 3px solid var(--gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-label {
+            font-size: 1rem;
+            font-weight: 900;
+            margin-bottom: 0.75rem;
+            color: var(--gold);
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--bg-deep);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .question-input:focus { border-color: var(--gold); }
+        .question-input::placeholder { color: var(--text-muted); font-size: 0.85rem; }
+
+        .draw-btn {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--gold), #B8943F);
+            border: none;
+            border-radius: 12px;
+            color: var(--bg-deep);
+            font-family: 'Gabarito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+        }
+
+        .draw-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--gold-glow);
+        }
+
+        .draw-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Card display */
+        .card-area {
+            perspective: 800px;
+            margin-bottom: 1.5rem;
+            min-height: 320px;
+            display: none;
+        }
+
+        .card-area.visible { display: block; }
+
+        .oracle-card {
+            width: 220px;
+            height: 310px;
+            margin: 0 auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .oracle-card.flipped { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* Card back */
+        .card-back {
+            background: linear-gradient(135deg, #2a2320, #3a3330);
+            border: 3px solid var(--gold);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px var(--gold-glow);
+        }
+
+        .card-back-pattern {
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-back-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        /* Card front */
+        .card-front {
+            background: linear-gradient(135deg, #2a2320, #352e28);
+            border: 3px solid var(--gold);
+            transform: rotateY(180deg);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px var(--gold-glow);
+        }
+
+        .card-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-message {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .card-answer {
+            margin-top: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 900;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+        }
+
+        .card-answer.yes {
+            background: rgba(126, 168, 139, 0.2);
+            color: #7EA88B;
+        }
+
+        .card-answer.no {
+            background: rgba(212, 137, 106, 0.2);
+            color: var(--coral);
+        }
+
+        .card-answer.maybe {
+            background: rgba(201, 168, 76, 0.2);
+            color: var(--gold);
+        }
+
+        /* Tap hint */
+        .tap-hint {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Shuffle animation */
+        .oracle-card.shuffling {
+            animation: cardShuffle 0.6s ease;
+        }
+
+        @keyframes cardShuffle {
+            0% { transform: translateX(0) rotate(0); }
+            20% { transform: translateX(-30px) rotate(-5deg); }
+            40% { transform: translateX(30px) rotate(5deg); }
+            60% { transform: translateX(-15px) rotate(-3deg); }
+            80% { transform: translateX(15px) rotate(3deg); }
+            100% { transform: translateX(0) rotate(0); }
+        }
+
+        /* Stars decoration */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.4; }
+        }
+
+        .again-btn {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-family: 'Gabarito', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .again-btn:hover {
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .oracle-card { width: 190px; height: 270px; }
+            .card-emoji { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <a href="/imagine/nurturing.html" class="back-btn">&larr; Back</a>
+
+    <div class="container" style="position:relative;z-index:1;">
+        <div class="hero-icon">🔮</div>
+        <h1>Oracle Cards</h1>
+        <p class="subtitle">Ask the universe for guidance</p>
+
+        <div class="info-card">
+            Think of a <strong>yes or no question</strong>. Focus on the situation, clear your mind, and ask the universe for guidance. Then draw a card to receive your answer and a message to reflect on.
+        </div>
+
+        <div class="question-section">
+            <div class="question-label">Your Question</div>
+            <input type="text" class="question-input" id="question" placeholder="Will I...? Should I...? Is it time to...?">
+            <button class="draw-btn" id="draw-btn" disabled>Draw a Card</button>
+        </div>
+
+        <div class="card-area" id="card-area">
+            <div class="oracle-card" id="oracle-card">
+                <div class="card-face card-back">
+                    <div class="card-back-pattern">✦</div>
+                    <div class="card-back-text">Tap to reveal</div>
+                </div>
+                <div class="card-face card-front" id="card-front">
+                </div>
+            </div>
+            <div class="tap-hint" id="tap-hint">Tap the card to reveal your answer</div>
+        </div>
+
+        <button class="again-btn" id="again-btn" style="display:none;" onclick="resetCard()">Ask Another Question</button>
+    </div>
+
+    <script>
+        var cards = [
+            { emoji: '🌟', title: 'The Star', answer: 'yes', message: 'The universe says yes. Trust the path you\'re on. What you\'re hoping for is aligned with your journey.' },
+            { emoji: '🌙', title: 'The Moon', answer: 'maybe', message: 'Not yet. Something is still hidden. Wait for clarity before you act — the answer will reveal itself in time.' },
+            { emoji: '☀️', title: 'The Sun', answer: 'yes', message: 'A resounding yes. Warmth and positivity surround this situation. Move forward with confidence.' },
+            { emoji: '🌊', title: 'The Wave', answer: 'maybe', message: 'Go with the flow. Stop trying to control the outcome. Let things unfold naturally and trust the process.' },
+            { emoji: '🦋', title: 'The Butterfly', answer: 'yes', message: 'Transformation is coming. Say yes to change — what feels scary now will become something beautiful.' },
+            { emoji: '🪨', title: 'The Stone', answer: 'no', message: 'Now is not the time. Stand firm where you are. There is strength in staying still and waiting.' },
+            { emoji: '🔥', title: 'The Flame', answer: 'yes', message: 'Follow your passion. Your gut feeling is right. The fire inside you is pointing you in the right direction.' },
+            { emoji: '🌿', title: 'The Garden', answer: 'yes', message: 'Yes, but be patient. Good things are growing beneath the surface. Keep nurturing what matters to you.' },
+            { emoji: '⚡', title: 'The Lightning', answer: 'maybe', message: 'Expect the unexpected. The answer may not be what you think. Stay open to surprises.' },
+            { emoji: '🏔️', title: 'The Mountain', answer: 'no', message: 'There\'s a bigger picture you\'re not seeing yet. Step back and look at this from a different angle.' },
+            { emoji: '🕊️', title: 'The Dove', answer: 'yes', message: 'Peace is coming. Let go of worry. What you\'re asking about will bring you calm and resolution.' },
+            { emoji: '🌹', title: 'The Rose', answer: 'yes', message: 'Love and beauty are at the heart of this. Trust your heart — it already knows the answer.' },
+            { emoji: '🦉', title: 'The Owl', answer: 'maybe', message: 'Look deeper. There\'s wisdom in this situation that you haven\'t found yet. Reflect before you decide.' },
+            { emoji: '🌀', title: 'The Spiral', answer: 'no', message: 'You may be going in circles. Break the pattern. Try a completely different approach.' },
+            { emoji: '💎', title: 'The Diamond', answer: 'yes', message: 'What you seek is valuable and worth pursuing. Pressure creates diamonds — keep going.' },
+            { emoji: '🍂', title: 'The Falling Leaf', answer: 'no', message: 'It\'s time to let this go. Release what no longer serves you. Something new will grow in its place.' },
+            { emoji: '🌅', title: 'The Sunrise', answer: 'yes', message: 'A new beginning is on the horizon. The answer is yes — embrace what\'s coming with open arms.' },
+            { emoji: '🐺', title: 'The Wolf', answer: 'maybe', message: 'Trust your instincts, but proceed with caution. Protect your energy and choose your path wisely.' },
+            { emoji: '🗝️', title: 'The Key', answer: 'yes', message: 'You already hold the answer. Look within. The solution is closer than you think.' },
+            { emoji: '🌑', title: 'The Eclipse', answer: 'no', message: 'Something is blocking this right now. It\'s not a forever no — just a not right now. Be patient with yourself.' },
+            { emoji: '🎭', title: 'The Mirror', answer: 'maybe', message: 'Are you asking the right question? Sometimes the question itself needs to change before the answer can appear.' },
+            { emoji: '⭐', title: 'The Wish', answer: 'yes', message: 'Make your wish. The energy around this is positive. Believe in it and take the first step.' },
+            { emoji: '🌻', title: 'The Sunflower', answer: 'yes', message: 'Turn towards the light. Say yes and watch yourself grow. Happiness is in this direction.' },
+            { emoji: '❄️', title: 'The Frost', answer: 'no', message: 'Let this one cool down. Emotions may be clouding your judgement. Revisit when you feel calmer.' }
+        ];
+
+        var questionInput = document.getElementById('question');
+        var drawBtn = document.getElementById('draw-btn');
+        var cardArea = document.getElementById('card-area');
+        var oracleCard = document.getElementById('oracle-card');
+        var cardFront = document.getElementById('card-front');
+        var tapHint = document.getElementById('tap-hint');
+        var againBtn = document.getElementById('again-btn');
+        var isRevealed = false;
+
+        questionInput.addEventListener('input', function() {
+            drawBtn.disabled = !questionInput.value.trim();
+        });
+
+        drawBtn.addEventListener('click', function() {
+            if (!questionInput.value.trim()) return;
+
+            // Shuffle animation
+            cardArea.classList.add('visible');
+            oracleCard.classList.remove('flipped');
+            oracleCard.classList.add('shuffling');
+            tapHint.style.display = 'block';
+            againBtn.style.display = 'none';
+            isRevealed = false;
+
+            // Pick a random card
+            var card = cards[Math.floor(Math.random() * cards.length)];
+
+            // Build front
+            var answerClass = card.answer === 'yes' ? 'yes' : card.answer === 'no' ? 'no' : 'maybe';
+            var answerText = card.answer === 'yes' ? 'Yes' : card.answer === 'no' ? 'No' : 'The universe says... maybe';
+
+            cardFront.innerHTML =
+                '<div class="card-emoji">' + card.emoji + '</div>' +
+                '<div class="card-title">' + card.title + '</div>' +
+                '<div class="card-message">' + card.message + '</div>' +
+                '<div class="card-answer ' + answerClass + '">' + answerText + '</div>';
+
+            setTimeout(function() {
+                oracleCard.classList.remove('shuffling');
+            }, 600);
+
+            // Disable draw button
+            drawBtn.disabled = true;
+            drawBtn.textContent = 'Card drawn — tap to reveal';
+        });
+
+        oracleCard.addEventListener('click', function() {
+            if (isRevealed) return;
+            if (!oracleCard.classList.contains('shuffling') && cardArea.classList.contains('visible')) {
+                oracleCard.classList.add('flipped');
+                tapHint.style.display = 'none';
+                againBtn.style.display = 'inline-block';
+                isRevealed = true;
+            }
+        });
+
+        function resetCard() {
+            oracleCard.classList.remove('flipped');
+            cardArea.classList.remove('visible');
+            againBtn.style.display = 'none';
+            questionInput.value = '';
+            drawBtn.disabled = true;
+            drawBtn.textContent = 'Draw a Card';
+            isRevealed = false;
+            questionInput.focus();
+        }
+
+        // Create background stars
+        (function() {
+            var starsEl = document.getElementById('stars');
+            for (var i = 0; i < 60; i++) {
+                var star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                starsEl.appendChild(star);
+            }
+        })();
+    </script>
+</body>
+</html>
