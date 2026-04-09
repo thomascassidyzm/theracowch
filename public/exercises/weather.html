@@ -514,7 +514,15 @@
                     <p id="display-prompt"></p>
                 </div>
                 <button class="change-btn" id="change-btn">Check Again</button>
+                <button class="change-btn" id="view-calendar-btn" style="margin-top:10px;background:transparent;border:2px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.8);">View Calendar</button>
             </div>
+        </div>
+
+        <!-- CALENDAR SCREEN -->
+        <div class="screen" id="calendar-screen" style="background:rgba(26,21,18,0.95);">
+            <h2 style="font-size:1.3rem;font-weight:900;margin-bottom:1rem;text-align:center;">Your Mood — Last 30 Days</h2>
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;max-width:350px;margin-bottom:1.5rem;"></div>
+            <button class="change-btn" id="cal-back-btn">Back to Check-In</button>
         </div>
     </div>
 
@@ -710,19 +718,111 @@
             document.getElementById('selection-screen').classList.add('active');
         }
 
+        // Save check-in to localStorage
+        function saveCheckIn(weatherType) {
+            var history = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
+            history.unshift({
+                weather: weatherType,
+                note: '',
+                timestamp: Date.now(),
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem('innerWeatherHistory', JSON.stringify(history));
+        }
+
+        // Calendar
+        var weatherIcons = {
+            'sunny': '☀️', 'cloudy': '⛅', 'overcast': '☁️',
+            'partly-cloudy': '🌤️', 'rainy': '🌧️', 'stormy': '⛈️',
+            'foggy': '🌫️', 'rainbow': '🌈'
+        };
+
+        function renderCalendar() {
+            var grid = document.getElementById('cal-grid');
+            grid.innerHTML = '';
+
+            var history = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
+
+            ['M','T','W','T','F','S','S'].forEach(function(l) {
+                var el = document.createElement('div');
+                el.style.cssText = 'text-align:center;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.4);padding:3px 0;';
+                el.textContent = l;
+                grid.appendChild(el);
+            });
+
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            var days = [];
+            for (var i = 29; i >= 0; i--) {
+                var d = new Date(today);
+                d.setDate(d.getDate() - i);
+                days.push(d);
+            }
+
+            var checkinMap = {};
+            history.forEach(function(entry) {
+                var ed = new Date(entry.timestamp);
+                var key = ed.getFullYear() + '-' + (ed.getMonth()+1) + '-' + ed.getDate();
+                if (!checkinMap[key]) checkinMap[key] = entry;
+            });
+
+            var firstDay = days[0].getDay();
+            var startPad = (firstDay + 6) % 7;
+            for (var p = 0; p < startPad; p++) {
+                var empty = document.createElement('div');
+                grid.appendChild(empty);
+            }
+
+            days.forEach(function(date) {
+                var el = document.createElement('div');
+                el.style.cssText = 'aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
+
+                var key = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+                var isToday = date.getTime() === today.getTime();
+
+                if (isToday) el.style.borderColor = '#D4896A';
+                if (isToday) el.style.borderWidth = '2px';
+
+                var checkin = checkinMap[key];
+                if (checkin) {
+                    el.style.background = 'rgba(255,255,255,0.1)';
+                    var icon = weatherIcons[checkin.weather] || '❓';
+                    el.innerHTML = '<span style="font-size:1rem;line-height:1;">' + icon + '</span><span style="font-size:0.5rem;font-weight:700;color:rgba(255,255,255,0.5);">' + date.getDate() + '</span>';
+                } else {
+                    el.innerHTML = '<span style="font-size:0.55rem;font-weight:700;color:rgba(255,255,255,0.4);">' + date.getDate() + '</span>';
+                }
+
+                grid.appendChild(el);
+            });
+        }
+
+        function showCalendar() {
+            document.getElementById('weather-screen').classList.remove('active');
+            document.getElementById('selection-screen').classList.remove('active');
+            document.getElementById('calendar-screen').classList.add('active');
+            renderCalendar();
+        }
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.weather-option').forEach(option => {
                 option.addEventListener('click', () => {
-                    const weather = option.dataset.weather;
+                    var weather = option.dataset.weather;
                     showWeather(weather);
+                    saveCheckIn(weather);
 
-                    // Haptic feedback
                     if (navigator.vibrate) navigator.vibrate(30);
                 });
             });
 
             document.getElementById('change-btn').addEventListener('click', showSelection);
+
+            document.getElementById('view-calendar-btn').addEventListener('click', showCalendar);
+
+            document.getElementById('cal-back-btn').addEventListener('click', function() {
+                document.getElementById('calendar-screen').classList.remove('active');
+                showSelection();
+            });
         });
     </script>
 </body>
