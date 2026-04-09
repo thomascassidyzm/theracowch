@@ -286,7 +286,9 @@
         <!-- Schedule -->
         <div class="section-card">
             <h2>Schedule Creative Time</h2>
-            <input type="datetime-local" id="scheduleTime">
+            <div style="overflow:hidden;">
+                <input type="datetime-local" id="scheduleTime" style="width:100%;max-width:100%;min-width:0;">
+            </div>
             <button class="action-btn" onclick="scheduleCreativeTime()">Schedule It</button>
             <div id="scheduledActivities"></div>
         </div>
