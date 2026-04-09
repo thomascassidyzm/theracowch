@@ -2320,12 +2320,6 @@
                         </button>
                     </div>
 
-                    <!-- Mood Calendar -->
-                    <div class="mood-calendar" id="mood-calendar">
-                        <h2 class="mood-calendar-title">Your Mood — Last 30 Days</h2>
-                        <div class="mood-calendar-grid" id="mood-calendar-grid"></div>
-                    </div>
-
                     <!-- Quick Exercises -->
                     <div class="exercises-section">
                         <h2 class="exercises-title">Exercises</h2>
@@ -3859,6 +3853,16 @@
         </div>
     </div>
 
+    <!-- Mood Calendar Overlay -->
+    <div id="mood-calendar-overlay" style="display:none;position:fixed;inset:0;background:rgba(12,10,8,0.95);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="max-width:400px;margin:0 auto;padding:3rem 1.5rem;padding-bottom:max(3rem,env(safe-area-inset-bottom));">
+            <h2 class="mood-calendar-title" style="font-size:1.3rem;margin-bottom:0.3rem;">Your Mood</h2>
+            <p style="text-align:center;color:var(--text-muted);font-size:var(--font-size-sm);margin-bottom:1.2rem;">Last 30 days</p>
+            <div class="mood-calendar-grid" id="mood-calendar-grid"></div>
+            <button id="mood-calendar-close" style="display:block;width:100%;margin-top:1.5rem;padding:1rem;background:var(--coral);border:none;border-radius:var(--radius-medium);color:var(--bg-primary);font-family:'Gabarito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;text-transform:uppercase;">Back to Home</button>
+        </div>
+    </div>
+
     <!-- External JavaScript -->
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
@@ -3874,28 +3878,20 @@
             panel.classList.toggle('open');
         });
 
-        // Mood Calendar
-        (function() {
-            var weatherIcons = {
-                'sunny': '☀️',
-                'partly-cloudy': '🌤️',
-                'cloudy': '☁️',
-                'rainy': '🌧️',
-                'stormy': '⛈️',
-                'foggy': '🌫️',
-                'rainbow': '🌈'
-            };
+        // Mood Calendar Overlay
+        var weatherIcons = {
+            'sunny': '☀️', 'partly-cloudy': '🌤️', 'cloudy': '☁️',
+            'overcast': '☁️', 'rainy': '🌧️', 'stormy': '⛈️',
+            'foggy': '🌫️', 'rainbow': '🌈'
+        };
 
+        function renderMoodCalendar() {
             var grid = document.getElementById('mood-calendar-grid');
+            grid.innerHTML = '';
+
             var saved = localStorage.getItem('innerWeatherHistory');
             var history = saved ? JSON.parse(saved) : [];
 
-            if (history.length === 0) {
-                grid.innerHTML = '<div class="mood-calendar-empty" style="grid-column:1/-1;">No check-ins yet. Tap Quick Check-in to start tracking your mood.</div>';
-                return;
-            }
-
-            // Day labels
             ['M','T','W','T','F','S','S'].forEach(function(label) {
                 var el = document.createElement('div');
                 el.className = 'mood-cal-label';
@@ -3903,7 +3899,6 @@
                 grid.appendChild(el);
             });
 
-            // Build last 30 days
             var today = new Date();
             today.setHours(0, 0, 0, 0);
             var days = [];
@@ -3913,15 +3908,13 @@
                 days.push(d);
             }
 
-            // Map check-ins by date
             var checkinMap = {};
             history.forEach(function(entry) {
-                var entryDate = new Date(entry.timestamp);
-                var key = entryDate.getFullYear() + '-' + (entryDate.getMonth() + 1) + '-' + entryDate.getDate();
+                var ed = new Date(entry.timestamp);
+                var key = ed.getFullYear() + '-' + (ed.getMonth() + 1) + '-' + ed.getDate();
                 if (!checkinMap[key]) checkinMap[key] = entry;
             });
 
-            // Pad start for day of week alignment (Mon=0)
             var firstDay = days[0].getDay();
             var startPad = (firstDay + 6) % 7;
             for (var p = 0; p < startPad; p++) {
@@ -3930,16 +3923,11 @@
                 grid.appendChild(empty);
             }
 
-            // Render days
             days.forEach(function(date) {
                 var el = document.createElement('div');
                 el.className = 'mood-cal-day';
-
                 var key = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-                var isToday = date.getTime() === today.getTime();
-
-                if (isToday) el.classList.add('today');
-
+                if (date.getTime() === today.getTime()) el.classList.add('today');
                 var checkin = checkinMap[key];
                 if (checkin && weatherIcons[checkin.weather]) {
                     el.classList.add('has-checkin');
@@ -3947,10 +3935,23 @@
                 } else {
                     el.innerHTML = '<span class="cal-num">' + date.getDate() + '</span>';
                 }
-
                 grid.appendChild(el);
             });
-        })();
+        }
+
+        function showMoodCalendar() {
+            renderMoodCalendar();
+            document.getElementById('mood-calendar-overlay').style.display = 'block';
+        }
+
+        document.getElementById('mood-calendar-close').addEventListener('click', function() {
+            document.getElementById('mood-calendar-overlay').style.display = 'none';
+        });
+
+        // Show calendar if returning from weather check-in
+        if (document.referrer && (document.referrer.indexOf('/exercises/weather') !== -1 || document.referrer.indexOf('/exercises/inner-weather') !== -1)) {
+            showMoodCalendar();
+        }
     </script>
 </body>
 </html>
