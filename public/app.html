@@ -303,6 +303,85 @@
            EXERCISES SECTION
            ============================================ */
 
+        /* Mood Calendar */
+        .mood-calendar {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-md);
+            margin-bottom: var(--space-xl);
+            animation: slideUp 0.7s ease-out 0.35s both;
+        }
+
+        .mood-calendar-title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            color: var(--coral);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-sm);
+            text-align: center;
+        }
+
+        .mood-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .mood-cal-label {
+            text-align: center;
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            padding: 2px 0;
+        }
+
+        .mood-cal-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.55rem;
+            position: relative;
+        }
+
+        .mood-cal-day.empty {
+            background: transparent;
+            border: none;
+        }
+
+        .mood-cal-day.today {
+            border-color: var(--coral);
+            border-width: 2px;
+        }
+
+        .mood-cal-day.has-checkin {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .mood-cal-day .cal-weather {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .mood-cal-day .cal-num {
+            font-weight: var(--font-weight-bold);
+            color: var(--text-muted);
+            font-size: 0.5rem;
+        }
+
+        .mood-calendar-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            padding: var(--space-sm) 0;
+        }
+
         .exercises-section {
             margin-bottom: var(--space-2xl);
             animation: slideUp 0.7s ease-out 0.35s both;
@@ -2241,6 +2320,12 @@
                         </button>
                     </div>
 
+                    <!-- Mood Calendar -->
+                    <div class="mood-calendar" id="mood-calendar">
+                        <h2 class="mood-calendar-title">Your Mood — Last 30 Days</h2>
+                        <div class="mood-calendar-grid" id="mood-calendar-grid"></div>
+                    </div>
+
                     <!-- Quick Exercises -->
                     <div class="exercises-section">
                         <h2 class="exercises-title">Exercises</h2>
@@ -3788,6 +3873,84 @@
             var panel = document.getElementById('helpline-panel');
             panel.classList.toggle('open');
         });
+
+        // Mood Calendar
+        (function() {
+            var weatherIcons = {
+                'sunny': '☀️',
+                'partly-cloudy': '🌤️',
+                'cloudy': '☁️',
+                'rainy': '🌧️',
+                'stormy': '⛈️',
+                'foggy': '🌫️',
+                'rainbow': '🌈'
+            };
+
+            var grid = document.getElementById('mood-calendar-grid');
+            var saved = localStorage.getItem('innerWeatherHistory');
+            var history = saved ? JSON.parse(saved) : [];
+
+            if (history.length === 0) {
+                grid.innerHTML = '<div class="mood-calendar-empty" style="grid-column:1/-1;">No check-ins yet. Tap Quick Check-in to start tracking your mood.</div>';
+                return;
+            }
+
+            // Day labels
+            ['M','T','W','T','F','S','S'].forEach(function(label) {
+                var el = document.createElement('div');
+                el.className = 'mood-cal-label';
+                el.textContent = label;
+                grid.appendChild(el);
+            });
+
+            // Build last 30 days
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var days = [];
+            for (var i = 29; i >= 0; i--) {
+                var d = new Date(today);
+                d.setDate(d.getDate() - i);
+                days.push(d);
+            }
+
+            // Map check-ins by date
+            var checkinMap = {};
+            history.forEach(function(entry) {
+                var entryDate = new Date(entry.timestamp);
+                var key = entryDate.getFullYear() + '-' + (entryDate.getMonth() + 1) + '-' + entryDate.getDate();
+                if (!checkinMap[key]) checkinMap[key] = entry;
+            });
+
+            // Pad start for day of week alignment (Mon=0)
+            var firstDay = days[0].getDay();
+            var startPad = (firstDay + 6) % 7;
+            for (var p = 0; p < startPad; p++) {
+                var empty = document.createElement('div');
+                empty.className = 'mood-cal-day empty';
+                grid.appendChild(empty);
+            }
+
+            // Render days
+            days.forEach(function(date) {
+                var el = document.createElement('div');
+                el.className = 'mood-cal-day';
+
+                var key = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                var isToday = date.getTime() === today.getTime();
+
+                if (isToday) el.classList.add('today');
+
+                var checkin = checkinMap[key];
+                if (checkin && weatherIcons[checkin.weather]) {
+                    el.classList.add('has-checkin');
+                    el.innerHTML = '<span class="cal-weather">' + weatherIcons[checkin.weather] + '</span><span class="cal-num">' + date.getDate() + '</span>';
+                } else {
+                    el.innerHTML = '<span class="cal-num">' + date.getDate() + '</span>';
+                }
+
+                grid.appendChild(el);
+            });
+        })();
     </script>
 </body>
 </html>
