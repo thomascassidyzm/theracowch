@@ -1380,3 +1380,145 @@
     0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
 }
+
+/* ============================================
+   Not-Okay Intervention Modal
+   ============================================ */
+
+.notokay-screen {
+    display: none;
+    text-align: center;
+}
+
+.notokay-screen.active {
+    display: block;
+    animation: depFadeIn 0.3s ease-out;
+}
+
+.notokay-intervention-card {
+    background: var(--bg-card);
+    border: var(--border-thicc) solid var(--coral);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl) var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.notokay-intervention-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--space-md);
+}
+
+.notokay-intervention-text {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.notokay-feedback-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.notokay-feedback-btn {
+    display: block;
+    width: 100%;
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.notokay-feedback-btn:hover,
+.notokay-feedback-btn:active {
+    border-color: var(--coral);
+    background: rgba(212, 137, 106, 0.1);
+}
+
+.notokay-gentle-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.notokay-gentle-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-md);
+    font-family: var(--font-family);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.notokay-gentle-btn:hover,
+.notokay-gentle-btn:active {
+    border-color: var(--coral);
+    background: rgba(212, 137, 106, 0.1);
+}
+
+.notokay-gentle-btn span {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.notokay-gentle-btn strong {
+    display: block;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+.notokay-gentle-btn small {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.notokay-safety-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.notokay-safety-btn {
+    display: block;
+    width: 100%;
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.notokay-safety-btn:hover,
+.notokay-safety-btn:active {
+    border-color: var(--coral);
+}
+
+.notokay-safety-btn-urgent {
+    border-color: var(--coral);
+    background: rgba(212, 137, 106, 0.15);
+    color: var(--coral);
+}

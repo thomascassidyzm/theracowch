@@ -4102,6 +4102,179 @@
         </div>
     </div>
 
+    <!-- Not-Okay Intervention Modal -->
+    <div class="exercise-modal" id="notokay-intervention-modal">
+        <div class="exercise-modal-content micro-intervention-content">
+            <div class="exercise-modal-header">
+                <h3>Let's Find a Shift</h3>
+                <button class="close-modal" id="close-notokay-intervention">&times;</button>
+            </div>
+
+            <!-- State: Intro -->
+            <div class="notokay-screen active" data-notokay="intro">
+                <p class="dep-quote">&ldquo;That's okay. Let's just find a small shift.&rdquo;</p>
+                <p class="dep-instruction">No pressure. One tiny thing.</p>
+                <div class="exercise-controls">
+                    <button class="btn-exercise btn-exercise-primary" id="notokay-go">Show me something &rarr;</button>
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-random-btn">🎲 Give me something random</button>
+                </div>
+            </div>
+
+            <!-- State: Intervention -->
+            <div class="notokay-screen" data-notokay="intervention">
+                <p class="micro-section-label" id="notokay-category-label"></p>
+                <div class="notokay-intervention-card" id="notokay-card">
+                    <span class="notokay-intervention-icon" id="notokay-icon"></span>
+                    <p class="notokay-intervention-text" id="notokay-text"></p>
+                </div>
+                <p class="dep-instruction" style="margin-top: var(--space-lg);">Take a moment. There's no rush.</p>
+                <div class="exercise-controls">
+                    <button class="btn-exercise btn-exercise-primary" id="notokay-done-intervention">I've done it</button>
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-try-else">🔁 Try something else</button>
+                </div>
+            </div>
+
+            <!-- State: Feedback -->
+            <div class="notokay-screen" data-notokay="feedback">
+                <p class="dep-quote">&ldquo;Did that help at all?&rdquo;</p>
+                <div class="notokay-feedback-options">
+                    <button class="notokay-feedback-btn" data-feedback="yes">Yes, a bit</button>
+                    <button class="notokay-feedback-btn" data-feedback="not-really">Not really</button>
+                    <button class="notokay-feedback-btn" data-feedback="no">No</button>
+                </div>
+            </div>
+
+            <!-- State: Yes response -->
+            <div class="notokay-screen" data-notokay="yes">
+                <p class="dep-quote">&ldquo;Good. Let's build on that.&rdquo;</p>
+                <p class="dep-instruction">Small shifts add up. Want another small step?</p>
+                <div class="exercise-controls">
+                    <button class="btn-exercise btn-exercise-primary" id="notokay-another">Another small step &rarr;</button>
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-save-yes">&#10084; Save what worked</button>
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-yes">I'm good for now</button>
+                </div>
+            </div>
+
+            <!-- State: Not-really response -->
+            <div class="notokay-screen" data-notokay="not-really">
+                <p class="dep-quote">&ldquo;Let's try something different.&rdquo;</p>
+                <p class="dep-instruction">We'll switch it up &mdash; a different kind of shift.</p>
+                <div class="exercise-controls">
+                    <button class="btn-exercise btn-exercise-primary" id="notokay-switch">Try a different approach &rarr;</button>
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-notreally">I want to stop</button>
+                </div>
+            </div>
+
+            <!-- State: No response -->
+            <div class="notokay-screen" data-notokay="no">
+                <p class="dep-quote">&ldquo;That's okay. When things feel this low, even small steps can feel like too much.&rdquo;</p>
+                <div class="notokay-gentle-options">
+                    <button class="notokay-gentle-btn" id="notokay-compassion">
+                        <span>🤍</span>
+                        <div>
+                            <strong>Self-compassion</strong>
+                            <small>A kind word for yourself</small>
+                        </div>
+                    </button>
+                    <button class="notokay-gentle-btn" id="notokay-rest">
+                        <span>🛋️</span>
+                        <div>
+                            <strong>Rest without pressure</strong>
+                            <small>It's okay to just be</small>
+                        </div>
+                    </button>
+                    <button class="notokay-gentle-btn" id="notokay-safety-check">
+                        <span>🫶</span>
+                        <div>
+                            <strong>I need more support</strong>
+                            <small>Talk to someone</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- State: Self-compassion -->
+            <div class="notokay-screen" data-notokay="compassion">
+                <p class="micro-section-label">Self-Compassion</p>
+                <div class="dep-compassion">
+                    <p class="dep-instruction">Place a hand on your chest and say:</p>
+                    <p class="dep-quote">&ldquo;I'm struggling right now, and that's okay. I don't have to fix everything today.&rdquo;</p>
+                </div>
+                <div class="micro-tip-box">
+                    <p>You showed up. That counts. Be gentle with yourself.</p>
+                </div>
+                <div class="exercise-controls" style="margin-top: var(--space-lg);">
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-compassion">Close</button>
+                </div>
+            </div>
+
+            <!-- State: Rest -->
+            <div class="notokay-screen" data-notokay="rest">
+                <p class="micro-section-label">Permission to Rest</p>
+                <p class="dep-quote">&ldquo;You don't have to do anything right now.&rdquo;</p>
+                <p class="dep-instruction">Sometimes the bravest thing is letting yourself be still. No goals. No fixing. Just existing is enough.</p>
+                <div class="micro-tip-box">
+                    <p>If you feel ready later, come back. We'll be here.</p>
+                </div>
+                <div class="exercise-controls" style="margin-top: var(--space-lg);">
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-rest">Close</button>
+                </div>
+            </div>
+
+            <!-- State: Safety -->
+            <div class="notokay-screen" data-notokay="safety">
+                <p class="micro-section-label">Are you feeling safe right now?</p>
+                <p class="dep-instruction">There's no wrong answer. We just want to make sure you're okay.</p>
+                <div class="notokay-safety-options">
+                    <button class="notokay-safety-btn" id="notokay-safe-yes">Yes, I'm safe &mdash; just struggling</button>
+                    <button class="notokay-safety-btn notokay-safety-btn-urgent" id="notokay-safe-no">No, I need help</button>
+                </div>
+            </div>
+
+            <!-- State: Safe-yes -->
+            <div class="notokay-screen" data-notokay="safe-yes">
+                <p class="dep-quote">&ldquo;Thank you for telling me.&rdquo;</p>
+                <p class="dep-instruction">You're not alone in this. Here are some options:</p>
+                <div class="notokay-gentle-options">
+                    <button class="notokay-gentle-btn" id="notokay-grounding">
+                        <span>🌱</span>
+                        <div>
+                            <strong>Stay here &amp; ground</strong>
+                            <small>A calming exercise together</small>
+                        </div>
+                    </button>
+                    <button class="notokay-gentle-btn" id="notokay-to-compassion">
+                        <span>🤍</span>
+                        <div>
+                            <strong>Self-compassion</strong>
+                            <small>Be kind to yourself</small>
+                        </div>
+                    </button>
+                </div>
+                <div class="exercise-controls" style="margin-top: var(--space-md);">
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-safey">Close</button>
+                </div>
+            </div>
+
+            <!-- State: Safe-no (crisis) -->
+            <div class="notokay-screen" data-notokay="safe-no">
+                <p class="micro-section-label">You're not alone</p>
+                <p class="dep-instruction">Please reach out to someone who can help right now:</p>
+                <div class="dep-steps">
+                    <a href="tel:116123" class="dep-step-item" style="text-decoration:none;color:var(--coral);font-weight:900;">📞 Samaritans: 116 123 (free, 24/7)</a>
+                    <a href="sms:85258" class="dep-step-item" style="text-decoration:none;color:var(--coral);font-weight:900;">💬 SHOUT: text SHOUT to 85258</a>
+                    <a href="tel:999" class="dep-step-item" style="text-decoration:none;color:var(--coral);font-weight:900;">🚨 Emergency: 999</a>
+                </div>
+                <div class="micro-tip-box" style="margin-top: var(--space-lg);">
+                    <p>Reaching out takes courage. You deserve support.</p>
+                </div>
+                <div class="exercise-controls" style="margin-top: var(--space-md);">
+                    <button class="btn-exercise btn-exercise-secondary" id="notokay-finish-crisis">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
@@ -4687,6 +4860,186 @@
                     goToSlide(current - 1);
                 }
             }, { passive: true });
+        })();
+
+        // ============================================
+        // Not-Okay Intervention (Exploratory Flow)
+        // ============================================
+        (function() {
+            var modal = document.getElementById('notokay-intervention-modal');
+            var closeBtn = document.getElementById('close-notokay-intervention');
+            var openBtn = document.querySelector('.micro-ai-option[data-mood="not-okay"]');
+
+            // Intervention bank: categories rotate Body → Mind → Sensory → Action
+            var categories = ['Body', 'Mind', 'Sensory', 'Action'];
+            var interventions = {
+                Body: [
+                    { icon: '🙆', text: 'Stretch your arms overhead and hold for 10 seconds' },
+                    { icon: '🤸', text: 'Roll your shoulders slowly — 5 times forward, 5 times back' },
+                    { icon: '🖐️', text: 'Shake out your hands vigorously for 15 seconds' },
+                    { icon: '🚶', text: 'Stand up and walk to another room and back' }
+                ],
+                Mind: [
+                    { icon: '🔢', text: 'Count backwards from 10, slowly, breathing between each number' },
+                    { icon: '🎨', text: 'Name 5 things you can see that are the same colour' },
+                    { icon: '📝', text: 'Write down one thing — just one — on your mind right now' },
+                    { icon: '🧠', text: 'Think of 3 things you\'re good at, no matter how small' }
+                ],
+                Sensory: [
+                    { icon: '💧', text: 'Splash cold water on your face or hold something cold' },
+                    { icon: '👃', text: 'Smell something strong — coffee, mint, citrus' },
+                    { icon: '🎧', text: 'Put on a song that usually makes you feel something' },
+                    { icon: '🕯️', text: 'Light a candle or hold something warm in your hands' }
+                ],
+                Action: [
+                    { icon: '🚰', text: 'Drink a full glass of water, slowly' },
+                    { icon: '🪟', text: 'Open a window and take 3 deep breaths of fresh air' },
+                    { icon: '🛋️', text: 'Sit in a different room or spot than where you are now' },
+                    { icon: '🎵', text: 'Put on one song you like — just one' }
+                ]
+            };
+
+            var catIndex = 0;
+            var usedInCategory = [];
+            var lastIntervention = null;
+            var savedTools = JSON.parse(localStorage.getItem('cowch_saved_tools') || '[]');
+
+            function pickIntervention(forceNewCategory) {
+                if (forceNewCategory) {
+                    catIndex = (catIndex + 1) % categories.length;
+                    usedInCategory = [];
+                }
+                var cat = categories[catIndex];
+                var pool = interventions[cat];
+                var available = pool.filter(function(_, i) { return usedInCategory.indexOf(i) === -1; });
+                if (available.length === 0) {
+                    usedInCategory = [];
+                    available = pool;
+                }
+                var idx = Math.floor(Math.random() * available.length);
+                var picked = available[idx];
+                usedInCategory.push(pool.indexOf(picked));
+                lastIntervention = { category: cat, icon: picked.icon, text: picked.text };
+                return lastIntervention;
+            }
+
+            function showScreen(name) {
+                modal.querySelectorAll('.notokay-screen').forEach(function(s) {
+                    s.classList.remove('active');
+                });
+                modal.querySelector('[data-notokay="' + name + '"]').classList.add('active');
+            }
+
+            function showIntervention(forceNew) {
+                var item = pickIntervention(forceNew);
+                document.getElementById('notokay-category-label').textContent = item.category;
+                document.getElementById('notokay-icon').textContent = item.icon;
+                document.getElementById('notokay-text').textContent = item.text;
+                showScreen('intervention');
+            }
+
+            // Open
+            openBtn.addEventListener('click', function() {
+                catIndex = Math.floor(Math.random() * categories.length);
+                usedInCategory = [];
+                showScreen('intro');
+                modal.classList.add('active');
+            });
+
+            // Close (all close buttons)
+            closeBtn.addEventListener('click', function() { modal.classList.remove('active'); });
+            ['notokay-finish-yes', 'notokay-finish-notreally', 'notokay-finish-compassion',
+             'notokay-finish-rest', 'notokay-finish-crisis', 'notokay-finish-safey'].forEach(function(id) {
+                document.getElementById(id).addEventListener('click', function() {
+                    modal.classList.remove('active');
+                });
+            });
+
+            // Intro → Intervention
+            document.getElementById('notokay-go').addEventListener('click', function() {
+                showIntervention(false);
+            });
+            document.getElementById('notokay-random-btn').addEventListener('click', function() {
+                catIndex = Math.floor(Math.random() * categories.length);
+                usedInCategory = [];
+                showIntervention(false);
+            });
+
+            // Intervention → Feedback
+            document.getElementById('notokay-done-intervention').addEventListener('click', function() {
+                showScreen('feedback');
+            });
+            document.getElementById('notokay-try-else').addEventListener('click', function() {
+                showIntervention(false);
+            });
+
+            // Feedback responses
+            modal.querySelectorAll('.notokay-feedback-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var response = btn.getAttribute('data-feedback');
+                    if (response === 'yes') {
+                        // Track success
+                        if (lastIntervention) {
+                            var history = JSON.parse(localStorage.getItem('cowch_intervention_history') || '[]');
+                            history.push({ text: lastIntervention.text, category: lastIntervention.category, helped: true, time: Date.now() });
+                            if (history.length > 50) history = history.slice(-50);
+                            localStorage.setItem('cowch_intervention_history', JSON.stringify(history));
+                        }
+                        showScreen('yes');
+                    } else if (response === 'not-really') {
+                        showScreen('not-really');
+                    } else {
+                        showScreen('no');
+                    }
+                });
+            });
+
+            // Yes → Another
+            document.getElementById('notokay-another').addEventListener('click', function() {
+                showIntervention(false);
+            });
+            document.getElementById('notokay-save-yes').addEventListener('click', function() {
+                if (lastIntervention && savedTools.indexOf(lastIntervention.text) === -1) {
+                    savedTools.push(lastIntervention.text);
+                    localStorage.setItem('cowch_saved_tools', JSON.stringify(savedTools));
+                    this.textContent = '✓ Saved';
+                    this.disabled = true;
+                }
+            });
+
+            // Not-really → Switch category
+            document.getElementById('notokay-switch').addEventListener('click', function() {
+                showIntervention(true);
+            });
+
+            // No → gentle options
+            document.getElementById('notokay-compassion').addEventListener('click', function() {
+                showScreen('compassion');
+            });
+            document.getElementById('notokay-rest').addEventListener('click', function() {
+                showScreen('rest');
+            });
+            document.getElementById('notokay-safety-check').addEventListener('click', function() {
+                showScreen('safety');
+            });
+
+            // Safety
+            document.getElementById('notokay-safe-yes').addEventListener('click', function() {
+                showScreen('safe-yes');
+            });
+            document.getElementById('notokay-safe-no').addEventListener('click', function() {
+                showScreen('safe-no');
+            });
+
+            // Safe-yes options
+            document.getElementById('notokay-grounding').addEventListener('click', function() {
+                modal.classList.remove('active');
+                var groundingModal = document.getElementById('grounding-modal');
+                if (groundingModal) groundingModal.classList.add('active');
+            });
+            document.getElementById('notokay-to-compassion').addEventListener('click', function() {
+                showScreen('compassion');
+            });
         })();
     </script>
 </body>
