@@ -267,7 +267,7 @@
         }
 
         .helpline-panel.open {
-            max-height: 300px;
+            max-height: 600px;
             opacity: 1;
         }
 
@@ -2293,12 +2293,16 @@
                                 <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
                                 <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
                                 <hr style="border: none; border-top: 2px solid var(--border-warm); margin: var(--space-md) 0;">
-                                <button class="overwhelmed-link" id="open-micro-intervention">
-                                    <span class="overwhelmed-link-text">
-                                        <strong>Feeling overwhelmed? Try this now</strong>
-                                    </span>
-                                    <span class="overwhelmed-link-arrow">&#8250;</span>
-                                </button>
+                                <div class="micro-ai-prompt">
+                                    <p class="micro-ai-question">Let's take this one step at a time. Which feels closest right now?</p>
+                                    <div class="micro-ai-options">
+                                        <button class="micro-ai-option" data-mood="heavy">Heavy / no energy</button>
+                                        <button class="micro-ai-option" data-mood="overwhelmed">Overwhelmed / too much in my head</button>
+                                        <button class="micro-ai-option" data-mood="numb">Numb / disconnected</button>
+                                        <button class="micro-ai-option" data-mood="anxious-low">Anxious and low</button>
+                                        <button class="micro-ai-option" data-mood="not-okay">I don't know, just not okay</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -4094,7 +4098,7 @@
         // ============================================
         (function() {
             var modal = document.getElementById('micro-intervention-modal');
-            var openBtn = document.getElementById('open-micro-intervention');
+            var openBtns = document.querySelectorAll('.micro-ai-option');
             var closeBtn = document.getElementById('close-micro-intervention');
             var startBtn = document.getElementById('micro-start-breathing');
             var skipBtn = document.getElementById('micro-skip-to-next');
@@ -4192,10 +4196,12 @@
                 });
             }
 
-            openBtn.addEventListener('click', function() {
-                resetBreathing();
-                goToStep(1);
-                modal.classList.add('active');
+            openBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    resetBreathing();
+                    goToStep(1);
+                    modal.classList.add('active');
+                });
             });
 
             closeBtn.addEventListener('click', function() {
