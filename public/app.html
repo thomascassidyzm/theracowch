@@ -4264,7 +4264,7 @@
 
             openBtns.forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    if (btn.getAttribute('data-mood') === 'depressed') return;
+                    if (btn.getAttribute('data-mood') !== 'overwhelmed') return;
                     resetBreathing();
                     goToStep(1);
                     modal.classList.add('active');
