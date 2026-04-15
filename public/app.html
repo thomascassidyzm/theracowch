@@ -4069,19 +4069,27 @@
                     <div class="micro-breathing-counter" id="anxious-breathing-counter"></div>
                 </div>
 
-                <!-- Screen 2: Opposite Action -->
+                <!-- Screen 2: Cognitive Defusion -->
                 <div class="dep-slide" data-anxious-slide="2">
-                    <p class="micro-section-label">Opposite Action</p>
-                    <p class="dep-instruction">Anxiety tells you to avoid and withdraw. Do the opposite:</p>
-                    <div class="dep-steps">
-                        <div class="dep-step-item">Go towards what you're avoiding &mdash; even a tiny step</div>
-                        <div class="dep-step-item">Text or call someone instead of isolating</div>
-                        <div class="dep-step-item">Stand tall, shoulders back &mdash; adopt a confident posture</div>
-                        <div class="dep-step-item">Do the thing your anxiety says you can't</div>
-                    </div>
+                    <p class="micro-section-label">Cognitive Defusion</p>
+                    <p class="dep-instruction">Instead of:</p>
+                    <p class="dep-quote">&ldquo;Something bad will happen&rdquo;</p>
+                    <p class="dep-instruction">Say:</p>
+                    <p class="dep-quote">&ldquo;I'm having the thought that something bad will happen&rdquo;</p>
                     <div class="dep-why">
                         <strong>Why it works:</strong>
-                        <p>Opposite action breaks the anxiety-avoidance loop. When you act against the urge, the emotion loses its grip.</p>
+                        <p>Creates distance from anxious thoughts without fighting them.</p>
+                    </div>
+                </div>
+
+                <!-- Screen 3: The Zoom Out Move -->
+                <div class="dep-slide" data-anxious-slide="3">
+                    <p class="micro-section-label">The &ldquo;Zoom Out&rdquo; Move</p>
+                    <p class="dep-instruction">Ask yourself:</p>
+                    <p class="dep-quote">&ldquo;Will this matter in a week? A month?&rdquo;</p>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>Anxiety zooms in. This zooms out and recalibrates threat.</p>
                     </div>
                 </div>
             </div>
@@ -4090,12 +4098,13 @@
             <div class="micro-progress">
                 <span class="dep-dot active" data-anxious-dot="1"></span>
                 <span class="dep-dot" data-anxious-dot="2"></span>
+                <span class="dep-dot" data-anxious-dot="3"></span>
             </div>
 
             <div class="exercise-controls" id="anxious-controls">
                 <button class="btn-exercise btn-exercise-primary" id="anxious-start-breathing">Start</button>
-                <button class="btn-exercise btn-exercise-secondary" id="anxious-skip">Next: Opposite Action &rarr;</button>
-                <button class="btn-exercise btn-exercise-primary" id="anxious-next-after" style="display: none;">Next: Opposite Action &rarr;</button>
+                <button class="btn-exercise btn-exercise-secondary" id="anxious-skip">Next: Defusion &rarr;</button>
+                <button class="btn-exercise btn-exercise-primary" id="anxious-next-after" style="display: none;">Next: Defusion &rarr;</button>
             </div>
 
             <div class="dep-swipe-hint" id="anxious-swipe-hint"></div>
@@ -4727,7 +4736,7 @@
             var nextAfterBtn = document.getElementById('anxious-next-after');
             var dots = modal.querySelectorAll('.dep-dot');
             var current = 1;
-            var total = 2;
+            var total = 3;
             var breathingTimer = null;
             var cycleCount = 0;
             var totalCycles = 3;
@@ -4738,15 +4747,16 @@
                 modal.querySelector('[data-anxious-slide="' + n + '"]').classList.add('active');
                 dots.forEach(function(d) { d.classList.remove('active'); });
                 modal.querySelector('[data-anxious-dot="' + n + '"]').classList.add('active');
+                startBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
+                nextAfterBtn.style.display = 'none';
                 if (n === 1) {
                     startBtn.style.display = '';
                     skipBtn.style.display = '';
-                    nextAfterBtn.style.display = 'none';
                     hint.textContent = '';
+                } else if (n < total) {
+                    hint.innerHTML = 'Swipe to continue &rarr;';
                 } else {
-                    startBtn.style.display = 'none';
-                    skipBtn.style.display = 'none';
-                    nextAfterBtn.style.display = 'none';
                     hint.innerHTML = 'Done &mdash; tap &times; to close';
                 }
             }
