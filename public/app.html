@@ -4591,7 +4591,7 @@
         // ============================================
         (function() {
             var modal = document.getElementById('depressed-intervention-modal');
-            var track = document.getElementById('dep-swipe-track');
+            var content = modal.querySelector('.exercise-modal-content');
             var closeBtn = document.getElementById('close-depressed-intervention');
             var openBtn = document.querySelector('.micro-ai-option[data-mood="depressed"]');
             var hint = document.getElementById('dep-swipe-hint');
@@ -4623,13 +4623,13 @@
             var startY = 0;
             var tracking = false;
 
-            track.addEventListener('touchstart', function(e) {
+            content.addEventListener('touchstart', function(e) {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 tracking = true;
             }, { passive: true });
 
-            track.addEventListener('touchend', function(e) {
+            content.addEventListener('touchend', function(e) {
                 if (!tracking) return;
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
@@ -4640,8 +4640,9 @@
             }, { passive: true });
 
             // Click/tap arrows for desktop
-            track.addEventListener('click', function(e) {
-                var rect = track.getBoundingClientRect();
+            content.addEventListener('click', function(e) {
+                if (e.target.closest('button, a')) return;
+                var rect = content.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
                 if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
@@ -4653,7 +4654,7 @@
         // ============================================
         (function() {
             var modal = document.getElementById('numb-intervention-modal');
-            var track = document.getElementById('numb-swipe-track');
+            var content = modal.querySelector('.exercise-modal-content');
             var closeBtn = document.getElementById('close-numb-intervention');
             var openBtn = document.querySelector('.micro-ai-option[data-mood="numb"]');
             var hint = document.getElementById('numb-swipe-hint');
@@ -4684,13 +4685,13 @@
             var startY = 0;
             var tracking = false;
 
-            track.addEventListener('touchstart', function(e) {
+            content.addEventListener('touchstart', function(e) {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 tracking = true;
             }, { passive: true });
 
-            track.addEventListener('touchend', function(e) {
+            content.addEventListener('touchend', function(e) {
                 if (!tracking) return;
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
@@ -4700,8 +4701,9 @@
                 if (dx > 0 && current > 1) goToSlide(current - 1);
             }, { passive: true });
 
-            track.addEventListener('click', function(e) {
-                var rect = track.getBoundingClientRect();
+            content.addEventListener('click', function(e) {
+                if (e.target.closest('button, a')) return;
+                var rect = content.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
                 if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
@@ -4713,7 +4715,7 @@
         // ============================================
         (function() {
             var modal = document.getElementById('anxious-intervention-modal');
-            var track = document.getElementById('anxious-swipe-track');
+            var content = modal.querySelector('.exercise-modal-content');
             var closeBtn = document.getElementById('close-anxious-intervention');
             var openBtn = document.querySelector('.micro-ai-option[data-mood="anxious-low"]');
             var hint = document.getElementById('anxious-swipe-hint');
@@ -4839,13 +4841,13 @@
             var startY = 0;
             var tracking = false;
 
-            track.addEventListener('touchstart', function(e) {
+            content.addEventListener('touchstart', function(e) {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 tracking = true;
             }, { passive: true });
 
-            track.addEventListener('touchend', function(e) {
+            content.addEventListener('touchend', function(e) {
                 if (!tracking) return;
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
