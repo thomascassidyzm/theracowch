@@ -3907,6 +3907,7 @@
 
             <div class="exercise-controls">
                 <button class="btn-exercise btn-exercise-primary" id="micro-start-breathing">Start</button>
+                <button class="btn-exercise btn-exercise-secondary" id="micro-skip-to-next" style="display: none;">Next: Reflection &rarr;</button>
                 <button class="btn-exercise btn-exercise-primary" id="micro-next" style="display: none;">Next: Reflection &rarr;</button>
                 <button class="btn-exercise btn-exercise-secondary" id="micro-back" style="display: none;">&larr; Breathing</button>
                 <button class="btn-exercise btn-exercise-primary" id="micro-done" style="display: none;">Done</button>
@@ -4093,6 +4094,7 @@
             var openBtn = document.getElementById('open-micro-intervention');
             var closeBtn = document.getElementById('close-micro-intervention');
             var startBtn = document.getElementById('micro-start-breathing');
+            var skipBtn = document.getElementById('micro-skip-to-next');
             var nextBtn = document.getElementById('micro-next');
             var backBtn = document.getElementById('micro-back');
             var doneBtn = document.getElementById('micro-done');
@@ -4105,6 +4107,16 @@
             var cycleCount = 0;
             var totalCycles = 3;
 
+            function showStep2() {
+                clearTimeout(breathingTimer);
+                goToStep(2);
+                startBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                backBtn.style.display = '';
+                doneBtn.style.display = '';
+            }
+
             function resetBreathing() {
                 clearTimeout(breathingTimer);
                 breathingTimer = null;
@@ -4115,6 +4127,7 @@
                 instruction.textContent = 'Tap Start when you\'re ready';
                 counter.textContent = '';
                 startBtn.style.display = '';
+                skipBtn.style.display = '';
                 nextBtn.style.display = 'none';
                 backBtn.style.display = 'none';
                 doneBtn.style.display = 'none';
@@ -4167,6 +4180,7 @@
                                     instruction.textContent = 'Well done. Take a moment.';
                                     counter.textContent = '';
                                     startBtn.style.display = 'none';
+                                    skipBtn.style.display = 'none';
                                     nextBtn.style.display = '';
                                 }
                             });
@@ -4188,18 +4202,15 @@
 
             startBtn.addEventListener('click', function() {
                 startBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
                 cycleCount = 0;
                 ball.style.top = '-9px';
                 ball.style.left = '-9px';
                 runCycle();
             });
 
-            nextBtn.addEventListener('click', function() {
-                goToStep(2);
-                nextBtn.style.display = 'none';
-                backBtn.style.display = '';
-                doneBtn.style.display = '';
-            });
+            skipBtn.addEventListener('click', function() { showStep2(); });
+            nextBtn.addEventListener('click', function() { showStep2(); });
 
             backBtn.addEventListener('click', function() {
                 resetBreathing();
