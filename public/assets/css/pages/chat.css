@@ -1272,3 +1272,111 @@
     border-color: var(--coral);
     background: rgba(212, 137, 106, 0.1);
 }
+
+/* ============================================
+   Depressed Intervention Modal
+   ============================================ */
+
+.dep-swipe-track {
+    overflow: hidden;
+    position: relative;
+    touch-action: pan-y;
+}
+
+.dep-slide {
+    display: none;
+    text-align: left;
+}
+
+.dep-slide.active {
+    display: block;
+    animation: depFadeIn 0.3s ease-out;
+}
+
+@keyframes depFadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.dep-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin: var(--space-md) 0;
+}
+
+.dep-step-item {
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.dep-compassion {
+    margin: var(--space-lg) 0;
+    text-align: center;
+}
+
+.dep-instruction {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-md) 0;
+}
+
+.dep-quote {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-black);
+    color: var(--coral);
+    line-height: 1.4;
+    margin: 0 0 var(--space-md) 0;
+}
+
+.dep-why {
+    background: rgba(212, 137, 106, 0.1);
+    border-left: 4px solid var(--coral);
+    border-radius: 0 var(--radius-medium) var(--radius-medium) 0;
+    padding: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.dep-why strong {
+    font-size: var(--font-size-sm);
+    color: var(--coral);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dep-why p {
+    margin: var(--space-xs) 0 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.dep-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--border-warm);
+    transition: background 0.3s ease;
+}
+
+.dep-dot.active {
+    background: var(--coral);
+}
+
+.dep-swipe-hint {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: var(--space-sm);
+    animation: depHintPulse 2s ease-in-out infinite;
+}
+
+@keyframes depHintPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}

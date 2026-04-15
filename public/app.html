@@ -3922,6 +3922,72 @@
         </div>
     </div>
 
+    <!-- Depressed Intervention Modal -->
+    <div class="exercise-modal" id="depressed-intervention-modal">
+        <div class="exercise-modal-content micro-intervention-content">
+            <div class="exercise-modal-header">
+                <h3>Micro Interventions</h3>
+                <button class="close-modal" id="close-depressed-intervention">&times;</button>
+            </div>
+
+            <div class="dep-swipe-track" id="dep-swipe-track">
+                <!-- Screen 1: 90-Second Body Shift -->
+                <div class="dep-slide" data-dep-slide="1">
+                    <p class="micro-section-label">The 90-Second Body Shift</p>
+                    <div class="dep-steps">
+                        <div class="dep-step-item">Stand up</div>
+                        <div class="dep-step-item">Roll shoulders</div>
+                        <div class="dep-step-item">Stretch arms overhead</div>
+                        <div class="dep-step-item">Shake out hands</div>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>Depression lives in stillness. Movement interrupts the &ldquo;freeze&rdquo; state.</p>
+                    </div>
+                </div>
+
+                <!-- Screen 2: Self-Compassion Sentence -->
+                <div class="dep-slide" data-dep-slide="2">
+                    <p class="micro-section-label">Self-Compassion Sentence</p>
+                    <div class="dep-compassion">
+                        <p class="dep-instruction">Place a hand on your chest and say:</p>
+                        <p class="dep-quote">&ldquo;This is hard right now. I'm doing what I can.&rdquo;</p>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>Reduces threat response. Increases emotional safety.</p>
+                    </div>
+                </div>
+
+                <!-- Screen 3: The 1% Lift Rule -->
+                <div class="dep-slide" data-dep-slide="3">
+                    <p class="micro-section-label">The &ldquo;1% Lift&rdquo; Rule</p>
+                    <p class="dep-instruction">Instead of &ldquo;fix my mood,&rdquo; ask:</p>
+                    <p class="dep-quote">&ldquo;What would make me feel 1% better right now?&rdquo;</p>
+                    <div class="dep-steps">
+                        <div class="dep-step-item">Open a window</div>
+                        <div class="dep-step-item">Sip something warm</div>
+                        <div class="dep-step-item">Sit in a different room</div>
+                        <div class="dep-step-item">Put on one song you like</div>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>It bypasses overwhelm. Depression hates small wins accumulating quietly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress dots -->
+            <div class="micro-progress">
+                <span class="dep-dot active" data-dep-dot="1"></span>
+                <span class="dep-dot" data-dep-dot="2"></span>
+                <span class="dep-dot" data-dep-dot="3"></span>
+            </div>
+
+            <div class="dep-swipe-hint" id="dep-swipe-hint">Swipe to continue &rarr;</div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
@@ -4198,6 +4264,7 @@
 
             openBtns.forEach(function(btn) {
                 btn.addEventListener('click', function() {
+                    if (btn.getAttribute('data-mood') === 'depressed') return;
                     resetBreathing();
                     goToStep(1);
                     modal.classList.add('active');
@@ -4229,6 +4296,68 @@
             doneBtn.addEventListener('click', function() {
                 clearTimeout(breathingTimer);
                 modal.classList.remove('active');
+            });
+        })();
+
+        // ============================================
+        // Depressed Intervention (Swipeable Screens)
+        // ============================================
+        (function() {
+            var modal = document.getElementById('depressed-intervention-modal');
+            var track = document.getElementById('dep-swipe-track');
+            var closeBtn = document.getElementById('close-depressed-intervention');
+            var openBtn = document.querySelector('.micro-ai-option[data-mood="depressed"]');
+            var hint = document.getElementById('dep-swipe-hint');
+            var slides = modal.querySelectorAll('.dep-slide');
+            var dots = modal.querySelectorAll('.dep-dot');
+            var current = 1;
+            var total = slides.length;
+
+            function goToSlide(n) {
+                current = n;
+                slides.forEach(function(s) { s.classList.remove('active'); });
+                modal.querySelector('[data-dep-slide="' + n + '"]').classList.add('active');
+                dots.forEach(function(d) { d.classList.remove('active'); });
+                modal.querySelector('[data-dep-dot="' + n + '"]').classList.add('active');
+                hint.innerHTML = n < total ? 'Swipe to continue &rarr;' : 'Done &mdash; tap &times; to close';
+            }
+
+            openBtn.addEventListener('click', function() {
+                goToSlide(1);
+                modal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+
+            // Swipe detection
+            var startX = 0;
+            var startY = 0;
+            var tracking = false;
+
+            track.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                tracking = true;
+            }, { passive: true });
+
+            track.addEventListener('touchend', function(e) {
+                if (!tracking) return;
+                tracking = false;
+                var dx = e.changedTouches[0].clientX - startX;
+                var dy = e.changedTouches[0].clientY - startY;
+                if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+                if (dx < 0 && current < total) goToSlide(current + 1);
+                if (dx > 0 && current > 1) goToSlide(current - 1);
+            }, { passive: true });
+
+            // Click/tap arrows for desktop
+            track.addEventListener('click', function(e) {
+                var rect = track.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
+                if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
             });
         })();
     </script>
