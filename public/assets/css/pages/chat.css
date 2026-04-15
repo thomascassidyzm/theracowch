@@ -1032,3 +1032,221 @@
 .trigger-summary-item span {
     color: var(--text-secondary);
 }
+
+/* ============================================
+   Micro Intervention Modal
+   ============================================ */
+
+.micro-intervention-content {
+    max-width: 420px;
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.micro-step {
+    display: none;
+}
+
+.micro-step.active {
+    display: block;
+}
+
+.micro-section-label {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-black);
+    color: var(--coral);
+    margin: 0 0 var(--space-xs) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.micro-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: 0 0 var(--space-lg) 0;
+}
+
+/* Box Breathing */
+
+.box-breathing-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--space-md) 0;
+}
+
+.box-breathing-box {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border: 3px solid var(--coral);
+    border-radius: var(--radius-medium);
+}
+
+.box-breathing-ball {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: var(--coral);
+    border-radius: var(--radius-full);
+    top: -9px;
+    left: -9px;
+    transition: none;
+}
+
+.box-breathing-ball.animating {
+    transition: top 4s linear, left 4s linear;
+}
+
+.box-label {
+    position: absolute;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.box-label-top {
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.box-label-right {
+    right: -56px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.box-label-bottom {
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.box-label-left {
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.micro-breathing-instruction {
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+    margin: var(--space-md) 0 var(--space-xs) 0;
+    min-height: 1.8rem;
+}
+
+.micro-breathing-counter {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    min-height: 1.2rem;
+}
+
+/* Reflection Questions */
+
+.micro-questions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    text-align: left;
+    margin-top: var(--space-md);
+}
+
+.micro-question-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-md);
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+}
+
+.micro-question-number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--coral);
+    color: var(--bg-primary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-black);
+    font-size: var(--font-size-sm);
+    margin-top: 2px;
+}
+
+.micro-question-card p {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.micro-question-hint {
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-muted) !important;
+    font-style: italic;
+    margin-top: var(--space-xs) !important;
+}
+
+/* Progress Dots */
+
+.micro-progress {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin: var(--space-lg) 0 var(--space-sm) 0;
+}
+
+.micro-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--border-warm);
+    transition: background 0.3s ease;
+}
+
+.micro-dot.active {
+    background: var(--coral);
+}
+
+/* Overwhelmed Link in Helpline Panel */
+
+.overwhelmed-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm) 0 0 0;
+    font-family: var(--font-family);
+    text-align: left;
+}
+
+.overwhelmed-link-text {
+    color: var(--coral);
+    font-size: var(--font-size-base);
+}
+
+.overwhelmed-link-text strong {
+    font-weight: var(--font-weight-black);
+}
+
+.overwhelmed-link-arrow {
+    font-size: 1.6rem;
+    color: var(--coral);
+    font-weight: var(--font-weight-black);
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.overwhelmed-link:hover .overwhelmed-link-arrow,
+.overwhelmed-link:active .overwhelmed-link-arrow {
+    transform: translateX(4px);
+}

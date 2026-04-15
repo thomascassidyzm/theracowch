@@ -267,7 +267,7 @@
         }
 
         .helpline-panel.open {
-            max-height: 200px;
+            max-height: 300px;
             opacity: 1;
         }
 
@@ -2292,6 +2292,13 @@
                             <div class="helpline-panel-inner">
                                 <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
                                 <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
+                                <hr style="border: none; border-top: 2px solid var(--border-warm); margin: var(--space-md) 0;">
+                                <button class="overwhelmed-link" id="open-micro-intervention">
+                                    <span class="overwhelmed-link-text">
+                                        <strong>Feeling overwhelmed? Try this now</strong>
+                                    </span>
+                                    <span class="overwhelmed-link-arrow">&#8250;</span>
+                                </button>
                             </div>
                         </div>
 
@@ -3842,6 +3849,71 @@
         </div>
     </div>
 
+    <!-- Micro Intervention Modal -->
+    <div class="exercise-modal" id="micro-intervention-modal">
+        <div class="exercise-modal-content micro-intervention-content">
+            <div class="exercise-modal-header">
+                <h3>Do this first to feel calmer</h3>
+                <button class="close-modal" id="close-micro-intervention">&times;</button>
+            </div>
+
+            <!-- Step 1: Box Breathing -->
+            <div class="micro-step active" data-micro-step="1">
+                <p class="micro-section-label">Box Breathing</p>
+                <p class="micro-subtitle">Follow the box. Breathe with each side.</p>
+                <div class="box-breathing-container">
+                    <div class="box-breathing-box" id="box-breathing-box">
+                        <div class="box-breathing-ball" id="box-breathing-ball"></div>
+                        <span class="box-label box-label-top">Inhale (4s)</span>
+                        <span class="box-label box-label-right">Hold (4s)</span>
+                        <span class="box-label box-label-bottom">Exhale (4s)</span>
+                        <span class="box-label box-label-left">Hold (4s)</span>
+                    </div>
+                </div>
+                <div class="micro-breathing-instruction" id="micro-breathing-instruction">Tap Start when you're ready</div>
+                <div class="micro-breathing-counter" id="micro-breathing-counter"></div>
+            </div>
+
+            <!-- Step 2: Reflection Questions -->
+            <div class="micro-step" data-micro-step="2">
+                <p class="micro-section-label">Now, gently ask yourself&hellip;</p>
+                <div class="micro-questions">
+                    <div class="micro-question-card">
+                        <span class="micro-question-number">1</span>
+                        <p>Is it helpful to be thinking in this way, or is it making you feel worse?</p>
+                    </div>
+                    <div class="micro-question-card">
+                        <span class="micro-question-number">2</span>
+                        <p>Where is the evidence that your thoughts are true? Are there exceptions?</p>
+                    </div>
+                    <div class="micro-question-card">
+                        <span class="micro-question-number">3</span>
+                        <p>How else can you look at the situation to feel less stressed?</p>
+                        <p class="micro-question-hint">It might not happen. I have coped in the past and will find a way through this.</p>
+                    </div>
+                    <div class="micro-question-card">
+                        <span class="micro-question-number">4</span>
+                        <p>What would you say to someone you cared about feeling the same way?</p>
+                        <p class="micro-question-hint">Show yourself compassion. Be kind to yourself &mdash; stop the self-criticism.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress dots -->
+            <div class="micro-progress">
+                <span class="micro-dot active" data-dot="1"></span>
+                <span class="micro-dot" data-dot="2"></span>
+            </div>
+
+            <div class="exercise-controls">
+                <button class="btn-exercise btn-exercise-primary" id="micro-start-breathing">Start</button>
+                <button class="btn-exercise btn-exercise-primary" id="micro-next" style="display: none;">Next: Reflection &rarr;</button>
+                <button class="btn-exercise btn-exercise-secondary" id="micro-back" style="display: none;">&larr; Breathing</button>
+                <button class="btn-exercise btn-exercise-primary" id="micro-done" style="display: none;">Done</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
@@ -4012,6 +4084,133 @@
         if (document.referrer && (document.referrer.indexOf('/exercises/weather') !== -1 || document.referrer.indexOf('/exercises/inner-weather') !== -1)) {
             showMoodCalendar();
         }
+
+        // ============================================
+        // Micro Intervention (Feeling Overwhelmed)
+        // ============================================
+        (function() {
+            var modal = document.getElementById('micro-intervention-modal');
+            var openBtn = document.getElementById('open-micro-intervention');
+            var closeBtn = document.getElementById('close-micro-intervention');
+            var startBtn = document.getElementById('micro-start-breathing');
+            var nextBtn = document.getElementById('micro-next');
+            var backBtn = document.getElementById('micro-back');
+            var doneBtn = document.getElementById('micro-done');
+            var ball = document.getElementById('box-breathing-ball');
+            var instruction = document.getElementById('micro-breathing-instruction');
+            var counter = document.getElementById('micro-breathing-counter');
+            var dots = modal.querySelectorAll('.micro-dot');
+
+            var breathingTimer = null;
+            var cycleCount = 0;
+            var totalCycles = 3;
+
+            function resetBreathing() {
+                clearTimeout(breathingTimer);
+                breathingTimer = null;
+                cycleCount = 0;
+                ball.className = 'box-breathing-ball';
+                ball.style.top = '-9px';
+                ball.style.left = '-9px';
+                instruction.textContent = 'Tap Start when you\'re ready';
+                counter.textContent = '';
+                startBtn.style.display = '';
+                nextBtn.style.display = 'none';
+                backBtn.style.display = 'none';
+                doneBtn.style.display = 'none';
+            }
+
+            function goToStep(n) {
+                var steps = modal.querySelectorAll('.micro-step');
+                steps.forEach(function(s) { s.classList.remove('active'); });
+                modal.querySelector('[data-micro-step="' + n + '"]').classList.add('active');
+                dots.forEach(function(d) { d.classList.remove('active'); });
+                modal.querySelector('[data-dot="' + n + '"]').classList.add('active');
+            }
+
+            function moveBall(phase, cb) {
+                // phase: 1=top-right, 2=bottom-right, 3=bottom-left, 4=top-left
+                ball.classList.add('animating');
+                if (phase === 1) {
+                    instruction.textContent = 'Breathe in...';
+                    ball.style.top = '-9px';
+                    ball.style.left = 'calc(100% - 9px)';
+                } else if (phase === 2) {
+                    instruction.textContent = 'Hold...';
+                    ball.style.top = 'calc(100% - 9px)';
+                    ball.style.left = 'calc(100% - 9px)';
+                } else if (phase === 3) {
+                    instruction.textContent = 'Breathe out...';
+                    ball.style.top = 'calc(100% - 9px)';
+                    ball.style.left = '-9px';
+                } else if (phase === 4) {
+                    instruction.textContent = 'Hold...';
+                    ball.style.top = '-9px';
+                    ball.style.left = '-9px';
+                }
+                breathingTimer = setTimeout(function() {
+                    ball.classList.remove('animating');
+                    cb();
+                }, 4000);
+            }
+
+            function runCycle() {
+                cycleCount++;
+                counter.textContent = 'Cycle ' + cycleCount + ' of ' + totalCycles;
+                moveBall(1, function() {
+                    moveBall(2, function() {
+                        moveBall(3, function() {
+                            moveBall(4, function() {
+                                if (cycleCount < totalCycles) {
+                                    runCycle();
+                                } else {
+                                    instruction.textContent = 'Well done. Take a moment.';
+                                    counter.textContent = '';
+                                    startBtn.style.display = 'none';
+                                    nextBtn.style.display = '';
+                                }
+                            });
+                        });
+                    });
+                });
+            }
+
+            openBtn.addEventListener('click', function() {
+                resetBreathing();
+                goToStep(1);
+                modal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                clearTimeout(breathingTimer);
+                modal.classList.remove('active');
+            });
+
+            startBtn.addEventListener('click', function() {
+                startBtn.style.display = 'none';
+                cycleCount = 0;
+                ball.style.top = '-9px';
+                ball.style.left = '-9px';
+                runCycle();
+            });
+
+            nextBtn.addEventListener('click', function() {
+                goToStep(2);
+                nextBtn.style.display = 'none';
+                backBtn.style.display = '';
+                doneBtn.style.display = '';
+            });
+
+            backBtn.addEventListener('click', function() {
+                resetBreathing();
+                goToStep(1);
+            });
+
+            doneBtn.addEventListener('click', function() {
+                clearTimeout(breathingTimer);
+                modal.classList.remove('active');
+            });
+        })();
     </script>
 </body>
 </html>
