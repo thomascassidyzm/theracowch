@@ -3988,6 +3988,57 @@
         </div>
     </div>
 
+    <!-- Numb Intervention Modal -->
+    <div class="exercise-modal" id="numb-intervention-modal">
+        <div class="exercise-modal-content micro-intervention-content">
+            <div class="exercise-modal-header">
+                <h3>Wake-Up Movement</h3>
+                <button class="close-modal" id="close-numb-intervention">&times;</button>
+            </div>
+
+            <div class="dep-swipe-track" id="numb-swipe-track">
+                <!-- Screen 1: Temperature Shift -->
+                <div class="dep-slide active" data-numb-slide="1">
+                    <p class="micro-section-label">Temperature Shift</p>
+                    <p class="dep-quote">&ldquo;Try holding something cold or splashing your face with water.&rdquo;</p>
+                    <div class="dep-steps">
+                        <div class="dep-step-item">Hold an ice cube in your hand</div>
+                        <div class="dep-step-item">Splash cold water on your face</div>
+                        <div class="dep-step-item">Press a cold drink against your neck</div>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>A sudden temperature change activates your nervous system and pulls you back into your body.</p>
+                    </div>
+                </div>
+
+                <!-- Screen 2: If Still Numb -->
+                <div class="dep-slide" data-numb-slide="2">
+                    <p class="micro-section-label">Still feeling numb?</p>
+                    <p class="dep-instruction">Try an external stimulus to gently reconnect:</p>
+                    <div class="dep-steps">
+                        <div class="dep-step-item">Put on a song that makes you feel something</div>
+                        <div class="dep-step-item">Watch a short video that usually moves you</div>
+                        <div class="dep-step-item">Step outside and focus on sounds around you</div>
+                        <div class="dep-step-item">Smell something strong &mdash; coffee, mint, citrus</div>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>Sensory input bypasses the thinking mind and speaks directly to the emotional brain.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress dots -->
+            <div class="micro-progress">
+                <span class="dep-dot active" data-numb-dot="1"></span>
+                <span class="dep-dot" data-numb-dot="2"></span>
+            </div>
+
+            <div class="dep-swipe-hint" id="numb-swipe-hint">Swipe to continue &rarr;</div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
@@ -4353,6 +4404,66 @@
             }, { passive: true });
 
             // Click/tap arrows for desktop
+            track.addEventListener('click', function(e) {
+                var rect = track.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
+                if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
+            });
+        })();
+
+        // ============================================
+        // Numb Intervention (Swipeable Screens)
+        // ============================================
+        (function() {
+            var modal = document.getElementById('numb-intervention-modal');
+            var track = document.getElementById('numb-swipe-track');
+            var closeBtn = document.getElementById('close-numb-intervention');
+            var openBtn = document.querySelector('.micro-ai-option[data-mood="numb"]');
+            var hint = document.getElementById('numb-swipe-hint');
+            var slides = modal.querySelectorAll('.dep-slide');
+            var dots = modal.querySelectorAll('.dep-dot');
+            var current = 1;
+            var total = slides.length;
+
+            function goToSlide(n) {
+                current = n;
+                slides.forEach(function(s) { s.classList.remove('active'); });
+                modal.querySelector('[data-numb-slide="' + n + '"]').classList.add('active');
+                dots.forEach(function(d) { d.classList.remove('active'); });
+                modal.querySelector('[data-numb-dot="' + n + '"]').classList.add('active');
+                hint.innerHTML = n < total ? 'Swipe to continue &rarr;' : 'Done &mdash; tap &times; to close';
+            }
+
+            openBtn.addEventListener('click', function() {
+                goToSlide(1);
+                modal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+
+            var startX = 0;
+            var startY = 0;
+            var tracking = false;
+
+            track.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                tracking = true;
+            }, { passive: true });
+
+            track.addEventListener('touchend', function(e) {
+                if (!tracking) return;
+                tracking = false;
+                var dx = e.changedTouches[0].clientX - startX;
+                var dy = e.changedTouches[0].clientY - startY;
+                if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+                if (dx < 0 && current < total) goToSlide(current + 1);
+                if (dx > 0 && current > 1) goToSlide(current - 1);
+            }, { passive: true });
+
             track.addEventListener('click', function(e) {
                 var rect = track.getBoundingClientRect();
                 var x = e.clientX - rect.left;
