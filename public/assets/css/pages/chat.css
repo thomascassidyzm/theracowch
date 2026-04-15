@@ -1193,6 +1193,23 @@
     margin-top: var(--space-xs) !important;
 }
 
+.micro-tip-box {
+    background: rgba(212, 137, 106, 0.12);
+    border: 2px solid var(--coral);
+    border-radius: var(--radius-medium);
+    padding: var(--space-md);
+    margin-top: var(--space-lg);
+    text-align: left;
+}
+
+.micro-tip-box p {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-weight: var(--font-weight-bold);
+}
+
 /* Progress Dots */
 
 .micro-progress {
