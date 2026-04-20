@@ -839,7 +839,11 @@ function addMessage(content, sender, quickReplies = null) {
     }
 
     chatMessages.appendChild(messageDiv);
-    scrollToBottom();
+    if (sender === 'mandy') {
+        scrollMessageToTop(messageDiv);
+    } else {
+        scrollToBottom();
+    }
 }
 
 // Add Mandy's response message instantly
@@ -894,7 +898,11 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
         messageDiv.appendChild(quickRepliesDiv);
     }
 
-    scrollToBottom();
+    if (sender === 'mandy') {
+        scrollMessageToTop(messageDiv);
+    } else {
+        scrollToBottom();
+    }
     focusInput();
 }
 
@@ -1062,6 +1070,14 @@ function removeTypingIndicator() {
 
 function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function scrollMessageToTop(messageDiv) {
+    if (!messageDiv) return;
+    const containerRect = chatMessages.getBoundingClientRect();
+    const messageRect = messageDiv.getBoundingClientRect();
+    const delta = messageRect.top - containerRect.top;
+    chatMessages.scrollTop += delta - 8;
 }
 
 function focusInput() {
