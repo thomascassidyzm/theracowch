@@ -133,7 +133,7 @@
             margin: 0;
         }
 
-        /* Daily Quote Cloud - Thought Bubble */
+        /* Daily Quote Cloud - Thought Bubble (matches 💭 icon) */
         .home-tab {
             position: relative;
         }
@@ -142,15 +142,13 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: min(260px, 48vw);
-            background: var(--bg-card);
-            padding: var(--space-md) var(--space-lg);
-            border-radius: 80px;
+            width: min(260px, 50vw);
+            aspect-ratio: 3 / 2;
             animation: slideUp 0.7s ease-out 0.2s both, cloudFloat 6s ease-in-out 1s infinite;
             transition: transform var(--transition-brutal);
             z-index: 2;
             filter:
-                drop-shadow(5px 5px 0 var(--coral))
+                drop-shadow(4px 4px 0 var(--coral))
                 drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
         }
 
@@ -158,33 +156,25 @@
             transform: translateY(-3px) rotate(-1deg);
         }
 
-        /* Cloud puff bumps */
-        .daily-thought::before,
-        .daily-thought::after {
-            content: '';
+        .daily-thought-cloud {
             position: absolute;
-            background: var(--bg-card);
-            border-radius: 50%;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            fill: var(--bg-card);
             pointer-events: none;
-        }
-
-        .daily-thought::before {
-            width: 52px;
-            height: 52px;
-            top: -18px;
-            left: 34px;
-        }
-
-        .daily-thought::after {
-            width: 72px;
-            height: 72px;
-            top: -34px;
-            right: 38px;
         }
 
         @keyframes cloudFloat {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-4px); }
+        }
+
+        .daily-thought-content {
+            position: relative;
+            z-index: 1;
+            padding: 18% 14% 22% 14%;
+            text-align: center;
         }
 
         .daily-thought-label {
@@ -194,18 +184,14 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
             margin-bottom: var(--space-xs);
-            position: relative;
-            z-index: 1;
         }
 
         .daily-thought-text {
-            font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+            font-size: clamp(0.75rem, 1.5vw, 0.9rem);
             font-weight: var(--font-weight-bold);
             color: var(--text-secondary);
-            line-height: 1.35;
+            line-height: 1.3;
             margin: 0;
-            position: relative;
-            z-index: 1;
         }
 
         /* Quick Actions - Brutal Buttons */
@@ -2121,23 +2107,11 @@
             }
 
             .daily-thought {
-                width: min(200px, 52vw);
-                padding: var(--space-sm) var(--space-md);
-                border-radius: 60px;
+                width: min(210px, 54vw);
             }
 
-            .daily-thought::before {
-                width: 38px;
-                height: 38px;
-                top: -14px;
-                left: 24px;
-            }
-
-            .daily-thought::after {
-                width: 54px;
-                height: 54px;
-                top: -26px;
-                right: 28px;
+            .daily-thought-content {
+                padding: 17% 13% 22% 13%;
             }
 
             .imagine-mini-letter {
@@ -2311,10 +2285,25 @@
                         </div>
                     </div>
 
-                    <!-- Daily Quote Card with Giant Quotation -->
+                    <!-- Daily Thought Cloud (💭-shaped) -->
                     <div class="daily-thought" id="daily-thought">
-                        <div class="daily-thought-label">Mandy's thought for you</div>
-                        <p class="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</p>
+                        <svg class="daily-thought-cloud" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                            <g>
+                                <circle cx="22" cy="192" r="7"/>
+                                <circle cx="48" cy="172" r="11"/>
+                                <circle cx="70" cy="110" r="45"/>
+                                <circle cx="130" cy="72" r="55"/>
+                                <circle cx="195" cy="68" r="50"/>
+                                <circle cx="250" cy="100" r="45"/>
+                                <circle cx="100" cy="142" r="40"/>
+                                <circle cx="175" cy="150" r="45"/>
+                                <circle cx="235" cy="142" r="40"/>
+                            </g>
+                        </svg>
+                        <div class="daily-thought-content">
+                            <div class="daily-thought-label">Mandy's thought for you</div>
+                            <p class="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</p>
+                        </div>
                     </div>
 
                     <!-- Quick Action Buttons -->
