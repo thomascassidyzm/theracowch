@@ -90,24 +90,23 @@
         }
 
         .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
             background: var(--bg-card);
-            border: var(--border-medium) solid var(--border-warm);
-            border-radius: var(--radius-small);
-            color: var(--text-secondary);
+            color: var(--accent);
+            text-decoration: none;
             font-size: 1.1rem;
             font-weight: 700;
-            padding: 12px 24px;
+            border: 4px solid var(--accent);
+            box-shadow: 8px 8px 0 rgba(107, 154, 175, 0.3);
+            transition: all 0.2s;
+            margin-bottom: 30px;
             cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 4px 4px 0 0 var(--bg-secondary);
         }
 
         .back-btn:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent);
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 0 var(--accent);
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 rgba(107, 154, 175, 0.3);
         }
 
         .header-content {
