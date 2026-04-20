@@ -789,14 +789,26 @@ function addMessage(content, sender, quickReplies = null) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
 
-    // Convert markdown-style formatting
-    const formattedContent = formatMessage(content);
-    messageDiv.innerHTML = formattedContent;
+    // For Mandy, try to inline the Box Breathing exercise where the text
+    // walkthrough would otherwise appear. Fall back to plain markdown render.
+    let boxBreathingInlined = false;
+    if (sender === 'mandy') {
+        boxBreathingInlined = renderMandyBodyWithBoxBreathing(messageDiv, content);
+    }
+    if (!boxBreathingInlined) {
+        messageDiv.innerHTML = formatMessage(content);
+    }
 
-    // Add exercise action card if Mandy mentions an exercise
+    // Add exercise action card if Mandy mentions an exercise (skip if the
+    // Box Breathing card is already embedded inline above).
     if (sender === 'mandy') {
         const exerciseCard = buildExerciseCard(content);
-        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+        const cardIsBoxBreathing = exerciseCard
+            && exerciseCard.querySelector('.exercise-action-card-title')
+            && exerciseCard.querySelector('.exercise-action-card-title').textContent === 'Box Breathing';
+        if (exerciseCard && !(boxBreathingInlined && cardIsBoxBreathing)) {
+            messageDiv.appendChild(exerciseCard);
+        }
     }
 
     // Add quick reply buttons if provided (only for Mandy's messages)
@@ -833,15 +845,28 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
 
-    // Render formatted content all at once
-    const textContainer = document.createElement('div');
-    textContainer.innerHTML = formatMessage(content);
-    messageDiv.appendChild(textContainer);
+    // For Mandy, try to inline the Box Breathing exercise where the text
+    // walkthrough would otherwise appear. Fall back to plain markdown render.
+    let boxBreathingInlined = false;
+    if (sender === 'mandy') {
+        boxBreathingInlined = renderMandyBodyWithBoxBreathing(messageDiv, content);
+    }
+    if (!boxBreathingInlined) {
+        const textContainer = document.createElement('div');
+        textContainer.innerHTML = formatMessage(content);
+        messageDiv.appendChild(textContainer);
+    }
 
-    // Add exercise action card if Mandy mentions an exercise
+    // Add exercise action card if Mandy mentions an exercise (skip if the
+    // Box Breathing card is already embedded inline above).
     if (sender === 'mandy') {
         const exerciseCard = buildExerciseCard(content);
-        if (exerciseCard) messageDiv.appendChild(exerciseCard);
+        const cardIsBoxBreathing = exerciseCard
+            && exerciseCard.querySelector('.exercise-action-card-title')
+            && exerciseCard.querySelector('.exercise-action-card-title').textContent === 'Box Breathing';
+        if (exerciseCard && !(boxBreathingInlined && cardIsBoxBreathing)) {
+            messageDiv.appendChild(exerciseCard);
+        }
     }
 
     chatMessages.appendChild(messageDiv);
@@ -1006,6 +1031,82 @@ function buildExerciseCard(content) {
     `;
     card.style.setProperty('--card-accent', ex.color);
     return card;
+}
+
+// Detect a "Box Breathing" walkthrough section inside Mandy's text reply and
+// return { before, after } with that section stripped out, so the caller can
+// drop the interactive Box Breathing exercise card in its place.
+function extractBoxBreathingSection(content) {
+    if (!content) return null;
+    const headerPattern = /^[\t ]*(?:#{1,4}[\t ]*|[-*][\t ]+)?\*{0,2}[\t ]*box[-\s]?breathing[^\n]*$/im;
+    const match = content.match(headerPattern);
+    if (!match) return null;
+
+    const start = match.index;
+    const headerEnd = start + match[0].length;
+    const afterHeader = content.slice(headerEnd);
+
+    // End the section at the next markdown heading, bold label, or a blank line
+    // followed by non-indented text that starts a new topic.
+    const endPattern = /\n[\t ]*(?:#{1,4}\s|\*\*[^*\n]+\*\*|\n(?=[A-Z]))/;
+    const endMatch = afterHeader.match(endPattern);
+    const sectionEnd = endMatch ? headerEnd + endMatch.index : content.length;
+
+    const before = content.slice(0, start).replace(/\s+$/, '');
+    const after = content.slice(sectionEnd).replace(/^\s+/, '');
+    return { before, after };
+}
+
+// Build an inline Box Breathing action card that opens the breathing modal.
+function createBoxBreathingCard() {
+    const card = document.createElement('div');
+    card.className = 'exercise-action-card exercise-action-card-inline';
+    card.innerHTML = `
+        <div class="exercise-action-card-header">
+            <span class="exercise-action-card-icon">🫁</span>
+            <div>
+                <div class="exercise-action-card-title">Box Breathing</div>
+                <div class="exercise-action-card-desc">4-count breathing to calm your nervous system</div>
+            </div>
+        </div>
+        <button type="button" class="exercise-action-card-btn">
+            Start Box Breathing (4 min) →
+        </button>
+    `;
+    card.style.setProperty('--card-accent', '#7EA88B');
+
+    const btn = card.querySelector('.exercise-action-card-btn');
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof breathingModal !== 'undefined' && breathingModal) {
+            breathingModal.classList.add('active');
+        }
+    });
+    return card;
+}
+
+// Render Mandy's message with the Box Breathing walkthrough replaced by the
+// interactive exercise card. Returns true if an inline embed was applied.
+function renderMandyBodyWithBoxBreathing(messageDiv, content) {
+    const split = extractBoxBreathingSection(content);
+    if (!split) return false;
+
+    if (split.before.trim()) {
+        const beforeDiv = document.createElement('div');
+        beforeDiv.innerHTML = formatMessage(split.before);
+        messageDiv.appendChild(beforeDiv);
+    }
+
+    messageDiv.appendChild(createBoxBreathingCard());
+
+    if (split.after.trim()) {
+        const afterDiv = document.createElement('div');
+        afterDiv.innerHTML = formatMessage(split.after);
+        messageDiv.appendChild(afterDiv);
+    }
+
+    return true;
 }
 
 function showTypingIndicator() {
