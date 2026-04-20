@@ -101,6 +101,41 @@
 }
 
 /* ============================================
+   Quick Replies (inline options under Mandy's message)
+   ============================================ */
+
+.quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
+.quick-reply-btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: var(--border-medium) solid var(--border-warm);
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    pointer-events: auto;
+    font-family: inherit;
+    transition: background var(--transition-brutal), color var(--transition-brutal), border-color var(--transition-brutal), transform var(--transition-brutal);
+}
+
+.quick-reply-btn:hover {
+    background: var(--coral);
+    color: var(--bg-primary);
+    border-color: var(--coral);
+}
+
+.quick-reply-btn:active {
+    transform: scale(0.97);
+}
+
+/* ============================================
    Slide Panels
    ============================================ */
 

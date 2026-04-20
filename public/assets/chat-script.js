@@ -806,31 +806,13 @@ function addMessage(content, sender, quickReplies = null) {
 
         quickReplies.forEach(reply => {
             const button = document.createElement('button');
+            button.type = 'button';
             button.className = 'quick-reply-btn';
             button.textContent = reply.text;
-            button.addEventListener('click', () => {
-                if (reply.action === 'exercise') {
-                    // Open specific exercise
-                    if (reply.exercise === 'breathing') {
-                        breathingModal.classList.add('active');
-                    } else if (reply.exercise === 'grounding') {
-                        groundingModal.classList.add('active');
-                    } else if (reply.exercise === 'pmr') {
-                        pmrModal.classList.add('active');
-                    }
-                } else if (reply.action === 'open-exercise-url') {
-                    // Open exercise page directly
-                    window.location.href = reply.url;
-                } else if (reply.action === 'exercises') {
-                    // Open exercise library panel
-                    exercisePanel.classList.add('active');
-                } else if (reply.action === 'imagine') {
-                    // Open IMAGINE panel
-                    imaginePanel.classList.add('active');
-                } else if (reply.prompt) {
-                    // Standard chat prompt
-                    triggerChatPrompt(reply.prompt);
-                }
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleQuickReply(reply);
             });
             quickRepliesDiv.appendChild(button);
         });
@@ -871,26 +853,13 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
 
         quickReplies.forEach(reply => {
             const button = document.createElement('button');
+            button.type = 'button';
             button.className = 'quick-reply-btn';
             button.textContent = reply.text;
-            button.addEventListener('click', () => {
-                if (reply.action === 'exercise') {
-                    if (reply.exercise === 'breathing') {
-                        breathingModal.classList.add('active');
-                    } else if (reply.exercise === 'grounding') {
-                        groundingModal.classList.add('active');
-                    } else if (reply.exercise === 'pmr') {
-                        pmrModal.classList.add('active');
-                    }
-                } else if (reply.action === 'open-exercise-url') {
-                    window.location.href = reply.url;
-                } else if (reply.action === 'exercises') {
-                    exercisePanel.classList.add('active');
-                } else if (reply.action === 'imagine') {
-                    imaginePanel.classList.add('active');
-                } else if (reply.prompt) {
-                    triggerChatPrompt(reply.prompt);
-                }
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleQuickReply(reply);
             });
             quickRepliesDiv.appendChild(button);
         });
@@ -1078,6 +1047,35 @@ function scrollMessageToTop(messageDiv) {
     const messageRect = messageDiv.getBoundingClientRect();
     const delta = messageRect.top - containerRect.top;
     chatMessages.scrollTop += delta - 8;
+}
+
+function handleQuickReply(reply) {
+    if (!reply) return;
+    if (reply.action === 'exercise') {
+        if (reply.exercise === 'breathing') {
+            breathingModal.classList.add('active');
+        } else if (reply.exercise === 'grounding') {
+            groundingModal.classList.add('active');
+        } else if (reply.exercise === 'pmr') {
+            pmrModal.classList.add('active');
+        }
+        return;
+    }
+    if (reply.action === 'open-exercise-url') {
+        window.location.href = reply.url;
+        return;
+    }
+    if (reply.action === 'exercises') {
+        exercisePanel.classList.add('active');
+        return;
+    }
+    if (reply.action === 'imagine') {
+        imaginePanel.classList.add('active');
+        return;
+    }
+    if (reply.prompt) {
+        triggerChatPrompt(reply.prompt);
+    }
 }
 
 function focusInput() {
