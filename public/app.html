@@ -71,6 +71,7 @@
             align-items: center;
             gap: var(--space-lg);
             margin-bottom: var(--space-2xl);
+            padding-right: min(280px, 52vw);
             animation: slideRight 0.7s ease-out;
         }
 
@@ -132,37 +133,58 @@
             margin: 0;
         }
 
-        /* Daily Quote Card - Chunky & Bold */
-        .daily-thought {
-            background: var(--bg-card);
-            border: var(--border-thicc) solid var(--border-warm);
-            border-radius: var(--radius-chunky);
-            padding: var(--space-md);
-            margin-bottom: var(--space-lg);
+        /* Daily Quote Cloud - Thought Bubble */
+        .home-tab {
             position: relative;
-            overflow: hidden;
-            animation: slideUp 0.7s ease-out 0.2s both;
-            transition: all var(--transition-brutal);
+        }
+
+        .daily-thought {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: min(260px, 48vw);
+            background: var(--bg-card);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: 80px;
+            animation: slideUp 0.7s ease-out 0.2s both, cloudFloat 6s ease-in-out 1s infinite;
+            transition: transform var(--transition-brutal);
+            z-index: 2;
+            filter:
+                drop-shadow(5px 5px 0 var(--coral))
+                drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
         }
 
         .daily-thought:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-4px) rotate(-0.5deg);
-            border-color: var(--coral);
+            transform: translateY(-3px) rotate(-1deg);
         }
 
-        /* Giant quotation mark */
-        .daily-thought::before {
-            content: '"';
+        /* Cloud puff bumps */
+        .daily-thought::before,
+        .daily-thought::after {
+            content: '';
             position: absolute;
-            top: -15px;
-            left: 15px;
-            font-size: 100px;
-            font-weight: var(--font-weight-black);
-            color: var(--coral);
-            opacity: 0.15;
-            line-height: 1;
+            background: var(--bg-card);
+            border-radius: 50%;
             pointer-events: none;
+        }
+
+        .daily-thought::before {
+            width: 52px;
+            height: 52px;
+            top: -18px;
+            left: 34px;
+        }
+
+        .daily-thought::after {
+            width: 72px;
+            height: 72px;
+            top: -34px;
+            right: 38px;
+        }
+
+        @keyframes cloudFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .daily-thought-label {
@@ -170,17 +192,17 @@
             font-weight: var(--font-weight-bold);
             color: var(--coral);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: var(--space-sm);
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-xs);
             position: relative;
             z-index: 1;
         }
 
         .daily-thought-text {
-            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            font-size: clamp(0.8rem, 1.6vw, 0.95rem);
             font-weight: var(--font-weight-bold);
             color: var(--text-secondary);
-            line-height: 1.4;
+            line-height: 1.35;
             margin: 0;
             position: relative;
             z-index: 1;
@@ -2089,6 +2111,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: var(--space-md);
+                padding-right: min(210px, 54vw);
             }
 
             .avatar-container {
@@ -2098,7 +2121,23 @@
             }
 
             .daily-thought {
-                padding: var(--space-sm);
+                width: min(200px, 52vw);
+                padding: var(--space-sm) var(--space-md);
+                border-radius: 60px;
+            }
+
+            .daily-thought::before {
+                width: 38px;
+                height: 38px;
+                top: -14px;
+                left: 24px;
+            }
+
+            .daily-thought::after {
+                width: 54px;
+                height: 54px;
+                top: -26px;
+                right: 28px;
             }
 
             .imagine-mini-letter {
