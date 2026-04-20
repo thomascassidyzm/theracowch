@@ -2200,21 +2200,41 @@
             transform: translateY(-2px);
         }
 
-        /* Exercise modal buttons */
+        /* Exercise modal close button — high-contrast circular button */
+        .exercise-modal-content {
+            position: relative;
+        }
+
         .close-modal {
             position: absolute;
             top: var(--space-sm);
             right: var(--space-sm);
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            border-radius: var(--radius-full);
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-black);
+            line-height: 1;
+            color: var(--bg-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            z-index: 1;
+            z-index: 100;
+            box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.35);
+            transition: transform var(--transition-brutal), background var(--transition-brutal);
         }
 
         .close-modal:hover {
-            color: var(--coral);
+            transform: scale(1.1) rotate(90deg);
+            background: var(--coral-light);
+        }
+
+        /* Reserve room for the close button in the header so it never overlaps the title */
+        .exercise-modal-header {
+            padding-right: calc(40px + var(--space-md));
         }
 
         .btn-exercise {
