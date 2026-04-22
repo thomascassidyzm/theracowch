@@ -31,6 +31,7 @@
     --font-weight-black: 900;
 
     /* ===== Dark Warm Palette ===== */
+    --bg-canvas: #5C4432;   /* page canvas — warm cinnamon, lighter and cheerful than bg-primary */
     --bg-primary: #1a1512;
     --bg-secondary: #2a2320;
     --bg-card: #2d2825;
