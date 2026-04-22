@@ -317,10 +317,40 @@
         }
 
         .helpline-panel-inner {
+            position: relative;
             background: var(--bg-card);
             border: var(--border-thicc) solid var(--coral);
             border-radius: var(--radius-medium);
             padding: var(--space-lg);
+        }
+
+        .helpline-close {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 32px;
+            height: 32px;
+            background: var(--coral);
+            border: var(--border-medium) solid var(--coral-dark);
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: var(--font-weight-black);
+            line-height: 1;
+            color: #FFFFFF;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .helpline-close:hover {
+            background: var(--coral-light);
+        }
+
+        /* "Need help now?" button hidden when the panel is showing */
+        #need-help-now.hidden-cta {
+            display: none;
         }
 
         .helpline-entry {
@@ -2436,6 +2466,7 @@
 
                         <div class="helpline-panel" id="helpline-panel">
                             <div class="helpline-panel-inner">
+                                <button type="button" class="helpline-close" id="helpline-close" aria-label="Close">&times;</button>
                                 <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
                                 <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
                             </div>
@@ -4475,10 +4506,21 @@
             navigator.serviceWorker.register('/sw.js');
         }
 
-        document.getElementById('need-help-now').addEventListener('click', function() {
-            var panel = document.getElementById('helpline-panel');
-            panel.classList.toggle('open');
-        });
+        (function() {
+            var helpBtn = document.getElementById('need-help-now');
+            var helpPanel = document.getElementById('helpline-panel');
+            var helpClose = document.getElementById('helpline-close');
+
+            helpBtn.addEventListener('click', function() {
+                helpBtn.classList.add('hidden-cta');
+                helpPanel.classList.add('open');
+            });
+
+            helpClose.addEventListener('click', function() {
+                helpPanel.classList.remove('open');
+                helpBtn.classList.remove('hidden-cta');
+            });
+        })();
 
         document.getElementById('choose-help').addEventListener('click', function() {
             var panel = document.getElementById('choose-help-panel');
