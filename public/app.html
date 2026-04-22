@@ -312,8 +312,77 @@
         }
 
         .helpline-panel.open {
-            max-height: 600px;
+            max-height: 1400px;
             opacity: 1;
+        }
+
+        .help-option + .help-option {
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 2px solid var(--border-subtle);
+        }
+
+        .help-option-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-black);
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-sm) 0;
+        }
+
+        .help-action {
+            display: block;
+            padding: var(--space-sm) var(--space-md);
+            margin-top: var(--space-sm);
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+            transition: background var(--transition-brutal), border-color var(--transition-brutal), transform var(--transition-brutal);
+        }
+
+        .help-action strong {
+            display: block;
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+        }
+
+        .help-action span {
+            display: block;
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .help-action:hover {
+            border-color: var(--coral);
+            background: #FBE8D5;
+        }
+
+        .help-action:active {
+            transform: scale(0.98);
+        }
+
+        .help-option-a .help-action { background: var(--sage-light); border-color: var(--sage-dark); }
+        .help-option-a .help-action:hover { background: #B6DDB6; }
+
+        .help-option-b .help-action { background: var(--amber-light); border-color: var(--amber); }
+        .help-option-b .help-action:hover { background: #FFD39C; border-color: var(--amber-dark); }
+
+        .help-action-urgent {
+            background: var(--coral) !important;
+            border-color: var(--coral-dark) !important;
+        }
+        .help-action-urgent strong,
+        .help-action-urgent span {
+            color: #FFFFFF !important;
+        }
+        .help-action-urgent:hover {
+            background: var(--coral-dark) !important;
         }
 
         .helpline-panel-inner {
@@ -2467,8 +2536,46 @@
                         <div class="helpline-panel" id="helpline-panel">
                             <div class="helpline-panel-inner">
                                 <button type="button" class="helpline-close" id="helpline-close" aria-label="Close">&times;</button>
-                                <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
-                                <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
+
+                                <section class="help-option help-option-a">
+                                    <h4 class="help-option-title">A. I want to talk to someone</h4>
+                                    <a class="help-action" href="sms:85258?body=SHOUT">
+                                        <strong>Text SHOUT to 85258</strong>
+                                        <span>24/7 crisis text support</span>
+                                    </a>
+                                    <a class="help-action" href="tel:116123">
+                                        <strong>Samaritans: Call 116 123</strong>
+                                        <span>24/7, free to call</span>
+                                    </a>
+                                </section>
+
+                                <section class="help-option help-option-b">
+                                    <h4 class="help-option-title">B. I don&rsquo;t want to talk to anyone&hellip; but I&rsquo;m not okay</h4>
+                                    <button type="button" class="help-action" data-help-action="grounding">
+                                        <strong>Stay with me mode</strong>
+                                        <span>Guided 5-minute grounding</span>
+                                    </button>
+                                    <a class="help-action" href="/exercises/wave.html">
+                                        <strong>Ride the wave</strong>
+                                        <span>Ride out a tough moment</span>
+                                    </a>
+                                    <button type="button" class="help-action" data-help-action="ten-minutes">
+                                        <strong>Just get through the next 10 minutes</strong>
+                                        <span>Breathing &rarr; defusion &rarr; zoom out</span>
+                                    </button>
+                                </section>
+
+                                <section class="help-option help-option-c">
+                                    <h4 class="help-option-title">C. I might be in danger or losing control</h4>
+                                    <a class="help-action help-action-urgent" href="tel:999">
+                                        <strong>Call 999</strong>
+                                        <span>Emergency services</span>
+                                    </a>
+                                    <a class="help-action help-action-urgent" href="tel:111">
+                                        <strong>Call NHS 111</strong>
+                                        <span>Urgent mental health help</span>
+                                    </a>
+                                </section>
                             </div>
                         </div>
 
@@ -4511,14 +4618,30 @@
             var helpPanel = document.getElementById('helpline-panel');
             var helpClose = document.getElementById('helpline-close');
 
+            function closePanel() {
+                helpPanel.classList.remove('open');
+                helpBtn.classList.remove('hidden-cta');
+            }
+
             helpBtn.addEventListener('click', function() {
                 helpBtn.classList.add('hidden-cta');
                 helpPanel.classList.add('open');
             });
 
-            helpClose.addEventListener('click', function() {
-                helpPanel.classList.remove('open');
-                helpBtn.classList.remove('hidden-cta');
+            helpClose.addEventListener('click', closePanel);
+
+            helpPanel.querySelectorAll('[data-help-action]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var action = btn.getAttribute('data-help-action');
+                    if (action === 'grounding') {
+                        var g = document.getElementById('grounding-modal');
+                        if (g) g.classList.add('active');
+                    } else if (action === 'ten-minutes') {
+                        var a = document.getElementById('anxious-intervention-modal');
+                        if (a) a.classList.add('active');
+                    }
+                    closePanel();
+                });
             });
         })();
 
