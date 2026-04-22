@@ -307,6 +307,21 @@
             opacity: 0.8;
         }
 
+        /* Always-visible help picker under "Need help now?" */
+        .help-picker {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-lg);
+        }
+
+        .help-picker-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-md) 0;
+        }
+
         /* ============================================
            EXERCISES SECTION
            ============================================ */
@@ -2338,21 +2353,21 @@
                             </div>
                         </button>
 
+                        <div class="help-picker">
+                            <p class="help-picker-title">Choose what you need help with:</p>
+                            <div class="micro-ai-options">
+                                <button class="micro-ai-option" data-mood="depressed">Depressed / no energy</button>
+                                <button class="micro-ai-option" data-mood="overwhelmed">Overwhelmed / too much in my head</button>
+                                <button class="micro-ai-option" data-mood="numb">Numb / disconnected</button>
+                                <button class="micro-ai-option" data-mood="anxious-low">Anxious and low</button>
+                                <button class="micro-ai-option" data-mood="not-okay">I don't know, just not okay</button>
+                            </div>
+                        </div>
+
                         <div class="helpline-panel" id="helpline-panel">
                             <div class="helpline-panel-inner">
                                 <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
                                 <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
-                                <hr style="border: none; border-top: 2px solid var(--border-warm); margin: var(--space-md) 0;">
-                                <div class="micro-ai-prompt">
-                                    <p class="micro-ai-question">Let's take this one step at a time. Which feels closest right now?</p>
-                                    <div class="micro-ai-options">
-                                        <button class="micro-ai-option" data-mood="depressed">Depressed / no energy</button>
-                                        <button class="micro-ai-option" data-mood="overwhelmed">Overwhelmed / too much in my head</button>
-                                        <button class="micro-ai-option" data-mood="numb">Numb / disconnected</button>
-                                        <button class="micro-ai-option" data-mood="anxious-low">Anxious and low</button>
-                                        <button class="micro-ai-option" data-mood="not-okay">I don't know, just not okay</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
