@@ -377,11 +377,20 @@
             text-align: center;
             padding: 10px;
             border-radius: 50%;
+            background: var(--amber-light);
+            border: 2px solid var(--amber);
+            color: var(--text-primary);
             font-size: 0.72rem;
             line-height: 1.15;
             overflow-wrap: break-word;
             word-break: break-word;
             hyphens: auto;
+        }
+
+        .help-picker .micro-ai-option:hover,
+        .help-picker .micro-ai-option:active {
+            background: #FFD39C;
+            border-color: var(--amber-dark);
         }
 
         @media (max-width: 360px) {
