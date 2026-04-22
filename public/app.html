@@ -217,30 +217,64 @@
             width: 100%;
         }
 
-        .action-btn.primary {
-            background: var(--coral);
+        /* Coral variant (Need help now) */
+        .action-btn.coral {
+            background: var(--coral-light);
+            border-color: var(--coral);
+        }
+        .action-btn.coral:hover {
+            background: #FBC7AE;
+            box-shadow: 8px 8px 0 0 var(--coral);
             border-color: var(--coral-dark);
+            transform: translateY(-4px) rotate(-1deg);
         }
 
-        .action-btn.primary .action-btn-text strong,
-        .action-btn.primary .action-btn-text span {
-            color: var(--text-on-coral);
+        /* Amber variant (Choose what you need) */
+        .action-btn.amber {
+            background: var(--amber-light);
+            border-color: var(--amber);
+        }
+        .action-btn.amber:hover {
+            background: #FFD39C;
+            box-shadow: 8px 8px 0 0 var(--amber);
+            border-color: var(--amber-dark);
+            transform: translateY(-4px) rotate(-1deg);
         }
 
-        .action-btn:hover {
+        /* Sage variant (Chat with Mandy) */
+        .action-btn.sage {
+            background: var(--sage-light);
+            border-color: var(--sage-dark);
+        }
+        .action-btn.sage:hover {
+            background: #B6DDB6;
+            box-shadow: 8px 8px 0 0 var(--sage-dark);
+            border-color: var(--sage-dark);
+            transform: translateY(-4px) rotate(-1deg);
+        }
+
+        /* Back-compat: retain .primary as coral */
+        .action-btn.primary {
+            background: var(--coral-light);
+            border-color: var(--coral);
+        }
+        .action-btn.primary:hover {
+            background: #FBC7AE;
+            box-shadow: 8px 8px 0 0 var(--coral);
+            border-color: var(--coral-dark);
+            transform: translateY(-4px) rotate(-1deg);
+        }
+
+        /* Non-primary fallback hover */
+        .action-btn:not(.coral):not(.amber):not(.sage):not(.primary):hover {
             transform: translateY(-4px) rotate(-1deg);
             box-shadow: 8px 8px 0 0 var(--coral);
             border-color: var(--coral);
         }
 
-        .action-btn.primary:hover {
-            background: var(--coral-light);
-            box-shadow: 8px 8px 0 0 var(--bg-card);
-        }
-
         .action-btn:active {
             transform: translateY(-2px) rotate(-0.5deg);
-            box-shadow: 4px 4px 0 0 var(--coral);
+            box-shadow: 4px 4px 0 0 var(--bg-dark);
         }
 
         .action-btn-icon {
@@ -2378,7 +2412,7 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="quick-actions">
-                        <button class="action-btn primary" id="need-help-now">
+                        <button class="action-btn coral" id="need-help-now">
                             <span class="action-btn-icon">🆘</span>
                             <div class="action-btn-text">
                                 <strong>Need help now?</strong>
@@ -2393,7 +2427,7 @@
                             </div>
                         </div>
 
-                        <button class="action-btn primary" id="choose-help">
+                        <button class="action-btn amber" id="choose-help">
                             <span class="action-btn-icon">🫂</span>
                             <div class="action-btn-text">
                                 <strong>Choose what you need help with</strong>
@@ -2413,7 +2447,7 @@
                             </div>
                         </div>
 
-                        <button class="action-btn primary" data-tab="chat">
+                        <button class="action-btn sage" data-tab="chat">
                             <span class="action-btn-icon">💬</span>
                             <div class="action-btn-text">
                                 <strong>Chat with Mandy</strong>
