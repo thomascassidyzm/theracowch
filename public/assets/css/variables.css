@@ -30,19 +30,19 @@
     --font-weight-bold: 700;
     --font-weight-black: 900;
 
-    /* ===== Dark Warm Palette ===== */
-    --bg-canvas: #F7E3CC;   /* page canvas — peachy cream, light and cheerful */
+    /* ===== Warm Peachy Palette ===== */
+    --bg-canvas: #F7E3CC;   /* page canvas — light peachy cream */
     --text-on-canvas: #3A2A1F;       /* dark warm brown for text floating on canvas */
     --text-on-canvas-muted: #6E553E; /* softer warm brown for secondary canvas text */
-    --bg-primary: #1a1512;
-    --bg-secondary: #2a2320;
-    --bg-card: #2d2825;
-    --bg-card-hover: #3a3533;
-    --bg-elevated: #3a3228;
-    --bg-dark: #0D0B09;
+    --bg-primary: #F2BC85;   /* deeper peach — tab bar, big surfaces */
+    --bg-secondary: #F3C595; /* slightly lighter peach — modals */
+    --bg-card: #FBD6AE;      /* peachy card */
+    --bg-card-hover: #F8C893;
+    --bg-elevated: #FDE1BF;
+    --bg-dark: #3A2A1F;      /* dark brown — brutalist shadow / strips */
 
     /* Chat Message Backgrounds */
-    --bg-mandy-message: #2d2825;
+    --bg-mandy-message: #FBD6AE;
     --bg-user-message: var(--coral);
 
     /* ===== Accent Colors - Coral ===== */
@@ -58,15 +58,15 @@
     --accent-glow: var(--coral-glow);
 
     /* ===== Text Colors ===== */
-    --text-primary: #F5F0E8;
-    --text-secondary: #FFF8F0;
-    --text-muted: #b0a499;
-    --text-on-coral: var(--bg-primary);
+    --text-primary: #2B1E15;   /* dark warm brown (on peach cards) */
+    --text-secondary: #1A120C; /* deep dark brown (on peach cards) */
+    --text-muted: #6E553E;     /* medium warm brown */
+    --text-on-coral: #2B1E15;
 
     /* ===== Border Colors ===== */
-    --border-warm: #8a7a6a;
+    --border-warm: #3A2A1F;
     --border-coral: var(--coral);
-    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(0, 0, 0, 0.08);
 
     /* ===== IMAGINE Domain Colors ===== */
     --color-self: #E88A6A;       /* I - Self Care (coral) */
@@ -109,16 +109,16 @@
     --max-width: 600px;
 
     /* ===== Shadows - Brutalist Style ===== */
-    --shadow-brutal: 8px 8px 0 0 var(--bg-card);
+    --shadow-brutal: 8px 8px 0 0 var(--bg-dark);
     --shadow-brutal-coral: 8px 12px 0 0 var(--coral);
     --shadow-brutal-hover: 12px 16px 0 0 var(--coral);
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 4px 12px rgba(58, 42, 31, 0.2);
     --shadow-glow: 0 0 20px var(--coral-glow);
 
     /* Standard Shadow Scale */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.25);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px rgba(58, 42, 31, 0.1);
+    --shadow-md: 0 4px 8px rgba(58, 42, 31, 0.12);
+    --shadow-lg: 0 8px 16px rgba(58, 42, 31, 0.15);
     --shadow-accent: 0 4px 12px var(--coral-glow);
 
     /* ===== Transitions ===== */

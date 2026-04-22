@@ -92,7 +92,7 @@
 
 .quick-prompt-btn:hover {
     background: var(--coral);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--coral);
 }
 
@@ -127,7 +127,7 @@
 
 .quick-reply-btn:hover {
     background: var(--coral);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--coral);
 }
 
@@ -524,7 +524,7 @@
 .control-option.selected,
 .playbreak-option.selected {
     background: var(--accent-primary);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--accent-primary);
 }
 
@@ -546,7 +546,7 @@
 
 .weather-option.selected {
     background: var(--accent-primary);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--accent-primary);
 }
 
@@ -733,7 +733,7 @@
 
 .ladder-rung.selected {
     background: var(--accent-primary);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--accent-primary);
 }
 
@@ -1019,7 +1019,7 @@
 
 .trigger-option.selected {
     background: var(--accent-primary);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-color: var(--accent-primary);
 }
 
@@ -1204,7 +1204,7 @@
     width: 28px;
     height: 28px;
     background: var(--coral);
-    color: var(--bg-primary);
+    color: var(--text-on-coral);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
