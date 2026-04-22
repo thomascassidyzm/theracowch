@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="grainPerky">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.06"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="overlay"/>
+    </filter>
+    <clipPath id="headClipPerky">
+      <circle cx="256" cy="290" r="140"/>
+    </clipPath>
+  </defs>
+
+  <!-- Green rounded card background -->
+  <rect width="512" height="512" rx="102" ry="102" fill="#2D5C38"/>
+  <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#3D6C48" stroke-width="8"/>
+
+  <!-- Perky-eared dairy chibi cow -->
+  <g transform="translate(256, 290)">
+
+    <!-- Perky upright ears (cream teardrops, angled slightly outward) -->
+    <g transform="translate(-70, -132) rotate(-18)">
+      <ellipse cx="0" cy="0" rx="24" ry="50" fill="#F5F0E8"/>
+      <ellipse cx="0" cy="8" rx="12" ry="34" fill="#FFB7D0"/>
+    </g>
+    <g transform="translate(70, -132) rotate(18)">
+      <ellipse cx="0" cy="0" rx="24" ry="50" fill="#F5F0E8"/>
+      <ellipse cx="0" cy="8" rx="12" ry="34" fill="#FFB7D0"/>
+    </g>
+
+    <!-- Small coral horns poking out between the ears -->
+    <ellipse cx="-28" cy="-160" rx="10" ry="16" fill="#F37A53" transform="rotate(-12 -28 -160)"/>
+    <ellipse cx="28" cy="-160" rx="10" ry="16" fill="#F37A53" transform="rotate(12 28 -160)"/>
+
+    <!-- Little hair tuft centred between horns -->
+    <path d="M -10 -172 Q 0 -188 10 -172" stroke="#F37A53" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+    <!-- Cream round head -->
+    <circle cx="0" cy="0" r="140" fill="#F5F0E8"/>
+  </g>
+
+  <!-- Dairy spots (clipped to head circle in absolute coords) -->
+  <g clip-path="url(#headClipPerky)">
+    <ellipse cx="196" cy="232" rx="36" ry="28" fill="#F37A53" transform="rotate(-18 196 232)"/>
+    <ellipse cx="316" cy="220" rx="22" ry="18" fill="#F37A53" transform="rotate(20 316 220)"/>
+    <ellipse cx="334" cy="318" rx="30" ry="24" fill="#F37A53" transform="rotate(18 334 318)"/>
+    <ellipse cx="202" cy="362" rx="24" ry="20" fill="#F37A53" transform="rotate(-24 202 362)"/>
+  </g>
+
+  <!-- Face features on top of spots -->
+  <g transform="translate(256, 290)">
+
+    <!-- Soft pink snout -->
+    <ellipse cx="0" cy="48" rx="70" ry="44" fill="#FFD1C0"/>
+
+    <!-- Nostrils -->
+    <ellipse cx="-22" cy="46" rx="7" ry="5" fill="#2D2D2D"/>
+    <ellipse cx="22" cy="46" rx="7" ry="5" fill="#2D2D2D"/>
+
+    <!-- Big cute smile -->
+    <path d="M -26 72 Q 0 108 26 72" stroke="#2D2D2D" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <!-- Tongue peek -->
+    <path d="M -8 88 Q 0 100 8 88" fill="#FFB7D0"/>
+
+    <!-- Blush cheeks -->
+    <circle cx="-95" cy="30" r="22" fill="#FFB7D0" opacity="0.85"/>
+    <circle cx="95" cy="30" r="22" fill="#FFB7D0" opacity="0.85"/>
+
+    <!-- Happy closed-eye arcs ^_^ -->
+    <path d="M -64 -18 Q -42 -54 -20 -18" stroke="#2D2D2D" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M 20 -18 Q 42 -54 64 -18" stroke="#2D2D2D" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Outer eyelash flicks -->
+    <path d="M -64 -18 L -72 -26" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 64 -18 L 72 -26" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  </g>
+
+  <!-- Subtle grain overlay -->
+  <rect width="512" height="512" rx="102" ry="102" fill="transparent" filter="url(#grainPerky)"/>
+</svg>
