@@ -1,51 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <!-- Kawaii chibi pink-spot dairy cow — favicon size -->
-  <defs>
-    <clipPath id="headClipFav">
-      <circle cx="32" cy="36" r="18"/>
-    </clipPath>
-  </defs>
-
+  <!-- Pre-chibi original Cowch face — simplified for favicon -->
   <rect width="64" height="64" rx="14" ry="14" fill="#2D5C38"/>
 
   <g transform="translate(32, 36)">
-    <!-- Tiny horns (coral) -->
-    <ellipse cx="-7" cy="-17" rx="2" ry="4" fill="#F37A53" transform="rotate(-10 -7 -17)"/>
-    <ellipse cx="7" cy="-17" rx="2" ry="4" fill="#F37A53" transform="rotate(10 7 -17)"/>
 
-    <!-- Cream ears with pink inner -->
-    <ellipse cx="-16" cy="-5" rx="5" ry="3.2" fill="#F5F0E8" transform="rotate(-28 -16 -5)"/>
-    <ellipse cx="16" cy="-5" rx="5" ry="3.2" fill="#F5F0E8" transform="rotate(28 16 -5)"/>
-    <ellipse cx="-15" cy="-4" rx="2.6" ry="1.6" fill="#FFB7D0" transform="rotate(-28 -15 -4)"/>
-    <ellipse cx="15" cy="-4" rx="2.6" ry="1.6" fill="#FFB7D0" transform="rotate(28 15 -4)"/>
+    <!-- Horns (cream, curved strokes) -->
+    <path d="M -11 -14 Q -12 -20 -9 -23" stroke="#F5F0E8" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 11 -14 Q 12 -20 9 -23" stroke="#F5F0E8" stroke-width="3" stroke-linecap="round" fill="none"/>
 
-    <!-- Cream head -->
-    <circle cx="0" cy="0" r="18" fill="#F5F0E8"/>
-  </g>
+    <!-- Ears (outward coral with darker inner detail) -->
+    <ellipse cx="-16" cy="-8" rx="6" ry="4" fill="#D4896A" transform="rotate(-30 -16 -8)"/>
+    <ellipse cx="16" cy="-8" rx="6" ry="4" fill="#D4896A" transform="rotate(30 16 -8)"/>
+    <ellipse cx="-15" cy="-7" rx="3" ry="2" fill="#C47A5D" transform="rotate(-30 -15 -7)"/>
+    <ellipse cx="15" cy="-7" rx="3" ry="2" fill="#C47A5D" transform="rotate(30 15 -7)"/>
 
-  <!-- Dairy spots (clipped to head) -->
-  <g clip-path="url(#headClipFav)">
-    <ellipse cx="24" cy="28" rx="5" ry="4" fill="#F37A53" transform="rotate(-20 24 28)"/>
-    <ellipse cx="42" cy="40" rx="4" ry="3.5" fill="#F37A53" transform="rotate(18 42 40)"/>
-    <ellipse cx="24" cy="46" rx="3.5" ry="3" fill="#F37A53" transform="rotate(-20 24 46)"/>
-  </g>
+    <!-- Main face (wide coral oval) -->
+    <ellipse cx="0" cy="0" rx="18" ry="15" fill="#D4896A"/>
 
-  <!-- Face features on top of spots -->
-  <g transform="translate(32, 36)">
-    <!-- Soft-pink snout -->
-    <ellipse cx="0" cy="7" rx="9" ry="6" fill="#FFD1C0"/>
+    <!-- Cream snout -->
+    <ellipse cx="0" cy="6" rx="10" ry="7" fill="#F5F0E8"/>
 
-    <circle cx="-3" cy="7" r="1" fill="#2D2D2D"/>
-    <circle cx="3" cy="7" r="1" fill="#2D2D2D"/>
+    <!-- Nostrils -->
+    <ellipse cx="-3.5" cy="7" rx="1.6" ry="1.2" fill="#2D5C38"/>
+    <ellipse cx="3.5" cy="7" rx="1.6" ry="1.2" fill="#2D5C38"/>
 
-    <path d="M -1.5 10 Q 0 11.5 1.5 10" stroke="#2D2D2D" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+    <!-- Closed serene eyes -->
+    <path d="M -9 -4 Q -6 -8 -3 -4" stroke="#2D5C38" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M 3 -4 Q 6 -8 9 -4" stroke="#2D5C38" stroke-width="1.5" fill="none" stroke-linecap="round"/>
 
-    <circle cx="-12" cy="3" r="2.6" fill="#FFB7D0" opacity="0.8"/>
-    <circle cx="12" cy="3" r="2.6" fill="#FFB7D0" opacity="0.8"/>
-
-    <!-- Happy closed-eye arcs ^_^ -->
-    <path d="M -8 -3 Q -5 -7 -2 -3" stroke="#2D2D2D" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <path d="M 2 -3 Q 5 -7 8 -3" stroke="#2D2D2D" stroke-width="1.6" fill="none" stroke-linecap="round"/>
   </g>
 </svg>
