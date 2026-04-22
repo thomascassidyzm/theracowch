@@ -71,7 +71,7 @@
             align-items: center;
             gap: var(--space-lg);
             margin-bottom: var(--space-2xl);
-            padding-right: min(320px, 58vw);
+            padding-right: min(360px, 64vw);
             animation: slideRight 0.7s ease-out;
         }
 
@@ -142,8 +142,8 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: min(300px, 56vw);
-            min-height: calc(min(300px, 56vw) * 0.7);
+            width: min(340px, 62vw);
+            min-height: calc(min(340px, 62vw) * 0.72);
             animation: slideUp 0.7s ease-out 0.2s both, cloudFloat 6s ease-in-out 1s infinite;
             transition: transform var(--transition-brutal);
             z-index: 2;
@@ -2182,7 +2182,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: var(--space-md);
-                padding-right: min(230px, 58vw);
+                padding-right: min(260px, 62vw);
             }
 
             .avatar-container {
@@ -2192,8 +2192,8 @@
             }
 
             .daily-thought {
-                width: min(230px, 58vw);
-                min-height: calc(min(230px, 58vw) * 0.7);
+                width: min(260px, 62vw);
+                min-height: calc(min(260px, 62vw) * 0.72);
             }
 
             .daily-thought-content {
@@ -2395,16 +2395,18 @@
                     <div class="daily-thought" id="daily-thought">
                         <svg class="daily-thought-cloud" viewBox="0 0 320 220" preserveAspectRatio="none" aria-hidden="true" focusable="false">
                             <g>
-                                <circle cx="22" cy="208" r="6"/>
-                                <circle cx="48" cy="192" r="10"/>
-                                <rect x="30" y="55" width="260" height="110" rx="50" ry="50"/>
-                                <circle cx="80" cy="45" r="35"/>
-                                <circle cx="145" cy="38" r="38"/>
-                                <circle cx="210" cy="40" r="36"/>
-                                <circle cx="265" cy="55" r="30"/>
-                                <circle cx="95" cy="178" r="34"/>
-                                <circle cx="165" cy="182" r="36"/>
-                                <circle cx="235" cy="178" r="34"/>
+                                <!-- Trail puffs bottom-left -->
+                                <circle cx="20" cy="212" r="5"/>
+                                <circle cx="38" cy="198" r="8"/>
+                                <!-- Overlapping body puffs (matches 💭 silhouette) -->
+                                <circle cx="80" cy="100" r="60"/>
+                                <circle cx="130" cy="70" r="55"/>
+                                <circle cx="180" cy="60" r="58"/>
+                                <circle cx="230" cy="75" r="55"/>
+                                <circle cx="270" cy="115" r="55"/>
+                                <circle cx="230" cy="155" r="55"/>
+                                <circle cx="170" cy="160" r="60"/>
+                                <circle cx="85" cy="145" r="55"/>
                             </g>
                         </svg>
                         <div class="daily-thought-content">
