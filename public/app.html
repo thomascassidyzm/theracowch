@@ -2386,21 +2386,30 @@
                             </div>
                         </button>
 
-                        <div class="help-picker">
-                            <p class="help-picker-title">Choose what you need help with:</p>
-                            <div class="micro-ai-options">
-                                <button class="micro-ai-option" data-mood="depressed">Depressed / no energy</button>
-                                <button class="micro-ai-option" data-mood="overwhelmed">Overwhelmed / too much in my head</button>
-                                <button class="micro-ai-option" data-mood="numb">Numb / disconnected</button>
-                                <button class="micro-ai-option" data-mood="anxious-low">Anxious and low</button>
-                                <button class="micro-ai-option" data-mood="not-okay">I don't know, just not okay</button>
-                            </div>
-                        </div>
-
                         <div class="helpline-panel" id="helpline-panel">
                             <div class="helpline-panel-inner">
                                 <p class="helpline-entry"><a href="tel:116123">Samaritans: 116 123</a> (free, 24/7)</p>
                                 <p class="helpline-entry">SHOUT: text <strong>SHOUT</strong> to <a href="sms:85258">85258</a> (free, 24/7)</p>
+                            </div>
+                        </div>
+
+                        <button class="action-btn primary" id="choose-help">
+                            <span class="action-btn-icon">🫂</span>
+                            <div class="action-btn-text">
+                                <strong>Choose what you need help with</strong>
+                                <span>Pick the feeling closest to right now</span>
+                            </div>
+                        </button>
+
+                        <div class="helpline-panel" id="choose-help-panel">
+                            <div class="help-picker">
+                                <div class="micro-ai-options">
+                                    <button class="micro-ai-option" data-mood="depressed">Depressed / no energy</button>
+                                    <button class="micro-ai-option" data-mood="overwhelmed">Overwhelmed / too much in my head</button>
+                                    <button class="micro-ai-option" data-mood="numb">Numb / disconnected</button>
+                                    <button class="micro-ai-option" data-mood="anxious-low">Anxious and low</button>
+                                    <button class="micro-ai-option" data-mood="not-okay">I don't know, just not okay</button>
+                                </div>
                             </div>
                         </div>
 
@@ -4420,6 +4429,11 @@
 
         document.getElementById('need-help-now').addEventListener('click', function() {
             var panel = document.getElementById('helpline-panel');
+            panel.classList.toggle('open');
+        });
+
+        document.getElementById('choose-help').addEventListener('click', function() {
+            var panel = document.getElementById('choose-help-panel');
             panel.classList.toggle('open');
         });
 
