@@ -320,6 +320,39 @@
             font-weight: var(--font-weight-bold);
             color: var(--text-secondary);
             margin: 0 0 var(--space-md) 0;
+            text-align: center;
+        }
+
+        /* Circular mood options inside the help picker */
+        .help-picker .micro-ai-options {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .help-picker .micro-ai-option {
+            width: 108px;
+            height: 108px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 0.72rem;
+            line-height: 1.15;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        @media (max-width: 360px) {
+            .help-picker .micro-ai-option {
+                width: 92px;
+                height: 92px;
+                font-size: 0.66rem;
+            }
         }
 
         /* ============================================
