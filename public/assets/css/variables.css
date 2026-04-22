@@ -31,7 +31,7 @@
     --font-weight-black: 900;
 
     /* ===== Warm Peachy Palette ===== */
-    --bg-canvas: #FFF6F0;   /* page canvas — soft warm cream */
+    --bg-canvas: #F2F2F2;   /* page canvas — neutral light grey */
     --text-on-canvas: #3C2E28;
     --text-on-canvas-muted: #7A6556;
     --bg-primary: #FFF0E4;   /* near-canvas surface — tab bar, app bg */
