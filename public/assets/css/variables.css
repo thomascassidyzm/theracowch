@@ -31,25 +31,35 @@
     --font-weight-black: 900;
 
     /* ===== Warm Peachy Palette ===== */
-    --bg-canvas: #F7E3CC;   /* page canvas — light peachy cream */
-    --text-on-canvas: #3A2A1F;       /* dark warm brown for text floating on canvas */
-    --text-on-canvas-muted: #6E553E; /* softer warm brown for secondary canvas text */
-    --bg-primary: #F2BC85;   /* deeper peach — tab bar, big surfaces */
-    --bg-secondary: #F3C595; /* slightly lighter peach — modals */
-    --bg-card: #FBD6AE;      /* peachy card */
-    --bg-card-hover: #F8C893;
-    --bg-elevated: #FDE1BF;
-    --bg-dark: #3A2A1F;      /* dark brown — brutalist shadow / strips */
+    --bg-canvas: #FFF6F0;   /* page canvas — soft warm cream */
+    --text-on-canvas: #2D2D2D;
+    --text-on-canvas-muted: #5C5C5C;
+    --bg-primary: #FFD6C9;   /* peachy pink — tab bar, primary surfaces */
+    --bg-secondary: #FFD6C9; /* secondary peach — modals */
+    --bg-card: #FFD6C9;      /* card surface — secondary peach */
+    --bg-card-hover: #FFC3AE;
+    --bg-elevated: #FFE6DB;
+    --bg-dark: #2D2D2D;      /* neutral dark — brutalist shadow */
 
     /* Chat Message Backgrounds */
-    --bg-mandy-message: #FBD6AE;
+    --bg-mandy-message: #FFD6C9;
     --bg-user-message: var(--coral);
 
-    /* ===== Accent Colors - Coral ===== */
-    --coral: #D4896A;
-    --coral-dark: #C47A5D;
-    --coral-light: #E39B7F;
-    --coral-glow: rgba(212, 137, 106, 0.25);
+    /* ===== Accent Colors - Coral (Primary brand) ===== */
+    --coral: #FF9E7A;
+    --coral-dark: #E8825F;
+    --coral-light: #FFB399;
+    --coral-glow: rgba(255, 158, 122, 0.28);
+
+    /* ===== Sage Accent & Blue Highlight ===== */
+    --sage: #A3C9A8;
+    --sage-dark: #84B58B;
+    --sage-light: #C2DCC6;
+    --sage-glow: rgba(163, 201, 168, 0.28);
+    --highlight: #B5D6FF;
+    --highlight-dark: #8DB8EA;
+    --highlight-light: #D4E6FF;
+    --highlight-glow: rgba(181, 214, 255, 0.28);
 
     /* Aliases for compatibility */
     --accent-primary: var(--coral);
@@ -58,15 +68,17 @@
     --accent-glow: var(--coral-glow);
 
     /* ===== Text Colors ===== */
-    --text-primary: #2B1E15;   /* dark warm brown (on peach cards) */
-    --text-secondary: #1A120C; /* deep dark brown (on peach cards) */
-    --text-muted: #6E553E;     /* medium warm brown */
-    --text-on-coral: #2B1E15;
+    --text-primary: #2D2D2D;
+    --text-secondary: #1F1F1F;
+    --text-muted: #5C5C5C;
+    --text-on-coral: #2D2D2D;
+
+    /* Canvas text overrides already use these darker tones too */
 
     /* ===== Border Colors ===== */
-    --border-warm: #3A2A1F;
+    --border-warm: #2D2D2D;
     --border-coral: var(--coral);
-    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-subtle: rgba(45, 45, 45, 0.14);
 
     /* ===== IMAGINE Domain Colors ===== */
     --color-self: #E88A6A;       /* I - Self Care (coral) */
@@ -112,13 +124,13 @@
     --shadow-brutal: 8px 8px 0 0 var(--bg-dark);
     --shadow-brutal-coral: 8px 12px 0 0 var(--coral);
     --shadow-brutal-hover: 12px 16px 0 0 var(--coral);
-    --shadow-soft: 0 4px 12px rgba(58, 42, 31, 0.2);
+    --shadow-soft: 0 4px 12px rgba(45, 45, 45, 0.18);
     --shadow-glow: 0 0 20px var(--coral-glow);
 
     /* Standard Shadow Scale */
-    --shadow-sm: 0 1px 2px rgba(58, 42, 31, 0.1);
-    --shadow-md: 0 4px 8px rgba(58, 42, 31, 0.12);
-    --shadow-lg: 0 8px 16px rgba(58, 42, 31, 0.15);
+    --shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.1);
+    --shadow-md: 0 4px 8px rgba(45, 45, 45, 0.12);
+    --shadow-lg: 0 8px 16px rgba(45, 45, 45, 0.15);
     --shadow-accent: 0 4px 12px var(--coral-glow);
 
     /* ===== Transitions ===== */
