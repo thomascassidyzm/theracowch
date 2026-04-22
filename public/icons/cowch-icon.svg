@@ -51,13 +51,22 @@
     <circle cx="-88" cy="20" r="20" fill="#FFB7D0" opacity="0.8"/>
     <circle cx="88" cy="20" r="20" fill="#FFB7D0" opacity="0.8"/>
 
-    <!-- Happy closed-eye arcs ^_^ -->
-    <path d="M -64 -18 Q -42 -52 -20 -18" stroke="#2D2D2D" stroke-width="10" fill="none" stroke-linecap="round"/>
-    <path d="M 20 -18 Q 42 -52 64 -18" stroke="#2D2D2D" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <!-- Sparkle eyes: big oval pupils with twin white highlights -->
+    <g>
+      <!-- Left eye -->
+      <ellipse cx="-42" cy="-20" rx="17" ry="23" fill="#2D2D2D"/>
+      <circle cx="-36" cy="-30" r="8" fill="#FFFFFF"/>
+      <circle cx="-50" cy="-10" r="3.5" fill="#FFFFFF"/>
 
-    <!-- Eyelash flicks -->
-    <path d="M -64 -18 L -72 -26" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
-    <path d="M 64 -18 L 72 -26" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- Right eye -->
+      <ellipse cx="42" cy="-20" rx="17" ry="23" fill="#2D2D2D"/>
+      <circle cx="36" cy="-30" r="8" fill="#FFFFFF"/>
+      <circle cx="50" cy="-10" r="3.5" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Small eyelash flicks on outer upper corners -->
+    <path d="M -58 -34 L -66 -42" stroke="#2D2D2D" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 58 -34 L 66 -42" stroke="#2D2D2D" stroke-width="5" fill="none" stroke-linecap="round"/>
 
   </g>
 

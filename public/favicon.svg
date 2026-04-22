@@ -24,7 +24,12 @@
     <circle cx="-11" cy="3" r="2.6" fill="#FFB7D0" opacity="0.8"/>
     <circle cx="11" cy="3" r="2.6" fill="#FFB7D0" opacity="0.8"/>
 
-    <path d="M -8 -3 Q -5 -7 -2 -3" stroke="#2D2D2D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <path d="M 2 -3 Q 5 -7 8 -3" stroke="#2D2D2D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="-5" cy="-3" rx="2.6" ry="3.4" fill="#2D2D2D"/>
+    <circle cx="-4" cy="-4.4" r="1.2" fill="#FFFFFF"/>
+    <circle cx="-6" cy="-1.6" r="0.55" fill="#FFFFFF"/>
+
+    <ellipse cx="5" cy="-3" rx="2.6" ry="3.4" fill="#2D2D2D"/>
+    <circle cx="4" cy="-4.4" r="1.2" fill="#FFFFFF"/>
+    <circle cx="6" cy="-1.6" r="0.55" fill="#FFFFFF"/>
   </g>
 </svg>
