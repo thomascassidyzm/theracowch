@@ -19,10 +19,10 @@
   </defs>
 
   <!-- Background - Dark warm brown with rounded corners (brutalist chunky) -->
-  <rect width="512" height="512" rx="102" ry="102" fill="#1a1512"/>
+  <rect width="512" height="512" rx="102" ry="102" fill="#2D5C38"/>
 
   <!-- Subtle border accent -->
-  <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#2d2825" stroke-width="8"/>
+  <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#3D6C48" stroke-width="8"/>
 
   <!-- Cow Face - Stylized, warm, therapeutic -->
   <g transform="translate(256, 280)" filter="url(#glow)">
@@ -34,11 +34,11 @@
     <ellipse cx="0" cy="50" rx="80" ry="55" fill="#F5F0E8"/>
 
     <!-- Nostrils - simple, friendly -->
-    <ellipse cx="-28" cy="55" rx="14" ry="10" fill="#1a1512"/>
-    <ellipse cx="28" cy="55" rx="14" ry="10" fill="#1a1512"/>
+    <ellipse cx="-28" cy="55" rx="14" ry="10" fill="#2D5C38"/>
+    <ellipse cx="28" cy="55" rx="14" ry="10" fill="#2D5C38"/>
 
     <!-- Eyes - closed, serene, therapeutic -->
-    <g stroke="#1a1512" stroke-width="8" stroke-linecap="round" fill="none">
+    <g stroke="#2D5C38" stroke-width="8" stroke-linecap="round" fill="none">
       <!-- Left eye - gentle closed arc -->
       <path d="M -70 -30 Q -50 -50 -30 -30"/>
       <!-- Right eye - gentle closed arc -->

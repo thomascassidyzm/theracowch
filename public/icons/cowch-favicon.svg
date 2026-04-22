@@ -3,7 +3,7 @@
   <!-- Simplified icon for small sizes - bolder, fewer details -->
 
   <!-- Background -->
-  <rect width="64" height="64" rx="14" ry="14" fill="#1a1512"/>
+  <rect width="64" height="64" rx="14" ry="14" fill="#2D5C38"/>
 
   <!-- Cow Face - Ultra simplified -->
   <g transform="translate(32, 36)">
@@ -15,11 +15,11 @@
     <ellipse cx="0" cy="6" rx="10" ry="7" fill="#F5F0E8"/>
 
     <!-- Nostrils - just dots -->
-    <circle cx="-4" cy="7" r="2" fill="#1a1512"/>
-    <circle cx="4" cy="7" r="2" fill="#1a1512"/>
+    <circle cx="-4" cy="7" r="2" fill="#2D5C38"/>
+    <circle cx="4" cy="7" r="2" fill="#2D5C38"/>
 
     <!-- Eyes - simplified closed arcs -->
-    <g stroke="#1a1512" stroke-width="2.5" stroke-linecap="round" fill="none">
+    <g stroke="#2D5C38" stroke-width="2.5" stroke-linecap="round" fill="none">
       <path d="M -9 -4 Q -6 -8 -3 -4"/>
       <path d="M 3 -4 Q 6 -8 9 -4"/>
     </g>
