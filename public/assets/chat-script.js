@@ -292,6 +292,7 @@ function initChat() {
     initChatDOM();
     migrateStorageKey();
     initExerciseListeners();
+    installQuickReplyDelegate();
     loadChatHistory();
     showWelcomeMessage();
     setupEventListeners();
@@ -817,16 +818,7 @@ function addMessage(content, sender, quickReplies = null) {
         quickRepliesDiv.className = 'quick-replies';
 
         quickReplies.forEach(reply => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'quick-reply-btn';
-            button.textContent = reply.text;
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                handleQuickReply(reply);
-            });
-            quickRepliesDiv.appendChild(button);
+            quickRepliesDiv.appendChild(createQuickReplyButton(reply));
         });
 
         messageDiv.appendChild(quickRepliesDiv);
@@ -877,16 +869,7 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
         quickRepliesDiv.className = 'quick-replies';
 
         quickReplies.forEach(reply => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'quick-reply-btn';
-            button.textContent = reply.text;
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                handleQuickReply(reply);
-            });
-            quickRepliesDiv.appendChild(button);
+            quickRepliesDiv.appendChild(createQuickReplyButton(reply));
         });
 
         messageDiv.appendChild(quickRepliesDiv);
@@ -1177,6 +1160,49 @@ function handleQuickReply(reply) {
     if (reply.prompt) {
         triggerChatPrompt(reply.prompt);
     }
+}
+
+function createQuickReplyButton(reply) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'quick-reply-btn';
+    button.textContent = reply.text;
+    if (reply.action) button.dataset.action = reply.action;
+    if (reply.prompt) button.dataset.prompt = reply.prompt;
+    if (reply.exercise) button.dataset.exercise = reply.exercise;
+    if (reply.url) button.dataset.url = reply.url;
+    // Direct listener
+    button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleQuickReply(reply);
+    });
+    return button;
+}
+
+function replyFromButton(btn) {
+    return {
+        action: btn.dataset.action || undefined,
+        prompt: btn.dataset.prompt || undefined,
+        exercise: btn.dataset.exercise || undefined,
+        url: btn.dataset.url || undefined,
+    };
+}
+
+// Safety-net delegated listener — catches the click even if the per-button
+// handler above is missed for any reason (DOM replacement, cache, etc.).
+function installQuickReplyDelegate() {
+    if (!chatMessages || chatMessages.dataset.quickReplyDelegate === '1') return;
+    chatMessages.dataset.quickReplyDelegate = '1';
+    chatMessages.addEventListener('click', (event) => {
+        const btn = event.target && event.target.closest
+            ? event.target.closest('.quick-reply-btn')
+            : null;
+        if (!btn) return;
+        event.preventDefault();
+        event.stopPropagation();
+        handleQuickReply(replyFromButton(btn));
+    });
 }
 
 function focusInput() {
