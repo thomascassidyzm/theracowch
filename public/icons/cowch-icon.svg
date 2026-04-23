@@ -1,91 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <clipPath id="headClipPink">
-      <circle cx="256" cy="290" r="140"/>
-    </clipPath>
-  </defs>
 
   <!-- Green rounded card background -->
   <rect width="512" height="512" rx="102" ry="102" fill="#2D5C38"/>
+
+  <!-- Subtle border accent -->
   <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#3D6C48" stroke-width="8"/>
 
-  <!-- Cow-on-the-cowch style face -->
-  <g transform="translate(256, 290)">
+  <!-- Cow Face — delicate, stylised, therapeutic -->
+  <g transform="translate(256, 280)">
 
-    <!-- Small pink horns with soft cream tips, peeking above the head -->
-    <ellipse cx="-60" cy="-140" rx="14" ry="26" fill="#F7C9B6" transform="rotate(-14 -60 -140)"/>
-    <ellipse cx="60" cy="-140" rx="14" ry="26" fill="#F7C9B6" transform="rotate(14 60 -140)"/>
-    <ellipse cx="-60" cy="-152" rx="8" ry="12" fill="#FFF0E4" transform="rotate(-14 -60 -152)"/>
-    <ellipse cx="60" cy="-152" rx="8" ry="12" fill="#FFF0E4" transform="rotate(14 60 -152)"/>
+    <!-- Horns (thin curved cream strokes) -->
+    <path d="M -85 -110 Q -95 -160 -70 -180" stroke="#F5F0E8" stroke-width="20" stroke-linecap="round" fill="none"/>
+    <path d="M 85 -110 Q 95 -160 70 -180" stroke="#F5F0E8" stroke-width="20" stroke-linecap="round" fill="none"/>
 
-    <!-- Fluffy white fringe between the horns -->
-    <g fill="#FFFDF9">
-      <circle cx="-18" cy="-140" r="14"/>
-      <circle cx="0"   cy="-150" r="18"/>
-      <circle cx="20"  cy="-140" r="14"/>
-      <circle cx="-8"  cy="-128" r="13"/>
-      <circle cx="14"  cy="-130" r="13"/>
-    </g>
+    <!-- Ears (outward coral with darker inner detail) -->
+    <ellipse cx="-130" cy="-60" rx="45" ry="28" fill="#D4896A" transform="rotate(-30 -130 -60)"/>
+    <ellipse cx="130" cy="-60" rx="45" ry="28" fill="#D4896A" transform="rotate(30 130 -60)"/>
+    <ellipse cx="-125" cy="-55" rx="25" ry="15" fill="#C47A5D" transform="rotate(-30 -125 -55)"/>
+    <ellipse cx="125" cy="-55" rx="25" ry="15" fill="#C47A5D" transform="rotate(30 125 -55)"/>
 
-    <!-- Pink ears with darker pink inner -->
-    <ellipse cx="-130" cy="-38" rx="40" ry="26" fill="#F7B2C5" transform="rotate(-32 -130 -38)"/>
-    <ellipse cx="130"  cy="-38" rx="40" ry="26" fill="#F7B2C5" transform="rotate(32 130 -38)"/>
-    <ellipse cx="-124" cy="-32" rx="22" ry="13" fill="#E48CA5" transform="rotate(-32 -124 -32)"/>
-    <ellipse cx="124"  cy="-32" rx="22" ry="13" fill="#E48CA5" transform="rotate(32 124 -32)"/>
+    <!-- Main face shape — wide, friendly oval -->
+    <ellipse cx="0" cy="0" rx="140" ry="120" fill="#D4896A"/>
 
-    <!-- Cream round head -->
-    <circle cx="0" cy="0" r="140" fill="#FFF6EC"/>
-  </g>
+    <!-- Snout / muzzle — lighter cream area -->
+    <ellipse cx="0" cy="50" rx="80" ry="55" fill="#F5F0E8"/>
 
-  <!-- Soft pink dairy spots (clipped to head in absolute coords) -->
-  <g clip-path="url(#headClipPink)" fill="#F7B7A6">
-    <ellipse cx="196" cy="232" rx="32" ry="24" transform="rotate(-18 196 232)"/>
-    <ellipse cx="316" cy="222" rx="22" ry="18" transform="rotate(20 316 222)"/>
-    <ellipse cx="332" cy="320" rx="28" ry="22" transform="rotate(18 332 320)"/>
-    <ellipse cx="204" cy="362" rx="24" ry="18" transform="rotate(-24 204 362)"/>
-  </g>
-
-  <!-- Face features on top of spots -->
-  <g transform="translate(256, 290)">
-
-    <!-- Pink round glasses -->
-    <!-- Lenses: stroke in hot pink with a cream wash for the "glass" -->
-    <g>
-      <!-- Left lens -->
-      <circle cx="-50" cy="-10" r="38" fill="#FFF8F0" opacity="0.45"/>
-      <circle cx="-50" cy="-10" r="38" fill="none" stroke="#E94F7A" stroke-width="8"/>
-      <!-- Right lens -->
-      <circle cx="50" cy="-10" r="38" fill="#FFF8F0" opacity="0.45"/>
-      <circle cx="50" cy="-10" r="38" fill="none" stroke="#E94F7A" stroke-width="8"/>
-      <!-- Bridge -->
-      <path d="M -12 -12 Q 0 -20 12 -12" stroke="#E94F7A" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <!-- Arms (hinting they tuck behind the ears) -->
-      <path d="M -88 -18 L -78 -14" stroke="#E94F7A" stroke-width="6" stroke-linecap="round"/>
-      <path d="M 88 -18 L 78 -14" stroke="#E94F7A" stroke-width="6" stroke-linecap="round"/>
-    </g>
-
-    <!-- Happy closed-arc eyes visible through the lenses -->
-    <path d="M -66 -12 Q -50 -32 -34 -12" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
-    <path d="M 34 -12 Q 50 -32 66 -12" stroke="#2D2D2D" stroke-width="6" fill="none" stroke-linecap="round"/>
-
-    <!-- Blush cheeks -->
-    <circle cx="-94" cy="40" r="18" fill="#F7B7A6" opacity="0.85"/>
-    <circle cx="94"  cy="40" r="18" fill="#F7B7A6" opacity="0.85"/>
-
-    <!-- Open happy mouth with peek of tongue -->
-    <!-- Muzzle: soft pink oval -->
-    <ellipse cx="0" cy="50" rx="60" ry="38" fill="#FFE3D4"/>
     <!-- Nostrils -->
-    <ellipse cx="-18" cy="44" rx="5" ry="4" fill="#2D2D2D"/>
-    <ellipse cx="18"  cy="44" rx="5" ry="4" fill="#2D2D2D"/>
-    <!-- Grin: dark curve forming an open mouth -->
-    <path d="M -36 74 Q 0 112 36 74 Q 20 90 0 90 Q -20 90 -36 74 Z" fill="#2D2D2D"/>
-    <!-- Tongue peek -->
-    <path d="M -14 88 Q 0 104 14 88 Q 8 96 0 96 Q -8 96 -14 88 Z" fill="#F48AA1"/>
-    <!-- Tiny tooth hint -->
-    <path d="M -10 76 L -6 76 L -6 83 L -10 83 Z" fill="#FFF8F0"/>
-    <path d="M 6 76 L 10 76 L 10 83 L 6 83 Z" fill="#FFF8F0"/>
+    <ellipse cx="-28" cy="55" rx="14" ry="10" fill="#2D5C38"/>
+    <ellipse cx="28" cy="55" rx="14" ry="10" fill="#2D5C38"/>
+
+    <!-- Eyes — gentle closed arcs -->
+    <g stroke="#2D5C38" stroke-width="8" stroke-linecap="round" fill="none">
+      <path d="M -70 -30 Q -50 -50 -30 -30"/>
+      <path d="M 30 -30 Q 50 -50 70 -30"/>
+    </g>
 
   </g>
 </svg>
