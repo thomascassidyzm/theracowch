@@ -1265,16 +1265,60 @@ function handleClearChat() {
 function handlePrivacyInfo() {
     if (menuPanel) menuPanel.classList.remove('active');
 
-    const privacyInfo = `**Privacy & Safety:**
+    const privacyInfo = `## Privacy & Safety
 
-✓ Your conversations are stored locally on your device only
-✓ I'm an AI assistant, not a replacement for professional therapy
-✓ For crisis support, please contact emergency services or a crisis hotline
-✓ Visit Mandy's website at thoughtsonlifeandlove.com for professional therapy services
+**Important: this app is for wellbeing support. It does not replace clinical therapy, medical care, or a crisis service.**
 
-Mandy Kloppers is a qualified CBT Therapist: BA(UNISA); PG Dip Psych(Open); PG Dip CBT(NewBucks); BABCP(Accred)
+Mandy is an AI assistant designed to help you reflect, build healthy habits and access self-help tools. She is not a licensed therapist, psychiatrist, doctor or emergency responder. Using this app does not create a therapist–patient relationship. Nothing here is a diagnosis, prescription or medical advice.
 
-This AI tool is for wellness support and self-reflection, but not medical advice.`;
+### If you are in crisis or at risk of harm, stop using the app and seek help now
+
+- **UK emergency services:** 999
+- **NHS urgent mental-health help:** 111 (press option 2)
+- **Samaritans:** [116 123](tel:116123) (24/7, free)
+- **SHOUT text line:** text SHOUT to 85258 (24/7, free)
+- **US emergency / crisis:** 911 or dial 988
+- **Outside the UK/US:** please contact your local emergency number
+
+### What this app does
+
+- Provides self-help exercises grounded in CBT, ACT and compassion-focused approaches
+- Offers reflections, journal prompts and coping tools
+- Stores your own entries so you can notice patterns over time
+
+### What it does not do
+
+- Diagnose or treat any physical or mental-health condition
+- Prescribe medication or recommend stopping any prescribed treatment
+- Replace ongoing care from a GP, psychologist, psychiatrist, counsellor or other qualified professional
+- Monitor you in real time or respond to emergencies
+
+### Your data
+
+- Conversations and journal entries are stored **locally on your device**
+- Messages you send Mandy are processed by our AI provider purely to generate a reply
+- You can clear your history any time from this screen
+- Please avoid sharing directly identifying information (full name, address, payment details, others' diagnoses) or data about third parties
+
+### AI limitations
+
+- Mandy may occasionally give incorrect, incomplete or out-of-date information
+- Treat her replies as reflective prompts, not facts or medical advice
+- Always verify important decisions with a qualified human professional
+
+### Age
+
+This app is intended for adults (18+). Under-18s should only use it with a parent or guardian involved in their care.
+
+### Limit of liability
+
+Use of this app is at your own discretion and risk. To the fullest extent permitted by law, the creators accept no liability for any loss or harm arising from use of or reliance on the app's content.
+
+### About Mandy Kloppers
+
+Mandy Kloppers is a qualified CBT Therapist: BA(UNISA); PG Dip Psych(Open); PG Dip CBT(NewBucks); BABCP(Accred). For professional therapy services visit thoughtsonlifeandlove.com.
+
+*By continuing to use the app you acknowledge and agree to the above.*`;
 
     addMessage(privacyInfo, 'mandy');
 }
