@@ -429,14 +429,11 @@ function setupSettingsButtons() {
         });
     }
 
-    // Privacy button - show privacy info in chat
+    // Privacy button — open the full Privacy Policy page
     const privacyBtn = document.getElementById('privacy-btn');
     if (privacyBtn) {
         privacyBtn.addEventListener('click', () => {
-            switchTab('chat');
-            setTimeout(() => {
-                if (window.handlePrivacyInfo) window.handlePrivacyInfo();
-            }, 200);
+            window.location.href = '/privacy.html';
         });
     }
 
