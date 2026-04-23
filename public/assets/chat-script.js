@@ -723,12 +723,9 @@ async function handleSendMessage() {
 }
 
 function generateQuickReplies(pattern, response) {
-    // Don't show quick replies too frequently
-    const messageCount = conversationHistory.length;
-    if (messageCount > 0 && messageCount % 3 !== 0) {
-        return null;
-    }
-
+    // Always return follow-up suggestions on every Mandy reply — the user
+    // expects an ongoing "Tell me more / How do I apply this / What else?"
+    // option as the conversation continues.
     const lowerResponse = response.toLowerCase();
     const replies = [];
 
