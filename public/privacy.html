@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0;
+            color: #2D2D2D;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FDF5E8;
+            color: #2D2D2D;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-bottom: 32px;
+        }
+
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            color: #2D2D2D;
+            margin-bottom: 8px;
+        }
+
+        .effective {
+            color: #7A6556;
+            margin-bottom: 32px;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #2D2D2D;
+            margin: 32px 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        p, li { font-size: 1rem; margin-bottom: 12px; }
+        ul { padding-left: 24px; }
+        strong { font-weight: 700; }
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+
+        .callout {
+            background: #FDF5E8;
+            border-left: 5px solid #C9A857;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html" class="back-link">← Back to app</a>
+
+        <h1>Privacy Policy</h1>
+        <p class="effective">Last updated: 23 April 2026</p>
+
+        <div class="callout">
+            <strong>Summary.</strong> Cowch is a wellbeing-support app. We keep your conversations and journal entries on your own device whenever possible. Messages you send Mandy (our AI companion) are sent to our AI model provider solely to generate a reply. We do not sell your data and we do not use it for advertising.
+        </div>
+
+        <h2>1. Who we are</h2>
+        <p>Cowch ("the app", "we", "us") is operated by Mandy Kloppers trading as <em>Thoughts On Life and Love</em>, United Kingdom. For privacy questions, contact <a href="mailto:hello@thoughtsonlifeandlove.com">hello@thoughtsonlifeandlove.com</a>.</p>
+        <p>For the purposes of the UK GDPR and the Data Protection Act 2018, the controller is Mandy Kloppers.</p>
+
+        <h2>2. What this app is (and isn't)</h2>
+        <p>Cowch is a self-help wellbeing tool. It is <strong>not</strong> a medical device, a therapy service, a clinical diagnostic tool, or a crisis-response service. Using the app does not create a therapist–patient relationship. If you are in crisis, please contact emergency services or a crisis line (UK: 999, NHS 111, Samaritans 116 123, SHOUT 85258; US: 911 / 988).</p>
+
+        <h2>3. The data we process</h2>
+        <ul>
+            <li><strong>Chat messages</strong> you type to Mandy, and her replies.</li>
+            <li><strong>Journal and exercise entries</strong> you create (gratitude notes, mood check-ins, etc.).</li>
+            <li><strong>Preferences</strong> (e.g. tab last viewed, exercises completed, streaks).</li>
+            <li><strong>Limited technical data</strong> needed to deliver the service (device type, browser, IP address while requests are in flight) — we do not store this beyond the request.</li>
+        </ul>
+        <p>We do <strong>not</strong> ask you for your full name, address, date of birth, payment details or health records. Please avoid sharing directly identifying personal data, and never share information about other people without their consent.</p>
+
+        <h2>4. Where your data lives</h2>
+        <ul>
+            <li><strong>On your device.</strong> Your chat history, journal entries, preferences and progress are stored in your browser's local storage. They stay on the device you use unless you actively export or share them.</li>
+            <li><strong>In transit, briefly.</strong> When you send a message to Mandy, the text of that message and recent context is sent to our AI model provider so a reply can be generated. The provider processes it, returns an answer, and we return it to your device.</li>
+            <li><strong>Server logs.</strong> Our hosting provider may retain short-term request logs (e.g. timestamp, coarse location, user-agent) for operational security. These are not used to profile you and are discarded on a short rolling basis.</li>
+        </ul>
+
+        <h2>5. Lawful bases (UK GDPR)</h2>
+        <ul>
+            <li><strong>Contract / pre-contract</strong> — to provide the service you have asked us for (responding to your messages, saving your own entries on your device).</li>
+            <li><strong>Legitimate interests</strong> — keeping the service secure and running, and improving it. We only rely on this where your rights do not override it.</li>
+            <li><strong>Consent</strong> — for any optional feature that asks you for it (e.g. push notifications, where available).</li>
+        </ul>
+
+        <h2>6. Who we share data with</h2>
+        <ul>
+            <li><strong>AI model provider</strong> (Anthropic, US) — processes the text of your Mandy messages to generate replies. Data is sent over TLS. Anthropic is contractually committed not to train its models on API inputs by default. International transfers are covered by the UK's approved transfer mechanisms (Standard Contractual Clauses / UK IDTA Addendum).</li>
+            <li><strong>Hosting / CDN</strong> (Vercel, US / EU edge) — serves the app and passes requests through.</li>
+            <li>We do <strong>not</strong> sell data, share it with advertisers, or use it for targeted advertising.</li>
+        </ul>
+
+        <h2>7. Retention</h2>
+        <ul>
+            <li>Device-stored data stays until you clear it (use "Clear conversation history" in the You tab, or clear site data in your browser).</li>
+            <li>Request-level server logs: up to 30 days unless needed for security.</li>
+            <li>We do not maintain a long-term account-level profile of you.</li>
+        </ul>
+
+        <h2>8. Your rights</h2>
+        <p>Under UK GDPR you have the right to: access your data, correct it, erase it, restrict processing, object to processing, and data portability. Because most of your data lives on your device you can exercise most of these yourself by clearing the app's storage. For anything else, email <a href="mailto:hello@thoughtsonlifeandlove.com">hello@thoughtsonlifeandlove.com</a>.</p>
+        <p>You also have the right to complain to the UK Information Commissioner's Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>.</p>
+
+        <h2>9. Cookies and storage</h2>
+        <p>We do not use advertising or analytics cookies. The app uses your browser's <code>localStorage</code> to keep your chat history, entries and preferences working — this is "strictly necessary" to provide the functionality you requested, so no consent banner is shown. You can clear it from the app (You → Clear conversation history) or from your browser's site-settings at any time.</p>
+
+        <h2>10. Children</h2>
+        <p>Cowch is intended for adults (18+). Under-18s should only use the app with a parent or guardian involved in their care. If you believe a child has submitted personal data to us, contact us and we will delete it.</p>
+
+        <h2>11. International transfers</h2>
+        <p>Some of our processors (AI provider, hosting) are based outside the UK / EEA. Transfers are protected by the UK's approved safeguards (UK International Data Transfer Agreement / Addendum to EU SCCs).</p>
+
+        <h2>12. Security</h2>
+        <p>We use TLS for requests, keep our dependencies patched, and limit who can access operational systems. No online service can be guaranteed 100% secure — please treat the app as a journal / companion rather than a place to record highly sensitive personal data about yourself or others.</p>
+
+        <h2>13. Changes to this notice</h2>
+        <p>We may update this policy. When we make material changes we will update the date at the top and, where appropriate, notify you in the app.</p>
+
+        <h2>14. Contact</h2>
+        <p>Questions or requests: <a href="mailto:hello@thoughtsonlifeandlove.com">hello@thoughtsonlifeandlove.com</a>.</p>
+
+        <p style="margin-top: 40px; font-size: 0.9rem; color: #7A6556;">See also: <a href="/terms.html">Terms of Use</a>.</p>
+    </div>
+</body>
+</html>

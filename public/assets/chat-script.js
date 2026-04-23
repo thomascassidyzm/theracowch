@@ -936,6 +936,9 @@ function formatMessage(content) {
     formatted = formatted.replace(/(?<![*_])\*(?!\*)([^*]+)\*(?![*_])/g, '<em>$1</em>');
     formatted = formatted.replace(/(?<![*_])_(?!_)([^_]+)_(?![*_])/g, '<em>$1</em>');
 
+    // Markdown links [text](url)
+    formatted = formatted.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+
     // Auto-link exercise names to their exercise pages
     const exerciseLinks = [];
     for (const category of IMAGINE_EXERCISES) {
@@ -1318,7 +1321,12 @@ Use of this app is at your own discretion and risk. To the fullest extent permit
 
 Mandy Kloppers is a qualified CBT Therapist: BA(UNISA); PG Dip Psych(Open); PG Dip CBT(NewBucks); BABCP(Accred). For professional therapy services visit thoughtsonlifeandlove.com.
 
-*By continuing to use the app you acknowledge and agree to the above.*`;
+### Full policies
+
+- [Privacy Policy](/privacy.html) — data we process, your rights under UK GDPR, retention, ICO contact
+- [Terms of Use](/terms.html) — eligibility, disclaimers, limitation of liability, governing law
+
+*By continuing to use the app you acknowledge and agree to the Privacy Policy and Terms of Use.*`;
 
     addMessage(privacyInfo, 'mandy');
 }
