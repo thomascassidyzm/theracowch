@@ -2394,6 +2394,117 @@
             transform: translateY(-2px);
         }
 
+        /* First-launch consent gate */
+        .consent-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(45, 45, 45, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+            overflow-y: auto;
+        }
+
+        .consent-gate[hidden] { display: none; }
+
+        .consent-card {
+            background: #FDF5E8;
+            color: #2D2D2D;
+            border: 4px solid #2D2D2D;
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .consent-title {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            font-weight: var(--font-weight-black);
+            margin-bottom: var(--space-xs);
+        }
+
+        .consent-lede {
+            color: #5C4432;
+            margin-bottom: var(--space-md);
+        }
+
+        .consent-statement {
+            background: #FFF6F0;
+            border-left: 5px solid #C9A857;
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .consent-statement p + p { margin-top: var(--space-sm); }
+
+        .consent-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: var(--space-md);
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+
+        .consent-row input {
+            margin-top: 4px;
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            accent-color: #E35B32;
+        }
+
+        .consent-row a {
+            color: #E35B32;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .consent-accept {
+            width: 100%;
+            background: #FFD6C9;
+            color: #2D2D2D;
+            border: 4px solid #F37A53;
+            border-radius: var(--radius-small);
+            padding: 14px 20px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: var(--font-weight-black);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            margin-top: var(--space-sm);
+            box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+        }
+
+        .consent-accept:not(:disabled):hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.25);
+        }
+
+        .consent-accept:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .consent-footnote {
+            font-size: 0.8rem;
+            color: #7A6556;
+            margin-top: var(--space-md);
+            text-align: center;
+        }
+
         /* Exercise modal close button — high-contrast circular button */
         .exercise-modal-content {
             position: relative;
@@ -2481,6 +2592,32 @@
     </style>
 </head>
 <body>
+    <!-- First-launch consent / age gate. Hidden once the user accepts. -->
+    <div id="consent-gate" class="consent-gate" role="dialog" aria-modal="true" aria-labelledby="consent-title" hidden>
+        <div class="consent-card">
+            <h2 id="consent-title" class="consent-title">Welcome to Cowch 🐄</h2>
+            <p class="consent-lede">Before we get started, a few things to know.</p>
+            <div class="consent-statement">
+                <p><strong>Cowch is a wellbeing-support app. It does not replace clinical therapy, medical care, diagnosis, medication, or emergency services.</strong></p>
+                <p>If you&rsquo;re in crisis right now, please contact emergency services (UK 999 / US 911), NHS 111 option 2, Samaritans 116 123, or text SHOUT to 85258.</p>
+            </div>
+            <label class="consent-row">
+                <input type="checkbox" id="consent-age">
+                <span>I am 18 or over, or using this app with a parent or guardian involved in my care.</span>
+            </label>
+            <label class="consent-row">
+                <input type="checkbox" id="consent-terms">
+                <span>I have read and agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>.</span>
+            </label>
+            <label class="consent-row">
+                <input type="checkbox" id="consent-clinical">
+                <span>I understand this app is for wellbeing support and is not a substitute for clinical therapy or crisis services.</span>
+            </label>
+            <button type="button" id="consent-accept" class="consent-accept" disabled>I agree and continue</button>
+            <p class="consent-footnote">You can review these policies any time from the You tab &rarr; Privacy &amp; Safety.</p>
+        </div>
+    </div>
+
     <!-- Main App Container -->
     <div class="app-container" id="app">
         <!-- Tab Content -->
@@ -4634,12 +4771,42 @@
     <!-- External JavaScript -->
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
-    <script src="/assets/chat-script.js?v=32"></script>
-    <script src="/assets/js/app.js?v=32"></script>
+    <script src="/assets/chat-script.js?v=33"></script>
+    <script src="/assets/js/app.js?v=33"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
+
+        // First-launch consent gate. Bumps the version when we need to
+        // re-prompt (e.g. material policy change).
+        (function() {
+            var CONSENT_KEY = 'cowch-consent-v1';
+            var gate = document.getElementById('consent-gate');
+            if (!gate) return;
+            var stored = null;
+            try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+            if (stored === 'accepted') return; // already consented
+            gate.hidden = false;
+
+            var boxes = ['consent-age', 'consent-terms', 'consent-clinical']
+                .map(function(id) { return document.getElementById(id); });
+            var btn = document.getElementById('consent-accept');
+
+            function update() {
+                var allChecked = boxes.every(function(b) { return b && b.checked; });
+                btn.disabled = !allChecked;
+            }
+
+            boxes.forEach(function(b) { if (b) b.addEventListener('change', update); });
+            btn.addEventListener('click', function() {
+                try {
+                    localStorage.setItem(CONSENT_KEY, 'accepted');
+                    localStorage.setItem(CONSENT_KEY + ':date', new Date().toISOString());
+                } catch (e) {}
+                gate.hidden = true;
+            });
+        })();
 
         // Document-level safety net for chat quick-reply buttons.
         // Runs in the capture phase so this is the first — and only — handler

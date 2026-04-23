@@ -1325,6 +1325,7 @@ Mandy Kloppers is a qualified CBT Therapist: BA(UNISA); PG Dip Psych(Open); PG D
 
 - [Privacy Policy](/privacy.html) — data we process, your rights under UK GDPR, retention, ICO contact
 - [Terms of Use](/terms.html) — eligibility, disclaimers, limitation of liability, governing law
+- [Accessibility Statement](/accessibility.html) — what we support, known issues, how to report a problem
 
 *By continuing to use the app you acknowledge and agree to the Privacy Policy and Terms of Use.*`;
 

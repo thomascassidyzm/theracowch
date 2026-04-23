@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0;
+            color: #2D2D2D;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 780px; margin: 0 auto; padding-bottom: 40px; }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FDF5E8;
+            color: #2D2D2D;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-bottom: 32px;
+        }
+
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; margin-bottom: 8px; }
+        .effective { color: #7A6556; margin-bottom: 32px; font-weight: 600; }
+        h2 { font-size: 1.4rem; font-weight: 900; margin: 32px 0 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+        p, li { font-size: 1rem; margin-bottom: 12px; }
+        ul { padding-left: 24px; }
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+
+        .callout {
+            background: #FDF5E8;
+            border-left: 5px solid #C9A857;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html" class="back-link">← Back to app</a>
+
+        <h1>Accessibility Statement</h1>
+        <p class="effective">Last updated: 23 April 2026</p>
+
+        <div class="callout">
+            We want Cowch to work for as many people as possible. This page explains what we do today, what we know isn't perfect yet, and how to get in touch if something is stopping you from using the app.
+        </div>
+
+        <h2>1. Standard we aim for</h2>
+        <p>We aim to meet <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener">WCAG 2.1 Level AA</a> wherever reasonably possible. We treat accessibility as ongoing work, not a one-off release.</p>
+
+        <h2>2. What we already do</h2>
+        <ul>
+            <li>Semantic HTML for headings, buttons, lists and form labels so screen readers can navigate naturally.</li>
+            <li>Keyboard-operable controls — you can tab through buttons, modals and quick replies without a mouse.</li>
+            <li>Visible focus styles on interactive elements.</li>
+            <li>Sufficient text contrast on the cream canvas and card surfaces. Primary body text is warm dark brown on light cream.</li>
+            <li><code>aria-label</code>, <code>role</code> and <code>aria-modal</code> used on dialogs, close buttons and the first-launch consent gate.</li>
+            <li>Respects <code>prefers-reduced-motion</code> — animations are damped if your system is set that way.</li>
+            <li>Responsive layout that scales on phones, tablets and desktops without horizontal scrolling.</li>
+        </ul>
+
+        <h2>3. Known issues we're working on</h2>
+        <ul>
+            <li>Some longer therapeutic exercises are delivered as their own standalone pages with bespoke styling; colour contrast and keyboard flow on those pages is still being audited.</li>
+            <li>Some decorative icons currently rely on emoji, which assistive-tech announces inconsistently across platforms.</li>
+            <li>Voice-input is not yet available in-app; you can use your device's dictation feature in the chat input meanwhile.</li>
+            <li>Full screen-reader user-testing is in progress — feedback from users who rely on VoiceOver, TalkBack or NVDA is very welcome.</li>
+        </ul>
+
+        <h2>4. Designing for distress</h2>
+        <p>Because this is a wellbeing app, we also try to be mindful of:</p>
+        <ul>
+            <li>Calm, not urgent, default palette.</li>
+            <li>No flashing / strobing content.</li>
+            <li>A consistent "Need help now?" button on the home screen that never hides.</li>
+            <li>Plain-English crisis resources in multiple places (home, chat disclaimer, terms, privacy, accessibility).</li>
+        </ul>
+
+        <h2>5. How to tell us about a problem</h2>
+        <p>If there's something you cannot do, or something that's difficult to use, please email <a href="mailto:hello@thoughtsonlifeandlove.com">hello@thoughtsonlifeandlove.com</a> with a short description and, if you can, a screenshot. We will aim to reply within 10 working days.</p>
+
+        <h2>6. Enforcement</h2>
+        <p>This app is a private wellbeing tool and is not subject to the Public Sector Bodies (Websites and Mobile Applications) Accessibility Regulations 2018. If you are not satisfied with how we have responded to an accessibility concern you can contact the Equality Advisory and Support Service (<a href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener">EASS</a>).</p>
+
+        <h2>7. Changes to this statement</h2>
+        <p>We update this page as features land and as we audit more of the product. The "Last updated" date at the top reflects the most recent review.</p>
+
+        <p style="margin-top: 40px; font-size: 0.9rem; color: #7A6556;">See also: <a href="/privacy.html">Privacy Policy</a> &middot; <a href="/terms.html">Terms of Use</a>.</p>
+    </div>
+</body>
+</html>
