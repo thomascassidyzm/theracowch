@@ -4657,6 +4657,26 @@
             }
         }, true);
 
+        // Document-level safety net for every modal X close button.
+        // Closes the nearest .exercise-modal even if per-button listeners
+        // were not wired (e.g. dynamic markup, stale refs, race conditions).
+        document.addEventListener('click', function(event) {
+            var x = event.target && event.target.closest
+                ? event.target.closest('.close-modal, .helpline-close')
+                : null;
+            if (!x) return;
+            var modal = x.closest('.exercise-modal');
+            if (modal) {
+                event.preventDefault();
+                event.stopPropagation();
+                modal.classList.remove('active');
+                // Best-effort cleanup for the grounding flow
+                if (modal.id === 'grounding-modal' && typeof window.stopGrounding === 'function') {
+                    try { window.stopGrounding(); } catch (e) {}
+                }
+            }
+        }, true);
+
         (function() {
             var helpBtn = document.getElementById('need-help-now');
             var helpPanel = document.getElementById('helpline-panel');

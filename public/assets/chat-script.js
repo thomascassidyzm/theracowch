@@ -366,6 +366,7 @@ function migrateStorageKey() {
 
 // Expose for app.js
 window.initChat = initChat;
+window.stopGrounding = function() { if (typeof stopGrounding === 'function') return stopGrounding(); };
 window.handleClearChat = function() { handleClearChat(); };
 window.handlePrivacyInfo = function() { handlePrivacyInfo(); };
 window.openInteractiveExercise = function(type) { openInteractiveExercise(type); };
