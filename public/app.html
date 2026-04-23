@@ -4613,6 +4613,50 @@
             navigator.serviceWorker.register('/sw.js');
         }
 
+        // Document-level safety net for chat quick-reply buttons.
+        // Runs in the capture phase so this is the first — and only — handler
+        // that fires for a click on "Tell me more / What else / How do I apply
+        // this" etc. stopPropagation keeps the per-button and delegated
+        // listeners in chat-script from also firing and duplicating the reply.
+        document.addEventListener('click', function(event) {
+            var btn = event.target && event.target.closest
+                ? event.target.closest('.quick-reply-btn')
+                : null;
+            if (!btn) return;
+            event.preventDefault();
+            event.stopPropagation();
+
+            var action = btn.dataset.action || '';
+            var prompt = btn.dataset.prompt || '';
+            var exercise = btn.dataset.exercise || '';
+            var url = btn.dataset.url || '';
+
+            if (action === 'exercise') {
+                var id = exercise === 'breathing' ? 'breathing-modal'
+                       : exercise === 'grounding' ? 'grounding-modal'
+                       : exercise === 'pmr' ? 'pmr-modal' : null;
+                if (id) {
+                    var modal = document.getElementById(id);
+                    if (modal) modal.classList.add('active');
+                }
+                return;
+            }
+            if (action === 'open-exercise-url' && url) { window.location.href = url; return; }
+            if (action === 'exercises') {
+                var p = document.getElementById('exercise-panel');
+                if (p) p.classList.add('active');
+                return;
+            }
+            if (action === 'imagine') {
+                var i = document.getElementById('imagine-panel');
+                if (i) i.classList.add('active');
+                return;
+            }
+            if (prompt && typeof window.triggerChatPrompt === 'function') {
+                window.triggerChatPrompt(prompt);
+            }
+        }, true);
+
         (function() {
             var helpBtn = document.getElementById('need-help-now');
             var helpPanel = document.getElementById('helpline-panel');
