@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- Green rounded card background -->
-  <rect width="512" height="512" rx="102" ry="102" fill="#2D5C38"/>
+  <!-- Amber rounded card background (matches "Choose what you need help with") -->
+  <rect width="512" height="512" rx="102" ry="102" fill="#FFE1B6"/>
 
-  <!-- Subtle border accent -->
-  <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#3D6C48" stroke-width="8"/>
+  <!-- Amber border accent -->
+  <rect x="8" y="8" width="496" height="496" rx="94" ry="94" fill="none" stroke="#F5A66E" stroke-width="8"/>
 
   <!-- Cow Face — delicate, stylised, therapeutic -->
   <g transform="translate(256, 280)">
