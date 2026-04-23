@@ -1172,7 +1172,10 @@ function createQuickReplyButton(reply) {
     if (reply.prompt) button.dataset.prompt = reply.prompt;
     if (reply.exercise) button.dataset.exercise = reply.exercise;
     if (reply.url) button.dataset.url = reply.url;
-    // Direct listener
+    // Inline onclick — the single most reliable way to fire in every browser,
+    // independent of listener timing / bundling / capture-phase quirks.
+    button.setAttribute('onclick', 'return window.handleQuickReplyFromButton(this);');
+    // Direct listener (belt & braces)
     button.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1180,6 +1183,20 @@ function createQuickReplyButton(reply) {
     });
     return button;
 }
+
+// Called directly from the inline onclick attribute on each button
+window.handleQuickReplyFromButton = function(btn) {
+    if (!btn) return false;
+    try {
+        handleQuickReply(replyFromButton(btn));
+    } catch (e) {
+        // fallback: at least open the chat input with the prompt
+        if (btn.dataset && btn.dataset.prompt && typeof window.triggerChatPrompt === 'function') {
+            window.triggerChatPrompt(btn.dataset.prompt);
+        }
+    }
+    return false;
+};
 
 function replyFromButton(btn) {
     return {
