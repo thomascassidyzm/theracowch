@@ -84,7 +84,7 @@ Mirror the Apple declarations:
 - **Privacy Policy URL:** `https://cowch.app/privacy.html`
 - **Terms of Use URL:** `https://cowch.app/terms.html`
 - **Accessibility Statement URL:** `https://cowch.app/accessibility.html`
-- **Support email:** `hello@thoughtsonlifeandlove.com`
+- **Support email:** `contact@thoughtsonlifeandlove.com`
 
 ## Version / change log entries
 
