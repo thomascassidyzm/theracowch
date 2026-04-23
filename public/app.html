@@ -80,24 +80,20 @@
             height: 90px;
             background: var(--coral);
             border-radius: var(--radius-full);
-            border: var(--border-thicc) solid var(--bg-primary);
+            border: var(--border-thicc) solid #3C2E28;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
             flex-shrink: 0;
-            box-shadow:
-                0 0 0 var(--border-thicc) var(--coral),
-                8px 8px 0 0 var(--bg-card);
+            box-shadow: 8px 8px 0 0 var(--bg-card);
             transition: all var(--transition-brutal);
             cursor: pointer;
         }
 
         .avatar-container:hover {
             transform: translate(-2px, -2px) rotate(-1deg);
-            box-shadow:
-                0 0 0 var(--border-thicc) var(--coral),
-                12px 12px 0 0 var(--coral);
+            box-shadow: 12px 12px 0 0 var(--coral);
         }
 
         .avatar-img {
@@ -110,7 +106,8 @@
         .chat-avatar {
             width: 36px;
             height: 36px;
-            border-radius: var(--radius-small);
+            border-radius: 50%;
+            border: 3px solid #3C2E28;
         }
 
         .greeting-text-wrapper {
