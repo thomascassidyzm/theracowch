@@ -437,16 +437,11 @@ function setupSettingsButtons() {
         });
     }
 
-    // About button - ask Mandy about herself
+    // About button — open the dedicated About page
     const aboutBtn = document.getElementById('about-btn');
     if (aboutBtn) {
         aboutBtn.addEventListener('click', () => {
-            switchTab('chat');
-            setTimeout(() => {
-                if (window.triggerChatPrompt) {
-                    window.triggerChatPrompt("Tell me about yourself, Mandy. What's the IMAGINE framework and how can you help me?");
-                }
-            }, 300);
+            window.location.href = '/about.html';
         });
     }
 }

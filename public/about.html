@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Mandy | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0;
+            color: #2D2D2D;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 780px; margin: 0 auto; padding-bottom: 40px; }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FDF5E8;
+            color: #2D2D2D;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-bottom: 32px;
+        }
+
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; margin-bottom: 8px; }
+        .lede { color: #7A6556; margin-bottom: 32px; font-weight: 600; font-size: 1.1rem; }
+        h2 { font-size: 1.4rem; font-weight: 900; margin: 32px 0 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+        p, li { font-size: 1rem; margin-bottom: 12px; }
+        ul { padding-left: 24px; }
+        strong { font-weight: 700; }
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+
+        .callout {
+            background: #FDF5E8;
+            border-left: 5px solid #C9A857;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .imagine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin: 20px 0 28px;
+        }
+        .imagine-tile {
+            background: #FDF5E8;
+            border: 3px solid #2D2D2D;
+            padding: 14px 16px;
+        }
+        .imagine-tile strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+        .imagine-tile span { font-size: 0.95rem; color: #5C4432; }
+
+        .chat-link {
+            display: inline-block;
+            padding: 12px 22px;
+            background: #FFE1B6;
+            color: #2D2D2D;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #F5A66E;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-top: 8px;
+        }
+        .chat-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html" class="back-link">← Back to app</a>
+
+        <h1>About Mandy &amp; Cowch</h1>
+        <p class="lede">A little more about who's behind this app, how it works, and how it&rsquo;s meant to help you.</p>
+
+        <div class="callout">
+            <strong>A reminder:</strong> Cowch is a wellbeing-support app. It is not a replacement for clinical therapy, medical care, or emergency services. If you&rsquo;re in crisis, please contact 999 (UK), 911 (US), NHS 111 option 2, Samaritans 116 123, or text SHOUT to 85258.
+        </div>
+
+        <h2>Who is Mandy?</h2>
+        <p>Mandy Kloppers is a qualified Cognitive Behavioural Therapist with over two decades of experience helping people navigate anxiety, depression, relationships and personal growth. Her credentials are:</p>
+        <ul>
+            <li>BA (UNISA)</li>
+            <li>PG Dip Psychology (Open)</li>
+            <li>PG Dip CBT (New Buckinghamshire)</li>
+            <li>BABCP-accredited CBT therapist</li>
+        </ul>
+        <p>For her one-to-one therapy work, visit <a href="https://thoughtsonlifeandlove.com" target="_blank" rel="noopener">thoughtsonlifeandlove.com</a>.</p>
+
+        <h2>What is Cowch?</h2>
+        <p>Cowch is a warm, private wellbeing companion. Inside the app you&rsquo;ll find:</p>
+        <ul>
+            <li><strong>Mandy</strong> &mdash; an AI reflection partner trained on CBT, ACT and compassion-focused approaches, with Mandy Kloppers&rsquo; therapeutic voice.</li>
+            <li><strong>The IMAGINE framework</strong> &mdash; seven domains for looking after your mind, body and relationships.</li>
+            <li><strong>Tiny daily exercises</strong> &mdash; box breathing, 5-4-3-2-1 grounding, gratitude, tiny wins, and more.</li>
+            <li><strong>A private, on-device journal</strong> &mdash; your entries stay on your own device.</li>
+            <li><strong>&ldquo;Need help now?&rdquo;</strong> &mdash; one-tap routing to crisis lines when things feel too much.</li>
+        </ul>
+
+        <h2>The IMAGINE framework</h2>
+        <p>Seven small letters, seven big areas of wellbeing. Each one gets its own page in the app with exercises you can try:</p>
+        <div class="imagine-grid">
+            <div class="imagine-tile"><strong>I &mdash; Self</strong><span>Know yourself deeply.</span></div>
+            <div class="imagine-tile"><strong>M &mdash; Mind</strong><span>Find your calm.</span></div>
+            <div class="imagine-tile"><strong>A &mdash; Accept</strong><span>Embrace what is.</span></div>
+            <div class="imagine-tile"><strong>G &mdash; Gratitude</strong><span>Notice the good.</span></div>
+            <div class="imagine-tile"><strong>I &mdash; Interactions</strong><span>Show up in relationships.</span></div>
+            <div class="imagine-tile"><strong>N &mdash; Nurturing</strong><span>Play, rest, recharge.</span></div>
+            <div class="imagine-tile"><strong>E &mdash; Exploring</strong><span>Try something new.</span></div>
+        </div>
+
+        <h2>How Mandy &ldquo;sounds&rdquo;</h2>
+        <p>Mandy is calm, grounded, practical and gently challenging when needed. She favours clarity and usefulness over softness for its own sake. She won&rsquo;t label you, won&rsquo;t rush to fix you, and won&rsquo;t pretend she&rsquo;s human. If she notices a pattern she&rsquo;ll check it with you first, and if she doesn&rsquo;t have enough evidence she&rsquo;ll say so.</p>
+
+        <h2>How Cowch handles privacy</h2>
+        <p>Your chats and journal entries live on your device. Messages you send Mandy are sent to our AI model provider solely to generate a reply. We don&rsquo;t sell data, advertise against it, or use it to train AI. See the <a href="/privacy.html">Privacy Policy</a> for the full detail.</p>
+
+        <h2>Want to start a conversation?</h2>
+        <p>Head back into the app and open the chat. Mandy is there whenever you need her.</p>
+        <a href="/app.html#chat" class="chat-link">💬 Open chat with Mandy</a>
+
+        <p style="margin-top: 40px; font-size: 0.9rem; color: #7A6556;">See also: <a href="/privacy.html">Privacy Policy</a> &middot; <a href="/terms.html">Terms of Use</a> &middot; <a href="/accessibility.html">Accessibility</a>.</p>
+    </div>
+</body>
+</html>
