@@ -4844,8 +4844,21 @@
                 if (i) i.classList.add('active');
                 return;
             }
-            if (prompt && typeof window.triggerChatPrompt === 'function') {
-                window.triggerChatPrompt(prompt);
+            if (prompt) {
+                // Drive the chat input + send button directly off fresh DOM
+                // refs so a click can never be lost to a stale chat-script
+                // variable, an exception inside triggerChatPrompt, or an
+                // isTyping flag that got pinned on. handleSendMessage reads
+                // #chat-input.value, which we set here.
+                var input = document.getElementById('chat-input');
+                var sendBtn = document.getElementById('chat-send-btn');
+                if (input && sendBtn) {
+                    input.value = prompt;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    sendBtn.click();
+                } else if (typeof window.triggerChatPrompt === 'function') {
+                    window.triggerChatPrompt(prompt);
+                }
             }
         }, true);
 
