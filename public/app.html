@@ -1064,7 +1064,7 @@
             align-items: center;
             justify-content: flex-end;
             flex-wrap: wrap;
-            gap: var(--space-sm);
+            gap: var(--space-xs);
         }
 
         .new-chat-btn {
@@ -1078,6 +1078,14 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all var(--transition-brutal);
+        }
+
+        .chat-header-actions .new-chat-btn[aria-label="IMAGINE framework"],
+        .chat-header-actions .new-chat-btn[aria-label="Exercises"],
+        .chat-header-actions .new-chat-btn[aria-label="Get prompt"] {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 1rem;
+            line-height: 1;
         }
 
         .new-chat-btn:hover {
