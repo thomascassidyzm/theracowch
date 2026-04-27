@@ -7,6 +7,17 @@
     <title>Cowch - Your Wellness Companion</title>
     <meta name="description" content="Cowch - Your compassionate AI wellness companion. Chat with Mandy, explore the IMAGINE framework, and nurture your wellbeing.">
 
+    <!-- Apply saved theme as early as possible to avoid a flash -->
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('cowch-theme');
+                if (t === 'warm' || t === 'cool' || t === 'peachy') {
+                    if (t !== 'peachy') document.documentElement.dataset.theme = t;
+                }
+            } catch (e) {}
+        })();
+    </script>
     <!-- Favicon -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -1401,6 +1412,77 @@
         .settings-btn span {
             font-size: 1.25rem;
         }
+
+        /* Theme picker */
+        .settings-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-on-canvas-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 0 0 var(--space-sm) 0;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .theme-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: var(--space-sm);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            cursor: pointer;
+            transition: transform var(--transition-brutal), border-color var(--transition-brutal), box-shadow var(--transition-brutal);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .theme-option:hover {
+            transform: translateY(-2px);
+            border-color: var(--coral);
+        }
+
+        .theme-option.active {
+            border-color: var(--coral);
+            box-shadow: 4px 4px 0 0 var(--coral);
+        }
+
+        .theme-swatch {
+            width: 56px;
+            height: 36px;
+            border-radius: var(--radius-small);
+            border: 2px solid #2D2D2D;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-swatch::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+        }
+
+        .theme-swatch-peachy {
+            background: linear-gradient(135deg, #FFF6F0 0%, #FFF6F0 50%, #FCDAC9 50%, #FCDAC9 100%);
+        }
+        .theme-swatch-warm {
+            background: linear-gradient(135deg, #5C4432 0%, #5C4432 50%, #2d2825 50%, #2d2825 100%);
+        }
+        .theme-swatch-cool {
+            background: linear-gradient(135deg, #EDF4F4 0%, #EDF4F4 50%, #B0CDD9 50%, #B0CDD9 100%);
+        }
+
+        .theme-name { font-size: var(--font-size-xs); }
 
         /* ============================================
            DOMAIN PANEL (Slide-in)
@@ -3034,6 +3116,24 @@
                                     <strong>Values</strong>
                                     <span>Check your alignment</span>
                                 </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <p class="settings-label">Appearance</p>
+                        <div class="theme-options" role="radiogroup" aria-label="Theme">
+                            <button type="button" class="theme-option" data-theme-choice="peachy" aria-label="Peachy cream theme">
+                                <span class="theme-swatch theme-swatch-peachy"></span>
+                                <span class="theme-name">Peachy</span>
+                            </button>
+                            <button type="button" class="theme-option" data-theme-choice="warm" aria-label="Warm cinnamon theme">
+                                <span class="theme-swatch theme-swatch-warm"></span>
+                                <span class="theme-name">Warm</span>
+                            </button>
+                            <button type="button" class="theme-option" data-theme-choice="cool" aria-label="Cool calm theme">
+                                <span class="theme-swatch theme-swatch-cool"></span>
+                                <span class="theme-name">Cool</span>
                             </button>
                         </div>
                     </div>
@@ -4784,8 +4884,8 @@
     <!-- External JavaScript -->
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
-    <script src="/assets/chat-script.js?v=38"></script>
-    <script src="/assets/js/app.js?v=38"></script>
+    <script src="/assets/chat-script.js?v=39"></script>
+    <script src="/assets/js/app.js?v=39"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');

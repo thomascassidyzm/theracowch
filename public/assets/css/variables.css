@@ -220,3 +220,98 @@
         --safe-area-right: 0px;
     }
 }
+
+/* ============================================
+   THEME OVERRIDES — applied via <html data-theme="warm">
+   etc. Default ":root" above is the peachy theme.
+   ============================================ */
+
+/* Warm cinnamon — cosy dark canvas with cream cards (the previous look) */
+[data-theme="warm"] {
+    --bg-canvas: #5C4432;
+    --bg-primary: #1a1512;
+    --bg-secondary: #2a2320;
+    --bg-card: #2d2825;
+    --bg-card-hover: #3a3533;
+    --bg-elevated: #3a3228;
+    --bg-dark: #0D0B09;
+
+    --bg-mandy-message: #2d2825;
+    --bg-user-message: var(--coral);
+
+    --coral: #D4896A;
+    --coral-dark: #C47A5D;
+    --coral-light: #E39B7F;
+    --coral-glow: rgba(212, 137, 106, 0.25);
+
+    --amber: #E8A86A;
+    --amber-dark: #D08F4F;
+    --amber-light: #F5C794;
+    --amber-glow: rgba(232, 168, 106, 0.25);
+
+    --sage: #A3C9A8;
+    --sage-dark: #7BB57A;
+    --sage-light: #C2DCC6;
+    --sage-glow: rgba(123, 181, 122, 0.25);
+
+    --text-primary: #F5F0E8;
+    --text-secondary: #FFF8F0;
+    --text-muted: #b0a499;
+    --text-on-coral: #1a1512;
+    --text-on-canvas: #FFF8F0;
+    --text-on-canvas-muted: #b0a499;
+
+    --border-warm: #8a7a6a;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+
+    --shadow-brutal: 8px 8px 0 0 var(--bg-card);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Cool & calm — soft mint-blue canvas, white cards, calm blue accent */
+[data-theme="cool"] {
+    --bg-canvas: #EDF4F4;
+    --bg-primary: #DCE8E8;
+    --bg-secondary: #F5FAFA;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #E5EFEF;
+    --bg-elevated: #F5FAFA;
+    --bg-dark: #2C3E50;
+
+    --bg-mandy-message: #FFFFFF;
+    --bg-user-message: var(--coral);
+
+    --coral: #6B9AAF;        /* primary accent becomes a calm blue */
+    --coral-dark: #4F7E92;
+    --coral-light: #B0CDD9;
+    --coral-glow: rgba(107, 154, 175, 0.28);
+
+    --amber: #C8B383;
+    --amber-dark: #A8945F;
+    --amber-light: #E6D9B8;
+    --amber-glow: rgba(200, 179, 131, 0.28);
+
+    --sage: #A3C9A8;
+    --sage-dark: #7BB57A;
+    --sage-light: #C8E6C9;
+    --sage-glow: rgba(123, 181, 122, 0.25);
+
+    --text-primary: #2C3E50;
+    --text-secondary: #1B2A3A;
+    --text-muted: #6B7B8B;
+    --text-on-coral: #FFFFFF;
+    --text-on-canvas: #2C3E50;
+    --text-on-canvas-muted: #6B7B8B;
+
+    --border-warm: #2C3E50;
+    --border-subtle: rgba(44, 62, 80, 0.12);
+
+    --shadow-brutal: 8px 8px 0 0 var(--bg-dark);
+    --shadow-soft: 0 4px 12px rgba(44, 62, 80, 0.18);
+    --shadow-sm: 0 1px 2px rgba(44, 62, 80, 0.1);
+    --shadow-md: 0 4px 8px rgba(44, 62, 80, 0.12);
+    --shadow-lg: 0 8px 16px rgba(44, 62, 80, 0.15);
+}
