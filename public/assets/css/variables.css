@@ -273,45 +273,48 @@
 
 /* Cool & calm — soft mint-blue canvas, white cards, calm blue accent */
 [data-theme="cool"] {
-    --bg-canvas: #DDEFDB;
-    --bg-primary: #C5DFC8;
-    --bg-secondary: #E8F4E7;
-    --bg-card: #F5FCF5;
-    --bg-card-hover: #D2E5D4;
-    --bg-elevated: #ECF6EC;
-    --bg-dark: #2C402F;
+    --bg-canvas: #C8E6CB;
+    --bg-primary: #A6CFAB;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #E8F4EA;
+    --bg-elevated: #FAFFFA;
+    --bg-dark: #1A1A1A;
 
     --bg-mandy-message: #FFFFFF;
     --bg-user-message: var(--coral);
 
-    --coral: #6FA978;        /* primary accent — sage forest green */
-    --coral-dark: #4F8959;
-    --coral-light: #B8D8BC;
-    --coral-glow: rgba(111, 169, 120, 0.28);
+    /* Primary accent — natural green */
+    --coral: #5B9D6A;
+    --coral-dark: #3E6E47;
+    --coral-light: #C9E0D2;
+    --coral-glow: rgba(91, 157, 106, 0.25);
 
-    --amber: #C8B383;
-    --amber-dark: #A8945F;
-    --amber-light: #E6D9B8;
-    --amber-glow: rgba(200, 179, 131, 0.28);
+    /* "Choose what you need" amber slot becomes baby-blue accent */
+    --amber: #8DC3DD;
+    --amber-dark: #6FA8C5;
+    --amber-light: #D8ECF5;
+    --amber-glow: rgba(141, 195, 221, 0.28);
 
+    /* "Chat with Mandy" sage stays a softer green */
     --sage: #A3C9A8;
     --sage-dark: #7BB57A;
-    --sage-light: #C8E6C9;
+    --sage-light: #DCEDDD;
     --sage-glow: rgba(123, 181, 122, 0.25);
 
-    --text-primary: #2C402F;
-    --text-secondary: #1B2A1E;
-    --text-muted: #6B7B6E;
+    --text-primary: #1A1A1A;
+    --text-secondary: #000000;
+    --text-muted: #4A4A4A;
     --text-on-coral: #FFFFFF;
-    --text-on-canvas: #2C402F;
-    --text-on-canvas-muted: #6B7B6E;
+    --text-on-canvas: #1A1A1A;
+    --text-on-canvas-muted: #4A4A4A;
 
-    --border-warm: #2C402F;
-    --border-subtle: rgba(44, 64, 47, 0.12);
+    --border-warm: #1A1A1A;
+    --border-subtle: rgba(0, 0, 0, 0.12);
 
     --shadow-brutal: 8px 8px 0 0 var(--bg-dark);
-    --shadow-soft: 0 4px 12px rgba(44, 64, 47, 0.18);
-    --shadow-sm: 0 1px 2px rgba(44, 64, 47, 0.1);
-    --shadow-md: 0 4px 8px rgba(44, 64, 47, 0.12);
-    --shadow-lg: 0 8px 16px rgba(44, 64, 47, 0.15);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.18);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
