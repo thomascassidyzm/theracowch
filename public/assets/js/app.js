@@ -444,6 +444,39 @@ function setupSettingsButtons() {
             window.location.href = '/about.html';
         });
     }
+
+    // Theme picker — peachy / warm / cool
+    setupThemePicker();
+}
+
+function setupThemePicker() {
+    const buttons = document.querySelectorAll('.theme-option[data-theme-choice]');
+    if (!buttons.length) return;
+
+    const VALID = ['peachy', 'warm', 'cool'];
+    let saved = 'peachy';
+    try {
+        const t = localStorage.getItem('cowch-theme');
+        if (VALID.indexOf(t) !== -1) saved = t;
+    } catch (e) {}
+
+    const apply = (choice) => {
+        if (choice === 'peachy') {
+            delete document.documentElement.dataset.theme;
+        } else {
+            document.documentElement.dataset.theme = choice;
+        }
+        try { localStorage.setItem('cowch-theme', choice); } catch (e) {}
+        buttons.forEach((b) => {
+            b.classList.toggle('active', b.dataset.themeChoice === choice);
+            b.setAttribute('aria-pressed', b.dataset.themeChoice === choice ? 'true' : 'false');
+        });
+    };
+
+    apply(saved);
+    buttons.forEach((b) => {
+        b.addEventListener('click', () => apply(b.dataset.themeChoice));
+    });
 }
 
 // clearConversation is now handled by chat-script.js via window.handleClearChat
