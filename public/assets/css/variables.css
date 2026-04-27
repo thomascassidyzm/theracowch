@@ -273,12 +273,12 @@
 
 /* Cool & calm — soft mint-blue canvas, white cards, calm blue accent */
 [data-theme="cool"] {
-    --bg-canvas: #ECF3EC;
-    --bg-primary: #DAE8DC;
-    --bg-secondary: #F4F9F4;
-    --bg-card: #FFFFFF;
-    --bg-card-hover: #E2EDE3;
-    --bg-elevated: #F4F9F4;
+    --bg-canvas: #DDEFDB;
+    --bg-primary: #C5DFC8;
+    --bg-secondary: #E8F4E7;
+    --bg-card: #F5FCF5;
+    --bg-card-hover: #D2E5D4;
+    --bg-elevated: #ECF6EC;
     --bg-dark: #2C402F;
 
     --bg-mandy-message: #FFFFFF;
