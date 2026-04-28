@@ -540,10 +540,14 @@ function setupToolPanels() {
         openToolPanel('exercises');
     });
 
-    // Home page "See all exercises" button
-    document.getElementById('home-see-all-exercises').addEventListener('click', () => {
-        openToolPanel('exercises');
-    });
+    // Home page "See all exercises" button (removed from the home tab — guarded
+    // in case it's reintroduced later)
+    const seeAllExercises = document.getElementById('home-see-all-exercises');
+    if (seeAllExercises) {
+        seeAllExercises.addEventListener('click', () => {
+            openToolPanel('exercises');
+        });
+    }
 }
 
 function openToolPanel(tool) {
