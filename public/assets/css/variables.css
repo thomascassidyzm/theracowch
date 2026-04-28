@@ -30,44 +30,48 @@
     --font-weight-bold: 700;
     --font-weight-black: 900;
 
-    /* ===== Warm Peachy Palette ===== */
-    --bg-canvas: #F2F2F2;   /* page canvas — neutral light grey */
-    --text-on-canvas: #3C2E28;
-    --text-on-canvas-muted: #7A6556;
-    --bg-primary: #FFF0E4;   /* near-canvas surface — tab bar, app bg */
-    --bg-secondary: #FDF5E8; /* secondary cream — modals, cloud */
-    --bg-card: #FDF5E8;      /* card surface — soft cream */
-    --bg-card-hover: #FBE8D5;
-    --bg-elevated: #FFFAF3;
-    --bg-dark: #3C2E28;      /* dark warm brown — brutalist shadow */
+    /* ===== Premium Wellness Palette (default) ===== */
+    /* Background and surface */
+    --bg-canvas: #F8F5F1;        /* warm linen page background */
+    --bg-primary: #FFFFFF;        /* primary surface (tab bar, sticky bars) */
+    --bg-secondary: #EEE6DE;      /* secondary panels (banners, helpline panels) */
+    --bg-card: #FFFFFF;           /* card surface */
+    --bg-card-hover: #F5EFE8;     /* hover state — slightly deeper than secondary */
+    --bg-elevated: #FFFFFF;       /* modals, popovers */
+    --bg-dark: #1F1F1F;           /* near-black for shadows / strong contrast */
 
-    /* Chat Message Backgrounds */
-    --bg-mandy-message: #FDF5E8;
+    /* Chat message backgrounds */
+    --bg-mandy-message: #FFFFFF;
     --bg-user-message: var(--coral);
 
-    /* ===== Accent Colors - Coral (Primary brand) ===== */
-    --coral: #F37A53;
-    --coral-dark: #E35B32;
-    --coral-light: #FCDAC9;
-    --coral-glow: rgba(243, 122, 83, 0.25);
+    /* Canvas-floating text */
+    --text-on-canvas: #1F1F1F;
+    --text-on-canvas-muted: #6E6863;
 
-    /* ===== Amber (secondary "choose" button) ===== */
-    --amber: #F5A66E;
-    --amber-dark: #E8914D;
-    --amber-light: #FFE1B6;
-    --amber-glow: rgba(245, 166, 110, 0.25);
+    /* ===== Accent Colours ===== */
+    /* Primary brand — warm terracotta */
+    --coral: #C97B63;
+    --coral-dark: #B86852;
+    --coral-light: #E0A696;
+    --coral-glow: rgba(201, 123, 99, 0.22);
 
-    /* ===== Sage (tertiary "chat" button) ===== */
-    --sage: #A3C9A8;
-    --sage-dark: #7BB57A;
-    --sage-light: #C8E6C9;
-    --sage-glow: rgba(123, 181, 122, 0.25);
+    /* Secondary CTA family ("Choose what you need") — calm dusty blue */
+    --amber: #8EA8C3;
+    --amber-dark: #738FAE;
+    --amber-light: #C7D4E1;
+    --amber-glow: rgba(142, 168, 195, 0.22);
 
-    /* ===== Optional soft blue highlight ===== */
-    --highlight: #B5D6FF;
-    --highlight-dark: #8DB8EA;
-    --highlight-light: #D4E6FF;
-    --highlight-glow: rgba(181, 214, 255, 0.28);
+    /* Tertiary CTA family ("Chat with Mandy") — soft success sage */
+    --sage: #8FA98F;
+    --sage-dark: #738F73;
+    --sage-light: #C5D2C5;
+    --sage-glow: rgba(143, 169, 143, 0.22);
+
+    /* Optional highlight — kept blue for backwards compatibility */
+    --highlight: #8EA8C3;
+    --highlight-dark: #738FAE;
+    --highlight-light: #C7D4E1;
+    --highlight-glow: rgba(142, 168, 195, 0.22);
 
     /* Aliases for compatibility */
     --accent-primary: var(--coral);
@@ -75,16 +79,16 @@
     --accent-hover: var(--coral-light);
     --accent-glow: var(--coral-glow);
 
-    /* ===== Text Colors ===== */
-    --text-primary: #3C2E28;
-    --text-secondary: #2A1F1A;
-    --text-muted: #7A6556;
+    /* ===== Text Colours ===== */
+    --text-primary: #1F1F1F;
+    --text-secondary: #1F1F1F;
+    --text-muted: #6E6863;
     --text-on-coral: #FFFFFF;
 
-    /* ===== Border Colors ===== */
-    --border-warm: #3C2E28;
+    /* ===== Border Colours ===== */
+    --border-warm: #D8CEC5;       /* subtle warm tan border */
     --border-coral: var(--coral);
-    --border-subtle: rgba(60, 46, 40, 0.12);
+    --border-subtle: rgba(31, 31, 31, 0.06);
 
     /* ===== IMAGINE Domain Colors ===== */
     --color-self: #E88A6A;       /* I - Self Care (coral) */
@@ -126,18 +130,18 @@
     --input-height: 52px;
     --max-width: 600px;
 
-    /* ===== Shadows - Brutalist Style ===== */
-    --shadow-brutal: 8px 8px 0 0 var(--bg-dark);
-    --shadow-brutal-coral: 8px 12px 0 0 var(--coral);
-    --shadow-brutal-hover: 12px 16px 0 0 var(--coral);
-    --shadow-soft: 0 4px 12px rgba(60, 46, 40, 0.18);
-    --shadow-glow: 0 0 20px var(--coral-glow);
+    /* ===== Shadows — Soft, Premium ===== */
+    --shadow-brutal: 0 6px 18px rgba(31, 31, 31, 0.06);
+    --shadow-brutal-coral: 0 6px 22px rgba(201, 123, 99, 0.22);
+    --shadow-brutal-hover: 0 12px 32px rgba(31, 31, 31, 0.10);
+    --shadow-soft: 0 4px 16px rgba(31, 31, 31, 0.06);
+    --shadow-glow: 0 0 24px var(--coral-glow);
 
     /* Standard Shadow Scale */
-    --shadow-sm: 0 1px 2px rgba(60, 46, 40, 0.1);
-    --shadow-md: 0 4px 8px rgba(60, 46, 40, 0.12);
-    --shadow-lg: 0 8px 16px rgba(60, 46, 40, 0.15);
-    --shadow-accent: 0 4px 12px var(--coral-glow);
+    --shadow-sm: 0 1px 2px rgba(31, 31, 31, 0.04);
+    --shadow-md: 0 4px 12px rgba(31, 31, 31, 0.06);
+    --shadow-lg: 0 12px 32px rgba(31, 31, 31, 0.08);
+    --shadow-accent: 0 6px 18px var(--coral-glow);
 
     /* ===== Transitions ===== */
     --transition-fast: 0.15s ease;
