@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v47';
+const CACHE_NAME = 'cowch-wellness-v48';
 const urlsToCache = [
   '/',
   '/app.html',
