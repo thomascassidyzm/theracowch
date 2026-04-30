@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two people hugging and supporting each other">
+<svg width="512" height="512" viewBox="50 89 412 412" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two people hugging and supporting each other">
 
   <!-- Sage body — right lobe + lower-right of the heart (back layer) -->
   <path d="
@@ -39,10 +39,10 @@
       C 270 334, 320 342, 348 332 Z"
     fill="#9AAA82"/>
 
-  <!-- Brown head — upper left -->
-  <circle cx="196" cy="178" r="54" fill="#8A7356"/>
+  <!-- Brown head — upper left, nudged right to touch the sage head -->
+  <circle cx="220" cy="178" r="58" fill="#8A7356"/>
 
-  <!-- Sage head — tucked in to the right and slightly below -->
-  <circle cx="328" cy="218" r="46" fill="#9AAA82"/>
+  <!-- Sage head — nudged left and up to overlap the brown head -->
+  <circle cx="308" cy="200" r="50" fill="#9AAA82"/>
 
 </svg>
