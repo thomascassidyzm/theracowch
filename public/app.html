@@ -291,6 +291,17 @@
         .action-btn-icon {
             font-size: 2rem;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            line-height: 1;
+        }
+        .action-btn-icon img {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .action-btn-text {
@@ -2823,7 +2834,9 @@
                         </div>
 
                         <button class="action-btn amber" id="choose-help">
-                            <span class="action-btn-icon">🫂</span>
+                            <span class="action-btn-icon">
+                                <img src="/icons/support-hug.svg" alt="" width="40" height="40" loading="lazy">
+                            </span>
                             <div class="action-btn-text">
                                 <strong>Choose what you need help with</strong>
                                 <span>Pick the feeling closest to right now</span>
