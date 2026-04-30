@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two people hugging and supporting each other">
+  <rect width="512" height="512" fill="transparent"/>
+
+  <!-- Left person head -->
+  <circle cx="205" cy="130" r="50" fill="#8A7356"/>
+
+  <!-- Right person head -->
+  <circle cx="315" cy="155" r="42" fill="#9AAA82"/>
+
+  <!-- Left person body / arm -->
+  <path d="M145 255
+           C150 200 190 175 235 195
+           C270 210 285 230 320 225
+           C350 220 365 245 345 270
+           C315 305 250 315 195 295
+           C160 282 140 285 132 315
+           C125 292 128 270 145 255Z"
+        fill="#8A7356"/>
+
+  <!-- Right person body / arm -->
+  <path d="M360 225
+           C390 260 390 335 355 390
+           C335 420 305 438 282 448
+           C275 410 275 365 280 320
+           C230 327 175 310 140 280
+           C150 330 180 390 235 430
+           C215 445 180 430 150 400
+           C105 355 100 285 138 240
+           C160 275 220 300 280 292
+           C325 286 350 260 360 225Z"
+        fill="#9AAA82"/>
+
+  <!-- White separation curve -->
+  <path d="M135 282
+           C180 305 230 325 285 305
+           C320 292 343 270 360 240"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="18"
+        stroke-linecap="round"/>
+</svg>
