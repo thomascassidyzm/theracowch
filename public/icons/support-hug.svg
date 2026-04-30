@@ -45,12 +45,4 @@
   <!-- Sage head — tucked in to the right and slightly below -->
   <circle cx="328" cy="218" r="46" fill="#9AAA82"/>
 
-  <!-- White separation: where the brown arm meets the sage shoulder -->
-  <path d="M 226 248 C 280 224, 340 224, 388 252"
-    fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/>
-
-  <!-- White separation: where the sage arm meets the brown body -->
-  <path d="M 96 312 C 180 304, 260 322, 348 332"
-    fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/>
-
 </svg>
