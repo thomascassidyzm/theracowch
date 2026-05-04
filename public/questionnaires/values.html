@@ -9,56 +9,101 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Gabarito', system-ui, sans-serif; background: #FFF6F0; color: #2D2D2D; line-height: 1.6; min-height: 100vh; padding: 20px; }
-        .container { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+        .container { max-width: 780px; margin: 0 auto; padding-bottom: 120px; }
+
+        button { touch-action: manipulation; -webkit-tap-highlight-color: rgba(0,0,0,0.08); }
 
         .back-link { display: inline-block; padding: 10px 20px; background: #FDF5E8; color: #2D2D2D; text-decoration: none; font-weight: 700; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); margin-bottom: 24px; }
         .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
 
         h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); font-weight: 900; margin-bottom: 6px; }
-        .lede { color: #7A6556; margin-bottom: 20px; font-weight: 600; }
+        .lede { color: #7A6556; margin-bottom: 16px; font-weight: 600; }
 
-        .progress { height: 10px; background: #FDF5E8; border: 3px solid #2D2D2D; margin-bottom: 26px; position: relative; }
-        .progress-bar { height: 100%; background: #C97B63; transition: width 0.3s; width: 0%; }
+        .callout { background: #FDF5E8; border-left: 5px solid #C9A857; padding: 14px 18px; margin: 6px 0 22px; font-size: 0.95rem; }
+        .callout strong { display: block; margin-bottom: 4px; }
 
-        .q-card { background: #FFFFFF; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); padding: 24px; margin-bottom: 20px; }
-        .q-num { font-size: 0.85rem; font-weight: 700; color: #7A6556; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
-        .domain-name { font-size: 1.4rem; font-weight: 900; margin-bottom: 4px; }
-        .domain-desc { color: #5C4432; margin-bottom: 18px; font-size: 0.98rem; }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .value-tile {
+            background: #FFFFFF;
+            border: 3px solid #2D2D2D;
+            padding: 12px 14px;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: left;
+            transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+            color: inherit;
+        }
+        .value-tile:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+        .value-tile.selected { background: #C97B63; color: #FFFFFF; }
+        .value-tile.disabled-pick { opacity: 0.35; cursor: not-allowed; }
+        .value-tile .name { font-weight: 900; font-size: 1.02rem; display: block; margin-bottom: 2px; }
+        .value-tile .desc { font-size: 0.8rem; opacity: 0.85; display: block; line-height: 1.3; }
 
-        button { touch-action: manipulation; -webkit-tap-highlight-color: rgba(0,0,0,0.08); }
+        .sticky-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #FFF6F0;
+            border-top: 4px solid #2D2D2D;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 30;
+        }
+        .count {
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+        .count .num { color: #C97B63; }
+        .count.full .num { color: #4A6A3A; }
+        .sticky-bar .spacer { flex: 1; }
+        .sticky-bar button {
+            padding: 12px 20px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            background: #C97B63;
+            color: #FFFFFF;
+            border: 4px solid #2D2D2D;
+            box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18);
+            cursor: pointer;
+        }
+        .sticky-bar button.is-disabled { opacity: 0.4; cursor: not-allowed; background: #FDF5E8; color: #2D2D2D; }
 
-        .sub-q { font-weight: 700; margin: 14px 0 8px; font-size: 1rem; }
-        .scale-10 { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
-        .scale-10 button { padding: 12px 4px; font-family: inherit; font-weight: 700; font-size: 0.9rem; background: #FDF5E8; border: 2px solid #2D2D2D; cursor: pointer; transition: all 0.12s; color: #2D2D2D; }
-        .scale-10 button:hover { background: #FFE8D4; }
-        .scale-10 button.selected { background: #C97B63; color: #FFFFFF; }
-        .scale-10.shake { animation: shake 0.4s; }
-        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-        .scale-label { font-size: 0.78rem; color: #7A6556; margin-top: 6px; display: flex; justify-content: space-between; }
-
-        .nav { display: flex; gap: 12px; margin-top: 22px; }
-        .nav button { flex: 1; padding: 14px; font-family: inherit; font-weight: 700; font-size: 1rem; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; }
-        .nav button.is-disabled { opacity: 0.4; cursor: not-allowed; }
-        .nav button.primary { background: #C97B63; color: #FFFFFF; }
-        .nav button:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(60, 46, 40, 0.18); }
-
-        .results h1 { margin-bottom: 14px; }
+        .results h1 { margin-bottom: 8px; }
         .results-intro { color: #5C4432; margin-bottom: 18px; }
-
-        .domain-row { background: #FFFFFF; border: 3px solid #D8CEC5; padding: 14px 16px; margin-bottom: 10px; }
-        .domain-row.gap-large { border-color: #C97B63; background: #FDF0E6; }
-        .domain-row .name { font-weight: 900; }
-        .domain-row .nums { display: flex; gap: 16px; font-size: 0.9rem; color: #5C4432; margin-top: 4px; }
-        .domain-row .nums strong { color: #2D2D2D; }
-        .domain-row .gap-bar { height: 8px; background: #EEE6DE; margin-top: 8px; position: relative; }
-        .domain-row .gap-bar > div { height: 100%; background: #C97B63; }
+        .top10-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+        .top10-tile {
+            background: #FFFFFF;
+            border: 3px solid #2D2D2D;
+            padding: 14px 16px;
+        }
+        .top10-tile .rank { font-size: 0.78rem; font-weight: 700; color: #C97B63; text-transform: uppercase; letter-spacing: 0.05em; }
+        .top10-tile .name { font-weight: 900; font-size: 1.05rem; display: block; margin: 2px 0 4px; }
+        .top10-tile .desc { font-size: 0.85rem; color: #5C4432; line-height: 1.35; }
 
         .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
         .actions a, .actions button { padding: 12px 18px; font-family: inherit; font-weight: 700; text-decoration: none; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; font-size: 0.95rem; }
         .actions .primary { background: #C97B63; color: #FFFFFF; }
 
-        .disclaimer { font-size: 0.85rem; color: #7A6556; margin-top: 22px; padding: 12px 14px; background: #FDF5E8; border-left: 4px solid #C9A857; }
         .hide { display: none; }
+
+        @media (max-width: 480px) {
+            .values-grid { grid-template-columns: repeat(2, 1fr); }
+            .top10-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
@@ -66,191 +111,190 @@
         <a href="/questionnaires/" class="back-link">← All questionnaires</a>
 
         <div id="quiz">
-            <h1>Values</h1>
-            <p class="lede">For each life area, two questions: how much it matters to you, and how aligned your actions feel right now.</p>
+            <h1>Your top 10 values</h1>
+            <p class="lede">From the list below, choose the 10 that matter most to <em>you</em> &mdash; not the 10 you think you <em>should</em> care about.</p>
 
-            <div class="progress"><div class="progress-bar" id="bar"></div></div>
-
-            <div class="q-card">
-                <div class="q-num" id="q-num"></div>
-                <div class="domain-name" id="domain-name"></div>
-                <div class="domain-desc" id="domain-desc"></div>
-
-                <div class="sub-q">How important is this to you?</div>
-                <div class="scale-10" id="scale-imp"></div>
-                <div class="scale-label"><span>Not at all</span><span>Deeply</span></div>
-
-                <div class="sub-q" style="margin-top: 22px;">How aligned do your actions feel here right now?</div>
-                <div class="scale-10" id="scale-act"></div>
-                <div class="scale-label"><span>Not aligned</span><span>Fully aligned</span></div>
+            <div class="callout">
+                <strong>Why this matters</strong>
+                In Acceptance and Commitment Therapy, living a life that&rsquo;s aligned with your values is one of the most reliable buffers against depression. Knowing what you care about gives you a compass when you&rsquo;re lost, stuck or low.
             </div>
 
-            <div class="nav">
-                <button type="button" id="prev">← Back</button>
-                <button type="button" id="next" class="primary is-disabled">Next →</button>
-            </div>
+            <div class="values-grid" id="values-grid"></div>
         </div>
 
         <div id="results" class="results hide">
-            <h1>Where to put your attention</h1>
-            <p class="results-intro">The biggest gaps between what matters and how you&rsquo;re living are usually where small changes pay off the most. Highlighted rows below have the largest gaps.</p>
+            <h1>Your compass</h1>
+            <p class="results-intro">These are the ten you chose. Pin them somewhere you&rsquo;ll see them. When you&rsquo;re feeling flat, stuck, or pulled off course, ask: &ldquo;Which of these would I be living right now if today was a good day?&rdquo;</p>
 
-            <div id="domains-list"></div>
+            <div class="top10-grid" id="top10-grid"></div>
 
-            <div class="disclaimer">
-                Values aren&rsquo;t a to-do list. They&rsquo;re directions, not destinations &mdash; you keep moving toward them. Pick one gap and ask yourself: what&rsquo;s one tiny action this week that would point me back toward what I care about?
+            <div class="callout">
+                <strong>One small action</strong>
+                Pick one value from your list and ask yourself: what&rsquo;s the smallest possible thing I could do today that points me toward this? Not a grand gesture &mdash; a five-minute choice.
             </div>
 
             <div class="actions">
-                <a href="/app.html#chat" class="primary">Talk to Mandy about a gap</a>
-                <button id="retake">Retake</button>
+                <a href="/app.html#chat" class="primary">Talk to Mandy about a value</a>
+                <button type="button" id="retake">Pick again</button>
                 <a href="/questionnaires/">More questionnaires</a>
             </div>
         </div>
     </div>
 
+    <div class="sticky-bar" id="sticky-bar">
+        <div class="count" id="count"><span class="num">0</span> / 10 chosen</div>
+        <div class="spacer"></div>
+        <button type="button" id="done" class="is-disabled">See your top 10 →</button>
+    </div>
+
     <script>
-        var domains = [
-            { name: "Intimate relationship", desc: "Your partner or romantic life &mdash; or, if you don't have one, the kind of partnership you'd want." },
-            { name: "Family", desc: "Parents, siblings, extended family. The people you grew up with or who feel like family." },
-            { name: "Parenting", desc: "If you're a parent or carer. Skip with low importance if not relevant." },
-            { name: "Friendship", desc: "Close friends and the wider social circle." },
-            { name: "Work / career", desc: "Paid work, vocation, the contribution you make through what you do." },
-            { name: "Education / growth", desc: "Learning, study, skill-building, curiosity." },
-            { name: "Recreation / play", desc: "Hobbies, fun, the things you do just because you enjoy them." },
-            { name: "Spirituality / meaning", desc: "Whatever gives you a sense of bigger picture &mdash; faith, philosophy, awe, purpose." },
-            { name: "Community / citizenship", desc: "Neighbourhood, causes, civic life, the wider world." },
-            { name: "Physical health", desc: "Body, movement, sleep, nutrition, energy." },
-            { name: "Mental health", desc: "Mood, stress, self-care, emotional life." },
-            { name: "Environment / home", desc: "Where you live, the natural world, the spaces you spend time in." }
+        // Standard ACT values list (Russ Harris-style worksheet).
+        var values = [
+            { name: "Acceptance", desc: "Open to myself, to others, to life as it is." },
+            { name: "Adventure", desc: "Seeking out new and stimulating experiences." },
+            { name: "Assertiveness", desc: "Standing up for myself and my needs respectfully." },
+            { name: "Authenticity", desc: "Being real, genuine, true to myself." },
+            { name: "Beauty", desc: "Noticing, creating and appreciating beauty around me." },
+            { name: "Caring", desc: "Looking after myself, others and the world." },
+            { name: "Challenge", desc: "Pushing myself to grow, learn, improve." },
+            { name: "Compassion", desc: "Acting kindly toward suffering, mine and others'." },
+            { name: "Connection", desc: "Engaging fully and being present with people." },
+            { name: "Contribution", desc: "Giving, helping, making a positive difference." },
+            { name: "Cooperation", desc: "Working with others toward shared goals." },
+            { name: "Courage", desc: "Acting on what matters even when afraid." },
+            { name: "Creativity", desc: "Making, imagining, expressing in original ways." },
+            { name: "Curiosity", desc: "Open, exploring, seeking to understand." },
+            { name: "Encouragement", desc: "Lifting others up, supporting their growth." },
+            { name: "Equality", desc: "Treating everyone as equally worthy." },
+            { name: "Excitement", desc: "Pursuing what stirs and energises me." },
+            { name: "Fairness", desc: "Being just and even-handed." },
+            { name: "Fitness", desc: "Looking after my physical health and strength." },
+            { name: "Flexibility", desc: "Adapting and adjusting as life changes." },
+            { name: "Freedom", desc: "Living and choosing on my own terms." },
+            { name: "Friendliness", desc: "Being warm, welcoming, easy to be around." },
+            { name: "Forgiveness", desc: "Letting go of grievance, in myself and others." },
+            { name: "Fun", desc: "Seeking enjoyment, play, lightness." },
+            { name: "Generosity", desc: "Sharing my time, attention and resources." },
+            { name: "Gratitude", desc: "Noticing and being thankful for what I have." },
+            { name: "Honesty", desc: "Being truthful with myself and others." },
+            { name: "Humour", desc: "Finding and bringing the funny side." },
+            { name: "Humility", desc: "Knowing I'm one of many, not better or less." },
+            { name: "Industry", desc: "Hard work, diligence, doing my best." },
+            { name: "Independence", desc: "Self-reliance and standing on my own feet." },
+            { name: "Intimacy", desc: "Sharing deeply and being known." },
+            { name: "Justice", desc: "Fighting for what's right." },
+            { name: "Kindness", desc: "Acting with warmth, care and consideration." },
+            { name: "Love", desc: "Loving and being loved, in all its forms." },
+            { name: "Mindfulness", desc: "Conscious, present, fully here." },
+            { name: "Open-mindedness", desc: "Willing to consider, learn, change my mind." },
+            { name: "Order", desc: "Tidy, organised, structured." },
+            { name: "Patience", desc: "Waiting calmly when things don't move fast." },
+            { name: "Persistence", desc: "Keeping at it, especially when it's hard." },
+            { name: "Pleasure", desc: "Savouring sensory enjoyment and delight." },
+            { name: "Power", desc: "Influence, capability, agency in the world." },
+            { name: "Reciprocity", desc: "Giving and receiving in balance." },
+            { name: "Respect", desc: "Treating myself and others with dignity." },
+            { name: "Responsibility", desc: "Owning my actions and their effects." },
+            { name: "Romance", desc: "Tenderness, courtship, romantic connection." },
+            { name: "Safety", desc: "Protecting wellbeing for me and others." },
+            { name: "Self-awareness", desc: "Knowing my inner world honestly." },
+            { name: "Self-care", desc: "Looking after my own wellbeing." },
+            { name: "Self-development", desc: "Growing, learning, becoming more." },
+            { name: "Self-control", desc: "Acting deliberately, not on impulse." },
+            { name: "Sensuality", desc: "Pleasure through the senses, embodied." },
+            { name: "Sexuality", desc: "Expressing my sexual self openly." },
+            { name: "Skilfulness", desc: "Continually improving at what I do." },
+            { name: "Spirituality", desc: "Connection to something bigger than me." },
+            { name: "Stability", desc: "Steady, grounded, predictable." },
+            { name: "Supportiveness", desc: "Being there for the people who matter." },
+            { name: "Trust", desc: "Being trustworthy and willing to trust." }
         ];
 
-        var answers = domains.map(function () { return { imp: null, act: null }; });
-        var i = 0;
+        var MAX = 10;
+        var picked = new Set();
 
-        var qNum = document.getElementById('q-num');
-        var dName = document.getElementById('domain-name');
-        var dDesc = document.getElementById('domain-desc');
-        var bar = document.getElementById('bar');
-        var prevBtn = document.getElementById('prev');
-        var nextBtn = document.getElementById('next');
-        var scaleImp = document.getElementById('scale-imp');
-        var scaleAct = document.getElementById('scale-act');
+        var grid = document.getElementById('values-grid');
+        var countEl = document.getElementById('count');
+        var doneBtn = document.getElementById('done');
 
-        function buildScale(target) {
-            target.innerHTML = '';
-            for (var n = 1; n <= 10; n++) {
-                var b = document.createElement('button');
-                b.type = 'button';
-                b.dataset.value = String(n);
-                b.textContent = n;
-                target.appendChild(b);
-            }
-        }
-
-        function paintSelections() {
-            ['imp', 'act'].forEach(function (key) {
-                var grid = key === 'imp' ? scaleImp : scaleAct;
-                Array.prototype.forEach.call(grid.querySelectorAll('button'), function (b) {
-                    b.classList.toggle('selected', parseInt(b.dataset.value, 10) === answers[i][key]);
-                });
-            });
-        }
-
-        function render() {
-            qNum.textContent = 'Area ' + (i + 1) + ' of ' + domains.length;
-            dName.textContent = domains[i].name;
-            dDesc.innerHTML = domains[i].desc;
-            bar.style.width = ((i / domains.length) * 100) + '%';
-
-            buildScale(scaleImp);
-            buildScale(scaleAct);
-            paintSelections();
-
-            prevBtn.classList.toggle('is-disabled', i === 0);
-            var ready = answers[i].imp !== null && answers[i].act !== null;
-            nextBtn.classList.toggle('is-disabled', !ready);
-            nextBtn.textContent = (i === domains.length - 1) ? 'See results →' : 'Next →';
-        }
-
-        function attachScaleHandler(grid, key) {
-            grid.addEventListener('click', function (e) {
-                var btn = e.target.closest('button');
-                if (!btn || !grid.contains(btn)) return;
-                answers[i][key] = parseInt(btn.dataset.value, 10);
-                paintSelections();
-                var ready = answers[i].imp !== null && answers[i].act !== null;
-                nextBtn.classList.toggle('is-disabled', !ready);
-            });
-        }
-        attachScaleHandler(scaleImp, 'imp');
-        attachScaleHandler(scaleAct, 'act');
-
-        prevBtn.addEventListener('click', function () {
-            if (i > 0) { i--; render(); }
+        values.forEach(function (v, idx) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'value-tile';
+            btn.dataset.idx = String(idx);
+            btn.innerHTML = '<span class="name">' + v.name + '</span><span class="desc">' + v.desc + '</span>';
+            grid.appendChild(btn);
         });
-        nextBtn.addEventListener('click', function () {
-            if (answers[i].imp === null || answers[i].act === null) {
-                var grid = answers[i].imp === null ? scaleImp : scaleAct;
-                grid.classList.remove('shake');
-                void grid.offsetWidth;
-                grid.classList.add('shake');
-                return;
+
+        function refresh() {
+            var atMax = picked.size >= MAX;
+            Array.prototype.forEach.call(grid.querySelectorAll('.value-tile'), function (tile) {
+                var idx = parseInt(tile.dataset.idx, 10);
+                var isSel = picked.has(idx);
+                tile.classList.toggle('selected', isSel);
+                tile.classList.toggle('disabled-pick', !isSel && atMax);
+            });
+            var n = picked.size;
+            countEl.innerHTML = '<span class="num">' + n + '</span> / ' + MAX + ' chosen';
+            countEl.classList.toggle('full', n === MAX);
+            doneBtn.classList.toggle('is-disabled', n !== MAX);
+        }
+
+        grid.addEventListener('click', function (e) {
+            var tile = e.target.closest('.value-tile');
+            if (!tile) return;
+            var idx = parseInt(tile.dataset.idx, 10);
+            if (picked.has(idx)) {
+                picked.delete(idx);
+            } else {
+                if (picked.size >= MAX) return;
+                picked.add(idx);
             }
-            if (i < domains.length - 1) { i++; render(); }
-            else { showResults(); }
+            refresh();
+        });
+
+        doneBtn.addEventListener('click', function () {
+            if (picked.size !== MAX) return;
+            showResults();
         });
 
         function showResults() {
-            var rows = domains.map(function (d, idx) {
-                var imp = answers[idx].imp;
-                var act = answers[idx].act;
-                var gap = Math.max(0, imp - act);
-                // Weighted gap = how important × how big the gap, so a big gap on a "5/10 importance" matters less
-                var weighted = gap * imp;
-                return { name: d.name, imp: imp, act: act, gap: gap, weighted: weighted };
-            });
-            // Sort by weighted gap descending — biggest signal first
-            rows.sort(function (a, b) { return b.weighted - a.weighted; });
-
-            var maxWeighted = rows[0].weighted || 1;
-            var list = document.getElementById('domains-list');
-            list.innerHTML = '';
-            rows.forEach(function (r, idx) {
-                var div = document.createElement('div');
-                div.className = 'domain-row' + (idx < 3 && r.weighted > 0 ? ' gap-large' : '');
-                div.innerHTML =
-                    '<div class="name">' + r.name + '</div>' +
-                    '<div class="nums">' +
-                        '<span>Matters: <strong>' + r.imp + '/10</strong></span>' +
-                        '<span>Aligned: <strong>' + r.act + '/10</strong></span>' +
-                        '<span>Gap: <strong>' + r.gap + '</strong></span>' +
-                    '</div>' +
-                    '<div class="gap-bar"><div style="width: ' + ((r.weighted / maxWeighted) * 100) + '%"></div></div>';
-                list.appendChild(div);
+            var chosen = Array.from(picked).map(function (i) { return values[i]; });
+            var top = document.getElementById('top10-grid');
+            top.innerHTML = '';
+            chosen.forEach(function (v, idx) {
+                var tile = document.createElement('div');
+                tile.className = 'top10-tile';
+                tile.innerHTML =
+                    '<span class="rank">No. ' + (idx + 1) + '</span>' +
+                    '<span class="name">' + v.name + '</span>' +
+                    '<span class="desc">' + v.desc + '</span>';
+                top.appendChild(tile);
             });
 
             try {
                 localStorage.setItem('cowch-q-values', JSON.stringify({
-                    rows: rows, takenAt: new Date().toISOString()
+                    chosen: chosen.map(function (v) { return v.name; }),
+                    takenAt: new Date().toISOString()
                 }));
             } catch (_) {}
 
             document.getElementById('quiz').classList.add('hide');
+            document.getElementById('sticky-bar').classList.add('hide');
             document.getElementById('results').classList.remove('hide');
             window.scrollTo(0, 0);
         }
 
         document.getElementById('retake').addEventListener('click', function () {
-            answers = domains.map(function () { return { imp: null, act: null }; });
-            i = 0;
+            picked = new Set();
+            refresh();
             document.getElementById('results').classList.add('hide');
             document.getElementById('quiz').classList.remove('hide');
-            render();
+            document.getElementById('sticky-bar').classList.remove('hide');
             window.scrollTo(0, 0);
         });
 
-        render();
+        refresh();
     </script>
 </body>
 </html>
