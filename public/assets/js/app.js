@@ -493,7 +493,7 @@ function setupThemePicker() {
 // ============================================
 
 // Storage keys
-const CHOICE_STORAGE_KEY = 'cowch_choices';
+const CHOICE_STORAGE_KEY = 'cowch_goals';
 const VALUES_STORAGE_KEY = 'cowch_values';
 const VALUES_ALIGNMENT_KEY = 'cowch_values_alignment';
 
@@ -808,7 +808,7 @@ function renderChoiceHistory() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
-                <p>No choices tracked yet. Start noticing today.</p>
+                <p>No goals set yet. Add your first one.</p>
             </div>
         `;
         return;
