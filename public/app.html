@@ -629,6 +629,57 @@
             padding: var(--space-sm) 0;
         }
 
+        /* Check-in tool panel */
+        .checkin-cta {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-bottom: var(--space-lg);
+            transition: transform 0.12s, box-shadow 0.12s;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+        }
+        .checkin-cta:hover, .checkin-cta:active {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.18);
+        }
+        .checkin-cta-icon { font-size: 2rem; line-height: 1; }
+        .checkin-cta-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .checkin-cta-text strong { font-size: 1.1rem; font-weight: 900; }
+        .checkin-cta-text span { font-size: 0.9rem; color: var(--text-muted); }
+        .checkin-cta-arrow { font-size: 1.6rem; font-weight: 900; }
+
+        .checkin-cal-heading {
+            font-size: 0.95rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-sm);
+        }
+        .checkin-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            padding: var(--space-lg) 0;
+        }
+        .checkin-alert {
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-card);
+            border-left: 4px solid var(--coral);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .checkin-alert strong { font-weight: 900; }
+        .checkin-alert a { color: var(--coral); font-weight: 700; }
+
         .exercises-section {
             margin-bottom: var(--space-2xl);
             animation: slideUp 0.7s ease-out 0.35s both;
@@ -3184,10 +3235,10 @@
                         <h2>Your Tools</h2>
                         <div class="tool-cards">
                             <button class="tool-card" data-tool="notice">
-                                <span class="tool-card-icon">✨</span>
+                                <span class="tool-card-icon">🌤️</span>
                                 <div class="tool-card-text">
-                                    <strong>Notice</strong>
-                                    <span>Gratitude and awareness journal</span>
+                                    <strong>Check-in</strong>
+                                    <span>Today&rsquo;s inner weather and your calendar</span>
                                 </div>
                             </button>
 
@@ -3267,76 +3318,31 @@
         <div class="tool-panel" id="notice-panel">
             <header class="tool-panel-header">
                 <button class="tool-panel-back" id="notice-panel-back">← Back</button>
-                <h1 class="tool-panel-title">Notice</h1>
+                <h1 class="tool-panel-title">Check-in</h1>
                 <div style="width: 80px;"></div>
             </header>
 
             <div class="tool-panel-content">
-                <div class="tool-view-toggle">
-                    <button class="tool-view-btn active" data-notice-view="today">Today</button>
-                    <button class="tool-view-btn" data-notice-view="timeline">Timeline</button>
+                <div class="tool-section-intro">
+                    <h2>How&rsquo;s your inner weather?</h2>
+                    <p>A 30-second check-in. Patterns build up over time, so the more days you log, the clearer the picture gets.</p>
                 </div>
 
-                <!-- Notice: Today View -->
-                <div class="tool-section active" id="notice-today-view">
-                    <div class="tool-section-intro">
-                        <h2>What do you notice today?</h2>
-                        <p>No pressure, no judgment. Just notice.</p>
-                    </div>
+                <a href="/exercises/weather.html" class="checkin-cta" id="checkin-start">
+                    <span class="checkin-cta-icon">🌤️</span>
+                    <span class="checkin-cta-text">
+                        <strong id="checkin-cta-strong">Start today&rsquo;s check-in</strong>
+                        <span id="checkin-cta-sub">Pick the weather that fits</span>
+                    </span>
+                    <span class="checkin-cta-arrow">→</span>
+                </a>
 
-                    <div class="tool-card-brutalist">
-                        <h3>How does today feel?</h3>
-                        <div class="notice-color-picker" id="notice-color-picker">
-                            <div class="notice-color-option" data-color="#D4896A" style="background: #D4896A;"></div>
-                            <div class="notice-color-option" data-color="#E39B7F" style="background: #E39B7F;"></div>
-                            <div class="notice-color-option" data-color="#C47A5D" style="background: #C47A5D;"></div>
-                            <div class="notice-color-option" data-color="#8a7a6a" style="background: #8a7a6a;"></div>
-                            <div class="notice-color-option" data-color="#b0a499" style="background: #b0a499;"></div>
-                            <div class="notice-color-option" data-color="#78716C" style="background: #78716C;"></div>
-                            <div class="notice-color-option" data-color="#6B9AAF" style="background: #6B9AAF;"></div>
-                            <div class="notice-color-option" data-color="#7EA88B" style="background: #7EA88B;"></div>
-                            <div class="notice-color-option" data-color="#8FBC8F" style="background: #8FBC8F;"></div>
-                            <div class="notice-color-option" data-color="#B794C4" style="background: #B794C4;"></div>
-                            <div class="notice-color-option" data-color="#C9A857" style="background: #C9A857;"></div>
-                            <div class="notice-color-option" data-color="#3a3533" style="background: #3a3533;"></div>
-                        </div>
-                    </div>
+                <h3 class="checkin-cal-heading">Last 30 days</h3>
+                <div class="mood-calendar-grid" id="checkin-cal-grid"></div>
+                <div class="checkin-empty" id="checkin-cal-empty">No check-ins yet. Tap above to do your first one.</div>
 
-                    <div class="tool-card-brutalist">
-                        <h3>Energy level</h3>
-                        <div class="notice-slider-container">
-                            <div class="notice-slider-label">
-                                <span>Low</span>
-                                <span>High</span>
-                            </div>
-                            <input type="range" min="0" max="100" value="50" class="notice-slider" id="notice-energy-slider">
-                        </div>
-                    </div>
-
-                    <div class="tool-card-brutalist">
-                        <div class="tool-prompt" id="notice-daily-prompt">What mattered to me today?</div>
-                        <textarea class="tool-textarea" id="notice-text" placeholder="Write as much or as little as you want..."></textarea>
-                    </div>
-
-                    <button class="tool-save-btn" id="notice-save-btn">Save Notice</button>
-                </div>
-
-                <!-- Notice: Timeline View -->
-                <div class="tool-section" id="notice-timeline-view">
-                    <div class="tool-section-intro">
-                        <h2>Your notices</h2>
-                        <p>Patterns you notice are yours to explore</p>
-                    </div>
-
-                    <div id="notice-timeline-container">
-                        <div class="tool-empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                            </svg>
-                            <p>No notices yet. Start noticing today.</p>
-                        </div>
-                    </div>
-                </div>
+                <div id="checkin-low-alert" class="checkin-alert" style="display:none;"></div>
+                <div id="checkin-day-alert" class="checkin-alert" style="display:none;"></div>
             </div>
         </div>
 
