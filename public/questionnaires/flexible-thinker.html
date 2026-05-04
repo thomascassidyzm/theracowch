@@ -24,18 +24,22 @@
         .q-num { font-size: 0.85rem; font-weight: 700; color: #7A6556; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
         .q-text { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
 
+        button { touch-action: manipulation; -webkit-tap-highlight-color: rgba(0,0,0,0.08); }
+
         .scale { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .scale button { padding: 16px 8px; font-family: inherit; font-weight: 700; font-size: 0.95rem; background: #FDF5E8; border: 3px solid #2D2D2D; cursor: pointer; transition: all 0.12s; color: #2D2D2D; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .scale button:hover { background: #FFE8D4; }
         .scale button.selected { background: #C97B63; color: #FFFFFF; }
         .scale button .num { font-size: 1.2rem; }
         .scale button .lbl { font-size: 0.78rem; font-weight: 600; }
+        .scale.shake { animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
         .nav { display: flex; gap: 12px; margin-top: 22px; }
         .nav button { flex: 1; padding: 14px; font-family: inherit; font-weight: 700; font-size: 1rem; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; }
-        .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav button.is-disabled { opacity: 0.4; cursor: not-allowed; }
         .nav button.primary { background: #C97B63; color: #FFFFFF; }
-        .nav button:hover:not(:disabled) { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(60, 46, 40, 0.18); }
+        .nav button:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(60, 46, 40, 0.18); }
 
         .results h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
         .score-tile { background: #FDF5E8; border: 3px solid #2D2D2D; padding: 18px 20px; text-align: center; margin: 0 0 16px; }
@@ -73,8 +77,8 @@
             </div>
 
             <div class="nav">
-                <button id="prev">← Back</button>
-                <button id="next" class="primary" disabled>Next →</button>
+                <button type="button" id="prev">← Back</button>
+                <button type="button" id="next" class="primary is-disabled">Next →</button>
             </div>
         </div>
 
@@ -156,23 +160,35 @@
             scaleEl.innerHTML = '';
             scaleOptions.forEach(function (opt) {
                 var b = document.createElement('button');
+                b.type = 'button';
+                b.dataset.value = String(opt.value);
                 b.innerHTML = '<span class="num">' + opt.num + '</span><span class="lbl">' + opt.lbl + '</span>';
                 if (answers[i] === opt.value) b.classList.add('selected');
-                b.addEventListener('click', function () {
-                    answers[i] = opt.value;
-                    render();
-                });
                 scaleEl.appendChild(b);
             });
 
-            prevBtn.disabled = i === 0;
-            nextBtn.disabled = answers[i] === null;
+            prevBtn.classList.toggle('is-disabled', i === 0);
+            nextBtn.classList.toggle('is-disabled', answers[i] === null);
             nextBtn.textContent = (i === items.length - 1) ? 'See score →' : 'Next →';
         }
 
-        prevBtn.addEventListener('click', function () { if (i > 0) { i--; render(); } });
+        scaleEl.addEventListener('click', function (e) {
+            var btn = e.target.closest('button');
+            if (!btn || !scaleEl.contains(btn)) return;
+            answers[i] = parseInt(btn.dataset.value, 10);
+            render();
+        });
+
+        prevBtn.addEventListener('click', function () {
+            if (i > 0) { i--; render(); }
+        });
         nextBtn.addEventListener('click', function () {
-            if (answers[i] === null) return;
+            if (answers[i] === null) {
+                scaleEl.classList.remove('shake');
+                void scaleEl.offsetWidth;
+                scaleEl.classList.add('shake');
+                return;
+            }
             if (i < items.length - 1) { i++; render(); }
             else { showResults(); }
         });
