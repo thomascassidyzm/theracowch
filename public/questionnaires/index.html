@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaires | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0;
+            color: #2D2D2D;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 780px; margin: 0 auto; padding-bottom: 40px; }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FDF5E8;
+            color: #2D2D2D;
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            margin-bottom: 32px;
+        }
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; margin-bottom: 8px; }
+        .lede { color: #7A6556; margin-bottom: 32px; font-weight: 600; font-size: 1.1rem; }
+
+        .callout {
+            background: #FDF5E8;
+            border-left: 5px solid #C9A857;
+            padding: 16px 20px;
+            margin: 20px 0 28px;
+            font-size: 0.95rem;
+        }
+
+        .q-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .q-card {
+            display: block;
+            background: #FFFFFF;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            padding: 22px 24px;
+            color: inherit;
+            text-decoration: none;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+        .q-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.18);
+        }
+
+        .q-card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .q-card h2 { font-size: 1.3rem; font-weight: 900; margin: 4px 0 6px; }
+        .q-card p { font-size: 0.98rem; color: #5C4432; margin-bottom: 6px; }
+        .q-card .meta { font-size: 0.85rem; color: #7A6556; font-weight: 600; }
+
+        .q-card .completed-tag {
+            display: inline-block;
+            background: #E8F0E0;
+            color: #4A6A3A;
+            border: 2px solid #9AAA82;
+            padding: 2px 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html" class="back-link">← Back to app</a>
+
+        <h1>Questionnaires</h1>
+        <p class="lede">Three short self-reflections to help you notice patterns. Your answers stay on your device.</p>
+
+        <div class="callout">
+            These aren&rsquo;t diagnostic tests &mdash; they&rsquo;re mirrors. Use them to spot what&rsquo;s alive in you right now, then bring anything that comes up to your chat with Mandy.
+        </div>
+
+        <div class="q-grid">
+            <a class="q-card" href="/questionnaires/attachment.html">
+                <span class="q-card-icon">💞</span>
+                <h2>Adult Attachment <span id="tag-attachment"></span></h2>
+                <p>How you tend to bond, trust and ask for closeness in relationships.</p>
+                <span class="meta">20 questions · about 5 minutes</span>
+            </a>
+
+            <a class="q-card" href="/questionnaires/values.html">
+                <span class="q-card-icon">🌱</span>
+                <h2>Values <span id="tag-values"></span></h2>
+                <p>What actually matters to you across the different parts of your life.</p>
+                <span class="meta">12 life areas · about 5 minutes</span>
+            </a>
+
+            <a class="q-card" href="/questionnaires/flexible-thinker.html">
+                <span class="q-card-icon">🧠</span>
+                <h2>Flexible Thinker <span id="tag-flex"></span></h2>
+                <p>How easily you adapt your thinking when life doesn&rsquo;t go to plan.</p>
+                <span class="meta">10 questions · about 3 minutes</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var tags = {
+                'cowch-q-attachment': 'tag-attachment',
+                'cowch-q-values': 'tag-values',
+                'cowch-q-flex': 'tag-flex'
+            };
+            Object.keys(tags).forEach(function (key) {
+                if (localStorage.getItem(key)) {
+                    var el = document.getElementById(tags[key]);
+                    if (el) el.innerHTML = '<span class="completed-tag">Done</span>';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

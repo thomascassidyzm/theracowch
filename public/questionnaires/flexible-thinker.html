@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexible Thinker | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Gabarito', system-ui, sans-serif; background: #FFF6F0; color: #2D2D2D; line-height: 1.6; min-height: 100vh; padding: 20px; }
+        .container { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+
+        .back-link { display: inline-block; padding: 10px 20px; background: #FDF5E8; color: #2D2D2D; text-decoration: none; font-weight: 700; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); margin-bottom: 24px; }
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); font-weight: 900; margin-bottom: 6px; }
+        .lede { color: #7A6556; margin-bottom: 20px; font-weight: 600; }
+
+        .progress { height: 10px; background: #FDF5E8; border: 3px solid #2D2D2D; margin-bottom: 26px; position: relative; }
+        .progress-bar { height: 100%; background: #C97B63; transition: width 0.3s; width: 0%; }
+
+        .q-card { background: #FFFFFF; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); padding: 24px; margin-bottom: 20px; }
+        .q-num { font-size: 0.85rem; font-weight: 700; color: #7A6556; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+        .q-text { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
+
+        .scale { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .scale button { padding: 16px 8px; font-family: inherit; font-weight: 700; font-size: 0.95rem; background: #FDF5E8; border: 3px solid #2D2D2D; cursor: pointer; transition: all 0.12s; color: #2D2D2D; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .scale button:hover { background: #FFE8D4; }
+        .scale button.selected { background: #C97B63; color: #FFFFFF; }
+        .scale button .num { font-size: 1.2rem; }
+        .scale button .lbl { font-size: 0.78rem; font-weight: 600; }
+
+        .nav { display: flex; gap: 12px; margin-top: 22px; }
+        .nav button { flex: 1; padding: 14px; font-family: inherit; font-weight: 700; font-size: 1rem; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; }
+        .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav button.primary { background: #C97B63; color: #FFFFFF; }
+        .nav button:hover:not(:disabled) { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(60, 46, 40, 0.18); }
+
+        .results h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+        .score-tile { background: #FDF5E8; border: 3px solid #2D2D2D; padding: 18px 20px; text-align: center; margin: 0 0 16px; }
+        .score-tile .big { font-size: 3rem; font-weight: 900; line-height: 1; }
+        .score-tile .out { font-size: 1.2rem; color: #7A6556; }
+        .score-tile .band { display: inline-block; background: #C97B63; color: #FFFFFF; padding: 4px 14px; font-weight: 700; font-size: 0.95rem; margin-top: 10px; }
+
+        .summary { background: #FFFFFF; border: 3px solid #D8CEC5; padding: 16px 18px; margin-bottom: 14px; }
+        .summary p { margin-bottom: 8px; }
+
+        .reflect { background: #FDF5E8; border-left: 4px solid #C9A857; padding: 14px 16px; margin-bottom: 14px; }
+        .reflect strong { display: block; margin-bottom: 4px; }
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+        .actions a, .actions button { padding: 12px 18px; font-family: inherit; font-weight: 700; text-decoration: none; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; font-size: 0.95rem; }
+        .actions .primary { background: #C97B63; color: #FFFFFF; }
+
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/questionnaires/" class="back-link">← All questionnaires</a>
+
+        <div id="quiz">
+            <h1>Flexible Thinker</h1>
+            <p class="lede">How easily you adapt your thinking when life doesn&rsquo;t go to plan. Rate each statement honestly, not aspirationally.</p>
+
+            <div class="progress"><div class="progress-bar" id="bar"></div></div>
+
+            <div class="q-card">
+                <div class="q-num" id="q-num"></div>
+                <div class="q-text" id="q-text"></div>
+                <div class="scale" id="scale"></div>
+            </div>
+
+            <div class="nav">
+                <button id="prev">← Back</button>
+                <button id="next" class="primary" disabled>Next →</button>
+            </div>
+        </div>
+
+        <div id="results" class="results hide">
+            <h1>Your flexibility score</h1>
+            <div class="score-tile">
+                <span class="big" id="score"></span>
+                <span class="out">/ 40</span>
+                <div><span class="band" id="band"></span></div>
+            </div>
+
+            <div class="summary" id="summary"></div>
+
+            <div class="reflect">
+                <strong>One small experiment</strong>
+                <span id="experiment"></span>
+            </div>
+
+            <div class="actions">
+                <a href="/app.html#chat" class="primary">Talk to Mandy about this</a>
+                <button id="retake">Retake</button>
+                <a href="/questionnaires/">More questionnaires</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 10 items, 1-4 scale, max 40. Higher = more flexible.
+        // Reverse-keyed items are flipped before summing.
+        var items = [
+            { text: "When something doesn't go to plan, I can usually find another way.", reverse: false },
+            { text: "I get stuck on the way I think things 'should' be.", reverse: true },
+            { text: "I can hold a strong feeling without acting on it straight away.", reverse: false },
+            { text: "When I'm wrong, I find it hard to admit it &mdash; even to myself.", reverse: true },
+            { text: "I can see a situation from more than one angle.", reverse: false },
+            { text: "I'd rather be right than understand the other person.", reverse: true },
+            { text: "I can change my approach when what I'm doing isn't working.", reverse: false },
+            { text: "Uncomfortable thoughts and feelings shut me down.", reverse: true },
+            { text: "I can act on what matters to me, even when I don't feel like it.", reverse: false },
+            { text: "When something feels uncertain, I tend to spiral.", reverse: true }
+        ];
+
+        var scaleOptions = [
+            { value: 1, num: "1", lbl: "Rarely" },
+            { value: 2, num: "2", lbl: "Sometimes" },
+            { value: 3, num: "3", lbl: "Often" },
+            { value: 4, num: "4", lbl: "Almost always" }
+        ];
+
+        var bands = [
+            { min: 33, max: 40, name: "Highly flexible", summary: "You move with life. You can sit with discomfort, change your mind when the evidence shifts, and keep moving toward what matters even when you don't feel like it. Keep practising &mdash; flexibility is built one moment at a time." },
+            { min: 25, max: 32, name: "Mostly flexible", summary: "You bend more often than you break. There are still some sticky places where you get caught &mdash; usually around being wrong, sitting with hard feelings, or holding uncertainty. Notice which questions you scored lowest on; that's where the next bit of growth lives." },
+            { min: 17, max: 24, name: "Mixed", summary: "Some areas are flexible, others rigid. You probably already know the situations where you dig in or shut down. Flexibility isn't a personality trait &mdash; it's a skill, and you can build it." },
+            { min: 10, max: 16, name: "Tends toward rigid", summary: "Your mind is working hard to keep things controlled and predictable, which made sense at some point. The cost is options. Even one small daily practice in noticing-without-acting can start to widen the gap between feeling something and doing something." }
+        ];
+
+        var experiments = [
+            "Pick one strong thought today and finish the sentence: 'I'm noticing the thought that...' before deciding what to do with it.",
+            "Find one situation this week where you can ask 'what's another way of seeing this?' before reacting.",
+            "Choose one tiny action that aligns with what matters to you, and do it even if you're not in the mood.",
+            "Notice one place you said 'should' today. Try swapping it for 'I'd prefer' or 'it would be nice if' and see how it feels."
+        ];
+
+        var answers = new Array(items.length).fill(null);
+        var i = 0;
+
+        var qNum = document.getElementById('q-num');
+        var qText = document.getElementById('q-text');
+        var scaleEl = document.getElementById('scale');
+        var bar = document.getElementById('bar');
+        var prevBtn = document.getElementById('prev');
+        var nextBtn = document.getElementById('next');
+
+        function render() {
+            qNum.textContent = 'Question ' + (i + 1) + ' of ' + items.length;
+            qText.innerHTML = items[i].text;
+            bar.style.width = ((i / items.length) * 100) + '%';
+
+            scaleEl.innerHTML = '';
+            scaleOptions.forEach(function (opt) {
+                var b = document.createElement('button');
+                b.innerHTML = '<span class="num">' + opt.num + '</span><span class="lbl">' + opt.lbl + '</span>';
+                if (answers[i] === opt.value) b.classList.add('selected');
+                b.addEventListener('click', function () {
+                    answers[i] = opt.value;
+                    render();
+                });
+                scaleEl.appendChild(b);
+            });
+
+            prevBtn.disabled = i === 0;
+            nextBtn.disabled = answers[i] === null;
+            nextBtn.textContent = (i === items.length - 1) ? 'See score →' : 'Next →';
+        }
+
+        prevBtn.addEventListener('click', function () { if (i > 0) { i--; render(); } });
+        nextBtn.addEventListener('click', function () {
+            if (answers[i] === null) return;
+            if (i < items.length - 1) { i++; render(); }
+            else { showResults(); }
+        });
+
+        function showResults() {
+            var total = 0;
+            items.forEach(function (item, idx) {
+                var v = answers[idx];
+                if (item.reverse) v = 5 - v;
+                total += v;
+            });
+
+            var band = bands.find(function (b) { return total >= b.min && total <= b.max; }) || bands[bands.length - 1];
+
+            document.getElementById('score').textContent = total;
+            document.getElementById('band').textContent = band.name;
+            document.getElementById('summary').innerHTML = '<p>' + band.summary + '</p>';
+            document.getElementById('experiment').innerHTML = experiments[Math.floor(Math.random() * experiments.length)];
+
+            try {
+                localStorage.setItem('cowch-q-flex', JSON.stringify({
+                    score: total, band: band.name, takenAt: new Date().toISOString()
+                }));
+            } catch (_) {}
+
+            document.getElementById('quiz').classList.add('hide');
+            document.getElementById('results').classList.remove('hide');
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('retake').addEventListener('click', function () {
+            answers = new Array(items.length).fill(null);
+            i = 0;
+            document.getElementById('results').classList.add('hide');
+            document.getElementById('quiz').classList.remove('hide');
+            render();
+            window.scrollTo(0, 0);
+        });
+
+        render();
+    </script>
+</body>
+</html>

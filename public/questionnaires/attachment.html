@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Attachment | Cowch</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Gabarito', system-ui, sans-serif; background: #FFF6F0; color: #2D2D2D; line-height: 1.6; min-height: 100vh; padding: 20px; }
+        .container { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+
+        .back-link { display: inline-block; padding: 10px 20px; background: #FDF5E8; color: #2D2D2D; text-decoration: none; font-weight: 700; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); margin-bottom: 24px; }
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); font-weight: 900; margin-bottom: 6px; }
+        .lede { color: #7A6556; margin-bottom: 20px; font-weight: 600; }
+
+        .progress { height: 10px; background: #FDF5E8; border: 3px solid #2D2D2D; margin-bottom: 26px; position: relative; }
+        .progress-bar { height: 100%; background: #C97B63; transition: width 0.3s; width: 0%; }
+
+        .q-card { background: #FFFFFF; border: 4px solid #2D2D2D; box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18); padding: 24px; margin-bottom: 20px; }
+        .q-num { font-size: 0.85rem; font-weight: 700; color: #7A6556; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+        .q-text { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
+
+        .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .scale button { padding: 14px 8px; font-family: inherit; font-weight: 700; font-size: 0.95rem; background: #FDF5E8; border: 3px solid #2D2D2D; cursor: pointer; transition: all 0.12s; color: #2D2D2D; }
+        .scale button:hover { background: #FFE8D4; }
+        .scale button.selected { background: #C97B63; color: #FFFFFF; }
+        .scale-label { font-size: 0.78rem; color: #7A6556; margin-top: 6px; display: flex; justify-content: space-between; }
+
+        .nav { display: flex; gap: 12px; margin-top: 22px; }
+        .nav button { flex: 1; padding: 14px; font-family: inherit; font-weight: 700; font-size: 1rem; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; }
+        .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav button.primary { background: #C97B63; color: #FFFFFF; }
+        .nav button:hover:not(:disabled) { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(60, 46, 40, 0.18); }
+
+        .results h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+        .style-tag { display: inline-block; background: #C97B63; color: #FFFFFF; padding: 4px 14px; font-weight: 700; font-size: 1rem; margin-bottom: 14px; }
+        .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 22px; }
+        .score-tile { background: #FDF5E8; border: 3px solid #2D2D2D; padding: 12px; }
+        .score-tile strong { display: block; font-size: 0.85rem; color: #7A6556; text-transform: uppercase; }
+        .score-tile span { font-size: 1.6rem; font-weight: 900; }
+        .score-bar { height: 8px; background: #EEE6DE; margin-top: 6px; }
+        .score-bar > div { height: 100%; background: #C97B63; }
+
+        .styles-list { display: grid; gap: 10px; margin: 16px 0; }
+        .style-row { background: #FFFFFF; border: 3px solid #D8CEC5; padding: 12px 14px; }
+        .style-row.active { border-color: #2D2D2D; background: #FDF5E8; }
+        .style-row strong { font-weight: 900; }
+        .style-row p { font-size: 0.95rem; color: #5C4432; margin-top: 4px; }
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        .actions a, .actions button { padding: 12px 18px; font-family: inherit; font-weight: 700; text-decoration: none; background: #FDF5E8; color: #2D2D2D; border: 4px solid #2D2D2D; box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.18); cursor: pointer; font-size: 0.95rem; }
+        .actions .primary { background: #C97B63; color: #FFFFFF; }
+
+        .disclaimer { font-size: 0.85rem; color: #7A6556; margin-top: 22px; padding: 12px 14px; background: #FDF5E8; border-left: 4px solid #C9A857; }
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/questionnaires/" class="back-link">← All questionnaires</a>
+
+        <div id="quiz">
+            <h1>Adult Attachment</h1>
+            <p class="lede">How you tend to bond, trust and seek closeness. Answer with your gut, not your ideal.</p>
+
+            <div class="progress"><div class="progress-bar" id="bar"></div></div>
+
+            <div class="q-card">
+                <div class="q-num" id="q-num"></div>
+                <div class="q-text" id="q-text"></div>
+                <div class="scale" id="scale"></div>
+                <div class="scale-label">
+                    <span>Strongly disagree</span>
+                    <span>Strongly agree</span>
+                </div>
+            </div>
+
+            <div class="nav">
+                <button id="prev">← Back</button>
+                <button id="next" class="primary" disabled>Next →</button>
+            </div>
+        </div>
+
+        <div id="results" class="results hide">
+            <h1>Your attachment pattern</h1>
+            <div class="style-tag" id="style-tag"></div>
+            <p id="style-desc"></p>
+
+            <div class="scores">
+                <div class="score-tile">
+                    <strong>Anxiety</strong>
+                    <span id="score-anx"></span>/30
+                    <div class="score-bar"><div id="bar-anx"></div></div>
+                </div>
+                <div class="score-tile">
+                    <strong>Avoidance</strong>
+                    <span id="score-avd"></span>/30
+                    <div class="score-bar"><div id="bar-avd"></div></div>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.1rem; margin-top: 18px; margin-bottom: 8px;">The four patterns</h2>
+            <div class="styles-list" id="styles-list"></div>
+
+            <div class="disclaimer">
+                Attachment isn&rsquo;t a fixed identity. It shifts with safe relationships, self-awareness and time. This is a snapshot, not a verdict.
+            </div>
+
+            <div class="actions">
+                <a href="/app.html#chat" class="primary">Talk to Mandy about this</a>
+                <button id="retake">Retake</button>
+                <a href="/questionnaires/">More questionnaires</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Items: each maps to "anxiety" (fear of abandonment / need for reassurance)
+        // or "avoidance" (discomfort with closeness / self-reliance to a fault).
+        // Reverse-keyed items are flipped to keep direction consistent.
+        var items = [
+            { text: "I worry that the people I love don't really love me back.", dim: "anx" },
+            { text: "I find it hard to depend on others, even when I need to.", dim: "avd" },
+            { text: "I get nervous when someone close to me wants to be very close.", dim: "avd" },
+            { text: "I worry about being abandoned.", dim: "anx" },
+            { text: "I'm comfortable being close to others.", dim: "avd", reverse: true },
+            { text: "I worry that I'm not good enough for the people I'm close to.", dim: "anx" },
+            { text: "I prefer not to show people how I feel deep down.", dim: "avd" },
+            { text: "I often need reassurance that I'm loved.", dim: "anx" },
+            { text: "I find it easy to trust people.", dim: "avd", reverse: true },
+            { text: "I worry that I care more about people than they care about me.", dim: "anx" },
+            { text: "I'd rather handle things on my own than ask someone for help.", dim: "avd" },
+            { text: "When I can't reach someone close to me, I feel anxious.", dim: "anx" },
+            { text: "I feel comfortable letting people see the messy bits of me.", dim: "avd", reverse: true },
+            { text: "I can get clingy when I feel a relationship is at risk.", dim: "anx" },
+            { text: "I feel uncomfortable when someone wants to be emotionally close to me.", dim: "avd" },
+            { text: "I worry a lot about my relationships.", dim: "anx" },
+            { text: "I find it hard to open up to people.", dim: "avd" },
+            { text: "I feel safe expressing my needs to the people I love.", dim: "anx", reverse: true },
+            { text: "I sometimes pull away when someone gets too close.", dim: "avd" },
+            { text: "I think about my relationships a lot, even when nothing is wrong.", dim: "anx" }
+        ];
+
+        var scaleOptions = [
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3" },
+            { value: 4, label: "4" },
+            { value: 5, label: "5" }
+        ];
+
+        var styles = [
+            { key: "secure", name: "Secure", desc: "Comfortable with closeness and with independence. You can ask for support, give it, and weather conflict without losing yourself." },
+            { key: "anxious", name: "Anxious / Preoccupied", desc: "You feel relationships deeply and want closeness, but worry about being left or not being loved enough. Reassurance helps; self-soothing skills help even more." },
+            { key: "avoidant", name: "Avoidant / Dismissing", desc: "Independence feels safer than depending on people. You may withdraw when things get emotional. Practice in tolerating closeness widens what you can handle." },
+            { key: "fearful", name: "Fearful-Avoidant / Disorganised", desc: "You want closeness and fear it at the same time. Often shaped by inconsistent or scary early relationships. Steady, safe contact slowly rewrites the wiring." }
+        ];
+
+        var answers = new Array(items.length).fill(null);
+        var i = 0;
+
+        var qNum = document.getElementById('q-num');
+        var qText = document.getElementById('q-text');
+        var scaleEl = document.getElementById('scale');
+        var bar = document.getElementById('bar');
+        var prevBtn = document.getElementById('prev');
+        var nextBtn = document.getElementById('next');
+
+        function render() {
+            qNum.textContent = 'Question ' + (i + 1) + ' of ' + items.length;
+            qText.textContent = items[i].text;
+            bar.style.width = ((i / items.length) * 100) + '%';
+
+            scaleEl.innerHTML = '';
+            scaleOptions.forEach(function (opt) {
+                var b = document.createElement('button');
+                b.textContent = opt.label;
+                if (answers[i] === opt.value) b.classList.add('selected');
+                b.addEventListener('click', function () {
+                    answers[i] = opt.value;
+                    render();
+                });
+                scaleEl.appendChild(b);
+            });
+
+            prevBtn.disabled = i === 0;
+            nextBtn.disabled = answers[i] === null;
+            nextBtn.textContent = (i === items.length - 1) ? 'See results →' : 'Next →';
+        }
+
+        prevBtn.addEventListener('click', function () { if (i > 0) { i--; render(); } });
+        nextBtn.addEventListener('click', function () {
+            if (answers[i] === null) return;
+            if (i < items.length - 1) { i++; render(); }
+            else { showResults(); }
+        });
+
+        function showResults() {
+            var anx = 0, anxN = 0, avd = 0, avdN = 0;
+            items.forEach(function (item, idx) {
+                var v = answers[idx];
+                if (item.reverse) v = 6 - v;
+                if (item.dim === 'anx') { anx += v; anxN++; }
+                else { avd += v; avdN++; }
+            });
+
+            // Scale to /30 for display (10 items in each dim, scored 1-5 → 10-50; map linearly to 0-30 over usable range 10-50)
+            var anxOut = Math.round(((anx - anxN) / (anxN * 4)) * 30);
+            var avdOut = Math.round(((avd - avdN) / (avdN * 4)) * 30);
+
+            var highAnx = anxOut >= 15;
+            var highAvd = avdOut >= 15;
+            var styleKey;
+            if (!highAnx && !highAvd) styleKey = 'secure';
+            else if (highAnx && !highAvd) styleKey = 'anxious';
+            else if (!highAnx && highAvd) styleKey = 'avoidant';
+            else styleKey = 'fearful';
+
+            var picked = styles.find(function (s) { return s.key === styleKey; });
+
+            document.getElementById('style-tag').textContent = picked.name;
+            document.getElementById('style-desc').textContent = picked.desc;
+            document.getElementById('score-anx').textContent = anxOut;
+            document.getElementById('score-avd').textContent = avdOut;
+            document.getElementById('bar-anx').style.width = ((anxOut / 30) * 100) + '%';
+            document.getElementById('bar-avd').style.width = ((avdOut / 30) * 100) + '%';
+
+            var list = document.getElementById('styles-list');
+            list.innerHTML = '';
+            styles.forEach(function (s) {
+                var row = document.createElement('div');
+                row.className = 'style-row' + (s.key === styleKey ? ' active' : '');
+                row.innerHTML = '<strong>' + s.name + '</strong><p>' + s.desc + '</p>';
+                list.appendChild(row);
+            });
+
+            try {
+                localStorage.setItem('cowch-q-attachment', JSON.stringify({
+                    style: styleKey, anxiety: anxOut, avoidance: avdOut, takenAt: new Date().toISOString()
+                }));
+            } catch (_) {}
+
+            document.getElementById('quiz').classList.add('hide');
+            document.getElementById('results').classList.remove('hide');
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('retake').addEventListener('click', function () {
+            answers = new Array(items.length).fill(null);
+            i = 0;
+            document.getElementById('results').classList.add('hide');
+            document.getElementById('quiz').classList.remove('hide');
+            render();
+            window.scrollTo(0, 0);
+        });
+
+        render();
+    </script>
+</body>
+</html>
