@@ -493,22 +493,9 @@ function setupThemePicker() {
 // ============================================
 
 // Storage keys
-const NOTICE_STORAGE_KEY = 'cowch_notices';
 const CHOICE_STORAGE_KEY = 'cowch_choices';
 const VALUES_STORAGE_KEY = 'cowch_values';
 const VALUES_ALIGNMENT_KEY = 'cowch_values_alignment';
-
-// Notice state
-let noticeSelectedColor = null;
-
-// Daily prompts for Notice
-const NOTICE_PROMPTS = [
-    "What mattered to me today?",
-    "What surprised me today?",
-    "Where did I feel most like myself?",
-    "What did I notice today?",
-    "What did I give myself today?"
-];
 
 // Get today's date key
 function getTodayKey() {
@@ -570,191 +557,126 @@ function closeToolPanel(tool) {
 }
 
 // ============================================
-// NOTICE TOOL
+// CHECK-IN TOOL (mood calendar fed by /exercises/weather.html)
 // ============================================
 
+const WEATHER_ICONS = {
+    'sunny': '☀️', 'partly-cloudy': '🌤️', 'cloudy': '☁️',
+    'overcast': '☁️', 'rainy': '🌧️', 'stormy': '⛈️',
+    'foggy': '🌫️', 'rainbow': '🌈'
+};
+const LOW_MOODS = ['partly-cloudy', 'cloudy', 'overcast', 'rainy', 'stormy', 'foggy'];
+
 function initNotice() {
-    // Set daily prompt
-    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-    document.getElementById('notice-daily-prompt').textContent = NOTICE_PROMPTS[dayOfYear % NOTICE_PROMPTS.length];
-
-    // Load today's notice
-    loadTodayNotice();
-
-    // Setup color picker
-    setupNoticeColorPicker();
-
-    // Setup view toggle
-    setupNoticeViewToggle();
-
-    // Setup save button
-    setupNoticeSave();
+    renderCheckinCalendar();
 }
 
-function setupNoticeColorPicker() {
-    const colorOptions = document.querySelectorAll('.notice-color-option');
-    colorOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            colorOptions.forEach(o => o.classList.remove('selected'));
-            option.classList.add('selected');
-            noticeSelectedColor = option.dataset.color;
-        });
-    });
-}
+function renderCheckinCalendar() {
+    const grid = document.getElementById('checkin-cal-grid');
+    const empty = document.getElementById('checkin-cal-empty');
+    const lowAlert = document.getElementById('checkin-low-alert');
+    const dayAlert = document.getElementById('checkin-day-alert');
+    if (!grid) return;
 
-function setupNoticeViewToggle() {
-    document.querySelectorAll('[data-notice-view]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const view = btn.dataset.noticeView;
-            document.querySelectorAll('[data-notice-view]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    grid.innerHTML = '';
 
-            document.getElementById('notice-today-view').classList.toggle('active', view === 'today');
-            document.getElementById('notice-timeline-view').classList.toggle('active', view === 'timeline');
+    const history = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
 
-            if (view === 'timeline') renderNoticeTimeline();
-        });
-    });
-}
-
-function loadTodayNotice() {
-    const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
-    const today = getTodayKey();
-    const todayNotice = notices[today];
-
-    if (todayNotice) {
-        // Set color
-        if (todayNotice.color) {
-            noticeSelectedColor = todayNotice.color;
-            const colorOption = document.querySelector(`.notice-color-option[data-color="${todayNotice.color}"]`);
-            if (colorOption) {
-                document.querySelectorAll('.notice-color-option').forEach(o => o.classList.remove('selected'));
-                colorOption.classList.add('selected');
-            }
-        }
-        // Set energy
-        if (todayNotice.energy !== undefined) {
-            document.getElementById('notice-energy-slider').value = todayNotice.energy;
-        }
-        // Set text
-        if (todayNotice.text) {
-            document.getElementById('notice-text').value = todayNotice.text;
-        }
-    }
-}
-
-function setupNoticeSave() {
-    document.getElementById('notice-save-btn').addEventListener('click', () => {
-        const energy = document.getElementById('notice-energy-slider').value;
-        const text = document.getElementById('notice-text').value;
-
-        if (!noticeSelectedColor && !text.trim()) return;
-
-        const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
-        const today = getTodayKey();
-
-        notices[today] = {
-            color: noticeSelectedColor,
-            energy: parseInt(energy),
-            text: text.trim(),
-            prompt: document.getElementById('notice-daily-prompt').textContent
-        };
-
-        localStorage.setItem(NOTICE_STORAGE_KEY, JSON.stringify(notices));
-
-        // Feedback
-        const btn = document.getElementById('notice-save-btn');
-        const originalText = btn.textContent;
-        btn.textContent = 'Saved ✓';
-        btn.disabled = true;
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }, 2000);
-    });
-}
-
-function renderNoticeTimeline() {
-    const notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY) || '{}');
-    const container = document.getElementById('notice-timeline-container');
-
-    if (Object.keys(notices).length === 0) {
-        container.innerHTML = `
-            <div class="tool-empty-state">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                <p>No notices yet. Start noticing today.</p>
-            </div>
-        `;
+    if (history.length === 0) {
+        empty.style.display = 'block';
+        grid.style.display = 'none';
+        lowAlert.style.display = 'none';
+        dayAlert.style.display = 'none';
         return;
     }
+    empty.style.display = 'none';
+    grid.style.display = '';
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-    const monthName = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-    let html = `
-        <div class="notice-timeline-header">
-            <h3>${monthName}</h3>
-        </div>
-        <div class="notice-timeline-grid">
-            <div class="notice-day-label">S</div>
-            <div class="notice-day-label">M</div>
-            <div class="notice-day-label">T</div>
-            <div class="notice-day-label">W</div>
-            <div class="notice-day-label">T</div>
-            <div class="notice-day-label">F</div>
-            <div class="notice-day-label">S</div>
-    `;
-
-    for (let i = 0; i < startingDayOfWeek; i++) {
-        html += '<div class="notice-day-cell empty"></div>';
-    }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const notice = notices[dateKey];
-        const isToday = day === now.getDate();
-
-        if (notice && notice.color) {
-            html += `
-                <div class="notice-day-cell has-entry ${isToday ? 'today' : ''}"
-                     style="background: ${notice.color};"
-                     data-date="${dateKey}">
-                    <div class="notice-day-number" style="color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${day}</div>
-                </div>
-            `;
-        } else {
-            html += `
-                <div class="notice-day-cell empty ${isToday ? 'today' : ''}">
-                    <div class="notice-day-number">${day}</div>
-                </div>
-            `;
-        }
-    }
-
-    html += '</div>';
-    container.innerHTML = html;
-
-    // Click handlers for entries
-    container.querySelectorAll('.notice-day-cell[data-date]').forEach(cell => {
-        cell.addEventListener('click', () => {
-            const dateKey = cell.dataset.date;
-            const notice = notices[dateKey];
-            if (notice) {
-                const formattedDate = new Date(dateKey + 'T00:00:00').toLocaleDateString('en-US', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                });
-                alert(`${formattedDate}\n\n"${notice.prompt}"\n\n${notice.text || '(No text recorded)'}`);
-            }
-        });
+    ['M','T','W','T','F','S','S'].forEach(label => {
+        const el = document.createElement('div');
+        el.className = 'mood-cal-label';
+        el.textContent = label;
+        grid.appendChild(el);
     });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        days.push(d);
+    }
+
+    const checkinMap = {};
+    history.forEach(entry => {
+        const ed = new Date(entry.timestamp);
+        const key = ed.getFullYear() + '-' + (ed.getMonth() + 1) + '-' + ed.getDate();
+        if (!checkinMap[key]) checkinMap[key] = entry;
+    });
+
+    const firstDay = days[0].getDay();
+    const startPad = (firstDay + 6) % 7;
+    for (let p = 0; p < startPad; p++) {
+        const e = document.createElement('div');
+        e.className = 'mood-cal-day empty';
+        grid.appendChild(e);
+    }
+
+    days.forEach(date => {
+        const el = document.createElement('div');
+        el.className = 'mood-cal-day';
+        const key = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        if (date.getTime() === today.getTime()) el.classList.add('today');
+        const ci = checkinMap[key];
+        if (ci && WEATHER_ICONS[ci.weather]) {
+            el.classList.add('has-checkin');
+            el.innerHTML = '<span class="cal-weather">' + WEATHER_ICONS[ci.weather] + '</span><span class="cal-num">' + date.getDate() + '</span>';
+        } else {
+            el.innerHTML = '<span class="cal-num">' + date.getDate() + '</span>';
+        }
+        grid.appendChild(el);
+    });
+
+    // 3+ consecutive low-mood days alert
+    let consecutive = 0;
+    for (let c = 0; c < days.length; c++) {
+        const d = days[days.length - 1 - c];
+        const k = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        const ci = checkinMap[k];
+        if (ci && LOW_MOODS.indexOf(ci.weather) !== -1) consecutive++;
+        else break;
+    }
+    if (consecutive >= 3) {
+        lowAlert.innerHTML = "You've had a few low-weather days in a row. What's around you that might be feeding it? <a href=\"#chat\" data-tab=\"chat\">Bring it to Mandy</a>.";
+        lowAlert.style.display = 'block';
+    } else {
+        lowAlert.style.display = 'none';
+    }
+
+    // Day-of-week pattern alert
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayLow = [0,0,0,0,0,0,0];
+    const dayTot = [0,0,0,0,0,0,0];
+    days.forEach(date => {
+        const k = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        const ci = checkinMap[k];
+        if (ci) {
+            const dow = date.getDay();
+            dayTot[dow]++;
+            if (LOW_MOODS.indexOf(ci.weather) !== -1) dayLow[dow]++;
+        }
+    });
+    let patternDay = null;
+    for (let pd = 0; pd < 7; pd++) {
+        if (dayTot[pd] >= 2 && dayLow[pd] === dayTot[pd]) { patternDay = pd; break; }
+    }
+    if (patternDay !== null) {
+        dayAlert.innerHTML = 'You tend to dip on a <strong>' + dayNames[patternDay] + '</strong>. Worth bringing to <a href="#chat" data-tab="chat">Mandy</a>.';
+        dayAlert.style.display = 'block';
+    } else {
+        dayAlert.style.display = 'none';
+    }
 }
 
 // ============================================
