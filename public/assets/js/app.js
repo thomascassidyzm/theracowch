@@ -372,13 +372,14 @@ function setupDomainPanel() {
 // ============================================
 
 // ============================================
-// Quick Check-in
+// Questionnaires
 // ============================================
 
 function setupQuickCheckin() {
-    document.getElementById('quick-checkin').addEventListener('click', () => {
-        // Go to Inner Weather exercise
-        window.location.href = '/exercises/weather.html';
+    var btn = document.getElementById('open-questionnaires');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        window.location.href = '/questionnaires/';
     });
 }
 
