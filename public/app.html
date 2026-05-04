@@ -3259,10 +3259,10 @@
                             </button>
 
                             <button class="tool-card" data-tool="choice">
-                                <span class="tool-card-icon">🌳</span>
+                                <span class="tool-card-icon">🏔️</span>
                                 <div class="tool-card-text">
-                                    <strong>Choice</strong>
-                                    <span>Track your decisions and agency</span>
+                                    <strong>Goals</strong>
+                                    <span>Set goals and watch your tree grow</span>
                                 </div>
                             </button>
 
@@ -3366,37 +3366,37 @@
         <div class="tool-panel" id="choice-panel">
             <header class="tool-panel-header">
                 <button class="tool-panel-back" id="choice-panel-back">← Back</button>
-                <h1 class="tool-panel-title">Choice</h1>
+                <h1 class="tool-panel-title">Goals</h1>
                 <div style="width: 80px;"></div>
             </header>
 
             <div class="tool-panel-content">
                 <div class="tool-view-toggle">
-                    <button class="tool-view-btn active" data-choice-view="today">Today</button>
+                    <button class="tool-view-btn active" data-choice-view="today">Add</button>
                     <button class="tool-view-btn" data-choice-view="tree">My Tree</button>
-                    <button class="tool-view-btn" data-choice-view="history">History</button>
+                    <button class="tool-view-btn" data-choice-view="history">All Goals</button>
                 </div>
 
-                <!-- Choice: Today View -->
+                <!-- Goals: Add View -->
                 <div class="tool-section active" id="choice-today-view">
                     <div class="tool-section-intro">
-                        <h2>What choice did you notice today?</h2>
-                        <p>Every choice you recognize strengthens your agency</p>
+                        <h2>What&rsquo;s a goal you want to work toward?</h2>
+                        <p>Big or small. Naming it is the first step toward reaching it.</p>
                     </div>
 
                     <div class="tool-card-brutalist">
-                        <div class="tool-prompt">I chose to...</div>
-                        <textarea class="tool-textarea" id="choice-text" placeholder="Even small choices matter - what did you choose today that you're noticing?"></textarea>
+                        <div class="tool-prompt">My goal is to&hellip;</div>
+                        <textarea class="tool-textarea" id="choice-text" placeholder="What do you want to move toward? Could be today, this week, this year."></textarea>
                     </div>
 
-                    <button class="tool-save-btn" id="choice-save-btn">Add Choice</button>
+                    <button class="tool-save-btn" id="choice-save-btn">Add Goal</button>
                 </div>
 
-                <!-- Choice: Tree View -->
+                <!-- Goals: Tree View -->
                 <div class="tool-section" id="choice-tree-view">
                     <div class="tool-section-intro">
-                        <h2>Your Choice Tree</h2>
-                        <p>Each leaf represents a choice you noticed</p>
+                        <h2>Your Goals Tree</h2>
+                        <p>Each leaf is a goal you&rsquo;ve set. Watch the tree grow.</p>
                     </div>
 
                     <div class="choice-tree-container">
@@ -3408,15 +3408,15 @@
                     </div>
 
                     <div class="choice-count-display">
-                        <strong id="choice-count">0</strong> choices noticed
+                        <strong id="choice-count">0</strong> goals set
                     </div>
                 </div>
 
-                <!-- Choice: History View -->
+                <!-- Goals: All Goals View -->
                 <div class="tool-section" id="choice-history-view">
                     <div class="tool-section-intro">
-                        <h2>Your Choices</h2>
-                        <p>A record of your agency</p>
+                        <h2>Your Goals</h2>
+                        <p>Every goal you&rsquo;ve set, in one place.</p>
                     </div>
 
                     <div id="choice-list-container">
@@ -3424,7 +3424,7 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                             </svg>
-                            <p>No choices tracked yet. Start noticing today.</p>
+                            <p>No goals set yet. Add your first one.</p>
                         </div>
                     </div>
                 </div>
