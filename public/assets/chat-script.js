@@ -630,6 +630,11 @@ async function handleSendMessage() {
     addMessage(message, 'user');
     conversationHistory.push({ role: 'user', content: message });
 
+    // First sign of real engagement — eligible to surface install banner
+    if (window.CowchInstall && window.CowchInstall.markEngagement) {
+        window.CowchInstall.markEngagement();
+    }
+
     // Track in therapy profile (for compression)
     if (window.TherapyProfile) {
         window.TherapyProfile.addToHistory({ role: 'user', content: message });
@@ -2581,89 +2586,7 @@ function addSwipeToDismiss(modalElement, closeCallback) {
   }, { passive: true });
 }
 
-// ================================
-// PWA Install Prompt
-// ================================
-
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  showInstallBanner();
-});
-
-function showInstallBanner() {
-  // Check if already installed or dismissed
-  if (window.matchMedia('(display-mode: standalone)').matches) return;
-  if (localStorage.getItem('installBannerDismissed')) return;
-
-  const banner = document.createElement('div');
-  banner.id = 'install-banner';
-  banner.innerHTML = `
-    <div style="
-      position: fixed;
-      bottom: 100px;
-      left: 1rem;
-      right: 1rem;
-      background: rgba(45, 40, 35, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    ">
-      <span style="font-size: 2rem;">🐄</span>
-      <div style="flex: 1;">
-        <div style="color: #F5F0EA; font-weight: 600; margin-bottom: 0.25rem;">Install Cowch</div>
-        <div style="color: rgba(245,240,234,0.6); font-size: 0.875rem;">Add to home screen for the best experience</div>
-      </div>
-      <button id="install-btn" style="
-        background: #E88A6A;
-        color: #1C1714;
-        border: none;
-        padding: 0.625rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        touch-action: manipulation;
-      ">Install</button>
-      <button id="dismiss-install" style="
-        background: transparent;
-        border: none;
-        color: rgba(245,240,234,0.5);
-        font-size: 1.25rem;
-        cursor: pointer;
-        padding: 0.5rem;
-      ">×</button>
-    </div>
-  `;
-  document.body.appendChild(banner);
-
-  document.getElementById('install-btn').addEventListener('click', async () => {
-    hapticFeedback('medium');
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        hapticFeedback('success');
-      }
-      deferredPrompt = null;
-    }
-    banner.remove();
-  });
-
-  document.getElementById('dismiss-install').addEventListener('click', () => {
-    hapticFeedback('light');
-    localStorage.setItem('installBannerDismissed', 'true');
-    banner.remove();
-  });
-}
+// PWA install — handled by /assets/js/pwa-install.js (window.CowchInstall)
 
 // Debug info
 console.log('Cowch Chat initialized');

@@ -406,27 +406,21 @@ function setupClearHistory() {
 // Settings Buttons
 // ============================================
 
-function isIOSSafari() {
-    const ua = window.navigator.userAgent;
-    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-    const webkit = !!ua.match(/WebKit/i);
-    const notChrome = !ua.match(/CriOS/i);
-    const notFirefox = !ua.match(/FxiOS/i);
-    return iOS && webkit && notChrome && notFirefox;
-}
-
 function isInStandaloneMode() {
     return window.navigator.standalone === true ||
            window.matchMedia('(display-mode: standalone)').matches;
 }
 
 function setupSettingsButtons() {
-    // Show install button only on iOS Safari when not already installed
-    const installBtn = document.getElementById('install-btn');
-    if (installBtn && isIOSSafari() && !isInStandaloneMode()) {
+    // Show install button on every platform unless already installed.
+    // Routes through the unified PWA install guide (window.CowchInstall).
+    const installBtn = document.getElementById('settings-install-btn');
+    if (installBtn && !isInStandaloneMode()) {
         installBtn.style.display = 'flex';
         installBtn.addEventListener('click', () => {
-            alert('To add Cowch to your home screen:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"\n\nThen you can access Cowch like any other app!');
+            if (window.CowchInstall && window.CowchInstall.openGuide) {
+                window.CowchInstall.openGuide();
+            }
         });
     }
 
