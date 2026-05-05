@@ -246,9 +246,9 @@
             <h1 class="cowch-install-h1">Install Cowch</h1>
             <p class="cowch-install-subtitle">A calmer space, on your home screen</p>
             <ul class="cowch-install-bullets">
-              <li>Opens instantly — no browser bar</li>
-              <li>Works offline — Mandy's still here</li>
-              <li>Picks up where you left off</li>
+              <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Opens instantly — no browser bar</li>
+              <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Works offline — Mandy's still here</li>
+              <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Picks up where you left off</li>
             </ul>
             <div class="cowch-install-prompt-slot" data-prompt-slot>
               ${deferredPrompt ? '<button type="button" class="cowch-install-btn" data-action="native-install">Install</button>' : loadingDots()}
@@ -300,9 +300,9 @@
           <h1 class="cowch-install-h1">Install Cowch</h1>
           <p class="cowch-install-subtitle">Its own window — no tabs, no distractions</p>
           <ul class="cowch-install-bullets">
-            <li>Opens in its own window</li>
-            <li>Works offline</li>
-            <li>Picks up where you left off</li>
+            <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Opens in its own window</li>
+            <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Works offline</li>
+            <li><span class="cowch-install-bullet-tick" aria-hidden="true"></span>Picks up where you left off</li>
           </ul>
           <div class="cowch-install-prompt-slot" data-prompt-slot>
             ${deferredPrompt ? '<button type="button" class="cowch-install-btn" data-action="native-install">Install</button>' : loadingDots()}

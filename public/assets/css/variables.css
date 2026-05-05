@@ -51,6 +51,7 @@
     /* ===== Accent Colours ===== */
     /* Primary brand — warm terracotta */
     --coral: #C97B63;
+    --coral-rgb: 201, 123, 99;
     --coral-dark: #B86852;
     --coral-light: #E0A696;
     --coral-glow: rgba(201, 123, 99, 0.22);
@@ -245,6 +246,7 @@
 
     /* Primary brand — sage green */
     --coral: #7F9E84;
+    --coral-rgb: 127, 158, 132;
     --coral-dark: #6D8B72;
     --coral-light: #C7D6C9;
     --coral-glow: rgba(127, 158, 132, 0.22);
@@ -300,6 +302,7 @@
 
     /* Primary brand — calm sky blue */
     --coral: #6E92B8;
+    --coral-rgb: 110, 146, 184;
     --coral-dark: #5A7FA7;
     --coral-light: #BAD0E1;
     --coral-glow: rgba(110, 146, 184, 0.22);
