@@ -1,41 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="50 89 412 412" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two people hugging and supporting each other">
+<svg width="512" height="512" viewBox="50 100 412 388" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two people hugging">
 
-  <!-- Sage body — right lobe + full lower-right of the heart, sits behind everything -->
+  <!-- Sage body — right half of the heart -->
   <path d="
       M 256 470
       C 360 470, 432 416, 448 348
       C 462 280, 432 220, 376 208
-      C 320 198, 290 224, 282 264
-      C 278 320, 270 400, 260 470 Z"
+      C 320 198, 280 230, 268 280
+      C 262 330, 258 400, 256 470 Z"
     fill="#9AAA82"/>
 
-  <!-- Brown body + arm — left lobe of the heart with a shoulder/arm
-       that sweeps across the top of the sage body and curls down on the right -->
+  <!-- Brown body — left half of the heart -->
   <path d="
-      M 252 470
+      M 256 470
       C 152 470, 80 416, 64 348
       C 50 280, 80 220, 136 208
-      C 200 196, 250 220, 272 258
-      C 296 268, 332 268, 368 270
-      C 408 274, 426 304, 414 334
-      C 400 360, 366 360, 332 350
-      C 296 338, 262 318, 236 296
-      C 240 376, 248 440, 252 470 Z"
+      C 192 198, 232 230, 244 280
+      C 250 330, 254 400, 256 470 Z"
     fill="#8A7356"/>
 
-  <!-- Brown head — upper left, the larger of the two -->
-  <circle cx="220" cy="178" r="60" fill="#8A7356"/>
+  <!-- Brown head — left, larger, sits on top of the heart -->
+  <circle cx="216" cy="184" r="60" fill="#8A7356"/>
 
-  <!-- Sage head — smaller, tucked to the right, slightly behind the brown shoulder -->
-  <circle cx="316" cy="202" r="46" fill="#9AAA82"/>
-
-  <!-- White wavy separation — runs along the underside of the brown arm,
-       rising under the sage head and dropping back down on the right -->
-  <path d="
-      M 96 340
-      C 180 340, 250 300, 312 270
-      C 372 246, 416 268, 420 322"
-    fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <!-- Sage head — right, smaller, overlapping the brown head -->
+  <circle cx="304" cy="202" r="48" fill="#9AAA82"/>
 
 </svg>
