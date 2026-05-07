@@ -815,11 +815,11 @@ function renderChoiceTree() {
         // 6 slots → angles from ~-150° to ~-30° (in degrees), so leaves reach high and wide.
         const angleDeg = -160 + slot * 26;  // -160, -134, -108, -82, -56, -30
         const rad = angleDeg * Math.PI / 180;
-        const length = 80 + layer * 22;
+        const length = 130 + layer * 28;
         const x2 = trunkTopX + Math.cos(rad) * length;
         const y2 = trunkTopY + Math.sin(rad) * length;
         addBranch(trunkTopX, trunkTopY, x2, y2, 'long');
-        addLeaf(x2, y2, 10, 'long', i);
+        addLeaf(x2, y2, 11, 'long', i);
     });
 
     // ── Short-term: small twigs along the trunk, alternating sides ──
