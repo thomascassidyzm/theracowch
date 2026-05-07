@@ -4632,7 +4632,12 @@
                 <span class="dep-dot" data-dep-dot="4"></span>
             </div>
 
-            <div class="dep-swipe-hint" id="dep-swipe-hint">Swipe to continue &rarr;</div>
+            <div class="dep-nav" id="dep-nav">
+                <button type="button" class="dep-nav-btn is-hidden" data-dep-nav="back">← Back</button>
+                <button type="button" class="dep-nav-btn is-primary" data-dep-nav="next">Next →</button>
+            </div>
+
+            <div class="dep-swipe-hint" id="dep-swipe-hint">Swipe or tap Next to continue</div>
         </div>
     </div>
 
@@ -4724,7 +4729,12 @@
                 <p>You don't need to feel anything yet. Just doing this is enough.</p>
             </div>
 
-            <div class="dep-swipe-hint" id="numb-swipe-hint">Swipe to continue &rarr;</div>
+            <div class="dep-nav" id="numb-nav">
+                <button type="button" class="dep-nav-btn is-hidden" data-numb-nav="back">← Back</button>
+                <button type="button" class="dep-nav-btn is-primary" data-numb-nav="next">Next →</button>
+            </div>
+
+            <div class="dep-swipe-hint" id="numb-swipe-hint">Swipe or tap Next to continue</div>
         </div>
     </div>
 
@@ -4790,6 +4800,11 @@
                 <button class="btn-exercise btn-exercise-primary" id="anxious-start-breathing">Start</button>
                 <button class="btn-exercise btn-exercise-secondary" id="anxious-skip">Next: Defusion &rarr;</button>
                 <button class="btn-exercise btn-exercise-primary" id="anxious-next-after" style="display: none;">Next: Defusion &rarr;</button>
+            </div>
+
+            <div class="dep-nav is-collapsed" id="anxious-nav">
+                <button type="button" class="dep-nav-btn" data-anxious-nav="back">← Back</button>
+                <button type="button" class="dep-nav-btn is-primary" data-anxious-nav="next">Next →</button>
             </div>
 
             <div class="dep-swipe-hint" id="anxious-swipe-hint"></div>
@@ -5417,6 +5432,8 @@
             var hint = document.getElementById('dep-swipe-hint');
             var slides = modal.querySelectorAll('.dep-slide');
             var dots = modal.querySelectorAll('.dep-dot');
+            var backBtn = modal.querySelector('[data-dep-nav="back"]');
+            var nextBtn = modal.querySelector('[data-dep-nav="next"]');
             var current = 1;
             var total = slides.length;
 
@@ -5426,7 +5443,9 @@
                 modal.querySelector('[data-dep-slide="' + n + '"]').classList.add('active');
                 dots.forEach(function(d) { d.classList.remove('active'); });
                 modal.querySelector('[data-dep-dot="' + n + '"]').classList.add('active');
-                hint.innerHTML = n < total ? 'Swipe to continue &rarr;' : 'Done &mdash; tap &times; to close';
+                hint.innerHTML = n < total ? 'Swipe or tap Next to continue' : 'You did it &mdash; tap Done to close';
+                backBtn.classList.toggle('is-hidden', n === 1);
+                nextBtn.innerHTML = n === total ? 'Done' : 'Next &rarr;';
             }
 
             openBtn.addEventListener('click', function() {
@@ -5436,6 +5455,14 @@
 
             closeBtn.addEventListener('click', function() {
                 modal.classList.remove('active');
+            });
+
+            backBtn.addEventListener('click', function() {
+                if (current > 1) goToSlide(current - 1);
+            });
+            nextBtn.addEventListener('click', function() {
+                if (current < total) goToSlide(current + 1);
+                else modal.classList.remove('active');
             });
 
             // Swipe detection
@@ -5454,19 +5481,10 @@
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
                 var dy = e.changedTouches[0].clientY - startY;
-                if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+                if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx)) return;
                 if (dx < 0 && current < total) goToSlide(current + 1);
                 if (dx > 0 && current > 1) goToSlide(current - 1);
             }, { passive: true });
-
-            // Click/tap arrows for desktop
-            content.addEventListener('click', function(e) {
-                if (e.target.closest('button, a')) return;
-                var rect = content.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
-                if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
-            });
         })();
 
         // ============================================
@@ -5480,6 +5498,8 @@
             var hint = document.getElementById('numb-swipe-hint');
             var slides = modal.querySelectorAll('.dep-slide');
             var dots = modal.querySelectorAll('.dep-dot');
+            var backBtn = modal.querySelector('[data-numb-nav="back"]');
+            var nextBtn = modal.querySelector('[data-numb-nav="next"]');
             var current = 1;
             var total = slides.length;
 
@@ -5489,7 +5509,9 @@
                 modal.querySelector('[data-numb-slide="' + n + '"]').classList.add('active');
                 dots.forEach(function(d) { d.classList.remove('active'); });
                 modal.querySelector('[data-numb-dot="' + n + '"]').classList.add('active');
-                hint.innerHTML = n < total ? 'Swipe to continue &rarr;' : 'Done &mdash; tap &times; to close';
+                hint.innerHTML = n < total ? 'Swipe or tap Next to continue' : 'You did it &mdash; tap Done to close';
+                backBtn.classList.toggle('is-hidden', n === 1);
+                nextBtn.innerHTML = n === total ? 'Done' : 'Next &rarr;';
             }
 
             openBtn.addEventListener('click', function() {
@@ -5499,6 +5521,14 @@
 
             closeBtn.addEventListener('click', function() {
                 modal.classList.remove('active');
+            });
+
+            backBtn.addEventListener('click', function() {
+                if (current > 1) goToSlide(current - 1);
+            });
+            nextBtn.addEventListener('click', function() {
+                if (current < total) goToSlide(current + 1);
+                else modal.classList.remove('active');
             });
 
             var startX = 0;
@@ -5516,18 +5546,10 @@
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
                 var dy = e.changedTouches[0].clientY - startY;
-                if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+                if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx)) return;
                 if (dx < 0 && current < total) goToSlide(current + 1);
                 if (dx > 0 && current > 1) goToSlide(current - 1);
             }, { passive: true });
-
-            content.addEventListener('click', function(e) {
-                if (e.target.closest('button, a')) return;
-                var rect = content.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                if (x > rect.width * 0.7 && current < total) goToSlide(current + 1);
-                if (x < rect.width * 0.3 && current > 1) goToSlide(current - 1);
-            });
         })();
 
         // ============================================
@@ -5546,6 +5568,9 @@
             var skipBtn = document.getElementById('anxious-skip');
             var nextAfterBtn = document.getElementById('anxious-next-after');
             var dots = modal.querySelectorAll('.dep-dot');
+            var nav = document.getElementById('anxious-nav');
+            var navBack = nav.querySelector('[data-anxious-nav="back"]');
+            var navNext = nav.querySelector('[data-anxious-nav="next"]');
             var current = 1;
             var total = 3;
             var breathingTimer = null;
@@ -5565,10 +5590,16 @@
                     startBtn.style.display = '';
                     skipBtn.style.display = '';
                     hint.textContent = '';
-                } else if (n < total) {
-                    hint.innerHTML = 'Swipe to continue &rarr;';
+                    nav.classList.add('is-collapsed');
                 } else {
-                    hint.innerHTML = 'Done &mdash; tap &times; to close';
+                    nav.classList.remove('is-collapsed');
+                    navBack.classList.toggle('is-hidden', false);
+                    navNext.innerHTML = n === total ? 'Done' : 'Next &rarr;';
+                    if (n < total) {
+                        hint.innerHTML = 'Swipe or tap Next to continue';
+                    } else {
+                        hint.innerHTML = 'You did it &mdash; tap Done to close';
+                    }
                 }
             }
 
@@ -5657,6 +5688,20 @@
                 goToSlide(2);
             });
 
+            navBack.addEventListener('click', function() {
+                if (current > 1) {
+                    if (current === 2) resetBreathing();
+                    goToSlide(current - 1);
+                }
+            });
+            navNext.addEventListener('click', function() {
+                if (current < total) goToSlide(current + 1);
+                else {
+                    clearTimeout(breathingTimer);
+                    modal.classList.remove('active');
+                }
+            });
+
             // Swipe on screen 2
             var startX = 0;
             var startY = 0;
@@ -5673,7 +5718,7 @@
                 tracking = false;
                 var dx = e.changedTouches[0].clientX - startX;
                 var dy = e.changedTouches[0].clientY - startY;
-                if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+                if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx)) return;
                 if (dx < 0 && current < total) {
                     clearTimeout(breathingTimer);
                     goToSlide(current + 1);
