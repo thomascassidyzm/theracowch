@@ -677,10 +677,34 @@ function renderCheckinCalendar() {
 // CHOICE TOOL
 // ============================================
 
+// Currently-selected term in the Add form
+let goalCurrentTerm = 'short';
+
 function initChoice() {
     setupChoiceViewToggle();
+    setupGoalTermToggle();
     setupChoiceSave();
     renderChoiceTree();
+}
+
+function setupGoalTermToggle() {
+    const buttons = document.querySelectorAll('.goal-term-btn');
+    if (!buttons.length) return;
+    // Default to short
+    goalCurrentTerm = 'short';
+    buttons.forEach(b => {
+        b.classList.toggle('active', b.dataset.goalTerm === 'short');
+        b.setAttribute('aria-checked', b.dataset.goalTerm === 'short' ? 'true' : 'false');
+        // Re-bind cleanly each open
+        b.onclick = () => {
+            goalCurrentTerm = b.dataset.goalTerm;
+            buttons.forEach(o => {
+                const on = o === b;
+                o.classList.toggle('active', on);
+                o.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+        };
+    });
 }
 
 function setupChoiceViewToggle() {
@@ -701,102 +725,117 @@ function setupChoiceViewToggle() {
 }
 
 function setupChoiceSave() {
-    document.getElementById('choice-save-btn').addEventListener('click', () => {
-        const text = document.getElementById('choice-text').value.trim();
-        if (!text) return;
+    const btn = document.getElementById('choice-save-btn');
+    if (!btn) return;
+    btn.onclick = () => {
+        const specific    = document.getElementById('goal-specific').value.trim();
+        const measurable  = document.getElementById('goal-measurable').value.trim();
+        const achievable  = document.getElementById('goal-achievable').value.trim();
+        const realistic   = document.getElementById('goal-realistic').value.trim();
+        const timebound   = document.getElementById('goal-timebound').value;
 
-        const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
-        choices.push({
-            text: text,
+        // Specific is the headline — required at minimum.
+        if (!specific) {
+            const sField = document.getElementById('goal-specific');
+            sField.focus();
+            return;
+        }
+
+        const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+        goals.push({
+            type: goalCurrentTerm === 'long' ? 'long' : 'short',
+            specific, measurable, achievable, realistic, timebound,
+            // Backwards-compat alias for any older renderers
+            text: specific,
             timestamp: new Date().toISOString(),
             date: new Date().toLocaleDateString('en-US', {
                 weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
             })
         });
+        localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(goals));
 
-        localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(choices));
-        document.getElementById('choice-text').value = '';
+        // Clear the form
+        ['goal-specific', 'goal-measurable', 'goal-achievable', 'goal-realistic'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('goal-timebound').value = '';
 
-        // Feedback
-        const btn = document.getElementById('choice-save-btn');
-        const originalText = btn.textContent;
+        const original = btn.textContent;
         btn.textContent = 'Added!';
         btn.disabled = true;
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }, 2000);
+        setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
 
         renderChoiceTree();
-    });
+    };
 }
 
 function renderChoiceTree() {
-    const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
-    const count = choices.length;
+    const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    document.getElementById('choice-count').textContent = goals.length;
 
-    document.getElementById('choice-count').textContent = count;
-
-    const leavesGroup = document.getElementById('choice-leaves');
+    const leavesGroup   = document.getElementById('choice-leaves');
     const branchesGroup = document.getElementById('choice-branches');
     leavesGroup.innerHTML = '';
     branchesGroup.innerHTML = '';
 
-    // Generate leaf positions
-    const leafPositions = [];
-    for (let i = 0; i < count; i++) {
-        const layer = Math.floor(i / 8);
-        const angle = (i % 8) * (Math.PI / 4) + Math.random() * 0.3;
-        const distance = 40 + layer * 25 + Math.random() * 15;
-        const x = 150 + Math.cos(angle) * distance;
-        const y = 200 - Math.sin(angle) * distance * 0.6;
-        leafPositions.push({ x, y });
+    function addBranch(x1, y1, x2, y2, extraClass) {
+        const b = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        b.setAttribute('class', 'choice-tree-branch' + (extraClass ? ' ' + extraClass : ''));
+        b.setAttribute('x1', x1); b.setAttribute('y1', y1);
+        b.setAttribute('x2', x2); b.setAttribute('y2', y2);
+        branchesGroup.appendChild(b);
+    }
+    function addLeaf(cx, cy, r, extraClass, idx) {
+        const l = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        l.setAttribute('class', 'choice-tree-leaf' + (extraClass ? ' ' + extraClass : ''));
+        l.setAttribute('cx', cx); l.setAttribute('cy', cy);
+        l.setAttribute('r', r);
+        l.style.animationDelay = (idx * 0.05) + 's';
+        leavesGroup.appendChild(l);
     }
 
-    // Draw leaves
-    leafPositions.forEach((pos, index) => {
-        const leaf = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        leaf.setAttribute('class', 'choice-tree-leaf');
-        leaf.setAttribute('cx', pos.x);
-        leaf.setAttribute('cy', pos.y);
-        leaf.setAttribute('r', '8');
-        leaf.style.animationDelay = `${index * 0.05}s`;
+    // Default older entries with no type to "long" so they still render meaningfully.
+    const longs  = goals.filter(g => (g.type || 'long') !== 'short');
+    const shorts = goals.filter(g => (g.type || 'long') === 'short');
 
-        const colors = ['#9BC4A7', '#7EA88B', '#C9A857'];
-        leaf.style.fill = colors[index % 3];
-        leavesGroup.appendChild(leaf);
+    // ── Long-term: tall branches fanning from the top of the trunk (150, 250) ──
+    // Up to ~12 directions before wrapping to a second layer.
+    const trunkTopX = 150;
+    const trunkTopY = 250;
+    longs.forEach((g, i) => {
+        const layer = Math.floor(i / 6);
+        const slot  = i % 6;
+        // Spread evenly between -110° and -70° (i.e. upward fan, slightly biased outward).
+        // 6 slots → angles from ~-150° to ~-30° (in degrees), so leaves reach high and wide.
+        const angleDeg = -160 + slot * 26;  // -160, -134, -108, -82, -56, -30
+        const rad = angleDeg * Math.PI / 180;
+        const length = 80 + layer * 22;
+        const x2 = trunkTopX + Math.cos(rad) * length;
+        const y2 = trunkTopY + Math.sin(rad) * length;
+        addBranch(trunkTopX, trunkTopY, x2, y2, 'long');
+        addLeaf(x2, y2, 10, 'long', i);
     });
 
-    // Draw branches
-    function addBranch(x1, y1, x2, y2) {
-        const branch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        branch.setAttribute('class', 'choice-tree-branch');
-        branch.setAttribute('x1', x1);
-        branch.setAttribute('y1', y1);
-        branch.setAttribute('x2', x2);
-        branch.setAttribute('y2', y2);
-        branchesGroup.appendChild(branch);
-    }
-
-    if (count > 0) {
-        addBranch(150, 250, 120, 180);
-        addBranch(150, 250, 180, 180);
-    }
-    if (count > 5) {
-        addBranch(120, 180, 90, 140);
-        addBranch(180, 180, 210, 140);
-    }
-    if (count > 10) {
-        addBranch(90, 140, 70, 100);
-        addBranch(210, 140, 230, 100);
-    }
+    // ── Short-term: small twigs along the trunk, alternating sides ──
+    // Trunk goes from y=250 (top) to y=400 (bottom). Place twigs from y=270 down.
+    shorts.forEach((g, i) => {
+        const trunkY = 280 + (i * 14);
+        const yClamped = Math.min(trunkY, 388);
+        const side = (i % 2 === 0) ? -1 : 1;
+        const length = 26 + (i % 3) * 6; // 26, 32, 38
+        const x1 = 150 + side * 12; // start from the edge of the trunk (trunk width = 30)
+        const x2 = x1 + side * length;
+        const y2 = yClamped - 10;   // slight upward slope so twigs feel alive
+        addBranch(x1, yClamped, x2, y2, 'short');
+        addLeaf(x2, y2, 6, 'short', i);
+    });
 }
 
 function renderChoiceHistory() {
-    const choices = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
     const container = document.getElementById('choice-list-container');
 
-    if (choices.length === 0) {
+    if (goals.length === 0) {
         container.innerHTML = `
             <div class="tool-empty-state">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -808,18 +847,47 @@ function renderChoiceHistory() {
         return;
     }
 
-    const html = choices
+    const escapeHtml = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const formatDate = (iso) => {
+        if (!iso) return '';
+        const d = new Date(iso + 'T00:00:00');
+        if (isNaN(d.getTime())) return iso;
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    };
+
+    const html = goals
         .slice()
         .reverse()
-        .map(choice => `
-            <div class="choice-item">
-                <div class="choice-date">${choice.date}</div>
-                <div class="choice-text">${choice.text}</div>
-            </div>
-        `)
+        .map(g => {
+            const type = (g.type || 'long') === 'short' ? 'short' : 'long';
+            const title = escapeHtml(g.specific || g.text || '(untitled goal)');
+            const due = g.timebound ? ' · by ' + escapeHtml(formatDate(g.timebound)) : '';
+            const hasDetails = g.measurable || g.achievable || g.realistic;
+            const detailRows = hasDetails ? `
+                <details>
+                    <summary>SMART details</summary>
+                    <dl>
+                        ${g.measurable ? `<dt>M</dt><dd>${escapeHtml(g.measurable)}</dd>` : ''}
+                        ${g.achievable ? `<dt>A</dt><dd>${escapeHtml(g.achievable)}</dd>` : ''}
+                        ${g.realistic  ? `<dt>R</dt><dd>${escapeHtml(g.realistic)}</dd>`  : ''}
+                    </dl>
+                </details>` : '';
+            return `
+                <div class="goal-item">
+                    <div class="goal-item-head">
+                        <div class="goal-item-title">${title}</div>
+                        <span class="goal-item-tag ${type}">${type === 'short' ? 'Short-term' : 'Long-term'}</span>
+                    </div>
+                    <div class="goal-item-meta">Added ${escapeHtml(g.date || '')}${due}</div>
+                    ${detailRows}
+                </div>`;
+        })
         .join('');
 
-    container.innerHTML = `<div class="choice-list">${html}</div>`;
+    container.innerHTML = html;
 }
 
 // ============================================
