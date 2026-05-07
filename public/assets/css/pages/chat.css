@@ -1416,6 +1416,44 @@
     50% { opacity: 1; }
 }
 
+.dep-nav {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    align-items: center;
+    justify-content: space-between;
+}
+.dep-nav-btn {
+    flex: 1;
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    font-family: inherit;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+    transition: transform 0.1s;
+}
+.dep-nav-btn:active {
+    transform: translateY(1px);
+}
+.dep-nav-btn.is-primary {
+    background: var(--coral);
+    color: var(--text-on-coral, #fff);
+    border-color: var(--coral);
+}
+.dep-nav-btn.is-hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+.dep-nav.is-collapsed {
+    display: none;
+}
+
 /* ============================================
    Not-Okay Intervention Modal
    ============================================ */
