@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v74';
+const CACHE_NAME = 'cowch-wellness-v75';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -53,11 +53,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For navigation requests (HTML pages), serve offline.html as fallback
+  // For navigation requests (HTML pages), bypass HTTP cache and serve
+  // offline.html as fallback if the network is unavailable.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'reload' })
         .catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  // For HTML pages requested directly (not via SPA nav), also bypass cache.
+  if (event.request.destination === 'document' || event.request.url.match(/\.html(\?|$)/)) {
+    event.respondWith(
+      fetch(event.request, { cache: 'reload' })
+        .catch(() => caches.match(event.request).then(r => r || caches.match('/offline.html')))
     );
     return;
   }
