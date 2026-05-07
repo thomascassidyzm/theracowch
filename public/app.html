@@ -2072,12 +2072,156 @@
             fill: none;
             stroke-linecap: round;
         }
+        .choice-tree-branch.short {
+            stroke-width: 3;
+        }
 
         .choice-tree-leaf {
             fill: #7EA88B;
             opacity: 0;
             animation: choiceLeafGrow 0.5s ease-out forwards;
+            transform-origin: center;
+            transform-box: fill-box;
         }
+        .choice-tree-leaf.short { fill: #9BC4A7; }
+        .choice-tree-leaf.long  { fill: #7EA88B; }
+
+        /* SMART goal form */
+        .goal-term-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+        .goal-term-btn {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border: 3px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--text-primary);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+        }
+        .goal-term-btn .goal-term-name {
+            font-weight: 900;
+            font-size: 1rem;
+        }
+        .goal-term-btn .goal-term-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .goal-term-btn.active {
+            background: var(--coral);
+            border-color: var(--coral);
+            color: var(--text-on-coral, #fff);
+        }
+        .goal-term-btn.active .goal-term-sub { color: rgba(255,255,255,0.85); }
+
+        .smart-form { padding: var(--space-md); }
+        .smart-label {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: var(--space-sm) 0 6px;
+            flex-wrap: wrap;
+        }
+        .smart-label:first-child { margin-top: 0; }
+        .smart-label .smart-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 0.85rem;
+        }
+        .smart-label .smart-name {
+            font-weight: 900;
+            font-size: 0.95rem;
+        }
+        .smart-label .smart-hint {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .smart-date {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-sizing: border-box;
+        }
+
+        /* Goal history items: SMART expandable */
+        .goal-item {
+            background: var(--bg-card);
+            border: 3px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        .goal-item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .goal-item-title {
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .goal-item-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-radius: 999px;
+            border: 2px solid var(--border-warm);
+            color: var(--text-muted);
+        }
+        .goal-item-tag.short { color: #4A6A3A; border-color: #9BC4A7; background: #EAF3E0; }
+        .goal-item-tag.long  { color: #2A4D2F; border-color: #7EA88B; background: #DEEBE0; }
+        .goal-item-meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .goal-item details { margin-top: 8px; }
+        .goal-item summary {
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--coral);
+        }
+        .goal-item dl {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 10px;
+            row-gap: 4px;
+            font-size: 0.88rem;
+        }
+        .goal-item dt { font-weight: 900; color: var(--coral); }
+        .goal-item dd { color: var(--text-secondary); }
 
         @keyframes choiceLeafGrow {
             from { opacity: 0; transform: scale(0); }
@@ -3367,13 +3511,56 @@
                 <!-- Goals: Add View -->
                 <div class="tool-section active" id="choice-today-view">
                     <div class="tool-section-intro">
-                        <h2>What&rsquo;s a goal you want to work toward?</h2>
-                        <p>Big or small. Naming it is the first step toward reaching it.</p>
+                        <h2>Set a SMART goal</h2>
+                        <p>Specific. Measurable. Achievable. Realistic. Time-bound.</p>
                     </div>
 
-                    <div class="tool-card-brutalist">
-                        <div class="tool-prompt">My goal is to&hellip;</div>
-                        <textarea class="tool-textarea" id="choice-text" placeholder="What do you want to move toward? Could be today, this week, this year."></textarea>
+                    <div class="goal-term-toggle" role="radiogroup" aria-label="Goal timeframe">
+                        <button type="button" class="goal-term-btn active" data-goal-term="short" role="radio" aria-checked="true">
+                            <span class="goal-term-name">Short-term</span>
+                            <span class="goal-term-sub">days &mdash; weeks</span>
+                        </button>
+                        <button type="button" class="goal-term-btn" data-goal-term="long" role="radio" aria-checked="false">
+                            <span class="goal-term-name">Long-term</span>
+                            <span class="goal-term-sub">months &mdash; year+</span>
+                        </button>
+                    </div>
+
+                    <div class="tool-card-brutalist smart-form">
+                        <label class="smart-label" for="goal-specific">
+                            <span class="smart-letter">S</span>
+                            <span class="smart-name">Specific</span>
+                            <span class="smart-hint">What exactly do you want?</span>
+                        </label>
+                        <textarea class="tool-textarea" id="goal-specific" rows="2" placeholder="e.g. Write a 30-min walk into Mon and Wed lunch breaks"></textarea>
+
+                        <label class="smart-label" for="goal-measurable">
+                            <span class="smart-letter">M</span>
+                            <span class="smart-name">Measurable</span>
+                            <span class="smart-hint">How will you know it&rsquo;s done?</span>
+                        </label>
+                        <textarea class="tool-textarea" id="goal-measurable" rows="2" placeholder="e.g. Two 30-min walks completed each week"></textarea>
+
+                        <label class="smart-label" for="goal-achievable">
+                            <span class="smart-letter">A</span>
+                            <span class="smart-name">Achievable</span>
+                            <span class="smart-hint">Why is it within reach?</span>
+                        </label>
+                        <textarea class="tool-textarea" id="goal-achievable" rows="2" placeholder="e.g. I have a free lunch break and a park nearby"></textarea>
+
+                        <label class="smart-label" for="goal-realistic">
+                            <span class="smart-letter">R</span>
+                            <span class="smart-name">Realistic</span>
+                            <span class="smart-hint">Why does it fit your life right now?</span>
+                        </label>
+                        <textarea class="tool-textarea" id="goal-realistic" rows="2" placeholder="e.g. It&rsquo;s something I can sustain on busy weeks"></textarea>
+
+                        <label class="smart-label" for="goal-timebound">
+                            <span class="smart-letter">T</span>
+                            <span class="smart-name">Time-bound</span>
+                            <span class="smart-hint">By when?</span>
+                        </label>
+                        <input type="date" class="smart-date" id="goal-timebound">
                     </div>
 
                     <button class="tool-save-btn" id="choice-save-btn">Add Goal</button>
