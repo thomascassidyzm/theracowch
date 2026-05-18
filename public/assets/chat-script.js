@@ -734,48 +734,48 @@ function generateQuickReplies(pattern, response) {
         replies.push(
             { text: '🌬️ Try Box Breathing', action: 'exercise', exercise: 'breathing' },
             { text: '🧘 5-4-3-2-1 Grounding', action: 'exercise', exercise: 'grounding' },
-            { text: 'Tell me more', prompt: 'Can you tell me more about managing anxiety?' }
+            { text: 'Tell me more', action: 'tell-me-more-confirm' }
         );
     } else if (pattern === 'stress' || lowerResponse.match(/\b(tense|tension|muscle|tight|relaxation)\b/)) {
         replies.push(
             { text: '💆 Muscle Relaxation', action: 'exercise', exercise: 'pmr' },
             { text: '🌬️ Try Box Breathing', action: 'exercise', exercise: 'breathing' },
-            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+            { text: 'Tell me more', action: 'tell-me-more-confirm' }
         );
     } else if (pattern === 'depression') {
         replies.push(
             { text: 'What can I do?', prompt: 'What practical steps can I take?' },
             { text: '💪 See all exercises', action: 'exercises' },
-            { text: 'Tell me more', prompt: 'Can you tell me more about this?' }
+            { text: 'Tell me more', action: 'tell-me-more-confirm' }
         );
     } else if (pattern === 'relationships') {
         replies.push(
             { text: 'Communication tips', prompt: 'How can I communicate better?' },
             { text: 'Setting boundaries', prompt: 'How do I set healthy boundaries?' },
-            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+            { text: 'Tell me more', action: 'tell-me-more-confirm' }
         );
     } else if (lowerResponse.includes('imagine') || lowerResponse.includes('framework')) {
         replies.push(
             { text: 'How does it work?', prompt: 'How does the IMAGINE framework work?' },
             { text: '🧭 Explore IMAGINE', action: 'imagine' },
-            { text: 'Show me more', prompt: 'Can you tell me more about applying this?' }
+            { text: 'Show me more', action: 'tell-me-more-confirm' }
         );
     } else if (lowerResponse.match(/\b(body reset|mini.?movement|body scan|intentional movement)\b/)) {
         replies.push(
             { text: '🏃 Try 5-Min Body Reset', action: 'open-exercise-url', url: '/exercises/body-scan.html' },
             { text: '💪 See all exercises', action: 'exercises' },
-            { text: 'Tell me more', prompt: 'Can you tell me more?' }
+            { text: 'Tell me more', action: 'tell-me-more-confirm' }
         );
     } else if (lowerResponse.match(/\b(exercise|breathing|grounding|relaxation|practice)\b/)) {
         replies.push(
             { text: '💪 See all exercises', action: 'exercises' },
-            { text: 'Tell me more', prompt: 'Can you tell me more?' },
+            { text: 'Tell me more', action: 'tell-me-more-confirm' },
             { text: 'How do I apply this?', prompt: 'How can I apply this in my life?' }
         );
     } else {
         // General follow-ups
         replies.push(
-            { text: 'Tell me more', prompt: 'Can you tell me more about this?' },
+            { text: 'Tell me more', action: 'tell-me-more-confirm' },
             { text: 'How do I apply this?', prompt: 'How can I apply this in my life?' },
             { text: 'What else?', prompt: 'What else should I know?' }
         );
@@ -1156,6 +1156,32 @@ function handleQuickReply(reply) {
     }
     if (reply.action === 'imagine') {
         imaginePanel.classList.add('active');
+        return;
+    }
+    if (reply.action === 'tell-me-more-confirm') {
+        // Don't blow up the thread with a generic "tell me more" — confirm
+        // with the user whether they want to stay on what we were just
+        // discussing or move on to something new.
+        addMessage(
+            "Happy to. Want me to go deeper on what we&rsquo;ve just been talking about, or shift to something different?",
+            'mandy',
+            [
+                { text: 'Stay on this', action: 'tell-me-more-continue' },
+                { text: 'Something different', action: 'tell-me-more-new' }
+            ]
+        );
+        return;
+    }
+    if (reply.action === 'tell-me-more-continue') {
+        triggerChatPrompt(
+            "Please tell me more, staying on exactly the topic we&rsquo;ve just been discussing. Don&rsquo;t change subject &mdash; pick up where we left off and go a bit deeper."
+        );
+        return;
+    }
+    if (reply.action === 'tell-me-more-new') {
+        triggerChatPrompt(
+            "Actually, let&rsquo;s shift. What else might be worth exploring right now?"
+        );
         return;
     }
     if (reply.prompt) {
