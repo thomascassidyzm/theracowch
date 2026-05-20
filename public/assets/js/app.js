@@ -204,10 +204,29 @@ function getEpochDays() {
     return Math.floor(local.getTime() / (1000 * 60 * 60 * 24));
 }
 
+// User-set ordering from the onboarding gate; falls back to standard IMAGINE
+// order when missing or invalid.
+const IMAGINE_ORDER_KEY = 'cowch-imagine-order';
+
+function getImagineOrder() {
+    try {
+        const saved = localStorage.getItem(IMAGINE_ORDER_KEY);
+        if (saved) {
+            const arr = JSON.parse(saved);
+            if (Array.isArray(arr) && arr.length === IMAGINE_DAILY.length
+                && arr.every(n => Number.isInteger(n) && n >= 0 && n < IMAGINE_DAILY.length)) {
+                return arr;
+            }
+        }
+    } catch (_) {}
+    return IMAGINE_DAILY.map((_, i) => i);
+}
+
 function getTodaysImagineSuggestion() {
     const day = getEpochDays();
-    const slot = IMAGINE_DAILY[day % IMAGINE_DAILY.length];
-    const exercise = slot.exercises[Math.floor(day / IMAGINE_DAILY.length) % slot.exercises.length];
+    const order = getImagineOrder();
+    const slot = IMAGINE_DAILY[order[day % order.length]];
+    const exercise = slot.exercises[Math.floor(day / order.length) % slot.exercises.length];
     return {
         letter: slot.letter,
         domain: slot.domain,

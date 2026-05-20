@@ -2903,6 +2903,112 @@
             text-align: center;
         }
 
+        /* IMAGINE onboarding gate — runs once, after consent, asks the user
+           which area they'd like to start with so the daily exercise rotation
+           can be re-ordered. */
+        .imagine-onboard {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(45, 45, 45, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+            overflow-y: auto;
+        }
+        .imagine-onboard[hidden] { display: none; }
+        .imagine-onboard-card {
+            background: #FDF5E8;
+            color: #2D2D2D;
+            border: 4px solid #2D2D2D;
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.2);
+        }
+        .imagine-onboard-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin: 0 0 4px;
+        }
+        .imagine-onboard-lede {
+            color: #5C4432;
+            font-size: 0.98rem;
+            margin: 0 0 var(--space-md);
+        }
+        .imagine-onboard-grid {
+            display: grid;
+            gap: 10px;
+            margin-bottom: var(--space-md);
+        }
+        .imagine-onboard-pick {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #FFFFFF;
+            border: 3px solid #2D2D2D;
+            border-radius: var(--radius-medium);
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .imagine-onboard-pick:active {
+            transform: translate(1px, 1px);
+        }
+        .imagine-onboard-pick:hover {
+            box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.15);
+        }
+        .imagine-onboard-pick .letter {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #C9A857;
+            color: #FFFDF9;
+            font-weight: 900;
+            font-size: 1.05rem;
+            border-radius: 50%;
+        }
+        .imagine-onboard-pick .meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .imagine-onboard-pick .domain {
+            font-weight: 900;
+            font-size: 1rem;
+        }
+        .imagine-onboard-pick .desc {
+            font-size: 0.82rem;
+            color: #6D5C4A;
+        }
+        .imagine-onboard-skip {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #FDF5E8;
+            border: 3px solid #7A6556;
+            color: #2D2D2D;
+            border-radius: var(--radius-medium);
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .imagine-onboard-skip:hover { background: #F4E8D0; }
+
         /* Exercise modal close button — high-contrast circular button */
         .exercise-modal-content {
             position: relative;
@@ -3012,7 +3118,17 @@
                 <span>I understand this app is for wellbeing support and is not a substitute for clinical therapy or crisis services.</span>
             </label>
             <button type="button" id="consent-accept" class="consent-accept" disabled>I agree and continue</button>
-            <p class="consent-footnote">You can review these policies any time from the You tab &rarr; Privacy &amp; Safety.</p>
+            <p class="consent-footnote">You can review these policies any time from the Your Space tab &rarr; Privacy &amp; Safety.</p>
+        </div>
+    </div>
+
+    <!-- IMAGINE onboarding (shown once, after consent) -->
+    <div id="imagine-onboard" class="imagine-onboard" role="dialog" aria-modal="true" aria-labelledby="imagine-onboard-title" hidden>
+        <div class="imagine-onboard-card">
+            <h2 id="imagine-onboard-title" class="imagine-onboard-title">Tune IMAGINE to you 🌱</h2>
+            <p class="imagine-onboard-lede">Which of these feels weakest right now? Pick one and we&rsquo;ll start your daily exercise there, then cycle through the rest. You can change your mind any time.</p>
+            <div class="imagine-onboard-grid" id="imagine-onboard-grid"></div>
+            <button type="button" class="imagine-onboard-skip" id="imagine-onboard-skip">No preference &mdash; use the standard IMAGINE order</button>
         </div>
     </div>
 
@@ -5304,7 +5420,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=53"></script>
+    <script src="/assets/js/app.js?v=54"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
@@ -5338,6 +5454,89 @@
                 } catch (e) {}
                 gate.hidden = true;
             });
+        })();
+
+        // IMAGINE onboarding gate — runs once, after consent is accepted.
+        // Asks the user which domain feels weakest so we can rotate the daily
+        // suggestion starting from there. "No preference" keeps the standard
+        // I → M → A → G → I → N → E order.
+        (function() {
+            var ONBOARDED_KEY = 'cowch-imagine-onboarded';
+            var ORDER_KEY = 'cowch-imagine-order';
+            var gate = document.getElementById('imagine-onboard');
+            var skipBtn = document.getElementById('imagine-onboard-skip');
+            var grid = document.getElementById('imagine-onboard-grid');
+            if (!gate || !grid || !skipBtn) return;
+
+            // Indices here MUST match IMAGINE_DAILY in /assets/js/app.js
+            var DOMAINS = [
+                { letter: 'I', domain: 'I, Me, Myself',  desc: 'Know yourself deeply.' },
+                { letter: 'M', domain: 'Mindfulness',    desc: 'Find your calm.' },
+                { letter: 'A', domain: 'Acceptance',     desc: 'Embrace what is.' },
+                { letter: 'G', domain: 'Gratitude',      desc: 'Notice the good.' },
+                { letter: 'I', domain: 'Interactions',   desc: 'Show up in relationships.' },
+                { letter: 'N', domain: 'Nurturing',      desc: 'Play, rest, recharge.' },
+                { letter: 'E', domain: 'Exploring',      desc: 'Try something new.' }
+            ];
+
+            function isOnboarded() {
+                try { return localStorage.getItem(ONBOARDED_KEY) === 'true'; } catch (e) { return false; }
+            }
+            function markOnboarded() {
+                try { localStorage.setItem(ONBOARDED_KEY, 'true'); } catch (e) {}
+            }
+            function refreshSuggestion() {
+                if (typeof window.updateDailySuggestion === 'function') {
+                    try { window.updateDailySuggestion(); } catch (e) {}
+                }
+            }
+
+            function buildGrid() {
+                grid.innerHTML = '';
+                DOMAINS.forEach(function(d, idx) {
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'imagine-onboard-pick';
+                    btn.innerHTML =
+                        '<span class="letter">' + d.letter + '</span>' +
+                        '<span class="meta">' +
+                            '<span class="domain">' + d.domain + '</span>' +
+                            '<span class="desc">' + d.desc + '</span>' +
+                        '</span>';
+                    btn.addEventListener('click', function() {
+                        var order = [];
+                        for (var i = 0; i < DOMAINS.length; i++) {
+                            order.push((idx + i) % DOMAINS.length);
+                        }
+                        try { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); } catch (e) {}
+                        markOnboarded();
+                        refreshSuggestion();
+                        gate.hidden = true;
+                    });
+                    grid.appendChild(btn);
+                });
+            }
+
+            skipBtn.addEventListener('click', function() {
+                // No preference — clear any prior custom order, use IMAGINE default
+                try { localStorage.removeItem(ORDER_KEY); } catch (e) {}
+                markOnboarded();
+                refreshSuggestion();
+                gate.hidden = true;
+            });
+
+            function maybeShow() {
+                if (isOnboarded()) return;
+                var consent = document.getElementById('consent-gate');
+                if (consent && !consent.hidden) {
+                    // Consent still showing — wait until the user accepts.
+                    setTimeout(maybeShow, 500);
+                    return;
+                }
+                buildGrid();
+                gate.hidden = false;
+            }
+            maybeShow();
         })();
 
         // Document-level safety net for chat quick-reply buttons.
