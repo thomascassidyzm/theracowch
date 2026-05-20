@@ -2647,12 +2647,17 @@
         .choice-tree-leaf.short { fill: #9BC4A7; }
         .choice-tree-leaf.long  { fill: #7EA88B; }
 
-        /* Completed goals: flowers (short-term) and fruits (long-term) */
+        /* Completed goals: flowers (short-term) and fruits (long-term).
+           These groups carry an SVG transform="translate(...)" for position,
+           so we must NOT animate with transform: scale() — that would clobber
+           the translate and dump every flower at (0, 0). Animate opacity only. */
         .choice-tree-flower, .choice-tree-fruit {
             opacity: 0;
-            animation: choiceLeafGrow 0.6s ease-out forwards;
-            transform-origin: center;
-            transform-box: fill-box;
+            animation: choiceBloomIn 0.6s ease-out forwards;
+        }
+        @keyframes choiceBloomIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
 
         /* Seasonal tint applied to the tree container based on data-season */
