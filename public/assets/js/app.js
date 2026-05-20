@@ -26,6 +26,12 @@ function switchTab(tabId) {
     if (tabId === 'chat') {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
+
+    // Refresh the progression card whenever the user lands on Your Space —
+    // picks up new check-ins, goals etc. completed earlier this session.
+    if (tabId === 'you' && typeof updateProgressionUI === 'function') {
+        updateProgressionUI();
+    }
 }
 
 function setupTabNavigation() {
@@ -244,6 +250,174 @@ function updateDailySuggestion() {
     document.getElementById('daily-suggestion-domain').textContent = pick.domain;
     document.getElementById('daily-suggestion-name').textContent = pick.name;
 }
+
+// ============================================
+// Progression: Beginner → Builder → Explorer
+// XP is recomputed from existing localStorage state on every load, so
+// adding it later picks up everything the user has already done. The only
+// thing we keep in cowch-progression-v1 is the highest level we've shown
+// the user, so we can fire a level-up toast when they cross a threshold.
+// ============================================
+const PROGRESSION_KEY = 'cowch-progression-v1';
+
+const PROGRESSION_LEVELS = [
+    {
+        id: 'beginner', name: 'Beginner', minXp: 0, emoji: '🌱',
+        blurb: 'Start with the basics &mdash; daily check-ins and foundational exercises.',
+        focus: [
+            { name: 'Inner-weather check-in', href: '/exercises/weather.html' },
+            { name: 'Box breathing', href: '/exercises/box-breathing.html' },
+            { name: '5-4-3-2-1 grounding', href: '/exercises/grounding-54321.html' }
+        ]
+    },
+    {
+        id: 'builder', name: 'Builder', minXp: 15, emoji: '🛠️',
+        blurb: 'Deeper tools &mdash; trigger mapping, boundaries, safety behaviours and SMART goals.',
+        focus: [
+            { name: 'Trigger mapping', href: '/exercises/trigger-mapping.html' },
+            { name: 'Set a SMART goal', href: '/app.html#tab-you' },
+            { name: 'Setting a boundary', href: '/exercises/boundary-setting.html' }
+        ]
+    },
+    {
+        id: 'explorer', name: 'Explorer', minXp: 40, emoji: '🧭',
+        blurb: 'Challenges, wonder cards and new content unlocks.',
+        focus: [
+            { name: 'Comfort-zone ladder', href: '/exercises/comfort-ladder.html' },
+            { name: 'Take a wonder walk', href: '/exercises/wonder.html' },
+            { name: 'Pick an oracle card', href: '/exercises/oracle-cards.html' }
+        ]
+    }
+];
+
+function progressionLoad() {
+    try {
+        const raw = localStorage.getItem(PROGRESSION_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return { lastShownLevelId: 'beginner' };
+}
+function progressionSave(p) {
+    try { localStorage.setItem(PROGRESSION_KEY, JSON.stringify(p)); } catch (_) {}
+}
+
+function computeProgressionXp() {
+    let xp = 0;
+    // Weather check-ins: +2 each, counted by unique calendar day
+    try {
+        const checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
+        const days = new Set();
+        checkins.forEach(c => {
+            if (!c || !c.timestamp) return;
+            days.add(new Date(c.timestamp).toISOString().slice(0, 10));
+        });
+        xp += days.size * 2;
+    } catch (_) {}
+    // SMART goals: +3 each
+    try {
+        const goals = JSON.parse(localStorage.getItem('cowch_goals') || '[]');
+        xp += goals.length * 3;
+    } catch (_) {}
+    // Questionnaires: +5 each completed (one per type)
+    ['cowch-q-attachment', 'cowch-q-values', 'cowch-q-flex'].forEach(k => {
+        if (localStorage.getItem(k)) xp += 5;
+    });
+    // Saved chat messages: +1 per session day, capped at +10
+    try {
+        const history = JSON.parse(localStorage.getItem('cowch_chat_history') || '[]');
+        const days = new Set();
+        history.forEach(m => {
+            if (m && m.role === 'user' && m.ts) {
+                days.add(new Date(m.ts).toISOString().slice(0, 10));
+            }
+        });
+        xp += Math.min(days.size, 10);
+    } catch (_) {}
+    return xp;
+}
+
+function progressionCurrentLevel(xp) {
+    let level = PROGRESSION_LEVELS[0];
+    for (const l of PROGRESSION_LEVELS) if (xp >= l.minXp) level = l;
+    return level;
+}
+function progressionNextLevel(xp) {
+    for (const l of PROGRESSION_LEVELS) if (xp < l.minXp) return l;
+    return null;
+}
+
+function progressionShowLevelUpToast(level) {
+    const t = document.createElement('div');
+    t.className = 'progression-toast';
+    t.innerHTML = '<span class="emoji">' + level.emoji + '</span>'
+        + '<span class="content"><strong>You reached ' + level.name + '!</strong>'
+        + '<span>' + level.blurb + '</span></span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+        t.classList.remove('show');
+        setTimeout(() => t.remove(), 500);
+    }, 5200);
+}
+
+function updateProgressionUI() {
+    const card = document.getElementById('progression-card');
+    if (!card) return;
+
+    const xp = computeProgressionXp();
+    const lvl = progressionCurrentLevel(xp);
+    const next = progressionNextLevel(xp);
+
+    document.getElementById('progression-emoji').textContent = lvl.emoji;
+    document.getElementById('progression-name').textContent = lvl.name;
+    document.getElementById('progression-blurb').innerHTML = lvl.blurb;
+
+    const bar = document.getElementById('progression-bar-fill');
+    const label = document.getElementById('progression-xp-label');
+    if (next) {
+        const span = next.minXp - lvl.minXp;
+        const into = Math.max(0, xp - lvl.minXp);
+        bar.style.width = Math.min(100, (into / span) * 100) + '%';
+        label.textContent = xp + ' / ' + next.minXp + ' XP';
+    } else {
+        bar.style.width = '100%';
+        label.textContent = xp + ' XP · max';
+    }
+
+    const list = document.getElementById('progression-focus-list');
+    list.innerHTML = '';
+    lvl.focus.forEach(f => {
+        const a = document.createElement('a');
+        a.className = 'progression-focus-link';
+        a.href = f.href;
+        a.innerHTML = '<span>' + f.name + '</span><span class="arrow">&rarr;</span>';
+        list.appendChild(a);
+    });
+
+    const nextBlock = document.getElementById('progression-next');
+    if (next) {
+        document.getElementById('progression-next-name').textContent = next.name;
+        document.getElementById('progression-next-blurb').innerHTML = next.blurb;
+        document.getElementById('progression-next-needed').textContent = ' ' + (next.minXp - xp) + ' more XP to unlock.';
+        nextBlock.hidden = false;
+    } else {
+        nextBlock.hidden = true;
+    }
+
+    // Level-up toast if the user has just crossed a threshold
+    const state = progressionLoad();
+    if (state.lastShownLevelId !== lvl.id) {
+        // Don't toast on the first ever paint (initial Beginner state)
+        if (state.lastShownLevelId) {
+            const prevIdx = PROGRESSION_LEVELS.findIndex(l => l.id === state.lastShownLevelId);
+            const newIdx = PROGRESSION_LEVELS.findIndex(l => l.id === lvl.id);
+            if (newIdx > prevIdx) progressionShowLevelUpToast(lvl);
+        }
+        state.lastShownLevelId = lvl.id;
+        progressionSave(state);
+    }
+}
+window.updateProgressionUI = updateProgressionUI;
 
 // ============================================
 // IMAGINE Framework Data & Domain Panel
@@ -881,6 +1055,7 @@ function setupChoiceSave() {
         setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
 
         renderChoiceTree();
+        if (typeof updateProgressionUI === 'function') updateProgressionUI();
     };
 }
 
@@ -1269,6 +1444,7 @@ function init() {
     updateGreeting();
     updateDailyQuote();
     updateDailySuggestion();
+    updateProgressionUI();
     setupTabNavigation();
     setupDomainPanel();
     setupToolPanels();

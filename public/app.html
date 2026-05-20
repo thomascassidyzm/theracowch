@@ -1469,6 +1469,133 @@
             font-weight: var(--font-weight-black);
         }
 
+        /* Progression card (Beginner → Builder → Explorer) */
+        .progression-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--coral);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 var(--coral-glow);
+        }
+        .progression-head {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        .progression-emoji { font-size: 2.6rem; flex-shrink: 0; }
+        .progression-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .progression-head-text .label {
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+        .progression-head-text .name {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+        .progression-blurb {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-md);
+        }
+        .progression-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+        .progression-bar {
+            flex: 1;
+            height: 10px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--text-primary);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progression-bar-fill {
+            height: 100%;
+            background: var(--coral);
+            transition: width 0.6s ease-out;
+            width: 0%;
+        }
+        .progression-xp-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .progression-section {
+            margin-top: var(--space-md);
+        }
+        .progression-section-title {
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--coral);
+            margin-bottom: 6px;
+        }
+        .progression-focus-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .progression-focus-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 0.92rem;
+            touch-action: manipulation;
+        }
+        .progression-focus-link:hover { background: var(--bg-card); }
+        .progression-focus-link .arrow { font-weight: 900; color: var(--coral); }
+        .progression-next {
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 2px dashed var(--border-warm);
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+        .progression-next strong { color: var(--text-primary); }
+
+        /* Level-up toast */
+        .progression-toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(80px + env(safe-area-inset-bottom));
+            transform: translate(-50%, 100px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 3px solid var(--coral);
+            border-radius: var(--radius-medium);
+            padding: 12px 16px;
+            box-shadow: 6px 6px 0 var(--coral-glow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10000;
+            max-width: 90vw;
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        .progression-toast.show { transform: translate(-50%, 0); opacity: 1; }
+        .progression-toast .emoji { font-size: 1.6rem; }
+        .progression-toast .content { display: flex; flex-direction: column; gap: 2px; }
+        .progression-toast .content strong { font-weight: 900; }
+        .progression-toast .content span { font-size: 0.85rem; color: var(--text-secondary); }
+
         .tools-section {
             margin-bottom: var(--space-2xl);
         }
@@ -3586,11 +3713,30 @@
                         <p>A gentle look at your journey</p>
                     </div>
 
-                    <div class="progress-card">
-                        <div class="progress-emoji">🌱</div>
-                        <p class="progress-text">
-                            You've shown up for yourself <strong>3 times</strong> this week. That matters.
-                        </p>
+                    <div class="progression-card" id="progression-card">
+                        <div class="progression-head">
+                            <div class="progression-emoji" id="progression-emoji">🌱</div>
+                            <div class="progression-head-text">
+                                <span class="label">Your level</span>
+                                <span class="name" id="progression-name">Beginner</span>
+                            </div>
+                        </div>
+                        <p class="progression-blurb" id="progression-blurb">Foundational exercises and daily check-ins.</p>
+
+                        <div class="progression-bar-wrap">
+                            <div class="progression-bar"><div class="progression-bar-fill" id="progression-bar-fill"></div></div>
+                            <span class="progression-xp-label" id="progression-xp-label">0 XP</span>
+                        </div>
+
+                        <div class="progression-section">
+                            <div class="progression-section-title">At your level</div>
+                            <div class="progression-focus-list" id="progression-focus-list"></div>
+                        </div>
+
+                        <div class="progression-next" id="progression-next" hidden>
+                            <strong id="progression-next-name">Builder</strong> &mdash; <span id="progression-next-blurb">Deeper tools&hellip;</span>
+                            <span id="progression-next-needed"></span>
+                        </div>
                     </div>
 
                     <div class="tools-section">
@@ -5420,7 +5566,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=54"></script>
+    <script src="/assets/js/app.js?v=55"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
