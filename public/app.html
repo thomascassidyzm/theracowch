@@ -1596,6 +1596,236 @@
         .progression-toast .content strong { font-weight: 900; }
         .progression-toast .content span { font-size: 0.85rem; color: var(--text-secondary); }
 
+        /* Streak card */
+        .streak-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .streak-head {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        .streak-current {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--coral);
+            line-height: 1;
+        }
+        .streak-current-unit {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .streak-best {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .streak-best strong { color: var(--text-primary); font-weight: 900; }
+        .streak-msg {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-md);
+            line-height: 1.4;
+        }
+        .streak-msg.broken {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 10px 14px;
+            border-radius: var(--radius-small);
+        }
+        .streak-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            border: 3px solid var(--coral);
+            border-radius: var(--radius-medium);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.92rem;
+            touch-action: manipulation;
+            margin-bottom: var(--space-md);
+        }
+        .streak-cta:hover { transform: translateY(-1px); }
+        .streak-badges-title {
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .streak-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
+            gap: 8px;
+        }
+        .streak-badge {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 10px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            opacity: 0.4;
+            transition: all 0.2s;
+        }
+        .streak-badge.unlocked {
+            opacity: 1;
+            border-color: var(--coral);
+            background: #FFF1E5;
+        }
+        .streak-badge .emoji {
+            font-size: 1.5rem;
+            filter: grayscale(60%);
+        }
+        .streak-badge.unlocked .emoji { filter: none; }
+        .streak-badge .label {
+            font-size: 0.66rem;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.1;
+            color: var(--text-primary);
+        }
+        .streak-badge .target {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Reminders settings card */
+        .reminders-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .reminders-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        .reminders-head h2 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin: 0;
+        }
+        .reminders-blurb {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-md);
+        }
+        .reminders-perm {
+            font-size: 0.82rem;
+            padding: 8px 12px;
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            border-radius: var(--radius-small);
+            margin-bottom: var(--space-md);
+        }
+        .reminders-perm button {
+            margin-top: 6px;
+            padding: 6px 12px;
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            border: 2px solid var(--coral);
+            border-radius: var(--radius-small);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .reminder-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-warm);
+        }
+        .reminder-row:last-of-type { border-bottom: none; }
+        .reminder-row .label {
+            flex: 1;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+        .reminder-row .label .sub {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .reminder-row input[type=time] {
+            padding: 6px 8px;
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .reminder-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            border-radius: 999px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .reminder-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            transition: transform 0.2s;
+        }
+        .reminder-toggle[aria-checked="true"] {
+            background: var(--coral);
+            border-color: var(--coral);
+        }
+        .reminder-toggle[aria-checked="true"]::after {
+            background: var(--bg-card);
+            transform: translateX(20px);
+        }
+        .reminder-snooze {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: var(--space-md);
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .reminder-snooze.active { background: #FDF5E8; border-color: #C9A857; }
+
         .tools-section {
             margin-bottom: var(--space-2xl);
         }
@@ -3789,6 +4019,48 @@
                         </div>
                     </div>
 
+                    <!-- Cowch streak -->
+                    <div class="streak-card" id="streak-card">
+                        <div class="streak-head">
+                            <span class="streak-current" id="streak-current">0</span>
+                            <span class="streak-current-unit">day streak</span>
+                            <span class="streak-best">Best: <strong id="streak-best">0</strong></span>
+                        </div>
+                        <p class="streak-msg" id="streak-msg">Do today&rsquo;s inner-weather check-in to start your streak.</p>
+                        <a class="streak-cta" id="streak-cta" href="/exercises/weather.html">
+                            <span>🌤️</span><span id="streak-cta-text">Do today&rsquo;s check-in</span>
+                        </a>
+                        <div class="streak-badges-title">Your collection</div>
+                        <div class="streak-badges" id="streak-badges"></div>
+                    </div>
+
+                    <!-- Gentle daily reminders -->
+                    <div class="reminders-card" id="reminders-card">
+                        <div class="reminders-head">
+                            <h2>Gentle reminders</h2>
+                            <button type="button" class="reminder-toggle" id="reminders-master" aria-checked="false" aria-label="Toggle daily reminders"></button>
+                        </div>
+                        <p class="reminders-blurb">Up to two soft nudges a day &mdash; no shame, just an invitation.</p>
+                        <div class="reminders-perm" id="reminders-perm" hidden>
+                            <span id="reminders-perm-msg">Notifications need permission to reach you. Tap below to grant.</span>
+                            <br><button type="button" id="reminders-perm-btn">Allow notifications</button>
+                        </div>
+
+                        <div class="reminder-row">
+                            <div class="label">Morning <span class="sub">e.g. &ldquo;How&rsquo;s your inner weather today?&rdquo;</span></div>
+                            <input type="time" id="reminder-morning-time" value="09:00">
+                            <button type="button" class="reminder-toggle" id="reminder-morning-on" aria-checked="true" aria-label="Toggle morning reminder"></button>
+                        </div>
+
+                        <div class="reminder-row">
+                            <div class="label">Evening <span class="sub">e.g. &ldquo;3-minute grounding waiting for you.&rdquo;</span></div>
+                            <input type="time" id="reminder-evening-time" value="20:00">
+                            <button type="button" class="reminder-toggle" id="reminder-evening-on" aria-checked="false" aria-label="Toggle evening reminder"></button>
+                        </div>
+
+                        <button type="button" class="reminder-snooze" id="reminder-snooze">😴 Snooze for today</button>
+                    </div>
+
                     <div class="tools-section">
                         <h2>Your Tools</h2>
                         <div class="tool-cards">
@@ -5616,7 +5888,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=55"></script>
+    <script src="/assets/js/app.js?v=56"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');

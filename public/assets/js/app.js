@@ -27,10 +27,12 @@ function switchTab(tabId) {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
 
-    // Refresh the progression card whenever the user lands on Your Space —
-    // picks up new check-ins, goals etc. completed earlier this session.
-    if (tabId === 'you' && typeof updateProgressionUI === 'function') {
-        updateProgressionUI();
+    // Refresh the progression + streak cards whenever the user lands on Your
+    // Space — picks up new check-ins, goals etc. completed earlier this
+    // session.
+    if (tabId === 'you') {
+        if (typeof updateProgressionUI === 'function') updateProgressionUI();
+        if (typeof updateStreakUI === 'function') updateStreakUI();
     }
 }
 
@@ -418,6 +420,313 @@ function updateProgressionUI() {
     }
 }
 window.updateProgressionUI = updateProgressionUI;
+
+// ============================================
+// Cowch Streak (from inner-weather check-ins) + badge collection
+// ============================================
+const STREAK_KEY = 'cowch-streaks-v1';
+const STREAK_BADGES = [
+    { days: 1,   emoji: '🌱', label: 'First seed' },
+    { days: 3,   emoji: '🌼', label: 'Bloom' },
+    { days: 7,   emoji: '🌿', label: 'Roots' },
+    { days: 14,  emoji: '🌳', label: 'Steady tree' },
+    { days: 21,  emoji: '🐄', label: 'Cowch friend' },
+    { days: 30,  emoji: '🌈', label: 'Rainbow' },
+    { days: 60,  emoji: '✨', label: 'Star streak' },
+    { days: 100, emoji: '🏆', label: 'Century' }
+];
+
+function streakDayKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function computeStreak() {
+    let days;
+    try {
+        const checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
+        days = new Set(checkins.filter(c => c && c.timestamp).map(c => streakDayKey(new Date(c.timestamp))));
+    } catch (_) { days = new Set(); }
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayKey = streakDayKey(today);
+    const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+    const yestKey = streakDayKey(yest);
+
+    let current = 0;
+    if (days.has(todayKey) || days.has(yestKey)) {
+        const start = days.has(todayKey) ? today : yest;
+        const cur = new Date(start);
+        while (days.has(streakDayKey(cur))) {
+            current++;
+            cur.setDate(cur.getDate() - 1);
+        }
+    }
+
+    // Best streak: walk all known days, find longest consecutive run
+    let best = 0;
+    if (days.size > 0) {
+        const sorted = Array.from(days).sort();
+        let run = 1;
+        for (let i = 1; i < sorted.length; i++) {
+            const prev = new Date(sorted[i-1] + 'T00:00:00');
+            const cur  = new Date(sorted[i]   + 'T00:00:00');
+            const diff = Math.round((cur - prev) / 86400000);
+            if (diff === 1) { run++; } else { best = Math.max(best, run); run = 1; }
+        }
+        best = Math.max(best, run);
+    }
+    // Don't let stored "best" regress (in case of clearing)
+    try {
+        const stored = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}');
+        const persistedBest = stored.best || 0;
+        if (best > persistedBest) {
+            stored.best = best;
+            localStorage.setItem(STREAK_KEY, JSON.stringify(stored));
+        } else if (persistedBest > best) {
+            best = persistedBest;
+        }
+    } catch (_) {}
+
+    const todayDone = days.has(todayKey);
+    const yesterdayDone = days.has(yestKey);
+    const broken = !todayDone && !yesterdayDone && days.size > 0;
+
+    return { current, best, todayDone, broken, totalDays: days.size };
+}
+
+function updateStreakUI() {
+    const card = document.getElementById('streak-card');
+    if (!card) return;
+    const s = computeStreak();
+
+    document.getElementById('streak-current').textContent = s.current;
+    document.getElementById('streak-best').textContent = s.best;
+
+    const msg = document.getElementById('streak-msg');
+    const cta = document.getElementById('streak-cta');
+    const ctaText = document.getElementById('streak-cta-text');
+    msg.classList.remove('broken');
+    if (s.todayDone) {
+        msg.textContent = `You showed up today. ${s.current} day${s.current === 1 ? '' : 's'} and counting — soft and steady.`;
+        cta.style.display = 'none';
+    } else if (s.broken) {
+        msg.classList.add('broken');
+        msg.innerHTML = "Streaks pause, that's just life. No shame &mdash; restart gently with one check-in today.";
+        cta.style.display = '';
+        ctaText.textContent = 'Restart gently';
+    } else if (s.current > 0) {
+        msg.textContent = `${s.current} day${s.current === 1 ? '' : 's'} so far. Check in today to keep it going.`;
+        cta.style.display = '';
+        ctaText.textContent = "Do today's check-in";
+    } else {
+        msg.textContent = "Do today's inner-weather check-in to start your streak.";
+        cta.style.display = '';
+        ctaText.textContent = "Do today's check-in";
+    }
+
+    const grid = document.getElementById('streak-badges');
+    grid.innerHTML = '';
+    const reached = Math.max(s.current, s.best);
+    STREAK_BADGES.forEach(b => {
+        const tile = document.createElement('div');
+        const unlocked = reached >= b.days;
+        tile.className = 'streak-badge' + (unlocked ? ' unlocked' : '');
+        tile.innerHTML = `<span class="emoji">${b.emoji}</span>
+                          <span class="label">${b.label}</span>
+                          <span class="target">${b.days} day${b.days === 1 ? '' : 's'}</span>`;
+        grid.appendChild(tile);
+    });
+}
+window.updateStreakUI = updateStreakUI;
+
+// ============================================
+// Daily reminders (gentle, customizable, 1–2/day, snoozable)
+// ============================================
+const REMINDERS_KEY = 'cowch-reminders-v1';
+const REMINDER_NUDGES = {
+    morning: [
+        { title: "How's your inner weather today? ☁️", body: "A 30-second check-in is waiting on the Cowch." },
+        { title: "Good morning 🌤️", body: "One small notice for yourself — what are you carrying today?" },
+        { title: "Soft start ✨", body: "Tap in for a one-minute reset before the day picks up speed." }
+    ],
+    evening: [
+        { title: "3-minute grounding waiting for you 🌿", body: "Wind down with 5-4-3-2-1 grounding or a body scan." },
+        { title: "Pause for a moment 🌙", body: "What was kind to you today? Add one gratitude star." },
+        { title: "End of day check-in 💝", body: "Inner weather, a tiny win, or just hello — no pressure." }
+    ]
+};
+
+function remindersLoad() {
+    try {
+        const raw = localStorage.getItem(REMINDERS_KEY);
+        if (raw) return Object.assign(remindersDefault(), JSON.parse(raw));
+    } catch (_) {}
+    return remindersDefault();
+}
+function remindersDefault() {
+    return {
+        enabled: false,
+        morning: { on: true,  time: '09:00' },
+        evening: { on: false, time: '20:00' },
+        snoozeUntil: 0
+    };
+}
+function remindersSave(s) {
+    try { localStorage.setItem(REMINDERS_KEY, JSON.stringify(s)); } catch (_) {}
+}
+
+let reminderTimers = [];
+function clearReminderTimers() {
+    reminderTimers.forEach(t => clearTimeout(t));
+    reminderTimers = [];
+}
+function nextOccurrence(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const now = new Date();
+    const target = new Date(now);
+    target.setHours(h, m, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    return target;
+}
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+async function fireReminder(slot) {
+    const nudge = pickRandom(REMINDER_NUDGES[slot]);
+    const opts = {
+        body: nudge.body,
+        icon: '/apple-touch-icon.png',
+        badge: '/icons/icon-96x96.svg',
+        tag: 'cowch-' + slot,
+        requireInteraction: false,
+        data: { url: '/app.html' }
+    };
+    try {
+        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg) {
+                reg.showNotification(nudge.title, opts);
+                return;
+            }
+        }
+        if (Notification.permission === 'granted') {
+            new Notification(nudge.title, opts);
+        }
+    } catch (_) {}
+}
+
+function scheduleRemindersForToday() {
+    clearReminderTimers();
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const s = remindersLoad();
+    if (!s.enabled) return;
+    if (s.snoozeUntil && Date.now() < s.snoozeUntil) return;
+
+    const queue = [];
+    if (s.morning.on) queue.push({ slot: 'morning', when: nextOccurrence(s.morning.time) });
+    if (s.evening.on) queue.push({ slot: 'evening', when: nextOccurrence(s.evening.time) });
+
+    queue.forEach(q => {
+        const ms = q.when - new Date();
+        // Cap at 24h so we always re-evaluate on the next app open
+        const delay = Math.min(ms, 1000 * 60 * 60 * 24);
+        const id = setTimeout(() => fireReminder(q.slot), delay);
+        reminderTimers.push(id);
+    });
+}
+
+function setupReminders() {
+    const card = document.getElementById('reminders-card');
+    if (!card) return;
+
+    const master   = document.getElementById('reminders-master');
+    const mTime    = document.getElementById('reminder-morning-time');
+    const mOn      = document.getElementById('reminder-morning-on');
+    const eTime    = document.getElementById('reminder-evening-time');
+    const eOn      = document.getElementById('reminder-evening-on');
+    const permBox  = document.getElementById('reminders-perm');
+    const permBtn  = document.getElementById('reminders-perm-btn');
+    const permMsg  = document.getElementById('reminders-perm-msg');
+    const snoozeBtn = document.getElementById('reminder-snooze');
+
+    function paintToggle(btn, on) {
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    }
+
+    function paint() {
+        const s = remindersLoad();
+        paintToggle(master, s.enabled);
+        paintToggle(mOn, s.morning.on);
+        paintToggle(eOn, s.evening.on);
+        mTime.value = s.morning.time;
+        eTime.value = s.evening.time;
+
+        const supported = 'Notification' in window;
+        if (!supported) {
+            permBox.hidden = false;
+            permMsg.textContent = 'This device doesn’t support notifications.';
+            if (permBtn) permBtn.style.display = 'none';
+        } else if (Notification.permission === 'granted') {
+            permBox.hidden = true;
+        } else if (Notification.permission === 'denied') {
+            permBox.hidden = false;
+            permMsg.textContent = 'Notifications are blocked for this site. Enable them in your browser settings to receive gentle reminders.';
+            if (permBtn) permBtn.style.display = 'none';
+        } else {
+            permBox.hidden = !s.enabled;
+            permMsg.textContent = 'Notifications need permission to reach you. Tap below to grant.';
+            if (permBtn) permBtn.style.display = '';
+        }
+
+        const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
+        snoozeBtn.classList.toggle('active', !!snoozed);
+        snoozeBtn.innerHTML = snoozed
+            ? '✓ Snoozed until tomorrow'
+            : '😴 Snooze for today';
+    }
+
+    function save(updater) {
+        const s = remindersLoad();
+        updater(s);
+        remindersSave(s);
+        scheduleRemindersForToday();
+        paint();
+    }
+
+    master.addEventListener('click', () => {
+        save(s => { s.enabled = !s.enabled; });
+        // If user turned reminders on but permission not granted, prompt
+        if (remindersLoad().enabled && 'Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().then(paint);
+        }
+    });
+    mOn.addEventListener('click', () => save(s => { s.morning.on = !s.morning.on; }));
+    eOn.addEventListener('click', () => save(s => { s.evening.on = !s.evening.on; }));
+    mTime.addEventListener('change', () => save(s => { s.morning.time = mTime.value; }));
+    eTime.addEventListener('change', () => save(s => { s.evening.time = eTime.value; }));
+
+    permBtn.addEventListener('click', () => {
+        if (!('Notification' in window)) return;
+        Notification.requestPermission().then(() => {
+            paint();
+            scheduleRemindersForToday();
+        });
+    });
+
+    snoozeBtn.addEventListener('click', () => {
+        const s = remindersLoad();
+        const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
+        if (snoozed) {
+            save(x => { x.snoozeUntil = 0; });
+        } else {
+            // Snooze until 04:00 local time tomorrow
+            const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(4, 0, 0, 0);
+            save(x => { x.snoozeUntil = t.getTime(); });
+        }
+    });
+
+    paint();
+    scheduleRemindersForToday();
+}
+window.setupReminders = setupReminders;
 
 // ============================================
 // IMAGINE Framework Data & Domain Panel
@@ -1445,6 +1754,8 @@ function init() {
     updateDailyQuote();
     updateDailySuggestion();
     updateProgressionUI();
+    updateStreakUI();
+    setupReminders();
     setupTabNavigation();
     setupDomainPanel();
     setupToolPanels();
