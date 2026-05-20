@@ -1809,6 +1809,141 @@
         }
         .reminder-snooze.active { background: #FDF5E8; border-color: #C9A857; }
 
+        /* Values pasture — the user's top 10 values bloom as flowers in a
+           little meadow; the more active days, the more vibrant. */
+        .pasture-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .pasture-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-md);
+            margin-bottom: 6px;
+        }
+        .pasture-head h2 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin: 0;
+        }
+        .pasture-vitality {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .pasture-vitality .num { color: var(--coral); font-weight: 900; }
+        .pasture-blurb {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-md);
+        }
+        .pasture-svg {
+            display: block;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(180deg, #DCEDF6 0%, #E7F4DE 38%, #C9E1A1 100%);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            margin-bottom: var(--space-md);
+        }
+        .pasture-empty {
+            background: var(--bg-secondary);
+            border-left: 4px solid #C9A857;
+            padding: 10px 14px;
+            border-radius: var(--radius-small);
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        .pasture-empty a { color: var(--coral); font-weight: 800; text-decoration: underline; }
+
+        /* Weekly report */
+        .weekly-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .weekly-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        .weekly-head h2 { font-size: 1.1rem; font-weight: 900; margin: 0; }
+        .weekly-range {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .weekly-headline {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 10px 14px;
+            border-radius: var(--radius-small);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        .weekly-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px;
+            margin-bottom: var(--space-md);
+        }
+        .weekly-stat {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 10px 12px;
+        }
+        .weekly-stat .num {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--coral);
+            line-height: 1.1;
+        }
+        .weekly-stat .lbl {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 4px;
+        }
+        .weekly-section-title {
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--coral);
+            margin: 6px 0 4px;
+        }
+        .weekly-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: var(--space-sm);
+        }
+        .weekly-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.92rem;
+            padding: 4px 0;
+        }
+        .weekly-row .count { font-weight: 900; color: var(--text-primary); }
+        .weekly-empty { color: var(--text-muted); font-size: 0.88rem; font-style: italic; }
+
         .tools-section {
             margin-bottom: var(--space-2xl);
         }
@@ -4085,6 +4220,35 @@
                         <div class="streak-badges" id="streak-badges"></div>
                     </div>
 
+                    <!-- Values pasture -->
+                    <div class="pasture-card" id="pasture-card">
+                        <div class="pasture-head">
+                            <h2>Your values pasture</h2>
+                            <span class="pasture-vitality"><span class="num" id="pasture-vitality-num">0</span> vibrant days</span>
+                        </div>
+                        <p class="pasture-blurb" id="pasture-blurb">Each flower is one of your top values. Consistent check-ins keep the pasture vibrant.</p>
+                        <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+                        <div class="pasture-empty" id="pasture-empty" hidden>
+                            <a href="/questionnaires/values.html?v=110">Pick your top 10 values</a> to grow the pasture.
+                        </div>
+                    </div>
+
+                    <!-- Weekly report -->
+                    <div class="weekly-card" id="weekly-card">
+                        <div class="weekly-head">
+                            <h2>Your week</h2>
+                            <span class="weekly-range" id="weekly-range"></span>
+                        </div>
+                        <p class="weekly-headline" id="weekly-headline">Open the app a few times this week and your report will start to fill in.</p>
+                        <div class="weekly-stats" id="weekly-stats"></div>
+
+                        <div class="weekly-section-title">Most-used exercises</div>
+                        <div class="weekly-list" id="weekly-exercises"></div>
+
+                        <div class="weekly-section-title">Inner weather pattern</div>
+                        <div class="weekly-list" id="weekly-weather"></div>
+                    </div>
+
                     <!-- Gentle daily reminders -->
                     <div class="reminders-card" id="reminders-card">
                         <div class="reminders-head">
@@ -5938,7 +6102,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=58"></script>
+    <script src="/assets/js/app.js?v=59"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
