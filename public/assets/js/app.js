@@ -27,12 +27,13 @@ function switchTab(tabId) {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
 
-    // Refresh the progression + streak cards whenever the user lands on Your
-    // Space — picks up new check-ins, goals etc. completed earlier this
-    // session.
+    // Refresh the Your-Space cards whenever the user lands on it — picks up
+    // anything completed earlier this session.
     if (tabId === 'you') {
-        if (typeof updateProgressionUI === 'function') updateProgressionUI();
-        if (typeof updateStreakUI === 'function') updateStreakUI();
+        if (typeof updateProgressionUI    === 'function') updateProgressionUI();
+        if (typeof updateStreakUI         === 'function') updateStreakUI();
+        if (typeof updatePastureUI        === 'function') updatePastureUI();
+        if (typeof updateWeeklyReportUI   === 'function') updateWeeklyReportUI();
     }
 }
 
@@ -537,6 +538,347 @@ function updateStreakUI() {
     });
 }
 window.updateStreakUI = updateStreakUI;
+
+// ============================================
+// Values pasture — visual that thrives with consistent activity
+// ============================================
+function loadActivityLog() {
+    try { return JSON.parse(localStorage.getItem('cowch-activity-v1') || '[]'); } catch (_) { return []; }
+}
+
+function gatherActiveDays(windowDays) {
+    // A day counts as "active" if any of: weather check-in, goal added,
+    // exercise logged in the activity log, OR chat message.
+    const days = new Set();
+    const fromMs = Date.now() - windowDays * 86400000;
+    function add(ts) {
+        if (!ts) return;
+        const d = new Date(ts);
+        if (isNaN(d.getTime()) || d.getTime() < fromMs) return;
+        days.add(streakDayKey(d));
+    }
+    try {
+        JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]').forEach(e => add(e && e.timestamp));
+    } catch (_) {}
+    try {
+        JSON.parse(localStorage.getItem('cowch_goals') || '[]').forEach(g => {
+            add(g && g.timestamp);
+            add(g && g.completedAt);
+        });
+    } catch (_) {}
+    loadActivityLog().forEach(e => add(e && e.at));
+    try {
+        JSON.parse(localStorage.getItem('cowch_chat_history') || '[]').forEach(m => {
+            if (m && m.role === 'user') add(m.ts);
+        });
+    } catch (_) {}
+    return days;
+}
+
+function loadTopValues() {
+    try {
+        const raw = localStorage.getItem('cowch-q-values');
+        if (!raw) return null;
+        const j = JSON.parse(raw);
+        if (j && Array.isArray(j.chosen) && j.chosen.length) return j.chosen;
+    } catch (_) {}
+    return null;
+}
+
+function updatePastureUI() {
+    const card = document.getElementById('pasture-card');
+    if (!card) return;
+    const svg = document.getElementById('pasture-svg');
+    const vitNum = document.getElementById('pasture-vitality-num');
+    const blurb = document.getElementById('pasture-blurb');
+    const empty = document.getElementById('pasture-empty');
+
+    const values = loadTopValues();
+    const activeDays = gatherActiveDays(30).size;
+    vitNum.textContent = activeDays;
+
+    if (!values) {
+        empty.hidden = false;
+        svg.innerHTML = '';
+        blurb.textContent = 'Pick your top 10 values to start growing the pasture.';
+        return;
+    }
+    empty.hidden = true;
+
+    // Vitality 0..1 — 18 vibrant days in the past month fills the meadow.
+    const vit = Math.max(0, Math.min(1, activeDays / 18));
+    blurb.textContent = vit < 0.2
+        ? 'A quiet pasture. Show up a few days and the flowers start to open.'
+        : vit < 0.6
+            ? 'Pasture is waking up — consistent days keep it bright.'
+            : 'Your pasture is thriving. Keep tending it.';
+
+    svg.innerHTML = '';
+    const W = 360, H = 180;
+
+    // Sun
+    const sun = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    sun.setAttribute('cx', 50); sun.setAttribute('cy', 32);
+    sun.setAttribute('r', 18);
+    sun.setAttribute('fill', '#FFD56B');
+    sun.setAttribute('opacity', 0.4 + vit * 0.6);
+    svg.appendChild(sun);
+
+    // Clouds
+    [{ x: 220, y: 28, r: 12 }, { x: 250, y: 24, r: 14 }, { x: 280, y: 30, r: 11 }].forEach(c => {
+        const e = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        e.setAttribute('cx', c.x); e.setAttribute('cy', c.y);
+        e.setAttribute('r', c.r);
+        e.setAttribute('fill', '#FFFFFF');
+        e.setAttribute('opacity', '0.9');
+        svg.appendChild(e);
+    });
+
+    // Distant hill
+    const hill = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hill.setAttribute('d', 'M 0 90 Q 90 60 180 86 T 360 92 L 360 180 L 0 180 Z');
+    hill.setAttribute('fill', '#A8C57E');
+    svg.appendChild(hill);
+
+    // Foreground ground
+    const ground = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    ground.setAttribute('d', 'M 0 130 Q 80 116 160 128 T 360 130 L 360 180 L 0 180 Z');
+    ground.setAttribute('fill', '#92BC6A');
+    svg.appendChild(ground);
+
+    // A small cow on the left of the pasture
+    const cow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    cow.setAttribute('transform', 'translate(70, 142)');
+    cow.innerHTML = `
+        <ellipse cx="0" cy="0" rx="16" ry="9" fill="#FFFFFF"/>
+        <ellipse cx="-7" cy="-3" rx="4" ry="3" fill="#3C2E28"/>
+        <ellipse cx="5" cy="2"  rx="3.5" ry="2.5" fill="#3C2E28"/>
+        <circle cx="-15" cy="-2" r="6" fill="#FFFFFF"/>
+        <ellipse cx="-15" cy="-1" rx="3.5" ry="2.4" fill="#FFE3D4"/>
+        <line x1="-7"  y1="9" x2="-7"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="-2"  y1="9" x2="-2"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="6"   y1="9" x2="6"   y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="11"  y1="9" x2="11"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>`;
+    svg.appendChild(cow);
+
+    // One flower per top value
+    const flowerColors = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF', '#FFC1A4',
+                          '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
+    values.forEach((name, i) => {
+        const row = i < 5 ? 0 : 1;
+        const col = i < 5 ? i : (i - 5);
+        const baseX = 110 + col * 50 + (row === 1 ? 25 : 0);
+        const baseY = row === 0 ? 145 : 165;
+        const scale = 0.6 + vit * 0.7;          // 0.6 → 1.3
+        const opacity = 0.45 + vit * 0.55;       // 0.45 → 1.0
+        const color = flowerColors[i % flowerColors.length];
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', `translate(${baseX}, ${baseY}) scale(${scale})`);
+        g.setAttribute('opacity', opacity.toFixed(2));
+        // Stem
+        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
+        stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
+        stem.setAttribute('stroke', '#3F8458');
+        stem.setAttribute('stroke-width', 1.6);
+        stem.setAttribute('stroke-linecap', 'round');
+        g.appendChild(stem);
+        // Tiny side leaf
+        const sideLeaf = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
+        sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
+        sideLeaf.setAttribute('fill', '#3F8458');
+        sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
+        g.appendChild(sideLeaf);
+        // Petals
+        for (let p = 0; p < 5; p++) {
+            const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
+            const px = Math.cos(a) * 4.2;
+            const py = Math.sin(a) * 4.2 - 16;
+            const petal = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            petal.setAttribute('cx', px); petal.setAttribute('cy', py);
+            petal.setAttribute('r', 3.4);
+            petal.setAttribute('fill', color);
+            g.appendChild(petal);
+        }
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', 0); c.setAttribute('cy', -16); c.setAttribute('r', 2);
+        c.setAttribute('fill', '#C9A857');
+        g.appendChild(c);
+        // Tooltip via <title>
+        const ttl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        ttl.textContent = name;
+        g.appendChild(ttl);
+        svg.appendChild(g);
+    });
+}
+window.updatePastureUI = updatePastureUI;
+
+// ============================================
+// Weekly in-app report — rolling 7 days, derived from existing storage
+// ============================================
+const EXERCISE_LABELS = {
+    'wave':            { label: 'Ride the wave',      verb: 'rode the wave' },
+    'box-breathing':   { label: 'Box breathing',      verb: 'breathed the box' },
+    'grounding-54321': { label: '5-4-3-2-1 grounding',verb: 'grounded with 5-4-3-2-1' },
+    'body-scan':       { label: '5-minute body scan', verb: 'did a body scan' },
+    'gratitude-stars': { label: 'Gratitude stars',    verb: 'added a gratitude star' },
+    'inner-weather':   { label: 'Inner weather',      verb: 'checked in with your inner weather' }
+};
+const WEATHER_LABELS = {
+    'sunny': '☀️ sunny', 'partly-cloudy': '🌤️ partly cloudy', 'cloudy': '☁️ cloudy',
+    'overcast': '☁️ overcast', 'rainy': '🌧️ rainy', 'stormy': '⛈️ stormy',
+    'foggy': '🌫️ foggy', 'rainbow': '🌈 rainbow'
+};
+
+function weeklyDaysWindow() {
+    const out = new Set();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        out.add(streakDayKey(d));
+    }
+    return out;
+}
+
+function updateWeeklyReportUI() {
+    const card = document.getElementById('weekly-card');
+    if (!card) return;
+    const range = document.getElementById('weekly-range');
+    const headline = document.getElementById('weekly-headline');
+    const stats = document.getElementById('weekly-stats');
+    const exList = document.getElementById('weekly-exercises');
+    const wxList = document.getElementById('weekly-weather');
+
+    const today = new Date();
+    const start = new Date(today); start.setDate(start.getDate() - 6);
+    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    range.textContent = fmt(start) + ' – ' + fmt(today);
+
+    const weekDays = weeklyDaysWindow();
+    const inWeek = (ts) => {
+        if (!ts) return false;
+        const d = new Date(ts);
+        return !isNaN(d.getTime()) && weekDays.has(streakDayKey(d));
+    };
+
+    // Check-ins
+    let checkins = [];
+    let weatherCounts = {};
+    try {
+        checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]')
+            .filter(c => c && inWeek(c.timestamp));
+        checkins.forEach(c => {
+            const w = c.weather || 'unknown';
+            weatherCounts[w] = (weatherCounts[w] || 0) + 1;
+        });
+    } catch (_) {}
+
+    // Goals added/completed
+    let goalsAdded = 0, goalsDone = 0;
+    try {
+        const goals = JSON.parse(localStorage.getItem('cowch_goals') || '[]');
+        goals.forEach(g => {
+            if (inWeek(g && g.timestamp)) goalsAdded++;
+            if (g && g.completed && inWeek(g.completedAt)) goalsDone++;
+        });
+    } catch (_) {}
+
+    // Exercises (from activity log)
+    const exCounts = {};
+    loadActivityLog().forEach(e => {
+        if (!inWeek(e && e.at)) return;
+        if (!e.name) return;
+        exCounts[e.name] = (exCounts[e.name] || 0) + 1;
+    });
+
+    // Active days this week
+    const activeThisWeek = gatherActiveDays(7);
+    const showedUpDays = activeThisWeek.size;
+
+    // Streak (current, for context)
+    const streak = computeStreak();
+
+    // Stats grid
+    stats.innerHTML = '';
+    const statTiles = [
+        { num: showedUpDays + '/7', lbl: 'Days you showed up' },
+        { num: checkins.length, lbl: 'Check-ins' },
+        { num: goalsAdded, lbl: 'Goals added' },
+        { num: goalsDone, lbl: 'Goals bloomed' },
+        { num: streak.current, lbl: 'Current streak' }
+    ];
+    statTiles.forEach(t => {
+        const tile = document.createElement('div');
+        tile.className = 'weekly-stat';
+        tile.innerHTML = '<div class="num">' + t.num + '</div><div class="lbl">' + t.lbl + '</div>';
+        stats.appendChild(tile);
+    });
+
+    // Exercises list
+    const exEntries = Object.keys(exCounts)
+        .map(k => ({ name: k, count: exCounts[k] }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4);
+    exList.innerHTML = '';
+    if (exEntries.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'weekly-empty';
+        empty.textContent = 'No exercises logged yet — try one this week and it’ll show up here.';
+        exList.appendChild(empty);
+    } else {
+        exEntries.forEach(e => {
+            const meta = EXERCISE_LABELS[e.name] || { label: e.name };
+            const row = document.createElement('div');
+            row.className = 'weekly-row';
+            row.innerHTML = '<span>' + meta.label + '</span><span class="count">' + e.count + 'x</span>';
+            exList.appendChild(row);
+        });
+    }
+
+    // Weather pattern list
+    const wxEntries = Object.keys(weatherCounts)
+        .map(k => ({ key: k, count: weatherCounts[k] }))
+        .sort((a, b) => b.count - a.count);
+    wxList.innerHTML = '';
+    if (wxEntries.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'weekly-empty';
+        empty.textContent = 'No inner-weather check-ins yet this week.';
+        wxList.appendChild(empty);
+    } else {
+        wxEntries.slice(0, 4).forEach(w => {
+            const row = document.createElement('div');
+            row.className = 'weekly-row';
+            const lbl = WEATHER_LABELS[w.key] || w.key;
+            row.innerHTML = '<span>' + lbl + '</span><span class="count">' + w.count + ' day' + (w.count === 1 ? '' : 's') + '</span>';
+            wxList.appendChild(row);
+        });
+    }
+
+    // Headline pattern observation — try the most evocative thing we can find
+    let line = '';
+    if (exEntries.length > 0 && exEntries[0].count >= 2) {
+        const meta = EXERCISE_LABELS[exEntries[0].name] || { verb: 'used ' + exEntries[0].name };
+        line = `This week you ${meta.verb} ${exEntries[0].count} times.`;
+        if (wxEntries[0]) {
+            const wxLabel = (WEATHER_LABELS[wxEntries[0].key] || wxEntries[0].key);
+            line += ` Most common weather: ${wxLabel}.`;
+        }
+    } else if (wxEntries[0] && wxEntries[0].count >= 2) {
+        const wxLabel = (WEATHER_LABELS[wxEntries[0].key] || wxEntries[0].key);
+        line = `Your week leaned ${wxLabel}. Worth bringing to Mandy?`;
+    } else if (showedUpDays >= 5) {
+        line = `${showedUpDays} days on the cowch this week. Soft and steady.`;
+    } else if (showedUpDays > 0) {
+        line = `${showedUpDays} day${showedUpDays === 1 ? '' : 's'} so far — even a quick check-in counts.`;
+    } else {
+        line = 'Open the app a few times this week and your report will start to fill in.';
+    }
+    headline.textContent = line;
+}
+window.updateWeeklyReportUI = updateWeeklyReportUI;
 
 // ============================================
 // Daily reminders (gentle, customizable, 1–2/day, snoozable)
@@ -2011,6 +2353,8 @@ function init() {
     updateDailySuggestion();
     updateProgressionUI();
     updateStreakUI();
+    updatePastureUI();
+    updateWeeklyReportUI();
     setupReminders();
     setupTabNavigation();
     setupDomainPanel();
