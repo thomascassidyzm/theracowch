@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/thomascassidyzm/theracowch#readme",
   "description": "",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0",
+    "web-push": "^3.6.7"
+  },
   "devDependencies": {
     "tailwindcss": "^4.1.13"
   }

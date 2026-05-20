@@ -613,10 +613,95 @@ async function fireReminder(slot) {
     } catch (_) {}
 }
 
+// Server-driven push: pushes the latest prefs + the browser's PushSubscription
+// up to /api/push/subscribe so the cron dispatcher can reach the device when
+// the app isn't open. Safe no-op if push isn't supported or VAPID isn't set.
+function urlBase64ToUint8Array(b64) {
+    const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+    const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base64);
+    const out = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+}
+
+async function syncPushSubscription() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+
+        if (!sub) {
+            // No subscription yet — fetch the VAPID public key + create one
+            let publicKey;
+            try {
+                const r = await fetch('/api/push/keys');
+                if (!r.ok) return; // push not configured server-side
+                const j = await r.json();
+                publicKey = j && j.publicKey;
+            } catch (_) { return; }
+            if (!publicKey) return;
+            sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+            });
+        }
+
+        const s = remindersLoad();
+        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+        await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                subscription: sub.toJSON(),
+                prefs: {
+                    enabled: s.enabled,
+                    morning: s.morning,
+                    evening: s.evening,
+                    snoozeUntil: s.snoozeUntil,
+                    tz
+                }
+            })
+        });
+    } catch (err) {
+        // Browser/permission/network noise — swallowed on purpose; the
+        // page-side setTimeout fallback in scheduleRemindersForToday() will
+        // still deliver while the tab is open.
+        console.warn('push subscribe failed (continuing with local timers):', err);
+    }
+}
+
+async function removePushSubscription() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (!sub) return;
+        const endpoint = sub.endpoint;
+        await sub.unsubscribe();
+        await fetch('/api/push/unsubscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint })
+        });
+    } catch (_) {}
+}
+
 function scheduleRemindersForToday() {
     clearReminderTimers();
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    // Always try to sync server-side push first — that's the reliable path
+    // even when the app isn't open. We then fall back to in-page setTimeouts
+    // as a best-effort layer while the tab is alive.
     const s = remindersLoad();
+    if (s.enabled) {
+        syncPushSubscription();
+    } else {
+        removePushSubscription();
+    }
+
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
     if (!s.enabled) return;
     if (s.snoozeUntil && Date.now() < s.snoozeUntil) return;
 
