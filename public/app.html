@@ -3039,7 +3039,28 @@
             max-width: 520px;
             width: 100%;
             box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.2);
+            position: relative;
         }
+        .imagine-onboard-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #FDF5E8;
+            border: 2px solid #2D2D2D;
+            color: #2D2D2D;
+            font-size: 1.3rem;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .imagine-onboard-close:hover { background: #F4E8D0; }
         .imagine-onboard-title {
             font-size: 1.4rem;
             font-weight: 900;
@@ -3076,6 +3097,21 @@
         }
         .imagine-onboard-pick:hover {
             box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.15);
+        }
+        .imagine-onboard-pick.current {
+            border-color: var(--coral, #C97B63);
+            background: #FFF1E5;
+        }
+        .imagine-onboard-pick.current .letter {
+            background: var(--coral, #C97B63);
+        }
+        .imagine-onboard-pick .current-tag {
+            margin-left: 8px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--coral, #C97B63);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
         .imagine-onboard-pick .letter {
             flex: 0 0 auto;
@@ -3232,11 +3268,12 @@
         </div>
     </div>
 
-    <!-- IMAGINE onboarding (shown once, after consent) -->
+    <!-- IMAGINE onboarding (also openable on demand from the IMAGINE tab) -->
     <div id="imagine-onboard" class="imagine-onboard" role="dialog" aria-modal="true" aria-labelledby="imagine-onboard-title" hidden>
         <div class="imagine-onboard-card">
+            <button type="button" class="imagine-onboard-close" id="imagine-onboard-close" aria-label="Close">&times;</button>
             <h2 id="imagine-onboard-title" class="imagine-onboard-title">Tune IMAGINE to you 🌱</h2>
-            <p class="imagine-onboard-lede">Which of these feels weakest right now? Pick one and we&rsquo;ll start your daily exercise there, then cycle through the rest. You can change your mind any time.</p>
+            <p class="imagine-onboard-lede">Which of these feels weakest right now? Pick one and we&rsquo;ll start your daily exercise there, then cycle through the rest.</p>
             <div class="imagine-onboard-grid" id="imagine-onboard-grid"></div>
             <button type="button" class="imagine-onboard-skip" id="imagine-onboard-skip">No preference &mdash; use the standard IMAGINE order</button>
         </div>
@@ -3604,6 +3641,18 @@
                                 <span class="domain-card-arrow">→</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Tune IMAGINE to you -->
+                    <div class="exercises-cta">
+                        <a href="#" class="exercises-cta-btn" id="tune-imagine-btn">
+                            <span class="exercises-cta-icon">🎛️</span>
+                            <div class="exercises-cta-text">
+                                <strong>Tune IMAGINE to you</strong>
+                                <span id="tune-imagine-sub">Pick the area to start your daily exercise</span>
+                            </div>
+                            <span class="exercises-cta-arrow">→</span>
+                        </a>
                     </div>
 
                     <!-- Explore All Exercises -->
@@ -5584,16 +5633,19 @@
             });
         })();
 
-        // IMAGINE onboarding gate — runs once, after consent is accepted.
-        // Asks the user which domain feels weakest so we can rotate the daily
-        // suggestion starting from there. "No preference" keeps the standard
-        // I → M → A → G → I → N → E order.
+        // IMAGINE tuner. The modal used to auto-open after consent; it now
+        // lives inside the IMAGINE tab as a "Tune IMAGINE to you" CTA so the
+        // user can change the rotation any time. The picker is the same:
+        // pick the area that feels weakest and we make that today's letter,
+        // then cycle through the rest from there.
         (function() {
-            var ONBOARDED_KEY = 'cowch-imagine-onboarded';
             var ORDER_KEY = 'cowch-imagine-order';
             var gate = document.getElementById('imagine-onboard');
             var skipBtn = document.getElementById('imagine-onboard-skip');
+            var closeBtn = document.getElementById('imagine-onboard-close');
             var grid = document.getElementById('imagine-onboard-grid');
+            var tuneBtn = document.getElementById('tune-imagine-btn');
+            var tuneSub = document.getElementById('tune-imagine-sub');
             if (!gate || !grid || !skipBtn) return;
 
             // Indices here MUST match IMAGINE_DAILY in /assets/js/app.js
@@ -5607,28 +5659,43 @@
                 { letter: 'E', domain: 'Exploring',      desc: 'Try something new.' }
             ];
 
-            function isOnboarded() {
-                try { return localStorage.getItem(ONBOARDED_KEY) === 'true'; } catch (e) { return false; }
-            }
-            function markOnboarded() {
-                try { localStorage.setItem(ONBOARDED_KEY, 'true'); } catch (e) {}
+            function currentStartIdx() {
+                try {
+                    var raw = localStorage.getItem(ORDER_KEY);
+                    if (!raw) return null;
+                    var arr = JSON.parse(raw);
+                    if (Array.isArray(arr) && arr.length === DOMAINS.length) return arr[0];
+                } catch (e) {}
+                return null;
             }
             function refreshSuggestion() {
                 if (typeof window.updateDailySuggestion === 'function') {
                     try { window.updateDailySuggestion(); } catch (e) {}
                 }
             }
+            function updateTuneSub() {
+                if (!tuneSub) return;
+                var idx = currentStartIdx();
+                if (idx == null) {
+                    tuneSub.textContent = 'Pick the area to start your daily exercise';
+                } else {
+                    var d = DOMAINS[idx];
+                    tuneSub.textContent = 'Currently starting with ' + d.domain;
+                }
+            }
 
             function buildGrid() {
+                var startIdx = currentStartIdx();
                 grid.innerHTML = '';
                 DOMAINS.forEach(function(d, idx) {
                     var btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'imagine-onboard-pick';
+                    btn.className = 'imagine-onboard-pick' + (idx === startIdx ? ' current' : '');
+                    var tag = idx === startIdx ? '<span class="current-tag">Current</span>' : '';
                     btn.innerHTML =
                         '<span class="letter">' + d.letter + '</span>' +
                         '<span class="meta">' +
-                            '<span class="domain">' + d.domain + '</span>' +
+                            '<span class="domain">' + d.domain + tag + '</span>' +
                             '<span class="desc">' + d.desc + '</span>' +
                         '</span>';
                     btn.addEventListener('click', function() {
@@ -5637,34 +5704,43 @@
                             order.push((idx + i) % DOMAINS.length);
                         }
                         try { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); } catch (e) {}
-                        markOnboarded();
                         refreshSuggestion();
+                        updateTuneSub();
                         gate.hidden = true;
                     });
                     grid.appendChild(btn);
                 });
             }
 
-            skipBtn.addEventListener('click', function() {
-                // No preference — clear any prior custom order, use IMAGINE default
-                try { localStorage.removeItem(ORDER_KEY); } catch (e) {}
-                markOnboarded();
-                refreshSuggestion();
-                gate.hidden = true;
-            });
-
-            function maybeShow() {
-                if (isOnboarded()) return;
-                var consent = document.getElementById('consent-gate');
-                if (consent && !consent.hidden) {
-                    // Consent still showing — wait until the user accepts.
-                    setTimeout(maybeShow, 500);
-                    return;
-                }
+            function open() {
                 buildGrid();
                 gate.hidden = false;
             }
-            maybeShow();
+            function close() {
+                gate.hidden = true;
+            }
+
+            skipBtn.addEventListener('click', function() {
+                // No preference — clear any prior custom order, use IMAGINE default
+                try { localStorage.removeItem(ORDER_KEY); } catch (e) {}
+                refreshSuggestion();
+                updateTuneSub();
+                close();
+            });
+            if (closeBtn) closeBtn.addEventListener('click', close);
+            // Backdrop click closes too
+            gate.addEventListener('click', function(e) { if (e.target === gate) close(); });
+
+            if (tuneBtn) {
+                tuneBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    open();
+                });
+            }
+
+            // Expose for any future call sites
+            window.openImagineOnboard = open;
+            updateTuneSub();
         })();
 
         // Document-level safety net for chat quick-reply buttons.
