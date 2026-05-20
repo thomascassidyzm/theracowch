@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v84';
+const CACHE_NAME = 'cowch-wellness-v85';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -121,8 +121,9 @@ self.addEventListener('activate', (event) => {
   // Take control of all open tabs immediately
   self.clients.claim();
 
-  // Start the daily mootivation scheduler
-  scheduleDailyMootivations();
+  // Daily reminders are now driven by the page (cowch-reminders-v1 settings)
+  // so we no longer auto-schedule 5 mootivations on every activation. The
+  // page calls registration.showNotification() at the configured times.
 });
 
 // Push notification event
@@ -160,70 +161,7 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-// Daily Mootivations Scheduler
-function scheduleDailyMootivations() {
-  // Schedule random mootivations throughout the day
-  const mootivations = [
-    {
-      title: "🐄 Moo-rning Check-in",
-      body: "Just wanted you to know - you're doing vache-tastic! Ready for a wonderful day on the cowch? 💝",
-      time: { hour: 9, minute: 0 }
-    },
-    {
-      title: "🏖️ Midday Vaca-tion", 
-      body: "Time for a quick mental vaca-tion! Your feelings are valid, and you deserve this moment of support. I'm here whenever you need me!",
-      time: { hour: 14, minute: 30 }
-    },
-    {
-      title: "🌙 Evening Encouragement",
-      body: "You've survived another day, and that's incroy-a-bull to be proud of! Sweet dreams! 🐄",
-      time: { hour: 20, minute: 0 }
-    },
-    {
-      title: "💝 Gentle Reminder",
-      body: "Moo-gress, not perfection, is the goal. You're doing better than you think! Kuh-nderbar! 🌈",
-      time: { hour: 16, minute: 15 }
-    },
-    {
-      title: "🤗 Cowch Vaca-tion Check-in",
-      body: "Ready for a mini mental vaca-tion? Just like a loyal pet, I'm always here for you. How are you feeling today? 💙",
-      time: { hour: 11, minute: 45 }
-    }
-  ];
-
-  // Set up notifications for each mootivation
-  mootivations.forEach((moot, index) => {
-    const now = new Date();
-    const scheduledTime = new Date();
-    scheduledTime.setHours(moot.time.hour, moot.time.minute, 0, 0);
-    
-    // If time has passed today, schedule for tomorrow
-    if (scheduledTime < now) {
-      scheduledTime.setDate(scheduledTime.getDate() + 1);
-    }
-    
-    const delay = scheduledTime.getTime() - now.getTime();
-    
-    setTimeout(() => {
-      // Set up recurring notification
-      setInterval(() => {
-        self.registration.showNotification(moot.title, {
-          body: moot.body,
-          icon: '/apple-touch-icon.png',
-          badge: '/icons/icon-96x96.svg',
-          tag: `daily-moot-${index}`,
-          requireInteraction: false
-        });
-      }, 24 * 60 * 60 * 1000); // Repeat every 24 hours
-      
-      // Show first notification
-      self.registration.showNotification(moot.title, {
-        body: moot.body,
-        icon: '/apple-touch-icon.png',
-        badge: '/icons/icon-96x96.svg',
-        tag: `daily-moot-${index}`,
-        requireInteraction: false
-      });
-    }, delay);
-  });
-}
+// Note: the old scheduleDailyMootivations() (5 hard-coded notifications/day)
+// has been removed. The page now drives gentle, customizable reminders
+// (up to two/day, with snooze) — see setupReminders() in /assets/js/app.js
+// and the cowch-reminders-v1 localStorage key.
