@@ -131,6 +131,102 @@ function updateDailyQuote() {
 }
 
 // ============================================
+// Daily IMAGINE Suggested Exercise
+// Cycles I → M → A → G → I → N → E day by day; each day picks a curated
+// exercise from that letter's pool, so the user moves methodically through
+// the whole framework over the course of a week and then revisits with
+// fresh exercises the next time round.
+// ============================================
+const IMAGINE_DAILY = [
+    { letter: 'I', domain: 'I, Me, Myself',  domainHref: '/imagine/self.html',
+      exercises: [
+          { name: 'Self-compassion break', href: '/exercises/self-compassion.html' },
+          { name: 'Inner child check-in',  href: '/exercises/inner-child-work.html' },
+          { name: 'Trigger mapping',       href: '/exercises/trigger-mapping.html' },
+          { name: 'Pick an oracle card',   href: '/exercises/oracle-cards.html' }
+      ]
+    },
+    { letter: 'M', domain: 'Mindfulness', domainHref: '/imagine/mindfulness.html',
+      exercises: [
+          { name: 'Box breathing (4×4×4×4)',  href: '/exercises/box-breathing.html' },
+          { name: '5-minute body scan',       href: '/exercises/body-scan.html' },
+          { name: '5-4-3-2-1 grounding',      href: '/exercises/grounding-54321.html' },
+          { name: 'Watch the thought stream', href: '/exercises/thought-stream.html' },
+          { name: 'One-minute reset',         href: '/exercises/minute-reset.html' }
+      ]
+    },
+    { letter: 'A', domain: 'Acceptance', domainHref: '/imagine/acceptance.html',
+      exercises: [
+          { name: 'Radical acceptance',    href: '/exercises/radical-acceptance.html' },
+          { name: 'Ride the wave',         href: '/exercises/wave.html' },
+          { name: 'Inner-weather check-in',href: '/exercises/weather.html' }
+      ]
+    },
+    { letter: 'G', domain: 'Gratitude', domainHref: '/imagine/gratitude.html',
+      exercises: [
+          { name: 'Add a gratitude star',  href: '/exercises/gratitude.html' },
+          { name: 'Gratitude journal',     href: '/exercises/gratitude-journal.html' },
+          { name: 'Notice a tiny win',     href: '/exercises/small-wins.html' }
+      ]
+    },
+    { letter: 'I', domain: 'Interactions', domainHref: '/imagine/interactions.html',
+      exercises: [
+          { name: 'Set a boundary',           href: '/exercises/boundary-setting.html' },
+          { name: 'Practice good communication', href: '/exercises/good-communication.html' },
+          { name: 'A small act of kindness',  href: '/exercises/kindness.html' },
+          { name: 'Map your connection web',  href: '/exercises/connection-web.html' }
+      ]
+    },
+    { letter: 'N', domain: 'Nurturing', domainHref: '/imagine/nurturing.html',
+      exercises: [
+          { name: 'Joy bubbles',         href: '/exercises/joy.html' },
+          { name: 'Playfulness diary',   href: '/exercises/playfulness-diary.html' },
+          { name: 'Energy audit',        href: '/exercises/energy-audit.html' },
+          { name: 'Silly dice',          href: '/exercises/silly-dice.html' },
+          { name: 'A fun prompt',        href: '/exercises/fun-prompts.html' }
+      ]
+    },
+    { letter: 'E', domain: 'Exploring', domainHref: '/imagine/exploring.html',
+      exercises: [
+          { name: 'Take a wonder walk',     href: '/exercises/wonder.html' },
+          { name: 'Creative expression',    href: '/exercises/creative-expression.html' },
+          { name: 'Comfort-zone ladder',    href: '/exercises/comfort-ladder.html' },
+          { name: 'Check your values compass', href: '/exercises/values-compass.html' }
+      ]
+    }
+];
+
+function getEpochDays() {
+    // Local-time epoch days so the daily rollover happens at midnight in
+    // the user's timezone, not at UTC.
+    const now = new Date();
+    const local = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.floor(local.getTime() / (1000 * 60 * 60 * 24));
+}
+
+function getTodaysImagineSuggestion() {
+    const day = getEpochDays();
+    const slot = IMAGINE_DAILY[day % IMAGINE_DAILY.length];
+    const exercise = slot.exercises[Math.floor(day / IMAGINE_DAILY.length) % slot.exercises.length];
+    return {
+        letter: slot.letter,
+        domain: slot.domain,
+        href: exercise.href,
+        name: exercise.name
+    };
+}
+
+function updateDailySuggestion() {
+    const link = document.getElementById('daily-suggestion');
+    if (!link) return;
+    const pick = getTodaysImagineSuggestion();
+    link.href = pick.href;
+    document.getElementById('daily-suggestion-letter').textContent = pick.letter;
+    document.getElementById('daily-suggestion-domain').textContent = pick.domain;
+    document.getElementById('daily-suggestion-name').textContent = pick.name;
+}
+
+// ============================================
 // IMAGINE Framework Data & Domain Panel
 // ============================================
 
@@ -1153,6 +1249,7 @@ function init() {
     // Setup all functionality
     updateGreeting();
     updateDailyQuote();
+    updateDailySuggestion();
     setupTabNavigation();
     setupDomainPanel();
     setupToolPanels();
