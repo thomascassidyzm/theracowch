@@ -2529,6 +2529,74 @@
         .choice-tree-leaf.short { fill: #9BC4A7; }
         .choice-tree-leaf.long  { fill: #7EA88B; }
 
+        /* Completed goals: flowers (short-term) and fruits (long-term) */
+        .choice-tree-flower, .choice-tree-fruit {
+            opacity: 0;
+            animation: choiceLeafGrow 0.6s ease-out forwards;
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        /* Seasonal tint applied to the tree container based on data-season */
+        #choice-tree-svg[data-season="spring"]  { background: linear-gradient(180deg, #FBF0F4 0%, transparent 60%); }
+        #choice-tree-svg[data-season="summer"]  { background: linear-gradient(180deg, #F4F9F4 0%, transparent 60%); }
+        #choice-tree-svg[data-season="autumn"]  { background: linear-gradient(180deg, #FBEFE0 0%, transparent 60%); }
+        #choice-tree-svg[data-season="winter"]  { background: linear-gradient(180deg, #EEF2F5 0%, transparent 60%); }
+
+        .choice-season-label {
+            display: block;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 6px;
+        }
+
+        /* Mark-complete button on each goal in the All Goals view */
+        .goal-item.completed {
+            background: #F0F4F0;
+            border-color: #9BC4A7;
+        }
+        .goal-item.completed .goal-item-title {
+            text-decoration: line-through;
+            color: #5C4432;
+            opacity: 0.85;
+        }
+        .goal-item-completed-tag {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 2px 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: #DEEBE0;
+            color: #2A4D2F;
+            border: 1px solid #7EA88B;
+            border-radius: 999px;
+        }
+        .goal-complete-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border: 2px solid #7EA88B;
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #2A4D2F;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .goal-complete-btn:hover { background: #E6F0E6; }
+        .goal-complete-btn.completed {
+            background: #DEEBE0;
+            color: #2A4D2F;
+        }
+
         /* SMART goal form */
         .goal-term-toggle {
             display: flex;
@@ -5888,7 +5956,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=57"></script>
+    <script src="/assets/js/app.js?v=58"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');

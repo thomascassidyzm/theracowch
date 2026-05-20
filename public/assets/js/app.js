@@ -1367,7 +1367,20 @@ function initChoice() {
     setupChoiceViewToggle();
     setupGoalTermToggle();
     setupChoiceSave();
+    setupGoalCompleteDelegate();
     renderChoiceTree();
+}
+
+function setupGoalCompleteDelegate() {
+    const container = document.getElementById('choice-list-container');
+    if (!container || container.dataset.goalToggleBound === '1') return;
+    container.dataset.goalToggleBound = '1';
+    container.addEventListener('click', function (e) {
+        const btn = e.target && e.target.closest && e.target.closest('[data-goal-toggle]');
+        if (!btn) return;
+        const idx = parseInt(btn.getAttribute('data-goal-toggle'), 10);
+        if (Number.isInteger(idx)) toggleGoalCompleted(idx);
+    });
 }
 
 function setupGoalTermToggle() {
@@ -1453,14 +1466,79 @@ function setupChoiceSave() {
     };
 }
 
+// Northern-hemisphere meteorological seasons. Used to theme the goal tree
+// (leaf colours, completion flowers/fruits, sky tint).
+function getGoalsSeason(date) {
+    const m = (date || new Date()).getMonth();
+    if (m >= 2 && m <= 4)  return 'spring';
+    if (m >= 5 && m <= 7)  return 'summer';
+    if (m >= 8 && m <= 10) return 'autumn';
+    return 'winter';
+}
+const GOAL_SEASON_PALETTE = {
+    spring: {
+        leafShort: ['#A6D78A', '#BFE19A'],
+        leafLong:  ['#7EBE7B', '#9CD27E'],
+        flower:    ['#F7B2C5', '#FFD1DC', '#E8A0BF', '#FFFFFF'],
+        fruit:     ['#FFB07A', '#FFCBA4'],
+        trunk:     '#5D4A3C',
+        label:     '🌸 Spring tree'
+    },
+    summer: {
+        leafShort: ['#7DC388', '#9DD79B'],
+        leafLong:  ['#4F8F60', '#5FA46B'],
+        flower:    ['#F7A8C5', '#FFD56B', '#FF8FA3'],
+        fruit:     ['#E0533D', '#F0876A', '#C44A2F'],
+        trunk:     '#5D4A3C',
+        label:     '☀️ Summer tree'
+    },
+    autumn: {
+        leafShort: ['#E5A468', '#E08F4A'],
+        leafLong:  ['#C2632D', '#A85428', '#8C4523'],
+        flower:    ['#D89665', '#C97B63'],
+        fruit:     ['#9B3A1A', '#C9531E', '#7C2E18'],
+        trunk:     '#6B4B30',
+        label:     '🍂 Autumn tree'
+    },
+    winter: {
+        leafShort: ['#7EA88B', '#6B9580'],
+        leafLong:  ['#5C8772', '#6F9A85'],
+        flower:    ['#FFFFFF', '#E7EEF2'],
+        fruit:     ['#7E9686', '#A5B8AC'],
+        trunk:     '#4A3B30',
+        label:     '❄️ Winter tree'
+    }
+};
+
 function renderChoiceTree() {
     const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
-    document.getElementById('choice-count').textContent = goals.length;
+    const completedCount = goals.filter(g => g.completed).length;
+    const totalCount = goals.length;
+    document.getElementById('choice-count').textContent =
+        completedCount > 0 ? (totalCount + ' goals · ' + completedCount + ' blooming') : totalCount;
 
+    const svg = document.getElementById('choice-tree-svg');
     const leavesGroup   = document.getElementById('choice-leaves');
     const branchesGroup = document.getElementById('choice-branches');
     leavesGroup.innerHTML = '';
     branchesGroup.innerHTML = '';
+
+    const season = getGoalsSeason();
+    const palette = GOAL_SEASON_PALETTE[season];
+    svg.setAttribute('data-season', season);
+    // Trunk takes the seasonal accent
+    const trunk = svg.querySelector('.choice-tree-trunk');
+    if (trunk) trunk.setAttribute('fill', palette.trunk);
+
+    // Season label (cached element, recreated if absent)
+    let seasonLabel = document.getElementById('choice-season-label');
+    if (!seasonLabel) {
+        seasonLabel = document.createElement('span');
+        seasonLabel.id = 'choice-season-label';
+        seasonLabel.className = 'choice-season-label';
+        svg.parentNode && svg.parentNode.insertBefore(seasonLabel, svg.nextSibling);
+    }
+    seasonLabel.textContent = palette.label;
 
     function addBranch(x1, y1, x2, y2, extraClass) {
         const b = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1469,13 +1547,67 @@ function renderChoiceTree() {
         b.setAttribute('x2', x2); b.setAttribute('y2', y2);
         branchesGroup.appendChild(b);
     }
-    function addLeaf(cx, cy, r, extraClass, idx) {
+    function addLeaf(cx, cy, r, extraClass, idx, fill) {
         const l = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         l.setAttribute('class', 'choice-tree-leaf' + (extraClass ? ' ' + extraClass : ''));
         l.setAttribute('cx', cx); l.setAttribute('cy', cy);
         l.setAttribute('r', r);
+        if (fill) l.setAttribute('fill', fill);
         l.style.animationDelay = (idx * 0.05) + 's';
         leavesGroup.appendChild(l);
+    }
+    function addFlower(cx, cy, idx) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'choice-tree-flower');
+        g.setAttribute('transform', 'translate(' + cx + ', ' + cy + ')');
+        g.style.animationDelay = (idx * 0.05) + 's';
+        const petalColor = palette.flower[idx % palette.flower.length];
+        const petalR = 3.2;
+        const offset = 3.6;
+        for (let p = 0; p < 5; p++) {
+            const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
+            const px = Math.cos(a) * offset;
+            const py = Math.sin(a) * offset;
+            const petal = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            petal.setAttribute('cx', px); petal.setAttribute('cy', py);
+            petal.setAttribute('r', petalR);
+            petal.setAttribute('fill', petalColor);
+            g.appendChild(petal);
+        }
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('r', 2);
+        c.setAttribute('fill', '#C9A857');
+        g.appendChild(c);
+        leavesGroup.appendChild(g);
+    }
+    function addFruit(cx, cy, idx) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'choice-tree-fruit');
+        g.setAttribute('transform', 'translate(' + cx + ', ' + cy + ')');
+        g.style.animationDelay = (idx * 0.05) + 's';
+        const fruitColor = palette.fruit[idx % palette.fruit.length];
+        // Stem
+        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        stem.setAttribute('x1', 0); stem.setAttribute('y1', -10);
+        stem.setAttribute('x2', 0); stem.setAttribute('y2', -6);
+        stem.setAttribute('stroke', palette.trunk);
+        stem.setAttribute('stroke-width', 1.6);
+        stem.setAttribute('stroke-linecap', 'round');
+        g.appendChild(stem);
+        // Tiny leaf on the stem
+        const stemLeaf = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        stemLeaf.setAttribute('cx', 3); stemLeaf.setAttribute('cy', -8);
+        stemLeaf.setAttribute('rx', 2.5); stemLeaf.setAttribute('ry', 1.2);
+        stemLeaf.setAttribute('fill', season === 'autumn' ? '#9C5A2A' : '#5B9D6A');
+        stemLeaf.setAttribute('transform', 'rotate(30 3 -8)');
+        g.appendChild(stemLeaf);
+        // Body
+        const body = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        body.setAttribute('cx', 0); body.setAttribute('cy', 0);
+        body.setAttribute('r', 7);
+        body.setAttribute('fill', fruitColor);
+        g.appendChild(body);
+        leavesGroup.appendChild(g);
     }
 
     // Default older entries with no type to "long" so they still render meaningfully.
@@ -1483,35 +1615,41 @@ function renderChoiceTree() {
     const shorts = goals.filter(g => (g.type || 'long') === 'short');
 
     // ── Long-term: tall branches fanning from the top of the trunk (150, 250) ──
-    // Up to ~12 directions before wrapping to a second layer.
     const trunkTopX = 150;
     const trunkTopY = 250;
     longs.forEach((g, i) => {
         const layer = Math.floor(i / 6);
         const slot  = i % 6;
-        // Spread evenly between -110° and -70° (i.e. upward fan, slightly biased outward).
-        // 6 slots → angles from ~-150° to ~-30° (in degrees), so leaves reach high and wide.
-        const angleDeg = -160 + slot * 26;  // -160, -134, -108, -82, -56, -30
+        const angleDeg = -160 + slot * 26;
         const rad = angleDeg * Math.PI / 180;
         const length = 130 + layer * 28;
         const x2 = trunkTopX + Math.cos(rad) * length;
         const y2 = trunkTopY + Math.sin(rad) * length;
         addBranch(trunkTopX, trunkTopY, x2, y2, 'long');
-        addLeaf(x2, y2, 11, 'long', i);
+        if (g.completed) {
+            addFruit(x2, y2, i);
+        } else {
+            const fill = palette.leafLong[i % palette.leafLong.length];
+            addLeaf(x2, y2, 11, 'long', i, fill);
+        }
     });
 
-    // ── Short-term: small twigs along the trunk, alternating sides ──
-    // Trunk goes from y=250 (top) to y=400 (bottom). Place twigs from y=270 down.
+    // ── Short-term: small twigs along the trunk ──
     shorts.forEach((g, i) => {
         const trunkY = 280 + (i * 14);
         const yClamped = Math.min(trunkY, 388);
         const side = (i % 2 === 0) ? -1 : 1;
-        const length = 26 + (i % 3) * 6; // 26, 32, 38
-        const x1 = 150 + side * 12; // start from the edge of the trunk (trunk width = 30)
+        const length = 26 + (i % 3) * 6;
+        const x1 = 150 + side * 12;
         const x2 = x1 + side * length;
-        const y2 = yClamped - 10;   // slight upward slope so twigs feel alive
+        const y2 = yClamped - 10;
         addBranch(x1, yClamped, x2, y2, 'short');
-        addLeaf(x2, y2, 6, 'short', i);
+        if (g.completed) {
+            addFlower(x2, y2, i);
+        } else {
+            const fill = palette.leafShort[i % palette.leafShort.length];
+            addLeaf(x2, y2, 6, 'short', i, fill);
+        }
     });
 }
 
@@ -1541,38 +1679,71 @@ function renderChoiceHistory() {
         if (isNaN(d.getTime())) return iso;
         return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     };
+    const formatTimestamp = (iso) => {
+        if (!iso) return '';
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    };
 
-    const html = goals
-        .slice()
-        .reverse()
-        .map(g => {
-            const type = (g.type || 'long') === 'short' ? 'short' : 'long';
-            const title = escapeHtml(g.specific || g.text || '(untitled goal)');
-            const due = g.timebound ? ' · by ' + escapeHtml(formatDate(g.timebound)) : '';
-            const hasDetails = g.measurable || g.achievable || g.realistic;
-            const detailRows = hasDetails ? `
-                <details>
-                    <summary>SMART details</summary>
-                    <dl>
-                        ${g.measurable ? `<dt>M</dt><dd>${escapeHtml(g.measurable)}</dd>` : ''}
-                        ${g.achievable ? `<dt>A</dt><dd>${escapeHtml(g.achievable)}</dd>` : ''}
-                        ${g.realistic  ? `<dt>R</dt><dd>${escapeHtml(g.realistic)}</dd>`  : ''}
-                    </dl>
-                </details>` : '';
-            return `
-                <div class="goal-item">
-                    <div class="goal-item-head">
-                        <div class="goal-item-title">${title}</div>
-                        <span class="goal-item-tag ${type}">${type === 'short' ? 'Short-term' : 'Long-term'}</span>
-                    </div>
-                    <div class="goal-item-meta">Added ${escapeHtml(g.date || '')}${due}</div>
-                    ${detailRows}
-                </div>`;
-        })
-        .join('');
+    // Sort: active first (newest at top), completed at the bottom (most-recent completion first)
+    const indexed = goals.map((g, i) => Object.assign({}, g, { _idx: i }));
+    const active = indexed.filter(g => !g.completed).reverse();
+    const done = indexed.filter(g => g.completed)
+        .sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+
+    const html = active.concat(done).map(g => {
+        const type = (g.type || 'long') === 'short' ? 'short' : 'long';
+        const title = escapeHtml(g.specific || g.text || '(untitled goal)');
+        const due = g.timebound ? ' · by ' + escapeHtml(formatDate(g.timebound)) : '';
+        const hasDetails = g.measurable || g.achievable || g.realistic;
+        const detailRows = hasDetails ? `
+            <details>
+                <summary>SMART details</summary>
+                <dl>
+                    ${g.measurable ? `<dt>M</dt><dd>${escapeHtml(g.measurable)}</dd>` : ''}
+                    ${g.achievable ? `<dt>A</dt><dd>${escapeHtml(g.achievable)}</dd>` : ''}
+                    ${g.realistic  ? `<dt>R</dt><dd>${escapeHtml(g.realistic)}</dd>`  : ''}
+                </dl>
+            </details>` : '';
+        const completedBits = g.completed
+            ? `<span class="goal-item-completed-tag">${type === 'short' ? '🌸 Bloomed' : '🍎 Fruited'} ${formatTimestamp(g.completedAt)}</span>`
+            : '';
+        const buttonLabel = g.completed ? '↩ Reopen' : '✓ Mark complete';
+        return `
+            <div class="goal-item${g.completed ? ' completed' : ''}" data-goal-idx="${g._idx}">
+                <div class="goal-item-head">
+                    <div class="goal-item-title">${title}${completedBits}</div>
+                    <span class="goal-item-tag ${type}">${type === 'short' ? 'Short-term' : 'Long-term'}</span>
+                </div>
+                <div class="goal-item-meta">Added ${escapeHtml(g.date || '')}${due}</div>
+                ${detailRows}
+                <button type="button" class="goal-complete-btn${g.completed ? ' completed' : ''}" data-goal-toggle="${g._idx}">
+                    ${buttonLabel}
+                </button>
+            </div>`;
+    }).join('');
 
     container.innerHTML = html;
 }
+
+// Toggle a goal's completed flag and refresh both tree + history.
+function toggleGoalCompleted(idx) {
+    const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    if (idx < 0 || idx >= goals.length) return;
+    const g = goals[idx];
+    if (g.completed) {
+        delete g.completed;
+        delete g.completedAt;
+    } else {
+        g.completed = true;
+        g.completedAt = new Date().toISOString();
+    }
+    localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(goals));
+    renderChoiceTree();
+    renderChoiceHistory();
+}
+window.toggleGoalCompleted = toggleGoalCompleted;
 
 // ============================================
 // VALUES TOOL
