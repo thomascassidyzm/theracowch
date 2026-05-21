@@ -1879,6 +1879,42 @@
         }
         .pasture-empty a { color: var(--coral); font-weight: 800; text-decoration: underline; }
 
+        /* Pasture flowers fade in (and never use a transform animation —
+           the group already carries an SVG translate for position). */
+        .pasture-flower {
+            cursor: pointer;
+            opacity: 0;
+            animation: pastureBloom 0.6s ease-out forwards;
+        }
+        .pasture-flower:hover { filter: brightness(1.08); }
+        .pasture-flower.tap-pulse { animation: pastureTapPulse 0.5s ease-out; }
+        @keyframes pastureBloom {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes pastureTapPulse {
+            0%   { opacity: 1; }
+            40%  { opacity: 0.55; }
+            100% { opacity: 1; }
+        }
+        .pasture-label-bg {
+            fill: #FFFDF9;
+            stroke: #C9A857;
+            stroke-width: 1.5;
+        }
+        .pasture-label-text {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            font-size: 12px;
+            font-weight: 900;
+            fill: #2A1F1A;
+        }
+        .pasture-floating-label {
+            opacity: 0;
+            transition: opacity 0.25s ease-out;
+            pointer-events: none;
+        }
+        .pasture-floating-label.show { opacity: 1; }
+
         /* Weekly report */
         .weekly-card {
             background: var(--bg-card);
@@ -6125,7 +6161,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=59"></script>
+    <script src="/assets/js/app.js?v=60"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');

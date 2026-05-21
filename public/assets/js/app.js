@@ -585,48 +585,103 @@ function loadTopValues() {
     return null;
 }
 
-function updatePastureUI() {
-    const card = document.getElementById('pasture-card');
-    if (!card) return;
-    const svg = document.getElementById('pasture-svg');
-    const vitNum = document.getElementById('pasture-vitality-num');
-    const blurb = document.getElementById('pasture-blurb');
-    const empty = document.getElementById('pasture-empty');
+const NS_SVG = 'http://www.w3.org/2000/svg';
 
-    const values = loadTopValues();
-    const activeDays = gatherActiveDays(30).size;
-    vitNum.textContent = activeDays;
+function buildPastureFlower(opts) {
+    // opts: { baseX, baseY, scale, color, name, delaySeconds, onTap }
+    const g = document.createElementNS(NS_SVG, 'g');
+    g.setAttribute('transform', `translate(${opts.baseX}, ${opts.baseY}) scale(${opts.scale})`);
+    g.classList.add('pasture-flower');
+    g.style.animationDelay = (opts.delaySeconds || 0) + 's';
 
-    if (!values) {
-        empty.hidden = false;
-        svg.innerHTML = '';
-        blurb.textContent = 'Pick your top 10 values to start growing the pasture.';
-        return;
+    const stem = document.createElementNS(NS_SVG, 'line');
+    stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
+    stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
+    stem.setAttribute('stroke', '#3F8458');
+    stem.setAttribute('stroke-width', 1.6);
+    stem.setAttribute('stroke-linecap', 'round');
+    g.appendChild(stem);
+
+    const sideLeaf = document.createElementNS(NS_SVG, 'ellipse');
+    sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
+    sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
+    sideLeaf.setAttribute('fill', '#3F8458');
+    sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
+    g.appendChild(sideLeaf);
+
+    for (let p = 0; p < 5; p++) {
+        const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
+        const px = Math.cos(a) * 4.2;
+        const py = Math.sin(a) * 4.2 - 16;
+        const petal = document.createElementNS(NS_SVG, 'circle');
+        petal.setAttribute('cx', px); petal.setAttribute('cy', py);
+        petal.setAttribute('r', 3.4);
+        petal.setAttribute('fill', opts.color);
+        g.appendChild(petal);
     }
-    empty.hidden = true;
+    const centre = document.createElementNS(NS_SVG, 'circle');
+    centre.setAttribute('cx', 0); centre.setAttribute('cy', -16); centre.setAttribute('r', 2);
+    centre.setAttribute('fill', '#C9A857');
+    g.appendChild(centre);
 
-    // Vitality 0..1 — 18 vibrant days in the past month fills the meadow.
-    const vit = Math.max(0, Math.min(1, activeDays / 18));
-    blurb.textContent = vit < 0.2
-        ? 'A quiet pasture. Show up a few days and the flowers start to open.'
-        : vit < 0.6
-            ? 'Pasture is waking up — consistent days keep it bright.'
-            : 'Your pasture is thriving. Keep tending it.';
+    if (opts.name) {
+        const ttl = document.createElementNS(NS_SVG, 'title');
+        ttl.textContent = opts.name;
+        g.appendChild(ttl);
+    }
+    if (typeof opts.onTap === 'function') {
+        g.addEventListener('click', () => {
+            g.classList.remove('tap-pulse');
+            void g.getBoundingClientRect();
+            g.classList.add('tap-pulse');
+            opts.onTap();
+        });
+    }
+    return g;
+}
 
-    svg.innerHTML = '';
-    const W = 360, H = 180;
+function showPastureFloatingLabel(svg, text) {
+    const prior = svg.querySelector('.pasture-floating-label');
+    if (prior) prior.remove();
 
-    // Sun
-    const sun = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const lbl = document.createElementNS(NS_SVG, 'g');
+    lbl.classList.add('pasture-floating-label');
+    const padX = 10;
+    const charW = 7;
+    const w = Math.max(60, Math.min(text.length * charW + padX * 2, 320));
+    const x = 180 - w / 2, y = 6;
+    const rect = document.createElementNS(NS_SVG, 'rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', y);
+    rect.setAttribute('width', w); rect.setAttribute('height', 22);
+    rect.setAttribute('rx', 11);
+    rect.setAttribute('class', 'pasture-label-bg');
+    const t = document.createElementNS(NS_SVG, 'text');
+    t.setAttribute('x', 180); t.setAttribute('y', y + 15);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('class', 'pasture-label-text');
+    t.textContent = text;
+    lbl.appendChild(rect);
+    lbl.appendChild(t);
+    svg.appendChild(lbl);
+    requestAnimationFrame(() => lbl.classList.add('show'));
+
+    clearTimeout(showPastureFloatingLabel._t);
+    showPastureFloatingLabel._t = setTimeout(() => {
+        lbl.classList.remove('show');
+        setTimeout(() => lbl.remove(), 400);
+    }, 2400);
+}
+
+function buildPastureScenery(svg, vit) {
+    const sun = document.createElementNS(NS_SVG, 'circle');
     sun.setAttribute('cx', 50); sun.setAttribute('cy', 32);
     sun.setAttribute('r', 18);
     sun.setAttribute('fill', '#FFD56B');
-    sun.setAttribute('opacity', 0.4 + vit * 0.6);
+    sun.setAttribute('opacity', (0.4 + vit * 0.6).toFixed(2));
     svg.appendChild(sun);
 
-    // Clouds
     [{ x: 220, y: 28, r: 12 }, { x: 250, y: 24, r: 14 }, { x: 280, y: 30, r: 11 }].forEach(c => {
-        const e = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const e = document.createElementNS(NS_SVG, 'circle');
         e.setAttribute('cx', c.x); e.setAttribute('cy', c.y);
         e.setAttribute('r', c.r);
         e.setAttribute('fill', '#FFFFFF');
@@ -634,20 +689,17 @@ function updatePastureUI() {
         svg.appendChild(e);
     });
 
-    // Distant hill
-    const hill = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const hill = document.createElementNS(NS_SVG, 'path');
     hill.setAttribute('d', 'M 0 90 Q 90 60 180 86 T 360 92 L 360 180 L 0 180 Z');
     hill.setAttribute('fill', '#A8C57E');
     svg.appendChild(hill);
 
-    // Foreground ground
-    const ground = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const ground = document.createElementNS(NS_SVG, 'path');
     ground.setAttribute('d', 'M 0 130 Q 80 116 160 128 T 360 130 L 360 180 L 0 180 Z');
     ground.setAttribute('fill', '#92BC6A');
     svg.appendChild(ground);
 
-    // A small cow on the left of the pasture
-    const cow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const cow = document.createElementNS(NS_SVG, 'g');
     cow.setAttribute('transform', 'translate(70, 142)');
     cow.innerHTML = `
         <ellipse cx="0" cy="0" rx="16" ry="9" fill="#FFFFFF"/>
@@ -660,57 +712,85 @@ function updatePastureUI() {
         <line x1="6"   y1="9" x2="6"   y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
         <line x1="11"  y1="9" x2="11"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>`;
     svg.appendChild(cow);
+}
 
-    // One flower per top value
+function updatePastureUI() {
+    const card = document.getElementById('pasture-card');
+    if (!card) return;
+    const svg = document.getElementById('pasture-svg');
+    const vitNum = document.getElementById('pasture-vitality-num');
+    const blurb = document.getElementById('pasture-blurb');
+    const empty = document.getElementById('pasture-empty');
+
+    const values = loadTopValues();
+    const activeDays = gatherActiveDays(30).size;
+    vitNum.textContent = activeDays;
+
+    // First-visit detection — drives a longer, more dramatic stagger so a
+    // user landing on Your Space for the first time literally watches their
+    // pasture grow. Subsequent renders use a tiny stagger.
+    const SEEN_KEY = 'cowch-pasture-seen';
+    let firstVisit = false;
+    try {
+        if (!localStorage.getItem(SEEN_KEY)) {
+            firstVisit = true;
+            localStorage.setItem(SEEN_KEY, '1');
+        }
+    } catch (_) {}
+
+    svg.innerHTML = '';
+
+    // ── Empty state: one welcome flower in the centre + the CTA below ──
+    if (!values) {
+        empty.hidden = false;
+        blurb.textContent = 'Tap the flower to plant your pasture.';
+        buildPastureScenery(svg, 0.6);
+        const welcome = buildPastureFlower({
+            baseX: 180, baseY: 152, scale: 1.7,
+            color: '#F7B2C5',
+            name: 'Pick your top 10 values',
+            delaySeconds: 0.25,
+            onTap: () => {
+                showPastureFloatingLabel(svg, 'Pick your top 10 values →');
+                setTimeout(() => {
+                    window.location.href = '/questionnaires/values.html?v=110';
+                }, 350);
+            }
+        });
+        svg.appendChild(welcome);
+        return;
+    }
+
+    empty.hidden = true;
+    // Vitality 0..1 — 18 vibrant days in the past month fills the meadow.
+    const vit = Math.max(0, Math.min(1, activeDays / 18));
+    blurb.textContent = vit < 0.2
+        ? 'A quiet pasture. Tap a flower to see its value — show up a few days and they bloom.'
+        : vit < 0.6
+            ? 'Pasture is waking up — tap any flower to remember the value behind it.'
+            : 'Your pasture is thriving. Tap any flower to see the value it stands for.';
+
+    buildPastureScenery(svg, vit);
+
     const flowerColors = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF', '#FFC1A4',
                           '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
+    // Wilted (vit=0) → noticeably smaller; thriving (vit=1) → bigger.
+    const scale = 0.55 + vit * 0.8;
+    const stagger = firstVisit ? 0.32 : 0.05;
+    const head = firstVisit ? 0.25 : 0.05;
+
     values.forEach((name, i) => {
         const row = i < 5 ? 0 : 1;
         const col = i < 5 ? i : (i - 5);
         const baseX = 110 + col * 50 + (row === 1 ? 25 : 0);
         const baseY = row === 0 ? 145 : 165;
-        const scale = 0.6 + vit * 0.7;          // 0.6 → 1.3
-        const opacity = 0.45 + vit * 0.55;       // 0.45 → 1.0
         const color = flowerColors[i % flowerColors.length];
-
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('transform', `translate(${baseX}, ${baseY}) scale(${scale})`);
-        g.setAttribute('opacity', opacity.toFixed(2));
-        // Stem
-        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
-        stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
-        stem.setAttribute('stroke', '#3F8458');
-        stem.setAttribute('stroke-width', 1.6);
-        stem.setAttribute('stroke-linecap', 'round');
-        g.appendChild(stem);
-        // Tiny side leaf
-        const sideLeaf = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
-        sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
-        sideLeaf.setAttribute('fill', '#3F8458');
-        sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
-        g.appendChild(sideLeaf);
-        // Petals
-        for (let p = 0; p < 5; p++) {
-            const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
-            const px = Math.cos(a) * 4.2;
-            const py = Math.sin(a) * 4.2 - 16;
-            const petal = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            petal.setAttribute('cx', px); petal.setAttribute('cy', py);
-            petal.setAttribute('r', 3.4);
-            petal.setAttribute('fill', color);
-            g.appendChild(petal);
-        }
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('cx', 0); c.setAttribute('cy', -16); c.setAttribute('r', 2);
-        c.setAttribute('fill', '#C9A857');
-        g.appendChild(c);
-        // Tooltip via <title>
-        const ttl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        ttl.textContent = name;
-        g.appendChild(ttl);
-        svg.appendChild(g);
+        const flower = buildPastureFlower({
+            baseX, baseY, scale, color, name,
+            delaySeconds: head + i * stagger,
+            onTap: () => showPastureFloatingLabel(svg, name)
+        });
+        svg.appendChild(flower);
     });
 }
 window.updatePastureUI = updatePastureUI;
