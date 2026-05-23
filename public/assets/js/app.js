@@ -1140,6 +1140,20 @@ function scheduleRemindersForToday() {
     });
 }
 
+function nextScheduledReminder() {
+    const s = remindersLoad();
+    if (!s.enabled) return null;
+    if (s.snoozeUntil && Date.now() < s.snoozeUntil) {
+        return { snoozed: true, snoozeUntil: s.snoozeUntil };
+    }
+    const candidates = [];
+    if (s.morning.on) candidates.push({ slot: 'morning', when: nextOccurrence(s.morning.time) });
+    if (s.evening.on) candidates.push({ slot: 'evening', when: nextOccurrence(s.evening.time) });
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => a.when - b.when);
+    return candidates[0];
+}
+
 function setupReminders() {
     const card = document.getElementById('reminders-card');
     if (!card) return;
@@ -1153,6 +1167,8 @@ function setupReminders() {
     const permBtn  = document.getElementById('reminders-perm-btn');
     const permMsg  = document.getElementById('reminders-perm-msg');
     const snoozeBtn = document.getElementById('reminder-snooze');
+    const testBtn   = document.getElementById('reminder-test');
+    const statusEl  = document.getElementById('reminder-status');
 
     function paintToggle(btn, on) {
         btn.setAttribute('aria-checked', on ? 'true' : 'false');
@@ -1188,6 +1204,47 @@ function setupReminders() {
         snoozeBtn.innerHTML = snoozed
             ? '✓ Snoozed until tomorrow'
             : '😴 Snooze for today';
+
+        // Status line — gives a clear "yes, this is wired up" signal
+        if (statusEl) {
+            statusEl.classList.remove('is-warn');
+            if (!supported) {
+                statusEl.textContent = 'Reminders aren’t supported in this browser.';
+                statusEl.classList.add('is-warn');
+            } else if (Notification.permission === 'denied') {
+                statusEl.textContent = 'Reminders are blocked. Open browser settings and allow notifications for this site.';
+                statusEl.classList.add('is-warn');
+            } else if (!s.enabled) {
+                statusEl.textContent = 'Reminders are off. Flip the switch above to start receiving them.';
+                statusEl.classList.add('is-warn');
+            } else if (Notification.permission !== 'granted') {
+                statusEl.textContent = 'Reminders are on but need notification permission — tap “Allow notifications” above.';
+                statusEl.classList.add('is-warn');
+            } else {
+                const next = nextScheduledReminder();
+                if (!next) {
+                    statusEl.textContent = 'No times selected. Toggle Morning or Evening above.';
+                    statusEl.classList.add('is-warn');
+                } else if (next.snoozed) {
+                    const until = new Date(next.snoozeUntil);
+                    statusEl.textContent = 'Snoozed until ' + until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' tomorrow.';
+                } else {
+                    const when = next.when;
+                    const sameDay = when.toDateString() === new Date().toDateString();
+                    const whenLabel = sameDay ? 'today' : 'tomorrow';
+                    const time = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    statusEl.textContent = 'Next ' + next.slot + ' reminder ' + whenLabel + ' at ' + time + '.';
+                }
+            }
+        }
+
+        if (testBtn) {
+            const canTest = supported && Notification.permission === 'granted';
+            testBtn.disabled = !canTest;
+            testBtn.title = canTest
+                ? 'Send yourself a test reminder right now'
+                : 'Grant notification permission first';
+        }
     }
 
     function save(updater) {
@@ -1198,13 +1255,29 @@ function setupReminders() {
         paint();
     }
 
-    master.addEventListener('click', () => {
-        save(s => { s.enabled = !s.enabled; });
-        // If user turned reminders on but permission not granted, prompt
-        if (remindersLoad().enabled && 'Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().then(paint);
+    // Master toggle: when turning ON, request permission FIRST so we don't
+    // end up in a half-enabled state where the user thinks reminders are
+    // running but the browser is silently dropping them.
+    async function handleMasterToggle() {
+        const currently = remindersLoad().enabled;
+        if (!currently) {
+            // Turning on
+            if ('Notification' in window && Notification.permission === 'default') {
+                const result = await Notification.requestPermission();
+                if (result !== 'granted') {
+                    // Permission denied or dismissed — leave enabled flag off so
+                    // status copy stays accurate
+                    paint();
+                    return;
+                }
+            }
+            save(s => { s.enabled = true; });
+        } else {
+            save(s => { s.enabled = false; });
         }
-    });
+    }
+    master.addEventListener('click', handleMasterToggle);
+
     mOn.addEventListener('click', () => save(s => { s.morning.on = !s.morning.on; }));
     eOn.addEventListener('click', () => save(s => { s.evening.on = !s.evening.on; }));
     mTime.addEventListener('change', () => save(s => { s.morning.time = mTime.value; }));
@@ -1224,11 +1297,29 @@ function setupReminders() {
         if (snoozed) {
             save(x => { x.snoozeUntil = 0; });
         } else {
-            // Snooze until 04:00 local time tomorrow
             const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(4, 0, 0, 0);
             save(x => { x.snoozeUntil = t.getTime(); });
         }
     });
+
+    if (testBtn) {
+        testBtn.addEventListener('click', async () => {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'default') {
+                const res = await Notification.requestPermission();
+                if (res !== 'granted') { paint(); return; }
+            }
+            if (Notification.permission !== 'granted') { paint(); return; }
+            const original = testBtn.textContent;
+            testBtn.disabled = true;
+            testBtn.textContent = '✓ Sent — check your tray';
+            await fireReminder('morning');
+            setTimeout(() => {
+                testBtn.textContent = original;
+                paint();
+            }, 2500);
+        });
+    }
 
     paint();
     scheduleRemindersForToday();

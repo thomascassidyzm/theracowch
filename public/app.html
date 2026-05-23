@@ -1826,6 +1826,45 @@
         }
         .reminder-snooze.active { background: #FDF5E8; border-color: #C9A857; }
 
+        .reminder-status {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: var(--space-md);
+            padding: 8px 10px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-small);
+            border-left: 3px solid var(--coral);
+        }
+        .reminder-status.is-warn {
+            border-left-color: #C9A857;
+            color: var(--text-primary);
+        }
+        .reminder-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: var(--space-md);
+        }
+        .reminder-test {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            border: 2px solid var(--coral);
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .reminder-test:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Values pasture — the user's top 10 values bloom as flowers in a
            little meadow; the more active days, the more vibrant. */
         .pasture-card {
@@ -4331,7 +4370,12 @@
                             <button type="button" class="reminder-toggle" id="reminder-evening-on" aria-checked="false" aria-label="Toggle evening reminder"></button>
                         </div>
 
-                        <button type="button" class="reminder-snooze" id="reminder-snooze">😴 Snooze for today</button>
+                        <div class="reminder-status" id="reminder-status"></div>
+
+                        <div class="reminder-actions">
+                            <button type="button" class="reminder-snooze" id="reminder-snooze">😴 Snooze for today</button>
+                            <button type="button" class="reminder-test" id="reminder-test">🔔 Send a test now</button>
+                        </div>
                     </div>
 
                     <div class="tools-section">
@@ -6161,7 +6205,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=60"></script>
+    <script src="/assets/js/app.js?v=61"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
