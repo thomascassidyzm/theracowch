@@ -1,15 +1,22 @@
 // Saves (or updates) a push subscription + the user's reminder preferences.
 //
-// Storage: Vercel KV (provision from the Vercel dashboard → Storage → KV;
-// the KV_REST_API_URL / KV_REST_API_TOKEN env vars are then auto-injected).
+// Storage: Upstash Redis (provision via Vercel → Storage → Marketplace →
+// Upstash Redis, or directly at upstash.com). The integration sets either
+// the UPSTASH_REDIS_REST_URL/TOKEN pair (new installs) or KV_REST_API_URL/TOKEN
+// (legacy KV stores that auto-migrated). We read whichever is present.
 //
 // Schema:
 //   key:  cowch:sub:<sha256(endpoint).slice(0,32)>
 //   val:  { subscription, prefs, updatedAt }
 //   set:  cowch:subs — ids for the cron iterator
 
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+
+const redis = new Redis({
+    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
+});
 
 function endpointId(endpoint) {
     return crypto.createHash('sha256').update(endpoint).digest('hex').slice(0, 32);
@@ -45,8 +52,8 @@ export default async function handler(req, res) {
             updatedAt: Date.now()
         };
 
-        await kv.set('cowch:sub:' + id, record);
-        await kv.sadd('cowch:subs', id);
+        await redis.set('cowch:sub:' + id, record);
+        await redis.sadd('cowch:subs', id);
 
         res.json({ ok: true, id });
     } catch (err) {

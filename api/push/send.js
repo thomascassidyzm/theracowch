@@ -3,21 +3,28 @@
 // to anyone whose configured reminder time matches the current minute in
 // their saved timezone (within +/- the cron tolerance).
 //
-// We use a per-(user, slot, day) "sent" marker in KV (26h TTL) to ensure
-// at-most-one notification per slot per day, even if cron overlaps the
+// We use a per-(user, slot, day) "sent" marker (26h TTL) to ensure at-
+// most-one notification per slot per day, even if cron overlaps the
 // window twice.
 //
 // Required env vars:
 //   VAPID_PUBLIC_KEY   — sent to the client by /api/push/keys
 //   VAPID_PRIVATE_KEY  — signs the push payload
 //   VAPID_SUBJECT      — mailto: URL (push-services require this)
+//   KV_REST_API_URL    + KV_REST_API_TOKEN   (legacy Vercel KV stores), or
+//   UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN (new Upstash integration)
 // Optional:
 //   CRON_SECRET        — if set, requests must include
 //                        `Authorization: Bearer <CRON_SECRET>` (Vercel Cron
 //                        sends this automatically when configured)
 
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import webpush from 'web-push';
+
+const redis = new Redis({
+    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
+});
 
 const NUDGES = {
     morning: [
@@ -43,7 +50,6 @@ function timeInTz(date, tz, opts) {
 }
 
 function dayKeyInTz(date, tz) {
-    // en-CA gives YYYY-MM-DD
     return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(date);
 }
 
@@ -61,7 +67,6 @@ function matchSlot(prefs, nowMins) {
         const [h, m] = time.split(':').map(Number);
         const target = h * 60 + m;
         const diff = Math.abs(nowMins - target);
-        // Also wrap around midnight (e.g. 23:55 vs 00:00)
         const wrap = Math.min(diff, 1440 - diff);
         if (wrap <= SLOT_TOLERANCE_MINUTES) return slot;
     }
@@ -95,10 +100,10 @@ export default async function handler(req, res) {
     const now = new Date();
     let ids = [];
     try {
-        ids = (await kv.smembers('cowch:subs')) || [];
+        ids = (await redis.smembers('cowch:subs')) || [];
     } catch (err) {
-        console.error('KV smembers failed:', err);
-        res.status(500).json({ error: 'KV unavailable', detail: String(err && err.message || err) });
+        console.error('Redis smembers failed:', err);
+        res.status(500).json({ error: 'Redis unavailable', detail: String(err && err.message || err) });
         return;
     }
 
@@ -106,7 +111,7 @@ export default async function handler(req, res) {
 
     for (const id of ids) {
         let rec;
-        try { rec = await kv.get('cowch:sub:' + id); } catch (_) { continue; }
+        try { rec = await redis.get('cowch:sub:' + id); } catch (_) { continue; }
         if (!rec || !rec.subscription || !rec.prefs) continue;
         const { subscription, prefs } = rec;
 
@@ -123,7 +128,7 @@ export default async function handler(req, res) {
         const day = dayKeyInTz(now, tz);
         const sentKey = `cowch:sent:${id}:${slot}:${day}`;
         try {
-            if (await kv.get(sentKey)) continue; // already sent today
+            if (await redis.get(sentKey)) continue; // already sent today
         } catch (_) { /* fall through */ }
 
         const nudge = pick(NUDGES[slot]);
@@ -135,16 +140,15 @@ export default async function handler(req, res) {
 
         try {
             await webpush.sendNotification(subscription, payload);
-            await kv.set(sentKey, '1', { ex: 60 * 60 * 26 });
+            await redis.set(sentKey, '1', { ex: 60 * 60 * 26 });
             sent++;
         } catch (err) {
             errors++;
             const code = err && err.statusCode;
             if (code === 404 || code === 410) {
-                // Subscription gone — clean up
                 try {
-                    await kv.del('cowch:sub:' + id);
-                    await kv.srem('cowch:subs', id);
+                    await redis.del('cowch:sub:' + id);
+                    await redis.srem('cowch:subs', id);
                     expired++;
                 } catch (_) {}
             } else {
