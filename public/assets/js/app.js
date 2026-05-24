@@ -255,66 +255,10 @@ function updateDailySuggestion() {
 
 
 // ============================================
-// Day helpers + streak math (still used by the weekly report for the
-// "current streak" stat, even though the streak card itself is gone)
+// Day helper — shared by the pasture, weekly report and activity log
 // ============================================
-const STREAK_KEY = 'cowch-streaks-v1';
-
 function streakDayKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-function computeStreak() {
-    let days;
-    try {
-        const checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]');
-        days = new Set(checkins.filter(c => c && c.timestamp).map(c => streakDayKey(new Date(c.timestamp))));
-    } catch (_) { days = new Set(); }
-
-    const today = new Date(); today.setHours(0,0,0,0);
-    const todayKey = streakDayKey(today);
-    const yest = new Date(today); yest.setDate(yest.getDate() - 1);
-    const yestKey = streakDayKey(yest);
-
-    let current = 0;
-    if (days.has(todayKey) || days.has(yestKey)) {
-        const start = days.has(todayKey) ? today : yest;
-        const cur = new Date(start);
-        while (days.has(streakDayKey(cur))) {
-            current++;
-            cur.setDate(cur.getDate() - 1);
-        }
-    }
-
-    // Best streak: walk all known days, find longest consecutive run
-    let best = 0;
-    if (days.size > 0) {
-        const sorted = Array.from(days).sort();
-        let run = 1;
-        for (let i = 1; i < sorted.length; i++) {
-            const prev = new Date(sorted[i-1] + 'T00:00:00');
-            const cur  = new Date(sorted[i]   + 'T00:00:00');
-            const diff = Math.round((cur - prev) / 86400000);
-            if (diff === 1) { run++; } else { best = Math.max(best, run); run = 1; }
-        }
-        best = Math.max(best, run);
-    }
-    // Don't let stored "best" regress (in case of clearing)
-    try {
-        const stored = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}');
-        const persistedBest = stored.best || 0;
-        if (best > persistedBest) {
-            stored.best = best;
-            localStorage.setItem(STREAK_KEY, JSON.stringify(stored));
-        } else if (persistedBest > best) {
-            best = persistedBest;
-        }
-    } catch (_) {}
-
-    const todayDone = days.has(todayKey);
-    const yesterdayDone = days.has(yestKey);
-    const broken = !todayDone && !yesterdayDone && days.size > 0;
-
-    return { current, best, todayDone, broken, totalDays: days.size };
 }
 
 
@@ -759,17 +703,13 @@ function updateWeeklyReportUI() {
     const activeThisWeek = gatherActiveDays(7);
     const showedUpDays = activeThisWeek.size;
 
-    // Streak (current, for context)
-    const streak = computeStreak();
-
     // Stats grid
     stats.innerHTML = '';
     const statTiles = [
         { num: showedUpDays + '/7', lbl: 'Days you showed up' },
         { num: checkins.length, lbl: 'Check-ins' },
         { num: goalsAdded, lbl: 'Goals added' },
-        { num: goalsDone, lbl: 'Goals bloomed' },
-        { num: streak.current, lbl: 'Current streak' }
+        { num: goalsDone, lbl: 'Goals bloomed' }
     ];
     statTiles.forEach(t => {
         const tile = document.createElement('div');
