@@ -1596,116 +1596,6 @@
         .progression-toast .content strong { font-weight: 900; }
         .progression-toast .content span { font-size: 0.85rem; color: var(--text-secondary); }
 
-        /* Streak card */
-        .streak-card {
-            background: var(--bg-card);
-            border: var(--border-thicc) solid var(--border-warm);
-            border-radius: var(--radius-chunky);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
-            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
-        }
-        .streak-head {
-            display: flex;
-            align-items: baseline;
-            gap: var(--space-md);
-            margin-bottom: var(--space-sm);
-        }
-        .streak-current {
-            font-size: 2.8rem;
-            font-weight: 900;
-            color: var(--coral);
-            line-height: 1;
-        }
-        .streak-current-unit {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .streak-best {
-            margin-left: auto;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-        .streak-best strong { color: var(--text-primary); font-weight: 900; }
-        .streak-msg {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin: 0 0 var(--space-md);
-            line-height: 1.4;
-        }
-        .streak-msg.broken {
-            background: #FDF5E8;
-            border-left: 4px solid #C9A857;
-            padding: 10px 14px;
-            border-radius: var(--radius-small);
-        }
-        .streak-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: var(--coral);
-            color: var(--text-on-coral, #fff);
-            border: 3px solid var(--coral);
-            border-radius: var(--radius-medium);
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 0.92rem;
-            touch-action: manipulation;
-            margin-bottom: var(--space-md);
-        }
-        .streak-cta:hover { transform: translateY(-1px); }
-        .streak-badges-title {
-            font-size: 0.78rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .streak-badges {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
-            gap: 8px;
-        }
-        .streak-badge {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-warm);
-            border-radius: var(--radius-medium);
-            padding: 10px 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            opacity: 0.4;
-            transition: all 0.2s;
-        }
-        .streak-badge.unlocked {
-            opacity: 1;
-            border-color: var(--coral);
-            background: #FFF1E5;
-        }
-        .streak-badge .emoji {
-            font-size: 1.5rem;
-            filter: grayscale(60%);
-        }
-        .streak-badge.unlocked .emoji { filter: none; }
-        .streak-badge .label {
-            font-size: 0.66rem;
-            font-weight: 800;
-            text-align: center;
-            line-height: 1.1;
-            color: var(--text-primary);
-        }
-        .streak-badge .target {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
-
         /* Reminders settings card */
         .reminders-card {
             background: var(--bg-card);
@@ -6214,9 +6104,20 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=64"></script>
+    <script src="/assets/js/app.js?v=65"></script>
     <script>
         if ('serviceWorker' in navigator) {
+            // Auto-reload once when a new service worker takes control, so a
+            // fresh deploy is picked up without the user manually hard-
+            // refreshing. We only reload if the page was already controlled
+            // (an update), not on the first-ever registration.
+            var hadController = !!navigator.serviceWorker.controller;
+            var swRefreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (swRefreshing) return;
+                swRefreshing = true;
+                if (hadController) window.location.reload();
+            });
             navigator.serviceWorker.register('/sw.js');
         }
 
