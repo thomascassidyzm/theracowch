@@ -28,10 +28,10 @@ function switchTab(tabId) {
     }
 
     // Refresh the Your-Space cards whenever the user lands on it — picks up
-    // anything completed earlier this session.
+    // anything completed earlier this session, and grows the pasture if it's
+    // a new day.
     if (tabId === 'you') {
         if (typeof updateProgressionUI    === 'function') updateProgressionUI();
-        if (typeof updateStreakUI         === 'function') updateStreakUI();
         if (typeof updatePastureUI        === 'function') updatePastureUI();
         if (typeof updateWeeklyReportUI   === 'function') updateWeeklyReportUI();
     }
@@ -423,19 +423,10 @@ function updateProgressionUI() {
 window.updateProgressionUI = updateProgressionUI;
 
 // ============================================
-// Cowch Streak (from inner-weather check-ins) + badge collection
+// Day helpers + streak math (still used by the weekly report for the
+// "current streak" stat, even though the streak card itself is gone)
 // ============================================
 const STREAK_KEY = 'cowch-streaks-v1';
-const STREAK_BADGES = [
-    { days: 1,   emoji: '🌱', label: 'First seed' },
-    { days: 3,   emoji: '🌼', label: 'Bloom' },
-    { days: 7,   emoji: '🌿', label: 'Roots' },
-    { days: 14,  emoji: '🌳', label: 'Steady tree' },
-    { days: 21,  emoji: '🐄', label: 'Cowch friend' },
-    { days: 30,  emoji: '🌈', label: 'Rainbow' },
-    { days: 60,  emoji: '✨', label: 'Star streak' },
-    { days: 100, emoji: '🏆', label: 'Century' }
-];
 
 function streakDayKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -494,50 +485,6 @@ function computeStreak() {
     return { current, best, todayDone, broken, totalDays: days.size };
 }
 
-function updateStreakUI() {
-    const card = document.getElementById('streak-card');
-    if (!card) return;
-    const s = computeStreak();
-
-    document.getElementById('streak-current').textContent = s.current;
-    document.getElementById('streak-best').textContent = s.best;
-
-    const msg = document.getElementById('streak-msg');
-    const cta = document.getElementById('streak-cta');
-    const ctaText = document.getElementById('streak-cta-text');
-    msg.classList.remove('broken');
-    if (s.todayDone) {
-        msg.textContent = `You showed up today. ${s.current} day${s.current === 1 ? '' : 's'} and counting — soft and steady.`;
-        cta.style.display = 'none';
-    } else if (s.broken) {
-        msg.classList.add('broken');
-        msg.innerHTML = "Streaks pause, that's just life. No shame &mdash; restart gently with one check-in today.";
-        cta.style.display = '';
-        ctaText.textContent = 'Restart gently';
-    } else if (s.current > 0) {
-        msg.textContent = `${s.current} day${s.current === 1 ? '' : 's'} so far. Check in today to keep it going.`;
-        cta.style.display = '';
-        ctaText.textContent = "Do today's check-in";
-    } else {
-        msg.textContent = "Do today's inner-weather check-in to start your streak.";
-        cta.style.display = '';
-        ctaText.textContent = "Do today's check-in";
-    }
-
-    const grid = document.getElementById('streak-badges');
-    grid.innerHTML = '';
-    const reached = Math.max(s.current, s.best);
-    STREAK_BADGES.forEach(b => {
-        const tile = document.createElement('div');
-        const unlocked = reached >= b.days;
-        tile.className = 'streak-badge' + (unlocked ? ' unlocked' : '');
-        tile.innerHTML = `<span class="emoji">${b.emoji}</span>
-                          <span class="label">${b.label}</span>
-                          <span class="target">${b.days} day${b.days === 1 ? '' : 's'}</span>`;
-        grid.appendChild(tile);
-    });
-}
-window.updateStreakUI = updateStreakUI;
 
 // ============================================
 // Values pasture — visual that thrives with consistent activity
@@ -575,102 +522,138 @@ function gatherActiveDays(windowDays) {
     return days;
 }
 
-function loadTopValues() {
-    try {
-        const raw = localStorage.getItem('cowch-q-values');
-        if (!raw) return null;
-        const j = JSON.parse(raw);
-        if (j && Array.isArray(j.chosen) && j.chosen.length) return j.chosen;
-    } catch (_) {}
-    return null;
-}
-
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
-function buildPastureFlower(opts) {
-    // opts: { baseX, baseY, scale, color, name, delaySeconds, onTap }
-    const g = document.createElementNS(NS_SVG, 'g');
-    g.setAttribute('transform', `translate(${opts.baseX}, ${opts.baseY}) scale(${opts.scale})`);
-    g.classList.add('pasture-flower');
-    g.style.animationDelay = (opts.delaySeconds || 0) + 's';
+// ── Pasture growth garden: a cumulative scene where each new day visited
+//    plants one new thing. Flowers first; once a few are growing, little
+//    trees and grass tufts join in. Items are draggable + deletable. ──
+const PASTURE_ITEMS_KEY    = 'cowch-pasture-items-v1';
+const PASTURE_LASTGROW_KEY = 'cowch-pasture-lastgrow';
+const PASTURE_FLOWER_COLORS = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF',
+                               '#FFC1A4', '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
 
+function loadPastureItems() {
+    try {
+        const arr = JSON.parse(localStorage.getItem(PASTURE_ITEMS_KEY) || '[]');
+        if (Array.isArray(arr)) return arr;
+    } catch (_) {}
+    return [];
+}
+function savePastureItems(items) {
+    try { localStorage.setItem(PASTURE_ITEMS_KEY, JSON.stringify(items)); } catch (_) {}
+}
+
+// The 1-based index of the item being added decides its kind. First few are
+// flowers; from the 5th onward little trees (every 5th) and grass tufts
+// (every 3rd) start appearing too.
+function nextPastureItemType(n) {
+    if (n <= 4) return 'flower';
+    if (n % 5 === 0) return 'tree';
+    if (n % 3 === 0) return 'grass';
+    return 'flower';
+}
+
+function randomPasturePosition() {
+    return { x: 26 + Math.random() * 308, y: 116 + Math.random() * 50 };
+}
+
+// Adds one item if today is a new calendar day since the last growth. Returns
+// the new item or null.
+function maybeGrowPasture() {
+    const todayKey = streakDayKey(new Date());
+    let last = null;
+    try { last = localStorage.getItem(PASTURE_LASTGROW_KEY); } catch (_) {}
+    if (last === todayKey) return null;
+
+    const items = loadPastureItems();
+    const type = nextPastureItemType(items.length + 1);
+    const pos = randomPasturePosition();
+    const item = {
+        id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1000).toString(36),
+        type,
+        x: pos.x,
+        y: pos.y,
+        variant: type === 'flower'
+            ? Math.floor(Math.random() * PASTURE_FLOWER_COLORS.length)
+            : Math.floor(Math.random() * 3),
+        addedAt: new Date().toISOString()
+    };
+    items.push(item);
+    savePastureItems(items);
+    try { localStorage.setItem(PASTURE_LASTGROW_KEY, todayKey); } catch (_) {}
+    return item;
+}
+
+// ── Drawing helpers: each draws into a group whose origin (0,0) is the
+//    item's base on the ground. ──
+function drawFlower(g, item) {
+    const color = PASTURE_FLOWER_COLORS[(item.variant || 0) % PASTURE_FLOWER_COLORS.length];
     const stem = document.createElementNS(NS_SVG, 'line');
     stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
     stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
-    stem.setAttribute('stroke', '#3F8458');
-    stem.setAttribute('stroke-width', 1.6);
+    stem.setAttribute('stroke', '#3F8458'); stem.setAttribute('stroke-width', 1.6);
     stem.setAttribute('stroke-linecap', 'round');
     g.appendChild(stem);
-
     const sideLeaf = document.createElementNS(NS_SVG, 'ellipse');
     sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
     sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
     sideLeaf.setAttribute('fill', '#3F8458');
     sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
     g.appendChild(sideLeaf);
-
     for (let p = 0; p < 5; p++) {
         const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
-        const px = Math.cos(a) * 4.2;
-        const py = Math.sin(a) * 4.2 - 16;
         const petal = document.createElementNS(NS_SVG, 'circle');
-        petal.setAttribute('cx', px); petal.setAttribute('cy', py);
+        petal.setAttribute('cx', Math.cos(a) * 4.2);
+        petal.setAttribute('cy', Math.sin(a) * 4.2 - 16);
         petal.setAttribute('r', 3.4);
-        petal.setAttribute('fill', opts.color);
+        petal.setAttribute('fill', color);
         g.appendChild(petal);
     }
     const centre = document.createElementNS(NS_SVG, 'circle');
     centre.setAttribute('cx', 0); centre.setAttribute('cy', -16); centre.setAttribute('r', 2);
     centre.setAttribute('fill', '#C9A857');
     g.appendChild(centre);
-
-    if (opts.name) {
-        const ttl = document.createElementNS(NS_SVG, 'title');
-        ttl.textContent = opts.name;
-        g.appendChild(ttl);
-    }
-    if (typeof opts.onTap === 'function') {
-        g.addEventListener('click', () => {
-            g.classList.remove('tap-pulse');
-            void g.getBoundingClientRect();
-            g.classList.add('tap-pulse');
-            opts.onTap();
-        });
-    }
-    return g;
+}
+function drawTree(g, item) {
+    const canopyColors = ['#5FA46B', '#4F8F60', '#76B47E'];
+    const cc = canopyColors[(item.variant || 0) % canopyColors.length];
+    const trunk = document.createElementNS(NS_SVG, 'rect');
+    trunk.setAttribute('x', -2.5); trunk.setAttribute('y', -16);
+    trunk.setAttribute('width', 5); trunk.setAttribute('height', 18);
+    trunk.setAttribute('rx', 2); trunk.setAttribute('fill', '#6B4B30');
+    g.appendChild(trunk);
+    [{ x: 0, y: -22, r: 11 }, { x: -8, y: -17, r: 8 }, { x: 8, y: -17, r: 8 }, { x: 0, y: -28, r: 8 }].forEach(c => {
+        const e = document.createElementNS(NS_SVG, 'circle');
+        e.setAttribute('cx', c.x); e.setAttribute('cy', c.y); e.setAttribute('r', c.r);
+        e.setAttribute('fill', cc);
+        g.appendChild(e);
+    });
+}
+function drawGrass(g, item) {
+    const greens = ['#5FA46B', '#6FB37A', '#4F8F60'];
+    const col = greens[(item.variant || 0) % greens.length];
+    const blades = [
+        'M -6 0 Q -7 -10 -4 -14', 'M -2 0 Q -3 -13 0 -18',
+        'M 2 0 Q 3 -12 6 -15', 'M 6 0 Q 8 -8 10 -11'
+    ];
+    blades.forEach(d => {
+        const p = document.createElementNS(NS_SVG, 'path');
+        p.setAttribute('d', d);
+        p.setAttribute('stroke', col); p.setAttribute('stroke-width', 2.2);
+        p.setAttribute('fill', 'none'); p.setAttribute('stroke-linecap', 'round');
+        g.appendChild(p);
+    });
 }
 
-function showPastureFloatingLabel(svg, text) {
-    const prior = svg.querySelector('.pasture-floating-label');
-    if (prior) prior.remove();
-
-    const lbl = document.createElementNS(NS_SVG, 'g');
-    lbl.classList.add('pasture-floating-label');
-    const padX = 10;
-    const charW = 7;
-    const w = Math.max(60, Math.min(text.length * charW + padX * 2, 320));
-    const x = 180 - w / 2, y = 6;
-    const rect = document.createElementNS(NS_SVG, 'rect');
-    rect.setAttribute('x', x); rect.setAttribute('y', y);
-    rect.setAttribute('width', w); rect.setAttribute('height', 22);
-    rect.setAttribute('rx', 11);
-    rect.setAttribute('class', 'pasture-label-bg');
-    const t = document.createElementNS(NS_SVG, 'text');
-    t.setAttribute('x', 180); t.setAttribute('y', y + 15);
-    t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('class', 'pasture-label-text');
-    t.textContent = text;
-    lbl.appendChild(rect);
-    lbl.appendChild(t);
-    svg.appendChild(lbl);
-    requestAnimationFrame(() => lbl.classList.add('show'));
-
-    clearTimeout(showPastureFloatingLabel._t);
-    showPastureFloatingLabel._t = setTimeout(() => {
-        lbl.classList.remove('show');
-        setTimeout(() => lbl.remove(), 400);
-    }, 2400);
+function clientToPastureSvg(svg, clientX, clientY) {
+    const pt = svg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: clientX, y: clientY };
+    const p = pt.matrixTransform(ctm.inverse());
+    return { x: p.x, y: p.y };
 }
+
 
 function buildPastureScenery(svg, vit) {
     const sun = document.createElementNS(NS_SVG, 'circle');
@@ -714,86 +697,153 @@ function buildPastureScenery(svg, vit) {
     svg.appendChild(cow);
 }
 
+let pastureEditing = false;
+
+function buildPastureItemNode(item, ctx) {
+    // ctx: { editing, svg, items, onDelete }
+    const g = document.createElementNS(NS_SVG, 'g');
+    g.setAttribute('transform', `translate(${item.x}, ${item.y})`);
+    g.classList.add('pasture-item');
+    g.dataset.id = item.id;
+
+    if (item.type === 'tree') drawTree(g, item);
+    else if (item.type === 'grass') drawGrass(g, item);
+    else drawFlower(g, item);
+
+    if (ctx.editing) {
+        g.classList.add('editing');
+
+        // Delete badge floats above the item
+        const badge = document.createElementNS(NS_SVG, 'g');
+        badge.setAttribute('class', 'pasture-delete-badge');
+        const topY = item.type === 'tree' ? -38 : (item.type === 'grass' ? -22 : -26);
+        badge.setAttribute('transform', `translate(8, ${topY})`);
+        const bc = document.createElementNS(NS_SVG, 'circle');
+        bc.setAttribute('cx', 0); bc.setAttribute('cy', 0); bc.setAttribute('r', 7);
+        bc.setAttribute('fill', '#E35B32');
+        const bx = document.createElementNS(NS_SVG, 'text');
+        bx.setAttribute('x', 0); bx.setAttribute('y', 3.5);
+        bx.setAttribute('text-anchor', 'middle');
+        bx.setAttribute('fill', '#fff');
+        bx.setAttribute('font-size', '11');
+        bx.setAttribute('font-weight', '900');
+        bx.textContent = '×';
+        badge.appendChild(bc); badge.appendChild(bx);
+        badge.addEventListener('pointerdown', e => { e.stopPropagation(); });
+        badge.addEventListener('click', e => {
+            e.stopPropagation();
+            ctx.onDelete(item.id);
+        });
+        g.appendChild(badge);
+
+        // Drag to move
+        let dragging = false, sP = null, sX = 0, sY = 0;
+        g.addEventListener('pointerdown', e => {
+            if (e.target.closest('.pasture-delete-badge')) return;
+            dragging = true;
+            g.classList.add('dragging');
+            try { g.setPointerCapture(e.pointerId); } catch (_) {}
+            sP = clientToPastureSvg(ctx.svg, e.clientX, e.clientY);
+            sX = item.x; sY = item.y;
+        });
+        g.addEventListener('pointermove', e => {
+            if (!dragging) return;
+            const p = clientToPastureSvg(ctx.svg, e.clientX, e.clientY);
+            item.x = Math.max(14, Math.min(346, sX + (p.x - sP.x)));
+            item.y = Math.max(104, Math.min(174, sY + (p.y - sP.y)));
+            g.setAttribute('transform', `translate(${item.x}, ${item.y})`);
+        });
+        function endDrag(e) {
+            if (!dragging) return;
+            dragging = false;
+            g.classList.remove('dragging');
+            try { g.releasePointerCapture(e.pointerId); } catch (_) {}
+            savePastureItems(ctx.items);
+        }
+        g.addEventListener('pointerup', endDrag);
+        g.addEventListener('pointercancel', endDrag);
+    }
+
+    return g;
+}
+
+function renderPasture() {
+    const svg = document.getElementById('pasture-svg');
+    if (!svg) return;
+    const items = loadPastureItems();
+    svg.innerHTML = '';
+    svg.classList.toggle('editing', pastureEditing);
+
+    // Fuller pasture (more items) → brighter scenery, capped at 12.
+    buildPastureScenery(svg, Math.min(1, items.length / 12));
+
+    // Draw back-to-front: smaller y (further back) first.
+    const ordered = items.slice().sort((a, b) => a.y - b.y);
+    const items_ref = items; // keep the array identity for drag-save
+    ordered.forEach((item, i) => {
+        const node = buildPastureItemNode(item, {
+            editing: pastureEditing,
+            svg,
+            items: items_ref,
+            onDelete: (id) => {
+                const next = loadPastureItems().filter(it => it.id !== id);
+                savePastureItems(next);
+                const countEl = document.getElementById('pasture-count');
+                if (countEl) countEl.textContent = next.length;
+                renderPasture();
+            }
+        });
+        node.style.animationDelay = (i * 0.04) + 's';
+        svg.appendChild(node);
+    });
+}
+
 function updatePastureUI() {
     const card = document.getElementById('pasture-card');
     if (!card) return;
-    const svg = document.getElementById('pasture-svg');
-    const vitNum = document.getElementById('pasture-vitality-num');
+    const countEl = document.getElementById('pasture-count');
     const blurb = document.getElementById('pasture-blurb');
-    const empty = document.getElementById('pasture-empty');
+    const growNote = document.getElementById('pasture-grow-note');
 
-    const values = loadTopValues();
-    const activeDays = gatherActiveDays(30).size;
-    vitNum.textContent = activeDays;
+    const grown = maybeGrowPasture();
+    const items = loadPastureItems();
+    if (countEl) countEl.textContent = items.length;
 
-    // First-visit detection — drives a longer, more dramatic stagger so a
-    // user landing on Your Space for the first time literally watches their
-    // pasture grow. Subsequent renders use a tiny stagger.
-    const SEEN_KEY = 'cowch-pasture-seen';
-    let firstVisit = false;
-    try {
-        if (!localStorage.getItem(SEEN_KEY)) {
-            firstVisit = true;
-            localStorage.setItem(SEEN_KEY, '1');
-        }
-    } catch (_) {}
-
-    svg.innerHTML = '';
-
-    // ── Empty state: one welcome flower in the centre + the CTA below ──
-    if (!values) {
-        empty.hidden = false;
-        blurb.textContent = 'Tap the flower to plant your pasture.';
-        buildPastureScenery(svg, 0.6);
-        const welcome = buildPastureFlower({
-            baseX: 180, baseY: 152, scale: 1.7,
-            color: '#F7B2C5',
-            name: 'Pick your top 10 values',
-            delaySeconds: 0.25,
-            onTap: () => {
-                showPastureFloatingLabel(svg, 'Pick your top 10 values →');
-                setTimeout(() => {
-                    window.location.href = '/questionnaires/values.html?v=110';
-                }, 350);
-            }
-        });
-        svg.appendChild(welcome);
-        return;
+    if (grown && growNote) {
+        const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿' };
+        growNote.hidden = false;
+        growNote.textContent = 'Today your pasture grew ' + (labelByType[grown.type] || 'something new') + '!';
+    } else if (growNote) {
+        growNote.hidden = true;
     }
 
-    empty.hidden = true;
-    // Vitality 0..1 — 18 vibrant days in the past month fills the meadow.
-    const vit = Math.max(0, Math.min(1, activeDays / 18));
-    blurb.textContent = vit < 0.2
-        ? 'A quiet pasture. Tap a flower to see its value — show up a few days and they bloom.'
-        : vit < 0.6
-            ? 'Pasture is waking up — tap any flower to remember the value behind it.'
-            : 'Your pasture is thriving. Tap any flower to see the value it stands for.';
+    if (blurb) {
+        if (items.length === 0) {
+            blurb.textContent = 'Every day you visit, something new grows here. Your first sprout appears today.';
+        } else if (items.length === 1) {
+            blurb.textContent = 'Your first sprout! Come back tomorrow and the pasture keeps growing.';
+        } else {
+            blurb.textContent = items.length + ' things growing. Tap “Rearrange” to move or remove anything.';
+        }
+    }
 
-    buildPastureScenery(svg, vit);
-
-    const flowerColors = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF', '#FFC1A4',
-                          '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
-    // Wilted (vit=0) → noticeably smaller; thriving (vit=1) → bigger.
-    const scale = 0.55 + vit * 0.8;
-    const stagger = firstVisit ? 0.32 : 0.05;
-    const head = firstVisit ? 0.25 : 0.05;
-
-    values.forEach((name, i) => {
-        const row = i < 5 ? 0 : 1;
-        const col = i < 5 ? i : (i - 5);
-        const baseX = 110 + col * 50 + (row === 1 ? 25 : 0);
-        const baseY = row === 0 ? 145 : 165;
-        const color = flowerColors[i % flowerColors.length];
-        const flower = buildPastureFlower({
-            baseX, baseY, scale, color, name,
-            delaySeconds: head + i * stagger,
-            onTap: () => showPastureFloatingLabel(svg, name)
-        });
-        svg.appendChild(flower);
-    });
+    renderPasture();
 }
 window.updatePastureUI = updatePastureUI;
+
+function setupPastureEdit() {
+    const btn = document.getElementById('pasture-edit-btn');
+    const hint = document.getElementById('pasture-edit-hint');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        pastureEditing = !pastureEditing;
+        btn.classList.toggle('active', pastureEditing);
+        btn.textContent = pastureEditing ? '✓ Done' : '✥ Rearrange';
+        if (hint) hint.hidden = !pastureEditing;
+        renderPasture();
+    });
+}
+window.setupPastureEdit = setupPastureEdit;
 
 // ============================================
 // Weekly in-app report — rolling 7 days, derived from existing storage
@@ -2523,8 +2573,8 @@ function init() {
     updateDailyQuote();
     updateDailySuggestion();
     updateProgressionUI();
-    updateStreakUI();
     updatePastureUI();
+    setupPastureEdit();
     updateWeeklyReportUI();
     setupReminders();
     setupTabNavigation();

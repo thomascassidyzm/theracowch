@@ -1954,6 +1954,54 @@
         }
         .pasture-floating-label.show { opacity: 1; }
 
+        /* Pasture items + edit mode */
+        .pasture-svg.editing { cursor: grab; }
+        .pasture-item { animation: pastureBloom 0.6s ease-out forwards; opacity: 0; }
+        .pasture-item.editing { cursor: grab; }
+        .pasture-item.dragging { cursor: grabbing; }
+        .pasture-grow-note {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 8px 12px;
+            border-radius: var(--radius-small);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            font-weight: 700;
+        }
+        .pasture-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pasture-edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .pasture-edit-btn.active {
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            border-color: var(--coral);
+        }
+        .pasture-edit-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .pasture-delete-badge { cursor: pointer; }
+
         /* Weekly report */
         .weekly-card {
             background: var(--bg-card);
@@ -4303,30 +4351,18 @@
                     </div>
 
                     <!-- Cowch streak -->
-                    <div class="streak-card" id="streak-card">
-                        <div class="streak-head">
-                            <span class="streak-current" id="streak-current">0</span>
-                            <span class="streak-current-unit">day streak</span>
-                            <span class="streak-best">Best: <strong id="streak-best">0</strong></span>
-                        </div>
-                        <p class="streak-msg" id="streak-msg">Do today&rsquo;s inner-weather check-in to start your streak.</p>
-                        <a class="streak-cta" id="streak-cta" href="/exercises/weather.html">
-                            <span>🌤️</span><span id="streak-cta-text">Do today&rsquo;s check-in</span>
-                        </a>
-                        <div class="streak-badges-title">Your collection</div>
-                        <div class="streak-badges" id="streak-badges"></div>
-                    </div>
-
-                    <!-- Values pasture -->
+                    <!-- Your pasture — grows with every day you visit -->
                     <div class="pasture-card" id="pasture-card">
                         <div class="pasture-head">
-                            <h2>Your values pasture</h2>
-                            <span class="pasture-vitality"><span class="num" id="pasture-vitality-num">0</span> vibrant days</span>
+                            <h2>Your pasture</h2>
+                            <span class="pasture-vitality"><span class="num" id="pasture-count">0</span> things growing</span>
                         </div>
-                        <p class="pasture-blurb" id="pasture-blurb">Each flower is one of your top values. Consistent check-ins keep the pasture vibrant.</p>
-                        <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
-                        <div class="pasture-empty" id="pasture-empty" hidden>
-                            <a href="/questionnaires/values.html?v=110">Pick your top 10 values</a> to grow the pasture.
+                        <p class="pasture-blurb" id="pasture-blurb">Every day you visit, something new grows here. Watch your pasture fill in over time.</p>
+                        <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Your pasture"></svg>
+                        <div class="pasture-grow-note" id="pasture-grow-note" hidden></div>
+                        <div class="pasture-actions">
+                            <button type="button" class="pasture-edit-btn" id="pasture-edit-btn">✥ Rearrange</button>
+                            <span class="pasture-edit-hint" id="pasture-edit-hint" hidden>Drag to move · tap ✕ to remove</span>
                         </div>
                     </div>
 
@@ -6205,7 +6241,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=61"></script>
+    <script src="/assets/js/app.js?v=62"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
