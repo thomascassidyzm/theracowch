@@ -459,17 +459,45 @@ function buildPastureScenery(svg, vit) {
     svg.appendChild(ground);
 
     const cow = document.createElementNS(NS_SVG, 'g');
-    cow.setAttribute('transform', 'translate(70, 142)');
+    cow.setAttribute('transform', 'translate(62, 138)');
     cow.innerHTML = `
-        <ellipse cx="0" cy="0" rx="16" ry="9" fill="#FFFFFF"/>
-        <ellipse cx="-7" cy="-3" rx="4" ry="3" fill="#3C2E28"/>
-        <ellipse cx="5" cy="2"  rx="3.5" ry="2.5" fill="#3C2E28"/>
-        <circle cx="-15" cy="-2" r="6" fill="#FFFFFF"/>
-        <ellipse cx="-15" cy="-1" rx="3.5" ry="2.4" fill="#FFE3D4"/>
-        <line x1="-7"  y1="9" x2="-7"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="-2"  y1="9" x2="-2"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="6"   y1="9" x2="6"   y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="11"  y1="9" x2="11"  y2="14" stroke="#3C2E28" stroke-width="1.6" stroke-linecap="round"/>`;
+        <!-- body -->
+        <ellipse cx="2" cy="8" rx="17" ry="11" fill="#FFFFFF"/>
+        <ellipse cx="8" cy="5" rx="6" ry="5" fill="#A77B52"/>
+        <ellipse cx="-4" cy="11" rx="4" ry="3" fill="#A77B52"/>
+        <!-- legs -->
+        <rect x="-8" y="16" width="3" height="6" rx="1.5" fill="#7A6253"/>
+        <rect x="-1" y="17" width="3" height="6" rx="1.5" fill="#7A6253"/>
+        <rect x="7"  y="17" width="3" height="6" rx="1.5" fill="#7A6253"/>
+        <rect x="13" y="16" width="3" height="6" rx="1.5" fill="#7A6253"/>
+        <!-- tail -->
+        <path d="M 18 4 Q 24 6 22 13" stroke="#A77B52" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <!-- head (front-facing, cute) -->
+        <g transform="translate(-13, -5)">
+            <!-- ears -->
+            <ellipse cx="-9" cy="-3" rx="4.2" ry="2.6" fill="#FFFFFF" transform="rotate(-38 -9 -3)"/>
+            <ellipse cx="-8.5" cy="-3" rx="2" ry="1.2" fill="#F7B2C5" transform="rotate(-38 -9 -3)"/>
+            <ellipse cx="9" cy="-3" rx="4.2" ry="2.6" fill="#FFFFFF" transform="rotate(38 9 -3)"/>
+            <ellipse cx="8.5" cy="-3" rx="2" ry="1.2" fill="#F7B2C5" transform="rotate(38 9 -3)"/>
+            <!-- little horns -->
+            <path d="M -3.5 -8 Q -4.5 -11 -2.5 -12" stroke="#E8C98A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <path d="M 3.5 -8 Q 4.5 -11 2.5 -12" stroke="#E8C98A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <!-- head -->
+            <circle cx="0" cy="0" r="9.5" fill="#FFFFFF"/>
+            <!-- brown patch over one eye -->
+            <ellipse cx="4.5" cy="-2" rx="4.2" ry="4" fill="#A77B52"/>
+            <!-- eyes -->
+            <circle cx="-3.5" cy="-1" r="1.7" fill="#3C2E28"/>
+            <circle cx="4.5" cy="-1" r="1.7" fill="#3C2E28"/>
+            <circle cx="-3" cy="-1.6" r="0.6" fill="#FFFFFF"/>
+            <circle cx="5" cy="-1.6" r="0.6" fill="#FFFFFF"/>
+            <!-- muzzle -->
+            <ellipse cx="0" cy="5.5" rx="6.5" ry="4.4" fill="#FFD9C7"/>
+            <ellipse cx="-2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
+            <ellipse cx="2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
+            <!-- gentle smile -->
+            <path d="M -2.5 8 Q 0 9.6 2.5 8" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+        </g>`;
     svg.appendChild(cow);
 }
 
@@ -481,6 +509,20 @@ function buildPastureItemNode(item, ctx) {
     g.setAttribute('transform', `translate(${item.x}, ${item.y})`);
     g.classList.add('pasture-item');
     g.dataset.id = item.id;
+
+    // In edit mode, a transparent hit-area gives a large, reliable grab
+    // target (the actual petals/blades/trunk are thin and hard to hit).
+    if (ctx.editing) {
+        const hit = document.createElementNS(NS_SVG, 'rect');
+        const h = item.type === 'tree' ? 40 : (item.type === 'grass' ? 24 : 28);
+        hit.setAttribute('x', -14);
+        hit.setAttribute('y', -h);
+        hit.setAttribute('width', 28);
+        hit.setAttribute('height', h + 6);
+        hit.setAttribute('fill', 'transparent');
+        hit.setAttribute('class', 'pasture-hit');
+        g.appendChild(hit);
+    }
 
     if (item.type === 'tree') drawTree(g, item);
     else if (item.type === 'grass') drawGrass(g, item);

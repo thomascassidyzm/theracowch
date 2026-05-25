@@ -1845,10 +1845,11 @@
         .pasture-floating-label.show { opacity: 1; }
 
         /* Pasture items + edit mode */
-        .pasture-svg.editing { cursor: grab; }
+        .pasture-svg.editing { cursor: grab; touch-action: none; }
         .pasture-item { animation: pastureBloom 0.6s ease-out forwards; opacity: 0; }
-        .pasture-item.editing { cursor: grab; }
+        .pasture-item.editing { cursor: grab; touch-action: none; }
         .pasture-item.dragging { cursor: grabbing; }
+        .pasture-hit { cursor: grab; }
         .pasture-grow-note {
             background: #FDF5E8;
             border-left: 4px solid #C9A857;
@@ -6104,7 +6105,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=65"></script>
+    <script src="/assets/js/app.js?v=66"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a
