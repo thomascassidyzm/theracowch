@@ -962,6 +962,51 @@ const WEATHER_LABELS = {
     'overcast': '☁️ overcast', 'rainy': '🌧️ rainy', 'stormy': '⛈️ stormy',
     'foggy': '🌫️ foggy', 'rainbow': '🌈 rainbow'
 };
+// Adjective form for the dominant weather ("This week was mostly ___").
+const WEATHER_WORDS = {
+    'sunny': 'sunny', 'partly-cloudy': 'partly cloudy', 'cloudy': 'cloudy',
+    'overcast': 'overcast', 'rainy': 'rainy', 'stormy': 'stormy',
+    'foggy': 'foggy', 'rainbow': 'bright'
+};
+// Noun form for the "with moments of ___ and ___" tail.
+const WEATHER_NOUNS = {
+    'sunny': 'sunshine', 'partly-cloudy': 'cloud', 'cloudy': 'cloud',
+    'overcast': 'grey skies', 'rainy': 'rain', 'stormy': 'storms',
+    'foggy': 'fog', 'rainbow': 'brightness'
+};
+const HARD_WEATHER = ['cloudy', 'overcast', 'rainy', 'stormy', 'foggy'];
+
+// Weaves the week's weather + how often the user showed up into one warm,
+// human sentence rather than a stat readout.
+function buildWeeklyNarrative(wxEntries, showedUpDays) {
+    const dayWord = showedUpDays === 1 ? 'day' : 'days';
+
+    if (wxEntries.length === 0) {
+        if (showedUpDays > 0) {
+            return `You showed up for yourself ${showedUpDays} ${dayWord} this week. Even a quiet visit counts.`;
+        }
+        return 'A fresh week ahead. Check in when you’re ready and your story will start to fill in.';
+    }
+
+    const dominantAdj = WEATHER_WORDS[wxEntries[0].key] || wxEntries[0].key;
+    const nouns = wxEntries.slice(1).map(w => WEATHER_NOUNS[w.key] || w.key);
+    let weather;
+    if (nouns.length === 0) {
+        weather = `This week was ${dominantAdj}.`;
+    } else if (nouns.length === 1) {
+        weather = `This week was mostly ${dominantAdj}, with some ${nouns[0]}.`;
+    } else {
+        weather = `This week was mostly ${dominantAdj}, with moments of ${nouns[0]} and ${nouns[1]}.`;
+    }
+
+    if (showedUpDays === 0) return weather;
+
+    const wasHard = HARD_WEATHER.indexOf(wxEntries[0].key) !== -1;
+    const closing = wasHard
+        ? ` You still kept returning to yourself ${showedUpDays} ${dayWord} — that matters.`
+        : ` You showed up for yourself ${showedUpDays} ${dayWord}.`;
+    return weather + closing;
+}
 
 function weeklyDaysWindow() {
     const out = new Set();
@@ -1084,26 +1129,8 @@ function updateWeeklyReportUI() {
         });
     }
 
-    // Headline pattern observation — try the most evocative thing we can find
-    let line = '';
-    if (exEntries.length > 0 && exEntries[0].count >= 2) {
-        const meta = EXERCISE_LABELS[exEntries[0].name] || { verb: 'used ' + exEntries[0].name };
-        line = `This week you ${meta.verb} ${exEntries[0].count} times.`;
-        if (wxEntries[0]) {
-            const wxLabel = (WEATHER_LABELS[wxEntries[0].key] || wxEntries[0].key);
-            line += ` Most common weather: ${wxLabel}.`;
-        }
-    } else if (wxEntries[0] && wxEntries[0].count >= 2) {
-        const wxLabel = (WEATHER_LABELS[wxEntries[0].key] || wxEntries[0].key);
-        line = `Your week leaned ${wxLabel}. Worth bringing to Mandy?`;
-    } else if (showedUpDays >= 5) {
-        line = `${showedUpDays} days on the cowch this week. Soft and steady.`;
-    } else if (showedUpDays > 0) {
-        line = `${showedUpDays} day${showedUpDays === 1 ? '' : 's'} so far — even a quick check-in counts.`;
-    } else {
-        line = 'Open the app a few times this week and your report will start to fill in.';
-    }
-    headline.textContent = line;
+    // Warm, personal narrative of the week's weather + showing up.
+    headline.textContent = buildWeeklyNarrative(wxEntries, showedUpDays);
 }
 window.updateWeeklyReportUI = updateWeeklyReportUI;
 
