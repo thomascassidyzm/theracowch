@@ -1346,11 +1346,13 @@ function setupReminders() {
             if (permBtn) permBtn.style.display = '';
         }
 
-        const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
-        snoozeBtn.classList.toggle('active', !!snoozed);
-        snoozeBtn.innerHTML = snoozed
-            ? '✓ Snoozed until tomorrow'
-            : '😴 Snooze for today';
+        if (snoozeBtn) {
+            const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
+            snoozeBtn.classList.toggle('active', !!snoozed);
+            snoozeBtn.innerHTML = snoozed
+                ? '✓ Snoozed until tomorrow'
+                : '😴 Snooze for today';
+        }
 
         // Status line — gives a clear "yes, this is wired up" signal
         if (statusEl) {
@@ -1438,16 +1440,18 @@ function setupReminders() {
         });
     });
 
-    snoozeBtn.addEventListener('click', () => {
-        const s = remindersLoad();
-        const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
-        if (snoozed) {
-            save(x => { x.snoozeUntil = 0; });
-        } else {
-            const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(4, 0, 0, 0);
-            save(x => { x.snoozeUntil = t.getTime(); });
-        }
-    });
+    if (snoozeBtn) {
+        snoozeBtn.addEventListener('click', () => {
+            const s = remindersLoad();
+            const snoozed = s.snoozeUntil && Date.now() < s.snoozeUntil;
+            if (snoozed) {
+                save(x => { x.snoozeUntil = 0; });
+            } else {
+                const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(4, 0, 0, 0);
+                save(x => { x.snoozeUntil = t.getTime(); });
+            }
+        });
+    }
 
     if (testBtn) {
         testBtn.addEventListener('click', async () => {

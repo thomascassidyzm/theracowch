@@ -4341,38 +4341,6 @@
                         <div class="weekly-list" id="weekly-weather"></div>
                     </div>
 
-                    <!-- Gentle daily reminders -->
-                    <div class="reminders-card" id="reminders-card">
-                        <div class="reminders-head">
-                            <h2>Gentle reminders</h2>
-                            <button type="button" class="reminder-toggle" id="reminders-master" aria-checked="false" aria-label="Toggle daily reminders"></button>
-                        </div>
-                        <p class="reminders-blurb">Up to two soft nudges a day &mdash; no shame, just an invitation.</p>
-                        <div class="reminders-perm" id="reminders-perm" hidden>
-                            <span id="reminders-perm-msg">Notifications need permission to reach you. Tap below to grant.</span>
-                            <br><button type="button" id="reminders-perm-btn">Allow notifications</button>
-                        </div>
-
-                        <div class="reminder-row">
-                            <div class="label">Morning <span class="sub">e.g. &ldquo;How&rsquo;s your inner weather today?&rdquo;</span></div>
-                            <input type="time" id="reminder-morning-time" value="09:00">
-                            <button type="button" class="reminder-toggle" id="reminder-morning-on" aria-checked="true" aria-label="Toggle morning reminder"></button>
-                        </div>
-
-                        <div class="reminder-row">
-                            <div class="label">Evening <span class="sub">e.g. &ldquo;3-minute grounding waiting for you.&rdquo;</span></div>
-                            <input type="time" id="reminder-evening-time" value="20:00">
-                            <button type="button" class="reminder-toggle" id="reminder-evening-on" aria-checked="false" aria-label="Toggle evening reminder"></button>
-                        </div>
-
-                        <div class="reminder-status" id="reminder-status"></div>
-
-                        <div class="reminder-actions">
-                            <button type="button" class="reminder-snooze" id="reminder-snooze">😴 Snooze for today</button>
-                            <button type="button" class="reminder-test" id="reminder-test">🔔 Send a test now</button>
-                        </div>
-                    </div>
-
                     <div class="tools-section">
                         <h2>Your Tools</h2>
                         <div class="tool-cards">
@@ -4399,6 +4367,36 @@
                                     <span>Check your alignment</span>
                                 </div>
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Gentle daily reminders (simplified) -->
+                    <div class="reminders-card" id="reminders-card">
+                        <div class="reminders-head">
+                            <h2>Gentle reminders</h2>
+                            <button type="button" class="reminder-toggle" id="reminders-master" aria-checked="false" aria-label="Toggle daily reminders"></button>
+                        </div>
+                        <p class="reminders-blurb">A soft nudge to check in &mdash; up to twice a day.</p>
+                        <div class="reminders-perm" id="reminders-perm" hidden>
+                            <span id="reminders-perm-msg">Notifications need permission to reach you. Tap below to grant.</span>
+                            <br><button type="button" id="reminders-perm-btn">Allow notifications</button>
+                        </div>
+
+                        <div class="reminder-row">
+                            <div class="label">Morning</div>
+                            <input type="time" id="reminder-morning-time" value="09:00">
+                            <button type="button" class="reminder-toggle" id="reminder-morning-on" aria-checked="true" aria-label="Toggle morning reminder"></button>
+                        </div>
+
+                        <div class="reminder-row">
+                            <div class="label">Evening</div>
+                            <input type="time" id="reminder-evening-time" value="20:00">
+                            <button type="button" class="reminder-toggle" id="reminder-evening-on" aria-checked="false" aria-label="Toggle evening reminder"></button>
+                        </div>
+
+                        <div class="reminder-status" id="reminder-status"></div>
+                        <div class="reminder-actions">
+                            <button type="button" class="reminder-test" id="reminder-test">🔔 Send a test</button>
                         </div>
                     </div>
 
@@ -6200,7 +6198,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=69"></script>
+    <script src="/assets/js/app.js?v=70"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a
