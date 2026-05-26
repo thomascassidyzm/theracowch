@@ -458,9 +458,11 @@ function buildPastureScenery(svg, vit) {
     ground.setAttribute('fill', '#92BC6A');
     svg.appendChild(ground);
 
-    const cow = document.createElementNS(NS_SVG, 'g');
-    cow.setAttribute('transform', 'translate(62, 138)');
-    cow.innerHTML = `
+    // The cow is rendered separately (renderPasture) so it can be dragged.
+}
+
+const PASTURE_COW_KEY = 'cowch-pasture-cow-v1';
+const COW_SVG = `
         <!-- body -->
         <ellipse cx="2" cy="8" rx="17" ry="11" fill="#FFFFFF"/>
         <ellipse cx="8" cy="5" rx="6" ry="5" fill="#A77B52"/>
@@ -498,7 +500,70 @@ function buildPastureScenery(svg, vit) {
             <!-- gentle smile -->
             <path d="M -2.5 8 Q 0 9.6 2.5 8" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>
         </g>`;
-    svg.appendChild(cow);
+
+function loadCowPos() {
+    try {
+        const p = JSON.parse(localStorage.getItem(PASTURE_COW_KEY));
+        if (p && typeof p.x === 'number' && typeof p.y === 'number') return p;
+    } catch (_) {}
+    return { x: 62, y: 138 };
+}
+function saveCowPos(p) {
+    try { localStorage.setItem(PASTURE_COW_KEY, JSON.stringify(p)); } catch (_) {}
+}
+
+// Shared drag: g is positioned at translate(pos.x,pos.y); updates pos live
+// and calls onCommit(pos) when the drag ends.
+function makePastureDraggable(g, pos, svg, onCommit) {
+    let dragging = false, sP = null, sX = 0, sY = 0;
+    g.addEventListener('pointerdown', e => {
+        if (e.target.closest('.pasture-delete-badge')) return;
+        dragging = true;
+        g.classList.add('dragging');
+        try { g.setPointerCapture(e.pointerId); } catch (_) {}
+        sP = clientToPastureSvg(svg, e.clientX, e.clientY);
+        sX = pos.x; sY = pos.y;
+    });
+    g.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const p = clientToPastureSvg(svg, e.clientX, e.clientY);
+        pos.x = Math.max(14, Math.min(346, sX + (p.x - sP.x)));
+        pos.y = Math.max(104, Math.min(174, sY + (p.y - sP.y)));
+        g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+    });
+    function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        g.classList.remove('dragging');
+        try { g.releasePointerCapture(e.pointerId); } catch (_) {}
+        if (onCommit) onCommit(pos);
+    }
+    g.addEventListener('pointerup', endDrag);
+    g.addEventListener('pointercancel', endDrag);
+}
+
+function buildCowNode(ctx) {
+    const pos = loadCowPos();
+    const g = document.createElementNS(NS_SVG, 'g');
+    g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+    g.classList.add('pasture-item', 'pasture-cow');
+    if (ctx.editing) {
+        // Big transparent hit-area over the whole cow for easy grabbing
+        const hit = document.createElementNS(NS_SVG, 'rect');
+        hit.setAttribute('x', -26); hit.setAttribute('y', -24);
+        hit.setAttribute('width', 54); hit.setAttribute('height', 48);
+        hit.setAttribute('fill', 'transparent');
+        hit.setAttribute('class', 'pasture-hit');
+        g.appendChild(hit);
+    }
+    const art = document.createElementNS(NS_SVG, 'g');
+    art.innerHTML = COW_SVG;
+    g.appendChild(art);
+    if (ctx.editing) {
+        g.classList.add('editing');
+        makePastureDraggable(g, pos, ctx.svg, saveCowPos);
+    }
+    return g;
 }
 
 let pastureEditing = false;
@@ -554,32 +619,8 @@ function buildPastureItemNode(item, ctx) {
         });
         g.appendChild(badge);
 
-        // Drag to move
-        let dragging = false, sP = null, sX = 0, sY = 0;
-        g.addEventListener('pointerdown', e => {
-            if (e.target.closest('.pasture-delete-badge')) return;
-            dragging = true;
-            g.classList.add('dragging');
-            try { g.setPointerCapture(e.pointerId); } catch (_) {}
-            sP = clientToPastureSvg(ctx.svg, e.clientX, e.clientY);
-            sX = item.x; sY = item.y;
-        });
-        g.addEventListener('pointermove', e => {
-            if (!dragging) return;
-            const p = clientToPastureSvg(ctx.svg, e.clientX, e.clientY);
-            item.x = Math.max(14, Math.min(346, sX + (p.x - sP.x)));
-            item.y = Math.max(104, Math.min(174, sY + (p.y - sP.y)));
-            g.setAttribute('transform', `translate(${item.x}, ${item.y})`);
-        });
-        function endDrag(e) {
-            if (!dragging) return;
-            dragging = false;
-            g.classList.remove('dragging');
-            try { g.releasePointerCapture(e.pointerId); } catch (_) {}
-            savePastureItems(ctx.items);
-        }
-        g.addEventListener('pointerup', endDrag);
-        g.addEventListener('pointercancel', endDrag);
+        // Drag to move (shared helper saves the whole items array on commit)
+        makePastureDraggable(g, item, ctx.svg, () => savePastureItems(ctx.items));
     }
 
     return g;
@@ -594,6 +635,9 @@ function renderPasture() {
 
     // Fuller pasture (more items) → brighter scenery, capped at 12.
     buildPastureScenery(svg, Math.min(1, items.length / 12));
+
+    // Cow sits behind the planted items but is itself draggable in edit mode.
+    svg.appendChild(buildCowNode({ editing: pastureEditing, svg }));
 
     // Draw back-to-front: smaller y (further back) first.
     const ordered = items.slice().sort((a, b) => a.y - b.y);
