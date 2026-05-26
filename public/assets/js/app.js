@@ -32,6 +32,7 @@ function switchTab(tabId) {
     // a new day.
     if (tabId === 'you') {
         if (typeof updatePastureUI        === 'function') updatePastureUI();
+        if (typeof updatePrideUI          === 'function') updatePrideUI();
         if (typeof updateWeeklyReportUI   === 'function') updateWeeklyReportUI();
     }
 }
@@ -850,6 +851,100 @@ function setupPastureEdit() {
     });
 }
 window.setupPastureEdit = setupPastureEdit;
+
+// ============================================
+// Moments of pride — tiny achievement cards, derived from existing data
+// ============================================
+const PRIDE_SEEN_KEY = 'cowch-pride-seen';
+const LOW_WEATHER = ['partly-cloudy', 'cloudy', 'overcast', 'rainy', 'stormy', 'foggy'];
+
+function longestDayRun(daySet) {
+    if (!daySet.size) return 0;
+    const sorted = Array.from(daySet).sort();
+    let best = 1, run = 1;
+    for (let i = 1; i < sorted.length; i++) {
+        const prev = new Date(sorted[i - 1] + 'T00:00:00');
+        const cur = new Date(sorted[i] + 'T00:00:00');
+        if (Math.round((cur - prev) / 86400000) === 1) run++; else run = 1;
+        if (run > best) best = run;
+    }
+    return best;
+}
+
+function gatherPrideData() {
+    let checkins = [];
+    try { checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]'); } catch (_) {}
+    const difficultDays = new Set();
+    checkins.forEach(c => {
+        if (c && c.timestamp && LOW_WEATHER.indexOf(c.weather) !== -1) {
+            difficultDays.add(streakDayKey(new Date(c.timestamp)));
+        }
+    });
+
+    let goals = [];
+    try { goals = JSON.parse(localStorage.getItem('cowch_goals') || '[]'); } catch (_) {}
+
+    let exercises = new Set();
+    try {
+        JSON.parse(localStorage.getItem('cowch-activity-v1') || '[]').forEach(e => { if (e && e.name) exercises.add(e.name); });
+    } catch (_) {}
+
+    return {
+        checkinCount: checkins.length,
+        maxDifficultRun: longestDayRun(difficultDays),
+        goalsSet: goals.length,
+        goalsBloomed: goals.filter(g => g && g.completed).length,
+        visitDays: getPastureVisitDays(),
+        valuesChosen: !!localStorage.getItem('cowch-q-values'),
+        distinctExercises: exercises.size
+    };
+}
+
+const PRIDE_ACHIEVEMENTS = [
+    { key: 'first-checkin',   emoji: '🌤️', title: 'First check-in',        desc: 'You checked in with your inner weather.',          earned: d => d.checkinCount >= 1 },
+    { key: 'difficult-3',     emoji: '💪', title: 'Named hard feelings',    desc: 'Named a difficult feeling 3 days in a row.',       earned: d => d.maxDifficultRun >= 3 },
+    { key: 'weather-watcher', emoji: '🔭', title: 'Weather watcher',        desc: 'Checked in 7 times.',                              earned: d => d.checkinCount >= 7 },
+    { key: 'first-goal',      emoji: '🎯', title: 'First goal set',         desc: 'You named something to work toward.',              earned: d => d.goalsSet >= 1 },
+    { key: 'goal-bloomed',    emoji: '🌸', title: 'First goal bloomed',     desc: 'You completed a goal you set.',                    earned: d => d.goalsBloomed >= 1 },
+    { key: 'values-compass',  emoji: '🧭', title: 'Found your compass',     desc: 'You chose your top values.',                       earned: d => d.valuesChosen },
+    { key: 'one-week',        emoji: '🗓️', title: 'One week of showing up', desc: 'Visited on 7 different days.',                     earned: d => d.visitDays >= 7 },
+    { key: 'explorer',        emoji: '🧰', title: 'Explorer',               desc: 'Tried 3 different exercises.',                     earned: d => d.distinctExercises >= 3 }
+];
+
+function updatePrideUI() {
+    const card = document.getElementById('pride-card');
+    if (!card) return;
+    const grid = document.getElementById('pride-grid');
+    const countEl = document.getElementById('pride-count');
+
+    const data = gatherPrideData();
+    let seen = [];
+    try { seen = JSON.parse(localStorage.getItem(PRIDE_SEEN_KEY) || '[]'); } catch (_) {}
+    if (!Array.isArray(seen)) seen = [];
+
+    const earnedKeys = [];
+    grid.innerHTML = '';
+    PRIDE_ACHIEVEMENTS.forEach(a => {
+        const earned = !!a.earned(data);
+        if (earned) earnedKeys.push(a.key);
+        const isNew = earned && seen.indexOf(a.key) === -1;
+        const tile = document.createElement('div');
+        tile.className = 'pride-tile' + (earned ? ' earned' : '');
+        tile.innerHTML =
+            (isNew ? '<span class="pride-new">New</span>' : '') +
+            '<span class="emoji">' + a.emoji + '</span>' +
+            '<span class="title">' + a.title + '</span>' +
+            '<span class="desc">' + a.desc + '</span>';
+        grid.appendChild(tile);
+    });
+
+    countEl.textContent = earnedKeys.length + ' of ' + PRIDE_ACHIEVEMENTS.length;
+
+    // Remember which earned badges have now been shown, so the "New" ribbon
+    // only appears once per achievement.
+    try { localStorage.setItem(PRIDE_SEEN_KEY, JSON.stringify(earnedKeys)); } catch (_) {}
+}
+window.updatePrideUI = updatePrideUI;
 
 // ============================================
 // Weekly in-app report — rolling 7 days, derived from existing storage
@@ -2575,6 +2670,7 @@ function init() {
     updateDailySuggestion();
     updatePastureUI();
     setupPastureEdit();
+    updatePrideUI();
     updateWeeklyReportUI();
     setupReminders();
     setupTabNavigation();
