@@ -1977,6 +1977,30 @@
             to   { transform: scale(1); }
         }
 
+        /* Patterns I'm noticing */
+        .patterns-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .patterns-head h2 { font-size: 1.1rem; font-weight: 900; margin: 0 0 var(--space-md); }
+        .patterns-list { display: flex; flex-direction: column; gap: 10px; }
+        .pattern-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--coral);
+            border-radius: var(--radius-small);
+            padding: 10px 14px;
+        }
+        .pattern-item .pattern-emoji { font-size: 1.1rem; line-height: 1.4; flex-shrink: 0; }
+        .pattern-item .pattern-text { font-size: 0.95rem; color: var(--text-primary); line-height: 1.45; }
+        .patterns-empty { font-size: 0.92rem; color: var(--text-muted); font-style: italic; }
+
         /* Weekly report */
         .weekly-card {
             background: var(--bg-card);
@@ -4299,10 +4323,10 @@
                         <p>A gentle look at your journey</p>
                     </div>
 
-                    <!-- Your pasture — grows with every day you visit -->
+                    <!-- 1. Your Growing Pasture -->
                     <div class="pasture-card" id="pasture-card">
                         <div class="pasture-head">
-                            <h2>Your pasture</h2>
+                            <h2>Your Growing Pasture</h2>
                             <span class="pasture-vitality"><span class="num" id="pasture-count">0</span> things growing</span>
                         </div>
                         <p class="pasture-blurb" id="pasture-blurb">Every day you visit, something new grows here. Watch your pasture fill in over time.</p>
@@ -4315,20 +4339,10 @@
                         <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
                     </div>
 
-                    <!-- Moments of pride -->
-                    <div class="pride-card" id="pride-card">
-                        <div class="pride-head">
-                            <h2>Moments of pride</h2>
-                            <span class="pride-count" id="pride-count"></span>
-                        </div>
-                        <p class="pride-blurb">Tiny wins worth celebrating. They light up as you go.</p>
-                        <div class="pride-grid" id="pride-grid"></div>
-                    </div>
-
-                    <!-- Weekly report -->
+                    <!-- 2. Your Week in Bloom -->
                     <div class="weekly-card" id="weekly-card">
                         <div class="weekly-head">
-                            <h2>Your week</h2>
+                            <h2>Your Week in Bloom</h2>
                             <span class="weekly-range" id="weekly-range"></span>
                         </div>
                         <p class="weekly-headline" id="weekly-headline">Open the app a few times this week and your report will start to fill in.</p>
@@ -4341,6 +4355,25 @@
                         <div class="weekly-list" id="weekly-weather"></div>
                     </div>
 
+                    <!-- 3. Small Wins -->
+                    <div class="pride-card" id="pride-card">
+                        <div class="pride-head">
+                            <h2>Small Wins</h2>
+                            <span class="pride-count" id="pride-count"></span>
+                        </div>
+                        <p class="pride-blurb">Tiny wins worth celebrating. They light up as you go.</p>
+                        <div class="pride-grid" id="pride-grid"></div>
+                    </div>
+
+                    <!-- 4. Patterns I'm noticing -->
+                    <div class="patterns-card" id="patterns-card">
+                        <div class="patterns-head">
+                            <h2>Patterns I&rsquo;m noticing</h2>
+                        </div>
+                        <div class="patterns-list" id="patterns-list"></div>
+                    </div>
+
+                    <!-- 5. Your Tools -->
                     <div class="tools-section">
                         <h2>Your Tools</h2>
                         <div class="tool-cards">
@@ -6198,7 +6231,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=71"></script>
+    <script src="/assets/js/app.js?v=72"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a

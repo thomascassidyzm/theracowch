@@ -32,8 +32,9 @@ function switchTab(tabId) {
     // a new day.
     if (tabId === 'you') {
         if (typeof updatePastureUI        === 'function') updatePastureUI();
-        if (typeof updatePrideUI          === 'function') updatePrideUI();
         if (typeof updateWeeklyReportUI   === 'function') updateWeeklyReportUI();
+        if (typeof updatePrideUI          === 'function') updatePrideUI();
+        if (typeof updatePatternsUI       === 'function') updatePatternsUI();
     }
 }
 
@@ -1078,7 +1079,7 @@ function updateWeeklyReportUI() {
     const statTiles = [
         { num: showedUpDays + '/7', lbl: 'Days you showed up' },
         { num: checkins.length, lbl: 'Check-ins' },
-        { num: goalsAdded, lbl: 'Goals added' },
+        { num: goalsAdded, lbl: 'Goals growing' },
         { num: goalsDone, lbl: 'Goals bloomed' }
     ];
     statTiles.forEach(t => {
@@ -1133,6 +1134,105 @@ function updateWeeklyReportUI() {
     headline.textContent = buildWeeklyNarrative(wxEntries, showedUpDays);
 }
 window.updateWeeklyReportUI = updateWeeklyReportUI;
+
+// ============================================
+// Patterns I'm noticing — gentle, non-judgmental reflections from the week
+// ============================================
+function buildWeeklyPatterns() {
+    const weekDays = weeklyDaysWindow();
+    const inWeek = (ts) => {
+        if (!ts) return false;
+        const d = new Date(ts);
+        return !isNaN(d.getTime()) && weekDays.has(streakDayKey(d));
+    };
+
+    let checkins = [];
+    try { checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]'); } catch (_) {}
+    const weekCheckins = checkins.filter(c => c && inWeek(c.timestamp));
+    const wxCounts = {};
+    let hardDays = 0;
+    weekCheckins.forEach(c => {
+        wxCounts[c.weather] = (wxCounts[c.weather] || 0) + 1;
+        if (HARD_WEATHER.indexOf(c.weather) !== -1) hardDays++;
+    });
+    const wxSorted = Object.keys(wxCounts).map(k => ({ key: k, count: wxCounts[k] })).sort((a, b) => b.count - a.count);
+
+    const exCounts = {};
+    try {
+        JSON.parse(localStorage.getItem('cowch-activity-v1') || '[]').forEach(e => {
+            if (e && e.name && inWeek(e.at)) exCounts[e.name] = (exCounts[e.name] || 0) + 1;
+        });
+    } catch (_) {}
+    const exSorted = Object.keys(exCounts).map(k => ({ name: k, count: exCounts[k] })).sort((a, b) => b.count - a.count);
+
+    const showedUp = gatherActiveDays(7).size;
+    const patterns = [];
+
+    // Dominant weather
+    if (wxSorted[0] && wxSorted[0].count >= 2) {
+        const adj = WEATHER_WORDS[wxSorted[0].key] || wxSorted[0].key;
+        const cap = adj.charAt(0).toUpperCase() + adj.slice(1);
+        patterns.push({ emoji: '☁️', text: cap + ' weather visited often this week.' });
+    }
+
+    // A calming exercise leaned on during hard-weather days
+    const calming = ['grounding-54321', 'box-breathing', 'body-scan'];
+    const calmingUsed = exSorted.find(e => calming.indexOf(e.name) !== -1);
+    if (hardDays >= 1 && calmingUsed) {
+        const label = (EXERCISE_LABELS[calmingUsed.name] || { label: calmingUsed.name }).label;
+        patterns.push({ emoji: '🌿', text: label + ' helped on the harder days.' });
+    }
+
+    // Most-used exercise (if different from the calming one already noted)
+    if (exSorted[0] && exSorted[0].count >= 2 && (!calmingUsed || exSorted[0].name !== calmingUsed.name)) {
+        const label = (EXERCISE_LABELS[exSorted[0].name] || { label: exSorted[0].name }).label;
+        patterns.push({ emoji: '🔁', text: label + ' was something you kept reaching for.' });
+    }
+
+    // Showing up steadily
+    if (showedUp >= 5) {
+        patterns.push({ emoji: '🌱', text: 'You showed up most days — that steadiness adds up.' });
+    }
+
+    // Day-of-week dip
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const lowByDow = [0, 0, 0, 0, 0, 0, 0], totByDow = [0, 0, 0, 0, 0, 0, 0];
+    weekCheckins.forEach(c => {
+        const dow = new Date(c.timestamp).getDay();
+        totByDow[dow]++;
+        if (HARD_WEATHER.indexOf(c.weather) !== -1) lowByDow[dow]++;
+    });
+    for (let i = 0; i < 7; i++) {
+        if (totByDow[i] >= 2 && lowByDow[i] === totByDow[i]) {
+            patterns.push({ emoji: '📅', text: dayNames[i] + 's tended to feel heavier — worth a gentle eye.' });
+            break;
+        }
+    }
+
+    return patterns.slice(0, 3);
+}
+
+function updatePatternsUI() {
+    const card = document.getElementById('patterns-card');
+    if (!card) return;
+    const list = document.getElementById('patterns-list');
+    const patterns = buildWeeklyPatterns();
+    list.innerHTML = '';
+    if (patterns.length === 0) {
+        const e = document.createElement('div');
+        e.className = 'patterns-empty';
+        e.textContent = 'As you check in over the week, I’ll gently reflect any patterns back to you here.';
+        list.appendChild(e);
+        return;
+    }
+    patterns.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'pattern-item';
+        row.innerHTML = '<span class="pattern-emoji">' + p.emoji + '</span><span class="pattern-text">' + p.text + '</span>';
+        list.appendChild(row);
+    });
+}
+window.updatePatternsUI = updatePatternsUI;
 
 // ============================================
 // Daily reminders (gentle, customizable, 1–2/day, snoozable)
@@ -2701,8 +2801,9 @@ function init() {
     updateDailySuggestion();
     updatePastureUI();
     setupPastureEdit();
-    updatePrideUI();
     updateWeeklyReportUI();
+    updatePrideUI();
+    updatePatternsUI();
     setupReminders();
     setupTabNavigation();
     setupDomainPanel();
