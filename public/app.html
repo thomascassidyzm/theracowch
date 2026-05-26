@@ -1850,6 +1850,25 @@
         .pasture-item.editing { cursor: grab; touch-action: none; }
         .pasture-item.dragging { cursor: grabbing; }
         .pasture-hit { cursor: grab; }
+        /* Inner group floats; outer group keeps the SVG position translate */
+        .pasture-butterfly {
+            animation: butterflyFloat 5s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        @keyframes butterflyFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25%      { transform: translate(7px, -6px) rotate(8deg); }
+            50%      { transform: translate(14px, 1px) rotate(-6deg); }
+            75%      { transform: translate(6px, -4px) rotate(5deg); }
+        }
+        .pasture-tally {
+            margin-top: var(--space-md);
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .pasture-tally strong { color: var(--coral); font-weight: 900; }
         .pasture-grow-note {
             background: #FDF5E8;
             border-left: 4px solid #C9A857;
@@ -4228,6 +4247,7 @@
                             <button type="button" class="pasture-edit-btn" id="pasture-edit-btn">✥ Rearrange</button>
                             <span class="pasture-edit-hint" id="pasture-edit-hint" hidden>Drag to move · tap ✕ to remove</span>
                         </div>
+                        <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
                     </div>
 
                     <!-- Weekly report -->
@@ -6105,7 +6125,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=67"></script>
+    <script src="/assets/js/app.js?v=68"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a

@@ -305,6 +305,26 @@ const NS_SVG = 'http://www.w3.org/2000/svg';
 //    trees and grass tufts join in. Items are draggable + deletable. ──
 const PASTURE_ITEMS_KEY    = 'cowch-pasture-items-v1';
 const PASTURE_LASTGROW_KEY = 'cowch-pasture-lastgrow';
+const PASTURE_VISITDAYS_KEY = 'cowch-pasture-visitdays';
+const PASTURE_MILESTONES_SEEN_KEY = 'cowch-pasture-milestones-seen';
+
+// Time-based progression, measured in distinct days the user has grown the
+// pasture (one per visit-day). Layers ambient scenery on top of the daily
+// planted flowers/trees/grass.
+const PASTURE_MILESTONES = [
+    { key: 'butterflies', days: 15, note: '🦋 Butterflies have found your pasture!' },   // week 3
+    { key: 'featuretree', days: 22, note: '🌳 A grand tree has taken root in your pasture!' }, // week 4
+    { key: 'stream',      days: 29, note: '💧 A little stream now runs through your pasture.' }, // month 2
+    { key: 'birdhouse',   days: 57, note: '🏠 A birdhouse has appeared in your pasture!' }  // month 3
+];
+
+function getPastureVisitDays() {
+    try {
+        const n = parseInt(localStorage.getItem(PASTURE_VISITDAYS_KEY), 10);
+        if (Number.isInteger(n) && n >= 0) return n;
+    } catch (_) {}
+    return 0;
+}
 const PASTURE_FLOWER_COLORS = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF',
                                '#FFC1A4', '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
 
@@ -333,13 +353,17 @@ function randomPasturePosition() {
     return { x: 26 + Math.random() * 308, y: 116 + Math.random() * 50 };
 }
 
-// Adds one item if today is a new calendar day since the last growth. Returns
-// the new item or null.
+// Adds one item if today is a new calendar day since the last growth, and
+// ticks the monotonic visit-day counter that drives milestone unlocks.
+// Returns { item, visitDays } or null if nothing happened today.
 function maybeGrowPasture() {
     const todayKey = streakDayKey(new Date());
     let last = null;
     try { last = localStorage.getItem(PASTURE_LASTGROW_KEY); } catch (_) {}
     if (last === todayKey) return null;
+
+    const visitDays = getPastureVisitDays() + 1;
+    try { localStorage.setItem(PASTURE_VISITDAYS_KEY, String(visitDays)); } catch (_) {}
 
     const items = loadPastureItems();
     const type = nextPastureItemType(items.length + 1);
@@ -357,7 +381,26 @@ function maybeGrowPasture() {
     items.push(item);
     savePastureItems(items);
     try { localStorage.setItem(PASTURE_LASTGROW_KEY, todayKey); } catch (_) {}
-    return item;
+    return { item, visitDays };
+}
+
+// Returns the note for the highest not-yet-announced milestone the user has
+// now reached, or null. Marks it announced.
+function pendingPastureMilestoneNote(visitDays) {
+    let seen = [];
+    try { seen = JSON.parse(localStorage.getItem(PASTURE_MILESTONES_SEEN_KEY) || '[]'); } catch (_) {}
+    if (!Array.isArray(seen)) seen = [];
+    let note = null;
+    PASTURE_MILESTONES.forEach(m => {
+        if (visitDays >= m.days && seen.indexOf(m.key) === -1) {
+            seen.push(m.key);
+            note = m.note; // last (highest) crossed wins the headline
+        }
+    });
+    if (note) {
+        try { localStorage.setItem(PASTURE_MILESTONES_SEEN_KEY, JSON.stringify(seen)); } catch (_) {}
+    }
+    return note;
 }
 
 // ── Drawing helpers: each draws into a group whose origin (0,0) is the
@@ -626,15 +669,87 @@ function buildPastureItemNode(item, ctx) {
     return g;
 }
 
+// Ambient milestone scenery that sits BEHIND the planted items + cow.
+function renderPastureBackFeatures(svg, visitDays) {
+    // Month 2: a little stream across the lower pasture
+    if (visitDays >= 29) {
+        const stream = document.createElementNS(NS_SVG, 'path');
+        stream.setAttribute('d', 'M -10 150 Q 80 142 150 156 T 370 150 L 370 174 Q 220 166 150 172 Q 70 177 -10 168 Z');
+        stream.setAttribute('fill', '#9CD3E8');
+        stream.setAttribute('opacity', '0.9');
+        svg.appendChild(stream);
+        const shine = document.createElementNS(NS_SVG, 'path');
+        shine.setAttribute('d', 'M 20 156 Q 90 150 150 160 T 340 156');
+        shine.setAttribute('stroke', '#D6EEF7');
+        shine.setAttribute('stroke-width', '2');
+        shine.setAttribute('fill', 'none');
+        shine.setAttribute('opacity', '0.8');
+        svg.appendChild(shine);
+    }
+    // Week 4: a grand feature tree on the right
+    if (visitDays >= 22) {
+        const g = document.createElementNS(NS_SVG, 'g');
+        g.setAttribute('transform', 'translate(322, 108)');
+        g.innerHTML = `
+            <rect x="-4" y="-2" width="8" height="30" rx="3" fill="#6B4B30"/>
+            <circle cx="0" cy="-12" r="17" fill="#5FA46B"/>
+            <circle cx="-13" cy="-3" r="12" fill="#4F8F60"/>
+            <circle cx="13" cy="-3" r="12" fill="#6FB37A"/>
+            <circle cx="0" cy="-24" r="12" fill="#76B47E"/>`;
+        svg.appendChild(g);
+    }
+    // Month 3: a birdhouse on a post, left side
+    if (visitDays >= 57) {
+        const g = document.createElementNS(NS_SVG, 'g');
+        g.setAttribute('transform', 'translate(36, 104)');
+        g.innerHTML = `
+            <rect x="-1.5" y="0" width="3" height="40" fill="#7A6253"/>
+            <polygon points="-13,-12 13,-12 0,-25" fill="#9B6B43"/>
+            <rect x="-11" y="-12" width="22" height="18" rx="2" fill="#C98A5E"/>
+            <circle cx="0" cy="-2" r="4" fill="#3C2E28"/>
+            <rect x="-1" y="6" width="2" height="6" fill="#7A6253"/>`;
+        svg.appendChild(g);
+    }
+}
+
+// Butterflies fly in FRONT of everything (week 3+).
+function renderPastureButterflies(svg, visitDays) {
+    if (visitDays < 15) return;
+    const spots = [{ x: 120, y: 66 }, { x: 250, y: 58 }, { x: 300, y: 92 }];
+    const colors = ['#F7B2C5', '#FFD56B', '#D9A6F0'];
+    const count = visitDays >= 29 ? 3 : 2;
+    for (let i = 0; i < count; i++) {
+        const s = spots[i];
+        const outer = document.createElementNS(NS_SVG, 'g');
+        outer.setAttribute('transform', `translate(${s.x}, ${s.y})`);
+        const inner = document.createElementNS(NS_SVG, 'g');
+        inner.setAttribute('class', 'pasture-butterfly');
+        inner.style.animationDelay = (i * 1.3) + 's';
+        const c = colors[i % colors.length];
+        inner.innerHTML = `
+            <ellipse cx="-2.6" cy="-1" rx="2.6" ry="3.4" fill="${c}"/>
+            <ellipse cx="2.6" cy="-1" rx="2.6" ry="3.4" fill="${c}"/>
+            <ellipse cx="-2.2" cy="2.5" rx="2" ry="2.4" fill="${c}" opacity="0.85"/>
+            <ellipse cx="2.2" cy="2.5" rx="2" ry="2.4" fill="${c}" opacity="0.85"/>
+            <line x1="0" y1="-3.5" x2="0" y2="3.5" stroke="#3C2E28" stroke-width="1"/>`;
+        outer.appendChild(inner);
+        svg.appendChild(outer);
+    }
+}
+
 function renderPasture() {
     const svg = document.getElementById('pasture-svg');
     if (!svg) return;
     const items = loadPastureItems();
+    const visitDays = getPastureVisitDays();
     svg.innerHTML = '';
     svg.classList.toggle('editing', pastureEditing);
 
     // Fuller pasture (more items) → brighter scenery, capped at 12.
     buildPastureScenery(svg, Math.min(1, items.length / 12));
+
+    // Milestone scenery behind the cow + items.
+    renderPastureBackFeatures(svg, visitDays);
 
     // Cow sits behind the planted items but is itself draggable in edit mode.
     svg.appendChild(buildCowNode({ editing: pastureEditing, svg }));
@@ -658,6 +773,9 @@ function renderPasture() {
         node.style.animationDelay = (i * 0.04) + 's';
         svg.appendChild(node);
     });
+
+    // Butterflies flutter in front of everything.
+    renderPastureButterflies(svg, visitDays);
 }
 
 function updatePastureUI() {
@@ -666,17 +784,35 @@ function updatePastureUI() {
     const countEl = document.getElementById('pasture-count');
     const blurb = document.getElementById('pasture-blurb');
     const growNote = document.getElementById('pasture-grow-note');
+    const tallyEl = document.getElementById('pasture-tally');
+
+    // One-time backfill: users who had a pasture before visit-day tracking
+    // get their counter seeded from their existing item count.
+    try {
+        if (localStorage.getItem(PASTURE_VISITDAYS_KEY) === null) {
+            const existing = loadPastureItems().length;
+            if (existing > 0) localStorage.setItem(PASTURE_VISITDAYS_KEY, String(existing));
+        }
+    } catch (_) {}
 
     const grown = maybeGrowPasture();
     const items = loadPastureItems();
+    const visitDays = getPastureVisitDays();
     if (countEl) countEl.textContent = items.length;
 
-    if (grown && growNote) {
-        const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿' };
-        growNote.hidden = false;
-        growNote.textContent = 'Today your pasture grew ' + (labelByType[grown.type] || 'something new') + '!';
-    } else if (growNote) {
-        growNote.hidden = true;
+    if (growNote) {
+        // A freshly-crossed milestone takes priority over the daily grow note.
+        const milestoneNote = grown ? pendingPastureMilestoneNote(visitDays) : null;
+        if (milestoneNote) {
+            growNote.hidden = false;
+            growNote.textContent = milestoneNote;
+        } else if (grown) {
+            const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿' };
+            growNote.hidden = false;
+            growNote.textContent = 'Today your pasture grew ' + (labelByType[grown.item.type] || 'something new') + '!';
+        } else {
+            growNote.hidden = true;
+        }
     }
 
     if (blurb) {
@@ -685,8 +821,16 @@ function updatePastureUI() {
         } else if (items.length === 1) {
             blurb.textContent = 'Your first sprout! Come back tomorrow and the pasture keeps growing.';
         } else {
-            blurb.textContent = items.length + ' things growing. Tap “Rearrange” to move or remove anything.';
+            const next = PASTURE_MILESTONES.find(m => visitDays < m.days);
+            const nextHint = next ? ' Keep visiting — more appears as the weeks go by.' : '';
+            blurb.textContent = items.length + ' things growing. Tap “Rearrange” to move or remove anything.' + nextHint;
         }
+    }
+
+    // Tally of distinct days the user has shown up.
+    if (tallyEl) {
+        const n = Math.max(visitDays, items.length);
+        tallyEl.innerHTML = 'You have shown up <strong>' + n + '</strong> time' + (n === 1 ? '' : 's') + ' so far. Investing in yourself is good for you 🤩';
     }
 
     renderPasture();
