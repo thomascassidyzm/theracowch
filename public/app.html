@@ -83,7 +83,7 @@
             align-items: center;
             gap: var(--space-lg);
             margin-bottom: var(--space-2xl);
-            padding-right: min(300px, 56vw);
+            padding-right: min(230px, 46vw);
             animation: slideRight 0.7s ease-out;
         }
 
@@ -151,8 +151,8 @@
             position: absolute;
             top: 0;
             right: var(--space-md);
-            width: min(300px, 56vw);
-            min-height: calc(min(300px, 56vw) * 0.95);
+            width: min(230px, 46vw);
+            min-height: calc(min(230px, 46vw) * 0.92);
             animation: slideUp 0.7s ease-out 0.2s both, cloudFloat 6s ease-in-out 1s infinite;
             transition: transform var(--transition-brutal);
             z-index: 2;
@@ -185,8 +185,18 @@
         .daily-thought-content {
             position: relative;
             z-index: 1;
-            padding: 22% 14% 20% 14%;
+            padding: 17% 13% 15% 13%;
             text-align: center;
+        }
+
+        .daily-thought-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #C9A857;
+            display: block;
+            margin: 0 auto 5px;
         }
 
         .daily-thought-label {
@@ -3372,26 +3382,19 @@
 
         @media (max-width: 480px) {
             .greeting-section {
-                flex-direction: column;
-                align-items: flex-start;
                 gap: var(--space-md);
-                padding-right: min(220px, 56vw);
-            }
-
-            .avatar-container {
-                width: 70px;
-                height: 70px;
-                font-size: 2.5rem;
+                padding-right: min(180px, 46vw);
             }
 
             .daily-thought {
-                width: min(220px, 56vw);
-                min-height: calc(min(220px, 56vw) * 1.0);
+                width: min(180px, 46vw);
+                min-height: calc(min(180px, 46vw) * 1.05);
             }
 
             .daily-thought-content {
-                padding: 18% 13% 16% 13%;
+                padding: 15% 12% 14% 12%;
             }
+            .daily-thought-logo { width: 26px; height: 26px; }
 
             .imagine-mini-letter {
                 width: 40px;
@@ -3865,9 +3868,6 @@
                 <div class="home-tab">
                     <!-- Greeting with Mandy Avatar -->
                     <div class="greeting-section">
-                        <div class="avatar-container">
-                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="avatar-img">
-                        </div>
                         <div class="greeting-text-wrapper">
                             <h1 id="greeting-text">good morning</h1>
                             <p>Hi, how is your day going?</p>
@@ -3895,6 +3895,7 @@
                             </g>
                         </svg>
                         <div class="daily-thought-content">
+                            <img src="/icons/cowch-icon.svg" alt="Mandy" class="daily-thought-logo">
                             <div class="daily-thought-label">Mandy's thought for you</div>
                             <p class="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</p>
                             <a class="daily-suggestion" id="daily-suggestion" href="#">
