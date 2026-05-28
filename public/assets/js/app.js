@@ -1027,6 +1027,8 @@ function updateWeeklyReportUI() {
     const stats = document.getElementById('weekly-stats');
     const exList = document.getElementById('weekly-exercises');
     const wxList = document.getElementById('weekly-weather');
+    const goalsTitle = document.getElementById('weekly-goals-title');
+    const goalsList = document.getElementById('weekly-goals');
 
     const today = new Date();
     const start = new Date(today); start.setDate(start.getDate() - 6);
@@ -1052,13 +1054,25 @@ function updateWeeklyReportUI() {
         });
     } catch (_) {}
 
-    // Goals added/completed
+    // Goals added/completed — keep the names so we can list them, not just count.
     let goalsAdded = 0, goalsDone = 0;
+    const bloomedGoals = [];   // completed this week
+    const newGoals = [];       // started this week and not yet completed
     try {
         const goals = JSON.parse(localStorage.getItem('cowch_goals') || '[]');
         goals.forEach(g => {
-            if (inWeek(g && g.timestamp)) goalsAdded++;
-            if (g && g.completed && inWeek(g.completedAt)) goalsDone++;
+            if (!g) return;
+            const title = (g.specific || g.text || '').trim();
+            const type = (g.type || 'long') === 'short' ? 'short' : 'long';
+            const startedThisWeek = inWeek(g.timestamp);
+            const bloomedThisWeek = g.completed && inWeek(g.completedAt);
+            if (startedThisWeek) goalsAdded++;
+            if (bloomedThisWeek) {
+                goalsDone++;
+                if (title) bloomedGoals.push({ title, type });
+            } else if (startedThisWeek && !g.completed && title) {
+                newGoals.push({ title, type });
+            }
         });
     } catch (_) {}
 
@@ -1088,6 +1102,34 @@ function updateWeeklyReportUI() {
         tile.innerHTML = '<div class="num">' + t.num + '</div><div class="lbl">' + t.lbl + '</div>';
         stats.appendChild(tile);
     });
+
+    // Goals in bloom — list the actual goals (bloomed first, then new) rather
+    // than leaving it as a bare count.
+    const escG = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (goalsList && goalsTitle) {
+        goalsList.innerHTML = '';
+        const hasAny = bloomedGoals.length || newGoals.length;
+        goalsTitle.hidden = !hasAny;
+        bloomedGoals.forEach(g => {
+            const row = document.createElement('div');
+            row.className = 'weekly-goal-row';
+            row.innerHTML =
+                '<span class="g-emoji">' + (g.type === 'short' ? '🌸' : '🍎') + '</span>' +
+                '<span class="g-body"><span class="g-title">' + escG(g.title) + '</span>' +
+                '<span class="g-meta">bloomed this week</span></span>';
+            goalsList.appendChild(row);
+        });
+        newGoals.forEach(g => {
+            const row = document.createElement('div');
+            row.className = 'weekly-goal-row is-new';
+            row.innerHTML =
+                '<span class="g-emoji">🌱</span>' +
+                '<span class="g-body"><span class="g-title">' + escG(g.title) + '</span>' +
+                '<span class="g-meta">' + (g.type === 'short' ? 'short-term' : 'long-term') + ' goal, started this week</span></span>';
+            goalsList.appendChild(row);
+        });
+    }
 
     // Exercises list
     const exEntries = Object.keys(exCounts)
