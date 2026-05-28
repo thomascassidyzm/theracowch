@@ -82,8 +82,11 @@
             display: flex;
             align-items: center;
             gap: var(--space-lg);
-            margin-bottom: var(--space-2xl);
+            margin-bottom: var(--space-md);
             padding-right: min(230px, 46vw);
+            /* Reserve the cloud's full height so the absolutely-positioned
+               cloud never overlaps the buttons below it. */
+            min-height: calc(min(230px, 46vw) * 0.92);
             animation: slideRight 0.7s ease-out;
         }
 
@@ -3436,6 +3439,7 @@
             .greeting-section {
                 gap: var(--space-md);
                 padding-right: min(180px, 46vw);
+                min-height: calc(min(180px, 46vw) * 1.05);
             }
 
             .avatar-container {
