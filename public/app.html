@@ -1922,71 +1922,6 @@
         }
         .pasture-delete-badge { cursor: pointer; }
 
-        /* Moments of pride */
-        .pride-card {
-            background: var(--bg-card);
-            border: var(--border-thicc) solid var(--border-warm);
-            border-radius: var(--radius-chunky);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
-            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
-        }
-        .pride-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: var(--space-md);
-            margin-bottom: 4px;
-        }
-        .pride-head h2 { font-size: 1.1rem; font-weight: 900; margin: 0; }
-        .pride-count { font-size: 0.82rem; font-weight: 800; color: var(--coral); white-space: nowrap; }
-        .pride-blurb { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 var(--space-md); }
-        .pride-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-        }
-        .pride-tile {
-            position: relative;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-warm);
-            border-radius: var(--radius-medium);
-            padding: 12px 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            opacity: 0.5;
-            transition: all 0.2s;
-        }
-        .pride-tile.earned {
-            opacity: 1;
-            border-color: var(--coral);
-            background: #FFF1E5;
-        }
-        .pride-tile .emoji { font-size: 1.7rem; line-height: 1; filter: grayscale(70%); }
-        .pride-tile.earned .emoji { filter: none; }
-        .pride-tile .title { font-weight: 900; font-size: 0.92rem; color: var(--text-primary); }
-        .pride-tile .desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; }
-        .pride-tile .pride-new {
-            position: absolute;
-            top: -8px;
-            right: -6px;
-            background: var(--coral);
-            color: var(--text-on-coral, #fff);
-            font-size: 0.62rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 2px 7px;
-            border-radius: 999px;
-            box-shadow: 0 2px 4px rgba(60,46,40,0.25);
-            animation: prideNewPop 0.5s ease-out;
-        }
-        @keyframes prideNewPop {
-            from { transform: scale(0); }
-            to   { transform: scale(1); }
-        }
-
         /* Patterns I'm noticing */
         .patterns-card {
             background: var(--bg-card);
@@ -4423,17 +4358,7 @@
                         <div class="weekly-list" id="weekly-weather"></div>
                     </div>
 
-                    <!-- 3. Small Wins -->
-                    <div class="pride-card" id="pride-card">
-                        <div class="pride-head">
-                            <h2>Small Wins</h2>
-                            <span class="pride-count" id="pride-count"></span>
-                        </div>
-                        <p class="pride-blurb">Tiny wins worth celebrating. They light up as you go.</p>
-                        <div class="pride-grid" id="pride-grid"></div>
-                    </div>
-
-                    <!-- 4. Patterns I'm noticing -->
+                    <!-- 3. Patterns I'm noticing -->
                     <div class="patterns-card" id="patterns-card">
                         <div class="patterns-head">
                             <h2>Patterns I&rsquo;m noticing</h2>
@@ -6300,7 +6225,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=75"></script>
+    <script src="/assets/js/app.js?v=76"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a
