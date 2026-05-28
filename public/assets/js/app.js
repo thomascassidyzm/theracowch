@@ -2329,17 +2329,15 @@ function renderChoiceTree() {
         completedCount > 0 ? (totalCount + ' goals · ' + completedCount + ' blooming') : totalCount;
 
     const svg = document.getElementById('choice-tree-svg');
-    const leavesGroup   = document.getElementById('choice-leaves');
+    const groundGroup   = document.getElementById('choice-ground');
+    const trunkGroup    = document.getElementById('choice-trunk');
     const branchesGroup = document.getElementById('choice-branches');
-    leavesGroup.innerHTML = '';
-    branchesGroup.innerHTML = '';
+    const leavesGroup   = document.getElementById('choice-leaves');
+    [groundGroup, trunkGroup, branchesGroup, leavesGroup].forEach(g => { if (g) g.innerHTML = ''; });
 
     const season = getGoalsSeason();
     const palette = GOAL_SEASON_PALETTE[season];
     svg.setAttribute('data-season', season);
-    // Trunk takes the seasonal accent
-    const trunk = svg.querySelector('.choice-tree-trunk');
-    if (trunk) trunk.setAttribute('fill', palette.trunk);
 
     // Season label (cached element, recreated if absent)
     let seasonLabel = document.getElementById('choice-season-label');
@@ -2351,73 +2349,74 @@ function renderChoiceTree() {
     }
     seasonLabel.textContent = palette.label;
 
-    function addBranch(x1, y1, x2, y2, extraClass) {
-        const b = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        b.setAttribute('class', 'choice-tree-branch' + (extraClass ? ' ' + extraClass : ''));
-        b.setAttribute('x1', x1); b.setAttribute('y1', y1);
-        b.setAttribute('x2', x2); b.setAttribute('y2', y2);
-        branchesGroup.appendChild(b);
+    const NS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs) {
+        const e = document.createElementNS(NS, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
     }
-    function addLeaf(cx, cy, r, extraClass, idx, fill) {
-        const l = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        l.setAttribute('class', 'choice-tree-leaf' + (extraClass ? ' ' + extraClass : ''));
-        l.setAttribute('cx', cx); l.setAttribute('cy', cy);
-        l.setAttribute('r', r);
-        if (fill) l.setAttribute('fill', fill);
-        l.style.animationDelay = (idx * 0.05) + 's';
-        leavesGroup.appendChild(l);
+
+    // ── Ground + grass ──
+    groundGroup.appendChild(el('ellipse', { cx: 150, cy: 398, rx: 132, ry: 15, fill: '#86B05F', opacity: 0.55 }));
+    groundGroup.appendChild(el('ellipse', { cx: 150, cy: 393, rx: 104, ry: 13, fill: '#9CC07A', opacity: 0.6 }));
+    [104, 128, 172, 196].forEach(gx => {
+        groundGroup.appendChild(el('path', { d: `M ${gx} 394 q -2 -8 1 -12`, stroke: '#6FA052', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }));
+        groundGroup.appendChild(el('path', { d: `M ${gx + 5} 394 q 2 -7 -1 -11`, stroke: '#6FA052', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }));
+    });
+
+    // ── Tapered trunk + root flares + bark line ──
+    trunkGroup.appendChild(el('path', {
+        d: 'M 134 396 C 132 358 140 318 144 288 C 145 274 146 262 146 250 L 154 250 C 154 262 155 274 156 288 C 160 318 168 358 166 396 Z',
+        fill: palette.trunk
+    }));
+    trunkGroup.appendChild(el('path', { d: 'M 140 392 C 128 392 120 396 110 400 C 124 398 134 396 142 396 Z', fill: palette.trunk }));
+    trunkGroup.appendChild(el('path', { d: 'M 160 392 C 172 392 180 396 190 400 C 176 398 166 396 158 396 Z', fill: palette.trunk }));
+    trunkGroup.appendChild(el('path', { d: 'M 150 388 C 149 356 150 318 150 282', stroke: 'rgba(0,0,0,0.12)', 'stroke-width': 1.5, fill: 'none' }));
+
+    // ── Soft decorative canopy behind the goal flowers, so the tree has body ──
+    const canopyColor = palette.leafLong[0];
+    [{ x: 150, y: 232, r: 36 }, { x: 108, y: 252, r: 26 }, { x: 192, y: 252, r: 26 },
+     { x: 150, y: 262, r: 28 }, { x: 124, y: 232, r: 22 }, { x: 176, y: 232, r: 22 }].forEach(c => {
+        branchesGroup.appendChild(el('circle', { cx: c.x, cy: c.y, r: c.r, fill: canopyColor, opacity: 0.16 }));
+    });
+
+    function addBranch(x1, y1, x2, y2, w) {
+        branchesGroup.appendChild(el('line', {
+            x1, y1, x2, y2, stroke: palette.trunk, 'stroke-width': w || 4, 'stroke-linecap': 'round'
+        }));
     }
-    function addFlower(cx, cy, idx) {
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('class', 'choice-tree-flower');
-        g.setAttribute('transform', 'translate(' + cx + ', ' + cy + ')');
+
+    // A proper little flower. `full` = a fuller double-layer bloom (completed).
+    function addFlower(cx, cy, idx, full) {
+        const g = el('g', { class: 'choice-tree-flower', transform: 'translate(' + cx + ', ' + cy + ')' });
         g.style.animationDelay = (idx * 0.05) + 's';
-        const petalColor = palette.flower[idx % palette.flower.length];
-        const petalR = 3.2;
-        const offset = 3.6;
+        const color = palette.flower[idx % palette.flower.length];
+        const petalR = full ? 3.8 : 3.0;
+        const offset = full ? 4.4 : 3.6;
+        if (full) {
+            for (let p = 0; p < 5; p++) {
+                const a = (p / 5) * Math.PI * 2 - Math.PI / 2 + 0.34;
+                g.appendChild(el('circle', { cx: Math.cos(a) * offset, cy: Math.sin(a) * offset, r: petalR * 0.8, fill: color, opacity: 0.7 }));
+            }
+        }
         for (let p = 0; p < 5; p++) {
             const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
-            const px = Math.cos(a) * offset;
-            const py = Math.sin(a) * offset;
-            const petal = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            petal.setAttribute('cx', px); petal.setAttribute('cy', py);
-            petal.setAttribute('r', petalR);
-            petal.setAttribute('fill', petalColor);
-            g.appendChild(petal);
+            g.appendChild(el('circle', { cx: Math.cos(a) * offset, cy: Math.sin(a) * offset, r: petalR, fill: color }));
         }
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('r', 2);
-        c.setAttribute('fill', '#C9A857');
-        g.appendChild(c);
+        g.appendChild(el('circle', { cx: 0, cy: 0, r: full ? 2.2 : 1.8, fill: '#C9A857' }));
         leavesGroup.appendChild(g);
     }
+
     function addFruit(cx, cy, idx) {
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('class', 'choice-tree-fruit');
-        g.setAttribute('transform', 'translate(' + cx + ', ' + cy + ')');
+        const g = el('g', { class: 'choice-tree-fruit', transform: 'translate(' + cx + ', ' + cy + ')' });
         g.style.animationDelay = (idx * 0.05) + 's';
         const fruitColor = palette.fruit[idx % palette.fruit.length];
-        // Stem
-        const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        stem.setAttribute('x1', 0); stem.setAttribute('y1', -10);
-        stem.setAttribute('x2', 0); stem.setAttribute('y2', -6);
-        stem.setAttribute('stroke', palette.trunk);
-        stem.setAttribute('stroke-width', 1.6);
-        stem.setAttribute('stroke-linecap', 'round');
-        g.appendChild(stem);
-        // Tiny leaf on the stem
-        const stemLeaf = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        stemLeaf.setAttribute('cx', 3); stemLeaf.setAttribute('cy', -8);
-        stemLeaf.setAttribute('rx', 2.5); stemLeaf.setAttribute('ry', 1.2);
-        stemLeaf.setAttribute('fill', season === 'autumn' ? '#9C5A2A' : '#5B9D6A');
+        g.appendChild(el('line', { x1: 0, y1: -10, x2: 0, y2: -6, stroke: palette.trunk, 'stroke-width': 1.6, 'stroke-linecap': 'round' }));
+        const stemLeaf = el('ellipse', { cx: 3, cy: -8, rx: 2.5, ry: 1.2, fill: season === 'autumn' ? '#9C5A2A' : '#5B9D6A' });
         stemLeaf.setAttribute('transform', 'rotate(30 3 -8)');
         g.appendChild(stemLeaf);
-        // Body
-        const body = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        body.setAttribute('cx', 0); body.setAttribute('cy', 0);
-        body.setAttribute('r', 7);
-        body.setAttribute('fill', fruitColor);
-        g.appendChild(body);
+        g.appendChild(el('circle', { cx: 0, cy: 0, r: 7, fill: fruitColor }));
+        g.appendChild(el('ellipse', { cx: -2.2, cy: -2, rx: 1.6, ry: 2.2, fill: '#FFFFFF', opacity: 0.35 }));
         leavesGroup.appendChild(g);
     }
 
@@ -2425,9 +2424,9 @@ function renderChoiceTree() {
     const longs  = goals.filter(g => (g.type || 'long') !== 'short');
     const shorts = goals.filter(g => (g.type || 'long') === 'short');
 
-    // ── Long-term: tall branches fanning from the top of the trunk (150, 250) ──
+    // ── Long-term: tall branches fanning from the top of the trunk ──
     const trunkTopX = 150;
-    const trunkTopY = 250;
+    const trunkTopY = 252;
     longs.forEach((g, i) => {
         const layer = Math.floor(i / 6);
         const slot  = i % 6;
@@ -2436,31 +2435,26 @@ function renderChoiceTree() {
         const length = 130 + layer * 28;
         const x2 = trunkTopX + Math.cos(rad) * length;
         const y2 = trunkTopY + Math.sin(rad) * length;
-        addBranch(trunkTopX, trunkTopY, x2, y2, 'long');
-        if (g.completed) {
-            addFruit(x2, y2, i);
-        } else {
-            const fill = palette.leafLong[i % palette.leafLong.length];
-            addLeaf(x2, y2, 11, 'long', i, fill);
-        }
+        addBranch(trunkTopX, trunkTopY, x2, y2, 5);
+        // a small sub-twig partway along, for detail
+        const mx = trunkTopX + (x2 - trunkTopX) * 0.55;
+        const my = trunkTopY + (y2 - trunkTopY) * 0.55;
+        addBranch(mx, my, mx + (x2 - trunkTopX) * 0.16, my - 12, 2.5);
+        if (g.completed) addFruit(x2, y2, i);
+        else addFlower(x2, y2, i, false);
     });
 
     // ── Short-term: small twigs along the trunk ──
     shorts.forEach((g, i) => {
-        const trunkY = 280 + (i * 14);
+        const trunkY = 282 + (i * 14);
         const yClamped = Math.min(trunkY, 388);
         const side = (i % 2 === 0) ? -1 : 1;
         const length = 26 + (i % 3) * 6;
-        const x1 = 150 + side * 12;
+        const x1 = 150 + side * 11;
         const x2 = x1 + side * length;
         const y2 = yClamped - 10;
-        addBranch(x1, yClamped, x2, y2, 'short');
-        if (g.completed) {
-            addFlower(x2, y2, i);
-        } else {
-            const fill = palette.leafShort[i % palette.leafShort.length];
-            addLeaf(x2, y2, 6, 'short', i, fill);
-        }
+        addBranch(x1, yClamped, x2, y2, 3);
+        addFlower(x2, y2, i, !!g.completed);
     });
 }
 
