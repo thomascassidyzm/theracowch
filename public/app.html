@@ -2865,6 +2865,45 @@
             background: #DEEBE0;
             color: #2A4D2F;
         }
+        .goal-item-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .goal-item-actions .goal-complete-btn { margin-top: 0; }
+        .goal-delete-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border: 2px solid #E0A99A;
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #A23E28;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .goal-delete-btn:hover { background: #FBE6DF; }
+        .goal-clear-btn {
+            display: block;
+            width: 100%;
+            margin-top: var(--space-md);
+            padding: 10px;
+            background: var(--bg-card);
+            border: 2px dashed #C99A8C;
+            border-radius: var(--radius-small);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #A23E28;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .goal-clear-btn:hover { background: #FBE6DF; }
 
         /* SMART goal form */
         .goal-term-toggle {
@@ -6237,7 +6276,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=72"></script>
+    <script src="/assets/js/app.js?v=73"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a

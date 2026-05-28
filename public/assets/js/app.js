@@ -2167,10 +2167,31 @@ function setupGoalCompleteDelegate() {
     if (!container || container.dataset.goalToggleBound === '1') return;
     container.dataset.goalToggleBound = '1';
     container.addEventListener('click', function (e) {
-        const btn = e.target && e.target.closest && e.target.closest('[data-goal-toggle]');
-        if (!btn) return;
-        const idx = parseInt(btn.getAttribute('data-goal-toggle'), 10);
-        if (Number.isInteger(idx)) toggleGoalCompleted(idx);
+        if (!e.target || !e.target.closest) return;
+
+        const toggleBtn = e.target.closest('[data-goal-toggle]');
+        if (toggleBtn) {
+            const idx = parseInt(toggleBtn.getAttribute('data-goal-toggle'), 10);
+            if (Number.isInteger(idx)) toggleGoalCompleted(idx);
+            return;
+        }
+
+        const delBtn = e.target.closest('[data-goal-delete]');
+        if (delBtn) {
+            const idx = parseInt(delBtn.getAttribute('data-goal-delete'), 10);
+            if (Number.isInteger(idx) && confirm('Delete this goal? This can’t be undone.')) {
+                deleteGoal(idx);
+            }
+            return;
+        }
+
+        const clearBtn = e.target.closest('[data-goal-clear]');
+        if (clearBtn) {
+            if (confirm('Start again? This removes all your goals and clears the tree. This can’t be undone.')) {
+                clearAllGoals();
+            }
+            return;
+        }
     });
 }
 
@@ -2508,13 +2529,17 @@ function renderChoiceHistory() {
                 </div>
                 <div class="goal-item-meta">Added ${escapeHtml(g.date || '')}${due}</div>
                 ${detailRows}
-                <button type="button" class="goal-complete-btn${g.completed ? ' completed' : ''}" data-goal-toggle="${g._idx}">
-                    ${buttonLabel}
-                </button>
+                <div class="goal-item-actions">
+                    <button type="button" class="goal-complete-btn${g.completed ? ' completed' : ''}" data-goal-toggle="${g._idx}">
+                        ${buttonLabel}
+                    </button>
+                    <button type="button" class="goal-delete-btn" data-goal-delete="${g._idx}">🗑 Delete</button>
+                </div>
             </div>`;
     }).join('');
 
-    container.innerHTML = html;
+    container.innerHTML = html +
+        '<button type="button" class="goal-clear-btn" data-goal-clear="1">Start again &mdash; clear all goals</button>';
 }
 
 // Toggle a goal's completed flag and refresh both tree + history.
@@ -2534,6 +2559,25 @@ function toggleGoalCompleted(idx) {
     renderChoiceHistory();
 }
 window.toggleGoalCompleted = toggleGoalCompleted;
+
+// Delete a single goal by its original index.
+function deleteGoal(idx) {
+    const goals = JSON.parse(localStorage.getItem(CHOICE_STORAGE_KEY) || '[]');
+    if (idx < 0 || idx >= goals.length) return;
+    goals.splice(idx, 1);
+    localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(goals));
+    renderChoiceTree();
+    renderChoiceHistory();
+}
+window.deleteGoal = deleteGoal;
+
+// Clear every goal and reset the tree.
+function clearAllGoals() {
+    localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify([]));
+    renderChoiceTree();
+    renderChoiceHistory();
+}
+window.clearAllGoals = clearAllGoals;
 
 // ============================================
 // VALUES TOOL
