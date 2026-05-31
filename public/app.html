@@ -159,12 +159,7 @@
             animation: slideUp 0.7s ease-out 0.2s both, cloudFloat 6s ease-in-out 1s infinite;
             transition: transform var(--transition-brutal);
             z-index: 2;
-            filter:
-                drop-shadow(2px 0 0 #C9A857)
-                drop-shadow(-2px 0 0 #C9A857)
-                drop-shadow(0 2px 0 #C9A857)
-                drop-shadow(0 -2px 0 #C9A857)
-                drop-shadow(0 6px 14px rgba(60, 46, 40, 0.18));
+            filter: drop-shadow(0 5px 12px rgba(60, 46, 40, 0.18));
         }
 
         .daily-thought:hover {
@@ -177,6 +172,8 @@
             width: 100%;
             height: 100%;
             fill: #FFFDF9;
+            stroke: #D8C9A8;
+            stroke-width: 3;
             pointer-events: none;
         }
 
@@ -195,7 +192,7 @@
         .daily-thought-label {
             font-size: var(--font-size-xs);
             font-weight: var(--font-weight-black);
-            color: #A58536;
+            color: #7A6F62;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             margin-bottom: var(--space-xs);
@@ -213,7 +210,7 @@
             display: block;
             margin-top: 10px;
             padding-top: 10px;
-            border-top: 1.5px dashed #E1CDA1;
+            border-top: 1.5px dashed #CDC4B0;
             text-decoration: none;
             color: inherit;
             -webkit-tap-highlight-color: rgba(0,0,0,0.06);
@@ -222,7 +219,7 @@
             display: block;
             font-size: 0.6rem;
             font-weight: 900;
-            color: #A58536;
+            color: #7A6F62;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             margin-bottom: 4px;
@@ -240,11 +237,10 @@
             justify-content: center;
             width: 22px;
             height: 22px;
-            background: #C9A857;
-            color: #FFFDF9;
+            background: transparent;
+            color: #2A1F1A;
             font-weight: 900;
-            font-size: 0.72rem;
-            border-radius: 50%;
+            font-size: 0.85rem;
         }
         .daily-suggestion-meta {
             flex: 1 1 auto;
@@ -256,7 +252,7 @@
         .daily-suggestion-domain {
             font-size: 0.62rem;
             font-weight: 700;
-            color: #A58536;
+            color: #7A6F62;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             line-height: 1.1;
@@ -273,7 +269,7 @@
         .daily-suggestion-arrow {
             flex: 0 0 auto;
             font-weight: 900;
-            color: #C9A857;
+            color: #7A6F62;
             font-size: 0.95rem;
         }
         .daily-suggestion:active { transform: translateY(1px); }
@@ -3882,22 +3878,23 @@
                     <!-- Daily Thought Cloud (💭-shaped) -->
                     <div class="daily-thought" id="daily-thought">
                         <svg class="daily-thought-cloud" viewBox="0 0 320 280" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                            <g>
-                                <!-- Trail puffs bottom-left -->
-                                <circle cx="20" cy="272" r="5"/>
-                                <circle cx="38" cy="258" r="8"/>
-                                <!-- Overlapping body puffs (matches 💭 silhouette, stretched a little taller) -->
-                                <circle cx="80" cy="100" r="60"/>
-                                <circle cx="130" cy="70" r="55"/>
-                                <circle cx="180" cy="60" r="58"/>
-                                <circle cx="230" cy="75" r="55"/>
-                                <circle cx="270" cy="115" r="55"/>
-                                <circle cx="275" cy="170" r="55"/>
-                                <circle cx="240" cy="215" r="55"/>
-                                <circle cx="170" cy="220" r="60"/>
-                                <circle cx="90" cy="205" r="55"/>
-                                <circle cx="60" cy="155" r="58"/>
-                            </g>
+                            <!-- Trail puffs bottom-left (no stroke — small standalone droplets) -->
+                            <circle cx="22" cy="268" r="6" stroke="none"/>
+                            <circle cx="42" cy="250" r="9" stroke="none"/>
+                            <!-- Single smooth cloud silhouette — one continuous path so the
+                                 outline reads cleanly. vector-effect keeps the stroke even
+                                 when the SVG is stretched by preserveAspectRatio="none". -->
+                            <path vector-effect="non-scaling-stroke" d="
+                                M 60 230
+                                C 26 226, 12 192, 32 168
+                                C 8 146, 24 100, 60 100
+                                C 60 66, 110 56, 132 82
+                                C 142 50, 188 48, 206 76
+                                C 226 50, 274 60, 278 100
+                                C 308 108, 312 156, 286 174
+                                C 304 200, 274 230, 240 220
+                                C 222 244, 174 246, 152 220
+                                C 130 246, 82 240, 60 230 Z" />
                         </svg>
                         <div class="daily-thought-content">
                             <div class="daily-thought-label">Mandy's thought for you</div>
