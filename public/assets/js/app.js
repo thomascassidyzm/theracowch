@@ -350,8 +350,77 @@ function nextPastureItemType(n) {
     return 'flower';
 }
 
-function randomPasturePosition() {
-    return { x: 26 + Math.random() * 308, y: 116 + Math.random() * 50 };
+// Pasture playable area (origin coords for items)
+const PASTURE_X_MIN = 26, PASTURE_X_MAX = 334;
+const PASTURE_Y_MIN = 116, PASTURE_Y_MAX = 166;
+
+// Build a list of {x, y, r} zones a new item should avoid: the cow's
+// footprint plus every existing item.
+function pastureAvoidZones(items, cowPos) {
+    const zones = [];
+    if (cowPos) zones.push({ x: cowPos.x + 2, y: cowPos.y + 4, r: 30 });
+    (items || []).forEach(it => {
+        const r = it.type === 'tree' ? 20 : (it.type === 'grass' ? 14 : 15);
+        zones.push({ x: it.x, y: it.y, r });
+    });
+    return zones;
+}
+
+function pastureIsClear(x, y, zones) {
+    for (const z of zones) {
+        const dx = x - z.x, dy = y - z.y;
+        if (dx * dx + dy * dy < z.r * z.r) return false;
+    }
+    return true;
+}
+
+function randomPasturePosition(items, cowPos) {
+    const zones = pastureAvoidZones(items, cowPos);
+    // Try plenty of random spots that don't collide with anything.
+    for (let i = 0; i < 60; i++) {
+        const x = PASTURE_X_MIN + Math.random() * (PASTURE_X_MAX - PASTURE_X_MIN);
+        const y = PASTURE_Y_MIN + Math.random() * (PASTURE_Y_MAX - PASTURE_Y_MIN);
+        if (pastureIsClear(x, y, zones)) return { x, y };
+    }
+    // Fallback: pick the spot from a few samples that's furthest from any zone.
+    let best = null, bestD = -Infinity;
+    for (let i = 0; i < 12; i++) {
+        const x = PASTURE_X_MIN + Math.random() * (PASTURE_X_MAX - PASTURE_X_MIN);
+        const y = PASTURE_Y_MIN + Math.random() * (PASTURE_Y_MAX - PASTURE_Y_MIN);
+        let minD = Infinity;
+        for (const z of zones) {
+            const dx = x - z.x, dy = y - z.y;
+            const d = dx * dx + dy * dy;
+            if (d < minD) minD = d;
+        }
+        if (minD > bestD) { bestD = minD; best = { x, y }; }
+    }
+    return best || { x: 180, y: 130 };
+}
+
+// One-time fix-up: relocate any item currently sitting on top of the cow.
+// Future placements use the avoidance above; this just rescues the current
+// state for users whose pasture grew before the avoidance was added.
+const PASTURE_RELOCATED_KEY = 'cowch-pasture-relocated-v1';
+function maybeRelocateCowCollisions() {
+    try { if (localStorage.getItem(PASTURE_RELOCATED_KEY) === '1') return; } catch (_) {}
+    const items = loadPastureItems();
+    if (items.length) {
+        const cowPos = loadCowPos();
+        const cowZ = { x: cowPos.x + 2, y: cowPos.y + 4, r: 24 };
+        let changed = false;
+        items.forEach((it, idx) => {
+            const dx = it.x - cowZ.x, dy = it.y - cowZ.y;
+            if (dx * dx + dy * dy < cowZ.r * cowZ.r) {
+                const others = items.filter((_, j) => j !== idx);
+                const np = randomPasturePosition(others, cowPos);
+                it.x = np.x; it.y = np.y;
+                changed = true;
+            }
+        });
+        if (changed) savePastureItems(items);
+    }
+    try { localStorage.setItem(PASTURE_RELOCATED_KEY, '1'); } catch (_) {}
 }
 
 // Adds one item if today is a new calendar day since the last growth, and
@@ -368,7 +437,7 @@ function maybeGrowPasture() {
 
     const items = loadPastureItems();
     const type = nextPastureItemType(items.length + 1);
-    const pos = randomPasturePosition();
+    const pos = randomPasturePosition(items, loadCowPos());
     const item = {
         id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1000).toString(36),
         type,
@@ -795,6 +864,10 @@ function updatePastureUI() {
             if (existing > 0) localStorage.setItem(PASTURE_VISITDAYS_KEY, String(existing));
         }
     } catch (_) {}
+
+    // One-time rescue: nudge any item that's currently sitting on top of
+    // the cow off it (legacy pasture before the avoidance was added).
+    maybeRelocateCowCollisions();
 
     const grown = maybeGrowPasture();
     const items = loadPastureItems();
