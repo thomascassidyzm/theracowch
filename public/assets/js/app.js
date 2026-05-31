@@ -31,9 +31,10 @@ function switchTab(tabId) {
     // anything completed earlier this session, and grows the pasture if it's
     // a new day.
     if (tabId === 'you') {
-        if (typeof updatePastureUI        === 'function') updatePastureUI();
-        if (typeof updateWeeklyReportUI   === 'function') updateWeeklyReportUI();
-        if (typeof updatePatternsUI       === 'function') updatePatternsUI();
+        if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
+        if (typeof updatePastureUI         === 'function') updatePastureUI();
+        if (typeof updateWeeklyReportUI    === 'function') updateWeeklyReportUI();
+        if (typeof updatePatternsUI        === 'function') updatePatternsUI();
     }
 }
 
@@ -992,6 +993,38 @@ function updatePastureUI() {
     renderPasture();
 }
 window.updatePastureUI = updatePastureUI;
+
+// Your Space header greeting that follows the same phases as the pasture
+// (dawn / morning / afternoon / sunset / evening / night).
+function updateYourSpaceGreeting() {
+    const head = document.getElementById('you-greeting');
+    const sub  = document.getElementById('you-greeting-sub');
+    if (!head) return;
+    const h = new Date().getHours();
+    let title, blurb;
+    if (h >= 5 && h <= 7) {
+        title = 'Good morning 🌅';
+        blurb = 'A soft start to the day.';
+    } else if (h >= 8 && h <= 11) {
+        title = 'Good morning ☀️';
+        blurb = 'A gentle look at your morning.';
+    } else if (h >= 12 && h <= 16) {
+        title = 'Good afternoon 🌤️';
+        blurb = 'A pause in the middle of the day.';
+    } else if (h >= 17 && h <= 19) {
+        title = 'Good evening 🌇';
+        blurb = 'Wind down gently.';
+    } else if (h >= 20 && h <= 21) {
+        title = 'Good evening 🌙';
+        blurb = 'Soft hours — rest matters.';
+    } else {
+        title = 'Good night 🌙';
+        blurb = 'Quiet hours. Be gentle with yourself.';
+    }
+    head.textContent = title;
+    if (sub) sub.textContent = blurb;
+}
+window.updateYourSpaceGreeting = updateYourSpaceGreeting;
 
 function setupPastureEdit() {
     const btn = document.getElementById('pasture-edit-btn');
@@ -2940,6 +2973,7 @@ function init() {
     updateGreeting();
     updateDailyQuote();
     updateDailySuggestion();
+    updateYourSpaceGreeting();
     updatePastureUI();
     setupPastureEdit();
     updateWeeklyReportUI();
