@@ -544,31 +544,111 @@ function clientToPastureSvg(svg, clientX, clientY) {
 }
 
 
-function buildPastureScenery(svg, vit) {
-    const sun = document.createElementNS(NS_SVG, 'circle');
-    sun.setAttribute('cx', 50); sun.setAttribute('cy', 32);
-    sun.setAttribute('r', 18);
-    sun.setAttribute('fill', '#FFD56B');
-    sun.setAttribute('opacity', (0.4 + vit * 0.6).toFixed(2));
-    svg.appendChild(sun);
+// Time-of-day phase for the pasture sky. Returns 'dawn' | 'day' | 'sunset' | 'night'.
+function getPastureTimeOfDay(date) {
+    const h = (date || new Date()).getHours();
+    if (h >= 5 && h <= 7)   return 'dawn';
+    if (h >= 8 && h <= 16)  return 'day';
+    if (h >= 17 && h <= 19) return 'sunset';
+    return 'night';
+}
 
-    [{ x: 220, y: 28, r: 12 }, { x: 250, y: 24, r: 14 }, { x: 280, y: 30, r: 11 }].forEach(c => {
-        const e = document.createElementNS(NS_SVG, 'circle');
-        e.setAttribute('cx', c.x); e.setAttribute('cy', c.y);
-        e.setAttribute('r', c.r);
-        e.setAttribute('fill', '#FFFFFF');
-        e.setAttribute('opacity', '0.9');
-        svg.appendChild(e);
-    });
+const PASTURE_PHASES = {
+    dawn: {
+        sun:   { cx: 56,  cy: 62, r: 16, fill: '#FF9264', glow: '#FFD3A6' },
+        cloud: '#FFE2CC', hill: '#9CB870', ground: '#86B05F'
+    },
+    day: {
+        sun:   { cx: 50,  cy: 32, r: 18, fill: '#FFD56B', glow: '#FFEDB4' },
+        cloud: '#FFFFFF', hill: '#A8C57E', ground: '#92BC6A'
+    },
+    sunset: {
+        sun:   { cx: 302, cy: 66, r: 17, fill: '#FF5B47', glow: '#FFA075' },
+        cloud: '#F2B58A', hill: '#7E9B66', ground: '#688F58'
+    },
+    night: {
+        moon:  { cx: 290, cy: 38, r: 14, fill: '#F3EEDB', shade: '#1F2A4F' },
+        cloud: null,
+        hill: '#445C46', ground: '#3D5840'
+    }
+};
+
+function buildPastureScenery(svg, vit) {
+    const phase = getPastureTimeOfDay();
+    svg.setAttribute('data-phase', phase);
+    const p = PASTURE_PHASES[phase];
+
+    if (phase === 'night') {
+        // Stars scattered across the sky
+        const stars = [
+            { x: 30, y: 18 }, { x: 62, y: 36 }, { x: 96, y: 14 },
+            { x: 128, y: 28 }, { x: 160, y: 12 }, { x: 196, y: 24 },
+            { x: 226, y: 44 }, { x: 254, y: 14 }, { x: 328, y: 30 }
+        ];
+        stars.forEach((s, i) => {
+            const c = document.createElementNS(NS_SVG, 'circle');
+            c.setAttribute('cx', s.x); c.setAttribute('cy', s.y);
+            c.setAttribute('r', (i % 3 === 0) ? 1.2 : 0.7);
+            c.setAttribute('fill', '#FFFFFF');
+            c.setAttribute('opacity', '0.85');
+            svg.appendChild(c);
+        });
+        // Moon + crescent shading for a soft 3/4 phase
+        const m = p.moon;
+        const moonGlow = document.createElementNS(NS_SVG, 'circle');
+        moonGlow.setAttribute('cx', m.cx); moonGlow.setAttribute('cy', m.cy);
+        moonGlow.setAttribute('r', m.r + 6);
+        moonGlow.setAttribute('fill', '#F3EEDB');
+        moonGlow.setAttribute('opacity', '0.18');
+        svg.appendChild(moonGlow);
+        const moon = document.createElementNS(NS_SVG, 'circle');
+        moon.setAttribute('cx', m.cx); moon.setAttribute('cy', m.cy);
+        moon.setAttribute('r', m.r);
+        moon.setAttribute('fill', m.fill);
+        moon.setAttribute('opacity', '0.95');
+        svg.appendChild(moon);
+        const shade = document.createElementNS(NS_SVG, 'circle');
+        shade.setAttribute('cx', m.cx + 5); shade.setAttribute('cy', m.cy - 1);
+        shade.setAttribute('r', m.r - 1);
+        shade.setAttribute('fill', m.shade);
+        shade.setAttribute('opacity', '0.7');
+        svg.appendChild(shade);
+    } else {
+        // Sun with a soft halo
+        const glow = document.createElementNS(NS_SVG, 'circle');
+        glow.setAttribute('cx', p.sun.cx); glow.setAttribute('cy', p.sun.cy);
+        glow.setAttribute('r', p.sun.r + 10);
+        glow.setAttribute('fill', p.sun.glow);
+        glow.setAttribute('opacity', (0.30 + vit * 0.30).toFixed(2));
+        svg.appendChild(glow);
+        const sun = document.createElementNS(NS_SVG, 'circle');
+        sun.setAttribute('cx', p.sun.cx); sun.setAttribute('cy', p.sun.cy);
+        sun.setAttribute('r', p.sun.r);
+        sun.setAttribute('fill', p.sun.fill);
+        sun.setAttribute('opacity', (0.55 + vit * 0.45).toFixed(2));
+        svg.appendChild(sun);
+    }
+
+    // Clouds — skip at night
+    if (p.cloud) {
+        [{ x: 220, y: 28, r: 12 }, { x: 250, y: 24, r: 14 }, { x: 280, y: 30, r: 11 }].forEach(c => {
+            const e = document.createElementNS(NS_SVG, 'circle');
+            e.setAttribute('cx', c.x); e.setAttribute('cy', c.y);
+            e.setAttribute('r', c.r);
+            e.setAttribute('fill', p.cloud);
+            e.setAttribute('opacity', phase === 'sunset' ? '0.85' : '0.9');
+            svg.appendChild(e);
+        });
+    }
 
     const hill = document.createElementNS(NS_SVG, 'path');
     hill.setAttribute('d', 'M 0 90 Q 90 60 180 86 T 360 92 L 360 180 L 0 180 Z');
-    hill.setAttribute('fill', '#A8C57E');
+    hill.setAttribute('fill', p.hill);
     svg.appendChild(hill);
 
     const ground = document.createElementNS(NS_SVG, 'path');
     ground.setAttribute('d', 'M 0 130 Q 80 116 160 128 T 360 130 L 360 180 L 0 180 Z');
-    ground.setAttribute('fill', '#92BC6A');
+    ground.setAttribute('fill', p.ground);
     svg.appendChild(ground);
 
     // The cow is rendered separately (renderPasture) so it can be dragged.
@@ -785,6 +865,8 @@ function renderPastureBackFeatures(svg, visitDays) {
 // Butterflies fly in FRONT of everything (week 3+).
 function renderPastureButterflies(svg, visitDays) {
     if (visitDays < 15) return;
+    // Butterflies don't fly at night — let them rest with the user.
+    if (getPastureTimeOfDay() === 'night') return;
     const spots = [{ x: 120, y: 66 }, { x: 250, y: 58 }, { x: 300, y: 92 }];
     const colors = ['#F7B2C5', '#FFD56B', '#D9A6F0'];
     const count = visitDays >= 29 ? 3 : 2;

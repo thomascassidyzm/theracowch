@@ -1806,7 +1806,13 @@
             border: 2px solid var(--border-warm);
             border-radius: var(--radius-medium);
             margin-bottom: var(--space-md);
+            transition: background 1.5s ease-in-out;
         }
+        /* Time-of-day sky tints */
+        .pasture-svg[data-phase="dawn"]   { background: linear-gradient(180deg, #F4A88A 0%, #FBD3A8 28%, #FBE6BE 52%, #C9E1A1 100%); }
+        .pasture-svg[data-phase="day"]    { background: linear-gradient(180deg, #DCEDF6 0%, #E7F4DE 38%, #C9E1A1 100%); }
+        .pasture-svg[data-phase="sunset"] { background: linear-gradient(180deg, #4D447B 0%, #E96D6D 38%, #F3A56A 60%, #C9E1A1 100%); }
+        .pasture-svg[data-phase="night"]  { background: linear-gradient(180deg, #1B244B 0%, #2A3A6E 40%, #3F5060 66%, #4C6E4F 100%); }
         .pasture-empty {
             background: var(--bg-secondary);
             border-left: 4px solid #C9A857;
@@ -6225,7 +6231,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=77"></script>
+    <script src="/assets/js/app.js?v=78"></script>
     <script>
         if ('serviceWorker' in navigator) {
             // Auto-reload once when a new service worker takes control, so a
