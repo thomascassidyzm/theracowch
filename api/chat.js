@@ -99,19 +99,29 @@ Guide users through: Trigger → Thoughts → Feelings → Behaviour. Help them 
 }
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  // Origin lock + CORS. This endpoint is public and account-less and fronts a
+  // billed Anthropic key, so restrict it to theracowch.com (+ Vercel previews)
+  // to stop it being used as a free Claude proxy / running up the bill.
+  // Same-origin and installed-PWA requests send no Origin header → allowed.
+  const origin = req.headers.origin;
+  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com'];
+  let originOk = !origin || allowedOrigins.includes(origin);
+  if (origin && !originOk) {
+    try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }
+  }
+  res.setHeader('Access-Control-Allow-Origin', originOk && origin ? origin : allowedOrigins[0]);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(204).end();
   }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+  if (origin && !originOk) {
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   try {
@@ -119,6 +129,11 @@ export default async function handler(req, res) {
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Cap input size so a single call can't balloon the Anthropic bill.
+    if (typeof message === 'string' && message.length > 4000) {
+      return res.status(413).json({ error: 'Message too long' });
     }
 
     // Get IMAGINE framework prompts from URL (with caching)

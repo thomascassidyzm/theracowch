@@ -3,18 +3,27 @@
 // Called periodically to update the local therapy profile
 
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Origin lock + CORS — same rationale as api/chat.js: a public, account-less
+  // endpoint fronting a billed Anthropic key, locked to theracowch.com.
+  const origin = req.headers.origin;
+  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com'];
+  let originOk = !origin || allowedOrigins.includes(origin);
+  if (origin && !originOk) {
+    try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }
+  }
+  res.setHeader('Access-Control-Allow-Origin', originOk && origin ? origin : allowedOrigins[0]);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(204).end();
   }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+  if (origin && !originOk) {
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   try {
@@ -22,6 +31,11 @@ export default async function handler(req, res) {
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt required' });
+    }
+
+    // Cap input size so a single call can't balloon the Anthropic bill.
+    if (typeof prompt === 'string' && prompt.length > 8000) {
+      return res.status(413).json({ error: 'Prompt too long' });
     }
 
     // Use a smaller/faster model for compression (Haiku equivalent)
