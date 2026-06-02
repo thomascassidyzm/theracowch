@@ -84,9 +84,9 @@
             gap: var(--space-lg);
             margin-bottom: var(--space-md);
             padding-right: min(230px, 46vw);
-            /* Reserve the cloud's full height so the absolutely-positioned
-               cloud never overlaps the buttons below it. */
-            min-height: calc(min(230px, 46vw) * 0.92);
+            /* Reserve enough height for the cloud (which is lifted by
+               --space-2xl) so it doesn't overlap content below. */
+            min-height: calc(min(230px, 46vw) * 0.92 - var(--space-2xl));
             animation: slideRight 0.7s ease-out;
         }
 
@@ -3376,7 +3376,7 @@
             .greeting-section {
                 gap: var(--space-md);
                 padding-right: min(180px, 46vw);
-                min-height: calc(min(180px, 46vw) * 1.05);
+                min-height: calc(min(180px, 46vw) * 1.05 - var(--space-2xl));
             }
 
             .avatar-container {
