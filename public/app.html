@@ -6229,20 +6229,123 @@
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
     <script src="/assets/js/app.js?v=79"></script>
+
+    <!-- "New version available" update banner (shown only when a new build is
+         ready). Styled to match the app; sits above everything, no layout shift. -->
+    <style>
+        #cowch-update-banner {
+            position: fixed;
+            left: 50%;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+            transform: translate(-50%, 220%);
+            z-index: 2147483647;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: min(92vw, 420px);
+            padding: 14px 20px;
+            border-radius: var(--radius-full, 999px);
+            background: var(--coral, #C97B63);
+            color: #fff;
+            font-family: 'Gabarito', system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 1.25;
+            text-align: left;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+            cursor: pointer;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        #cowch-update-banner.cowch-update-banner--in { transform: translate(-50%, 0); }
+        #cowch-update-banner:active { filter: brightness(0.95); }
+        #cowch-update-banner .cowch-update-emoji { font-size: 20px; line-height: 1; }
+    </style>
     <script>
         if ('serviceWorker' in navigator) {
-            // Auto-reload once when a new service worker takes control, so a
-            // fresh deploy is picked up without the user manually hard-
-            // refreshing. We only reload if the page was already controlled
-            // (an update), not on the first-ever registration.
-            var hadController = !!navigator.serviceWorker.controller;
-            var swRefreshing = false;
+            // --- PWA update handling --------------------------------------------
+            // Problem this solves: the browser only auto-checks for a new service
+            // worker on a real top-level navigation. When an installed PWA is
+            // resumed from the background (very common on iOS), the page is NOT
+            // reloaded, so no update check runs and the user keeps the old cached
+            // build until they fully force-quit. To fix that we:
+            //   (a) actively poll for a new SW on load, whenever the app returns
+            //       to the foreground, and periodically while it stays open; and
+            //   (b) surface a friendly "tap to update" banner the moment a new
+            //       version is ready. Tapping it activates the new SW and reloads.
+
+            var refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', function () {
-                if (swRefreshing) return;
-                swRefreshing = true;
-                if (hadController) window.location.reload();
+                // Fires after the waiting SW takes control (via SKIP_WAITING).
+                // Reload once to start running the fresh build.
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
             });
-            navigator.serviceWorker.register('/sw.js');
+
+            function showUpdateBanner(worker) {
+                if (document.getElementById('cowch-update-banner')) return;
+                var banner = document.createElement('div');
+                banner.id = 'cowch-update-banner';
+                banner.setAttribute('role', 'button');
+                banner.setAttribute('tabindex', '0');
+                banner.innerHTML =
+                    '<span class="cowch-update-emoji" aria-hidden="true">🐄</span>' +
+                    '<span class="cowch-update-text">A new version is available — tap to update</span>';
+
+                var apply = function () {
+                    banner.style.pointerEvents = 'none';
+                    banner.querySelector('.cowch-update-text').textContent = 'Updating…';
+                    if (worker) {
+                        worker.postMessage({ type: 'SKIP_WAITING' });
+                    } else {
+                        window.location.reload();
+                    }
+                    // Safety net: if controllerchange doesn't fire, reload anyway.
+                    setTimeout(function () { if (!refreshing) window.location.reload(); }, 2500);
+                };
+                banner.addEventListener('click', apply);
+                banner.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apply(); }
+                });
+
+                (document.body || document.documentElement).appendChild(banner);
+                requestAnimationFrame(function () {
+                    banner.classList.add('cowch-update-banner--in');
+                });
+            }
+
+            navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+                .then(function (reg) {
+                    // A new SW may already be waiting from an earlier check.
+                    if (reg.waiting && navigator.serviceWorker.controller) {
+                        showUpdateBanner(reg.waiting);
+                    }
+
+                    reg.addEventListener('updatefound', function () {
+                        var newWorker = reg.installing;
+                        if (!newWorker) return;
+                        newWorker.addEventListener('statechange', function () {
+                            // 'installed' WITH an existing controller means this is
+                            // an update (not the first-ever install) and the new SW
+                            // is now waiting — time to offer the update.
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateBanner(newWorker);
+                            }
+                        });
+                    });
+
+                    // Proactively check for a fresh build: now, whenever the app
+                    // comes back to the foreground, and every 30 min while open.
+                    var checkForUpdate = function () { reg.update().catch(function () {}); };
+                    checkForUpdate();
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') checkForUpdate();
+                    });
+                    window.addEventListener('focus', checkForUpdate);
+                    setInterval(checkForUpdate, 30 * 60 * 1000);
+                })
+                .catch(function () { /* SW registration failed; app still works online */ });
         }
 
         // First-launch consent gate. Bumps the version when we need to

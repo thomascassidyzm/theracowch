@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cowch-wellness-v118';
+const CACHE_NAME = 'cowch-wellness-v119';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -8,7 +8,10 @@ const urlsToCache = [
   '/assets/theracowch_main_image.jpg'
 ];
 
-// Install event - cache resources and activate immediately
+// Install event - pre-cache resources. We deliberately do NOT call
+// skipWaiting() here: a freshly-installed SW stays in the "waiting" state so
+// the page can show a friendly "new version available" banner and only swap
+// it in (via the SKIP_WAITING message below) when the user taps to update.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -17,7 +20,15 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
-  self.skipWaiting();
+});
+
+// Let the page activate a waiting SW on demand (driven by the update banner
+// in app.html). Once we skip waiting, the SW activates, clients.claim() runs,
+// and the page reloads on the resulting controllerchange.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Fetch event - serve from cache when offline
