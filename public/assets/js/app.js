@@ -232,30 +232,6 @@ function getImagineOrder() {
     return IMAGINE_DAILY.map((_, i) => i);
 }
 
-function getTodaysImagineSuggestion() {
-    const day = getEpochDays();
-    const order = getImagineOrder();
-    const slot = IMAGINE_DAILY[order[day % order.length]];
-    const exercise = slot.exercises[Math.floor(day / order.length) % slot.exercises.length];
-    return {
-        letter: slot.letter,
-        domain: slot.domain,
-        href: exercise.href,
-        name: exercise.name
-    };
-}
-
-function updateDailySuggestion() {
-    const link = document.getElementById('daily-suggestion');
-    if (!link) return;
-    const pick = getTodaysImagineSuggestion();
-    link.href = pick.href;
-    document.getElementById('daily-suggestion-letter').textContent = pick.letter;
-    document.getElementById('daily-suggestion-domain').textContent = pick.domain;
-    document.getElementById('daily-suggestion-name').textContent = pick.name;
-}
-
-
 // ============================================
 // Day helper — shared by the pasture, weekly report and activity log
 // ============================================
@@ -3078,7 +3054,6 @@ function init() {
     // Setup all functionality
     updateGreeting();
     updateDailyQuote();
-    updateDailySuggestion();
     updateYourSpaceGreeting();
     updatePastureUI();
     setupPastureEdit();

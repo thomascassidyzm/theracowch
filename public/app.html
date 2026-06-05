@@ -206,74 +206,6 @@
             margin: 0;
         }
 
-        .daily-suggestion {
-            display: block;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1.5px dashed #CDC4B0;
-            text-decoration: none;
-            color: inherit;
-            -webkit-tap-highlight-color: rgba(0,0,0,0.06);
-        }
-        .daily-suggestion-label {
-            display: block;
-            font-size: 0.6rem;
-            font-weight: 900;
-            color: #7A6F62;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-        .daily-suggestion-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-align: left;
-        }
-        .daily-suggestion-letter {
-            flex: 0 0 auto;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            background: transparent;
-            color: #2A1F1A;
-            font-weight: 900;
-            font-size: 0.85rem;
-        }
-        .daily-suggestion-meta {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            min-width: 0;
-        }
-        .daily-suggestion-domain {
-            font-size: 0.62rem;
-            font-weight: 700;
-            color: #7A6F62;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            line-height: 1.1;
-        }
-        .daily-suggestion-name {
-            font-size: 0.78rem;
-            font-weight: 800;
-            color: #2A1F1A;
-            line-height: 1.15;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .daily-suggestion-arrow {
-            flex: 0 0 auto;
-            font-weight: 900;
-            color: #7A6F62;
-            font-size: 0.95rem;
-        }
-        .daily-suggestion:active { transform: translateY(1px); }
-
         /* Quick Actions - Brutal Buttons */
         .quick-actions {
             display: flex;
@@ -3918,17 +3850,6 @@
                         <div class="daily-thought-content">
                             <div class="daily-thought-label">Mandy's thought for you</div>
                             <p class="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</p>
-                            <a class="daily-suggestion" id="daily-suggestion" href="#">
-                                <span class="daily-suggestion-label">Today's exercise</span>
-                                <span class="daily-suggestion-row">
-                                    <span class="daily-suggestion-letter" id="daily-suggestion-letter">M</span>
-                                    <span class="daily-suggestion-meta">
-                                        <span class="daily-suggestion-domain" id="daily-suggestion-domain">Mindfulness</span>
-                                        <span class="daily-suggestion-name" id="daily-suggestion-name">Box breathing</span>
-                                    </span>
-                                    <span class="daily-suggestion-arrow">&rarr;</span>
-                                </span>
-                            </a>
                         </div>
                     </div>
 
@@ -6253,7 +6174,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=80"></script>
+    <script src="/assets/js/app.js?v=81"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
          ready). Styled to match the app; sits above everything, no layout shift. -->
