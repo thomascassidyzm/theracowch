@@ -8,6 +8,15 @@ on:
 permissions:
   contents: write
 
+# Serialize all auto-merges. Many claude/* sessions run at once; without this
+# two runs could both check out main, merge, and race on `git push origin main`
+# — the loser is rejected (non-fast-forward) and its changes are silently
+# dropped. A single shared concurrency group forces these runs to queue instead
+# of racing. cancel-in-progress is false so no queued merge is ever thrown away.
+concurrency:
+  group: auto-merge-to-main
+  cancel-in-progress: false
+
 jobs:
   merge-to-main:
     runs-on: ubuntu-latest
@@ -20,18 +29,47 @@ jobs:
 
       - name: Merge to main and deploy
         run: |
+          set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Refresh in case main moved since checkout
-          git fetch origin main
+          BRANCH="${{ github.ref_name }}"
 
-          # Skip if branch is already an ancestor of main
-          if git merge-base --is-ancestor origin/${{ github.ref_name }} origin/main; then
-            echo "Branch already merged into main — nothing to do"
-            exit 0
-          fi
+          # Belt-and-braces against races: even with the concurrency guard above,
+          # re-fetch and retry the merge/push a few times so a run that started
+          # just before main moved still lands cleanly instead of failing.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main "$BRANCH"
 
-          git checkout main
-          git merge origin/${{ github.ref_name }} --no-edit
-          git push origin main
+            # Already merged? Nothing to do.
+            if git merge-base --is-ancestor "origin/$BRANCH" origin/main; then
+              echo "Branch already merged into main — nothing to do"
+              exit 0
+            fi
+
+            # Start each attempt from the very latest main.
+            git checkout -B main origin/main
+
+            # Attempt the merge. A genuine content conflict is NOT a transient
+            # race — abort and fail loudly so a human resolves it, rather than
+            # leaving a half-merged tree.
+            if ! git merge "origin/$BRANCH" --no-edit; then
+              git merge --abort || true
+              echo "::error::Merge conflict between $BRANCH and main. Resolve manually."
+              exit 1
+            fi
+
+            # Push. If main moved under us (another run won the race), the push
+            # is rejected; loop and retry from the new main.
+            if git push origin main; then
+              echo "Merged $BRANCH into main on attempt $attempt"
+              exit 0
+            fi
+
+            echo "Push rejected (main moved) — retrying ($attempt)…"
+            sleep $(( attempt * 3 ))
+          done
+
+          echo "::error::Could not push merge of $BRANCH after 5 attempts."
+          exit 1
