@@ -36,15 +36,24 @@ jobs:
 
           BRANCH="${{ github.ref_name }}"
 
+          # Tidy up the source branch once its work is safely on main. Never let
+          # a failed delete fail the job — the merge already succeeded, which is
+          # what matters; a leftover branch is harmless.
+          delete_branch() {
+            echo "Deleting merged branch $BRANCH…"
+            git push origin --delete "$BRANCH" || echo "Branch delete failed (already gone?) — ignoring"
+          }
+
           # Belt-and-braces against races: even with the concurrency guard above,
           # re-fetch and retry the merge/push a few times so a run that started
           # just before main moved still lands cleanly instead of failing.
           for attempt in 1 2 3 4 5; do
             git fetch origin main "$BRANCH"
 
-            # Already merged? Nothing to do.
+            # Already merged? Nothing to do but tidy up.
             if git merge-base --is-ancestor "origin/$BRANCH" origin/main; then
               echo "Branch already merged into main — nothing to do"
+              delete_branch
               exit 0
             fi
 
@@ -64,6 +73,7 @@ jobs:
             # is rejected; loop and retry from the new main.
             if git push origin main; then
               echo "Merged $BRANCH into main on attempt $attempt"
+              delete_branch
               exit 0
             fi
 
