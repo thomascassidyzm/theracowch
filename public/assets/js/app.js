@@ -133,11 +133,33 @@ const MANDY_QUOTES = [
 ];
 
 function updateDailyQuote() {
-    const quoteElement = document.querySelector('.daily-thought-text');
+    const quoteElement = document.getElementById('daily-thought-text');
     if (quoteElement) {
-        const randomIndex = Math.floor(Math.random() * MANDY_QUOTES.length);
-        quoteElement.textContent = MANDY_QUOTES[randomIndex];
+        // Stable for the whole day so it really is a "thought for the day"
+        // rather than changing on every reload.
+        const idx = getEpochDays() % MANDY_QUOTES.length;
+        quoteElement.textContent = MANDY_QUOTES[idx];
     }
+}
+
+// The home cloud shows only a "Mandy's thought for the day…" teaser; tapping it
+// opens the full thought in a modal. Closing is handled by the global
+// .close-modal handler (the X) and by tapping the backdrop here.
+function setupDailyThought() {
+    const cloud = document.getElementById('daily-thought');
+    const modal = document.getElementById('thought-modal');
+    if (!cloud || !modal) return;
+
+    const open = function () { modal.classList.add('active'); };
+    cloud.addEventListener('click', open);
+    cloud.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+
+    // Tap outside the card (on the dimmed backdrop) to dismiss.
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) modal.classList.remove('active');
+    });
 }
 
 // ============================================
@@ -3054,6 +3076,7 @@ function init() {
     // Setup all functionality
     updateGreeting();
     updateDailyQuote();
+    setupDailyThought();
     updateYourSpaceGreeting();
     updatePastureUI();
     setupPastureEdit();

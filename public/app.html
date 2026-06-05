@@ -162,8 +162,17 @@
             filter: drop-shadow(0 5px 12px rgba(60, 46, 40, 0.18));
         }
 
+        .daily-thought {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         .daily-thought:hover {
             transform: translateY(-3px) rotate(-1deg);
+        }
+
+        .daily-thought:active {
+            transform: translateY(1px) scale(0.98);
         }
 
         .daily-thought-cloud {
@@ -183,27 +192,33 @@
         }
 
         .daily-thought-content {
-            position: relative;
+            position: absolute;
+            inset: 0;
             z-index: 1;
-            padding: 17% 13% 15% 13%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16% 16% 17% 16%;
             text-align: center;
+            box-sizing: border-box;
         }
 
-        .daily-thought-label {
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-black);
-            color: #7A6F62;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: var(--space-xs);
-        }
-
-        .daily-thought-text {
-            font-size: clamp(0.75rem, 1.4vw, 0.88rem);
-            font-weight: var(--font-weight-bold);
-            color: #2A1F1A;
-            line-height: 1.25;
+        .daily-thought-teaser {
             margin: 0;
+            font-size: clamp(0.82rem, 1.7vw, 1rem);
+            font-weight: var(--font-weight-black);
+            color: #2A1F1A;
+            line-height: 1.22;
+            letter-spacing: 0.01em;
+        }
+
+        /* Full thought shown in the modal after tapping the cloud */
+        .thought-modal-text {
+            margin: 0;
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            line-height: 1.4;
         }
 
         /* Quick Actions - Brutal Buttons */
@@ -3826,8 +3841,8 @@
                         </div>
                     </div>
 
-                    <!-- Daily Thought Cloud (💭-shaped) -->
-                    <div class="daily-thought" id="daily-thought">
+                    <!-- Daily Thought Cloud (💭-shaped) — tap to read the full thought -->
+                    <div class="daily-thought" id="daily-thought" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Mandy's thought for the day — tap to read">
                         <svg class="daily-thought-cloud" viewBox="0 0 320 280" preserveAspectRatio="none" aria-hidden="true" focusable="false">
                             <!-- Trail puffs bottom-left (no stroke — small standalone droplets) -->
                             <circle cx="22" cy="268" r="6" stroke="none"/>
@@ -3848,8 +3863,7 @@
                                 C 130 246, 82 240, 60 230 Z" />
                         </svg>
                         <div class="daily-thought-content">
-                            <div class="daily-thought-label">Mandy's thought for you</div>
-                            <p class="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.</p>
+                            <p class="daily-thought-teaser">Mandy&rsquo;s thought<br>for the day&hellip;</p>
                         </div>
                     </div>
 
@@ -4837,6 +4851,17 @@
             <h2>Exercise Library</h2>
         </div>
         <div class="slide-panel-content" id="exercise-content"></div>
+    </div>
+
+    <!-- Mandy's Thought for the Day — opened by tapping the home cloud -->
+    <div class="exercise-modal" id="thought-modal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h3>Mandy&rsquo;s thought for you</h3>
+                <button class="close-modal" id="close-thought" aria-label="Close">&times;</button>
+            </div>
+            <p class="thought-modal-text" id="daily-thought-text">Sometimes the bravest thing we can do is simply show up for ourselves. You&rsquo;re here, and that matters.</p>
+        </div>
     </div>
 
     <!-- Box Breathing Exercise Modal -->
@@ -6174,7 +6199,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=81"></script>
+    <script src="/assets/js/app.js?v=82"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
          ready). Styled to match the app; sits above everything, no layout shift. -->
