@@ -1,4 +1,7 @@
-const CACHE_NAME = 'cowch-wellness-v119';
+const CACHE_NAME = 'cowch-wellness-v120';
+// Human-readable build date, surfaced in Settings via the GET_VERSION message
+// below so users can confirm at a glance which build they're running.
+const BUILD_DATE = '5 Jun 2026';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -26,8 +29,16 @@ self.addEventListener('install', (event) => {
 // in app.html). Once we skip waiting, the SW activates, clients.claim() runs,
 // and the page reloads on the resulting controllerchange.
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  } else if (event.data.type === 'GET_VERSION') {
+    // Reply with the active SW's version + build date so the Settings stamp
+    // reflects what's actually controlling the page (not just what's on the
+    // server). Answered over the MessageChannel port the page provides.
+    if (event.ports && event.ports[0]) {
+      event.ports[0].postMessage({ version: CACHE_NAME, buildDate: BUILD_DATE });
+    }
   }
 });
 

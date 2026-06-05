@@ -2052,6 +2052,112 @@ function setupSettingsButtons() {
 
     // Theme picker — peachy / warm / cool
     setupThemePicker();
+
+    // Build version stamp + "check for updates / clear cache" control
+    setupAppVersion();
+    setupForceRefresh();
+}
+
+// Ask the active service worker which build it is, over a MessageChannel.
+// Resolves to { version, buildDate } or null if there's no SW / it doesn't
+// answer (e.g. an older SW that predates the GET_VERSION handler).
+function getActiveSwVersion() {
+    return new Promise((resolve) => {
+        const ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+        if (!ctrl) { resolve(null); return; }
+        const channel = new MessageChannel();
+        const timer = setTimeout(() => resolve(null), 1500);
+        channel.port1.onmessage = (e) => {
+            clearTimeout(timer);
+            resolve(e.data || null);
+        };
+        try {
+            ctrl.postMessage({ type: 'GET_VERSION' }, [channel.port2]);
+        } catch (_e) {
+            clearTimeout(timer);
+            resolve(null);
+        }
+    });
+}
+
+// Show a small "theracowch · v120 · 5 Jun 2026" stamp in Settings so users can
+// confirm at a glance which build they're running. If a newer build is already
+// waiting to install, append a gentle "update available" note.
+async function setupAppVersion() {
+    // Tidy up the one-shot cache-buster left by a force refresh, if present.
+    try {
+        const here = new URL(window.location.href);
+        if (here.searchParams.has('_fresh')) {
+            here.searchParams.delete('_fresh');
+            window.history.replaceState(null, '', here.pathname + here.search + here.hash);
+        }
+    } catch (_e) { /* ignore */ }
+
+    const stamp = document.getElementById('app-version-stamp');
+    if (!stamp) return;
+
+    let label = 'theracowch';
+    const info = await getActiveSwVersion();
+    if (info && info.version) {
+        // CACHE_NAME looks like 'cowch-wellness-v120' — show just the vNNN part.
+        const match = String(info.version).match(/v\d+/i);
+        const ver = match ? match[0] : info.version;
+        label = 'theracowch · ' + ver;
+        if (info.buildDate) label += ' · ' + info.buildDate;
+    }
+    stamp.textContent = label;
+
+    // If a new SW is sitting in "waiting", let them know an update is ready.
+    if ('serviceWorker' in navigator) {
+        try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && reg.waiting && navigator.serviceWorker.controller) {
+                const note = document.createElement('span');
+                note.className = 'app-version-update';
+                note.textContent = 'A new version is ready — tap “Check for updates”';
+                stamp.appendChild(document.createElement('br'));
+                stamp.appendChild(note);
+            }
+        } catch (_e) { /* ignore */ }
+    }
+}
+
+// "Check for updates & clear cache" button. Nukes all service-worker caches,
+// unregisters the worker, and reloads — the in-app equivalent of deleting and
+// reinstalling the PWA, so the very latest build loads fresh from the network.
+function setupForceRefresh() {
+    const btn = document.getElementById('refresh-app-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        const label = btn.querySelector('.refresh-app-label');
+        if (btn.dataset.busy === '1') return;
+        btn.dataset.busy = '1';
+        btn.disabled = true;
+        if (label) label.textContent = 'Updating…';
+
+        try {
+            if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map((r) => r.unregister().catch(() => {})));
+            }
+            if (window.caches && caches.keys) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map((k) => caches.delete(k).catch(() => {})));
+            }
+        } catch (_e) {
+            /* best effort — reload anyway */
+        }
+
+        // Bypass any lingering HTTP cache with a one-shot query param, then reload.
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('_fresh', Date.now().toString());
+            window.location.replace(url.toString());
+        } catch (_e) {
+            window.location.reload();
+        }
+    });
 }
 
 function setupThemePicker() {

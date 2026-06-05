@@ -2148,6 +2148,25 @@
         .settings-btn span {
             font-size: 1.25rem;
         }
+        /* Text labels wrapped in a span (so JS can update them) keep base size */
+        .settings-btn span.refresh-app-label {
+            font-size: var(--font-size-base);
+        }
+
+        /* App version stamp — lets users confirm which build they're on */
+        .app-version-stamp {
+            margin: var(--space-md) 0 0 0;
+            text-align: center;
+            font-size: var(--font-size-sm);
+            color: var(--text-on-canvas-muted);
+            letter-spacing: 0.02em;
+        }
+        .app-version-stamp .app-version-update {
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: var(--font-weight-bold);
+            color: var(--coral);
+        }
 
         /* Theme picker */
         .settings-label {
@@ -4460,10 +4479,16 @@
                             <span>ℹ️</span>
                             About Mandy
                         </button>
+                        <button class="settings-btn" id="refresh-app-btn">
+                            <span>🔄</span>
+                            <span class="refresh-app-label">Check for updates &amp; clear cache</span>
+                        </button>
                         <button class="settings-btn danger" id="clear-btn">
                             <span>🗑️</span>
                             Clear conversation history
                         </button>
+
+                        <p class="app-version-stamp" id="app-version-stamp">theracowch</p>
                     </div>
                 </div>
             </div>
@@ -6228,7 +6253,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=53"></script>
-    <script src="/assets/js/app.js?v=79"></script>
+    <script src="/assets/js/app.js?v=80"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
          ready). Styled to match the app; sits above everything, no layout shift. -->
