@@ -38,16 +38,21 @@ export default async function handler(req, res) {
       return res.status(413).json({ error: 'Prompt too long' });
     }
 
-    // Use a smaller/faster model for compression (Haiku equivalent)
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('Compress profile: ANTHROPIC_API_KEY is not set in the environment');
+      return res.status(500).json({ error: 'AI service not configured' });
+    }
+
+    // Use a smaller/faster model for compression (Haiku)
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.ANTHROPIC_API_KEY,
-        'Anthropic-Version': '2023-06-01'
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-haiku-4-5',
         max_tokens: 500,
         messages: [
           { role: 'user', content: prompt }
@@ -57,7 +62,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('Compression API error:', error);
+      console.error(`Compression API error (${response.status}):`, error);
       return res.status(500).json({ error: 'Compression failed' });
     }
 

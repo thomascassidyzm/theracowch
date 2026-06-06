@@ -613,18 +613,33 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
     // Add current message
     messages.push({ role: 'user', content: message });
 
-    // Call Claude API with prompt caching
+    // Fail fast with a clear signal if the key isn't configured. An unset
+    // ANTHROPIC_API_KEY is the most common cause of "trouble connecting":
+    // the request goes out with `x-api-key: undefined` and Anthropic returns
+    // 401, which surfaces to the user as a generic connection error.
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('Chat API: ANTHROPIC_API_KEY is not set in the environment');
+      return res.status(500).json({
+        error: 'AI service not configured',
+        fallback: "I'm having a technical moment on my end right now. Please try again shortly — I'm still here with you."
+      });
+    }
+
+    // Call Claude API. Prompt caching is GA, so `cache_control` works without
+    // a beta header. Model is Sonnet 4.6 (the supported successor to Sonnet 4);
+    // effort:low + thinking disabled keeps replies fast and conversational.
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.ANTHROPIC_API_KEY,
-        'Anthropic-Version': '2023-06-01',
-        'anthropic-beta': 'prompt-caching-2024-07-31'
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 500,  // Increased for guided interventions
+        thinking: { type: 'disabled' },
+        output_config: { effort: 'low' },
         system: [
           {
             type: 'text',
@@ -638,9 +653,10 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Claude API Error:', errorData);
-      return res.status(500).json({ 
+      console.error(`Claude API Error (${response.status}):`, errorData);
+      return res.status(500).json({
         error: 'AI service temporarily unavailable',
+        upstreamStatus: response.status,
         fallback: "I'm experiencing a technical moment, but I'm still here with you. Sometimes we all need to pause and regroup - that's perfectly normal. What's one thing you're feeling right now that we can explore together?"
       });
     }
