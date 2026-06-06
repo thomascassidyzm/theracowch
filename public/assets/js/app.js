@@ -34,7 +34,6 @@ function switchTab(tabId) {
         if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
         if (typeof updatePastureUI         === 'function') updatePastureUI();
         if (typeof updateWeeklySummaryUI   === 'function') updateWeeklySummaryUI();
-        if (typeof updateWeeklyReportUI    === 'function') updateWeeklyReportUI();
         if (typeof updatePatternsUI        === 'function') updatePatternsUI();
     }
 }
@@ -1334,23 +1333,26 @@ function buildSummaryHighlights() {
     let topEx = null, topCount = 0;
     Object.keys(exCounts).forEach(k => { if (exCounts[k] > topCount) { topCount = exCounts[k]; topEx = k; } });
 
-    if (!showedUpDays && !checkins && !exTotal) {
-        return 'Open the app a few times this week and your highlights will start to fill in here.';
-    }
+    // Always lead with the exact number of times shown up — matching the
+    // pasture's "shown up X times" wording — so the count is never vague.
+    let sentence = 'This week you&rsquo;ve shown up <strong>' + showedUpDays +
+        '</strong> time' + (showedUpDays === 1 ? '' : 's');
 
-    const parts = [];
-    parts.push(showedUpDays === 1 ? 'shown up 1 day' : 'shown up ' + showedUpDays + ' days');
-    if (checkins) parts.push(checkins === 1 ? 'checked in once' : 'checked in ' + checkins + ' times');
-    if (exTotal) parts.push(exTotal === 1 ? 'done 1 exercise' : 'done ' + exTotal + ' exercises');
-
-    let sentence = 'This week you&rsquo;ve ';
-    if (parts.length === 1) {
-        sentence += parts[0] + '.';
-    } else if (parts.length === 2) {
-        sentence += parts[0] + ' and ' + parts[1] + '.';
+    const extra = [];
+    if (checkins) extra.push(checkins === 1 ? 'checked in once' : 'checked in ' + checkins + ' times');
+    if (exTotal) extra.push(exTotal === 1 ? 'done 1 exercise' : 'done ' + exTotal + ' exercises');
+    if (extra.length === 1) {
+        sentence += ', and ' + extra[0] + '.';
+    } else if (extra.length === 2) {
+        sentence += ', ' + extra[0] + ' and ' + extra[1] + '.';
     } else {
-        sentence += parts[0] + ', ' + parts[1] + ' and ' + parts[2] + '.';
+        sentence += '.';
     }
+
+    if (!showedUpDays && !checkins && !exTotal) {
+        sentence += ' Open the app any day this week and the rest fills in here.';
+    }
+
     if (topEx && topCount > 1) {
         const meta = (typeof EXERCISE_LABELS !== 'undefined' && EXERCISE_LABELS[topEx]) || { label: topEx };
         sentence += ' You came back to <strong>' + meta.label + '</strong> the most.';
@@ -3301,7 +3303,6 @@ function init() {
     setupPastureEdit();
     setupWeeklySummary();
     updateWeeklySummaryUI();
-    updateWeeklyReportUI();
     updatePatternsUI();
     setupReminders();
     setupTabNavigation();
