@@ -1279,6 +1279,47 @@ const WEEKLY_REFLECTION_KEY = 'cowch_weekly_reflection';
 const WEEKLY_TODOS_KEY = 'cowch_weekly_todos';
 const REFLECTION_FIELDS = { good: 'summary-good', tough: 'summary-tough', solve: 'summary-solve' };
 
+// Words/phrases in the "something that wasn't so good" reflection that suggest
+// the week genuinely weighed on the person. When one shows up we gently offer
+// a chat with Mandy — see maybeOfferMandyChat(). The field is negative-only by
+// design, so we lean toward stronger distress signals rather than mild grumbles.
+const DISTRESS_SIGNALS = [
+    'overwhelm', "can't cope", 'cant cope', "can't go on", 'cant go on',
+    'anxious', 'anxiety', 'panic', 'depress', 'hopeless', 'worthless',
+    'lonely', 'so alone', 'all alone', 'scared', 'afraid', 'terrified',
+    'crying', 'cried', 'in tears', 'breaking down', 'broke down', 'broken',
+    'exhausted', 'burnt out', 'burned out', 'burnout', 'stressed', 'stress',
+    'struggling', 'struggle', 'awful', 'terrible', 'unbearable', "can't sleep",
+    'cant sleep', 'falling apart', 'fell apart', 'give up', 'giving up',
+    'too much', 'numb', 'grief', 'grieving', 'ashamed', 'no point',
+    'hate myself', 'dread', 'despair', 'devastated', 'heartbroken'
+];
+
+// True if the "tough" reflection text sounds distressing enough to offer support.
+function summaryToughSoundsDistressing(text) {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return DISTRESS_SIGNALS.some(word => lower.indexOf(word) !== -1);
+}
+
+// Remember the exact reflection text we last prompted on, so the popup doesn't
+// reappear every time the field loses focus without a change.
+let _mandyCheckinPromptedFor = '';
+
+// If the "tough" reflection sounds distressing, surface the "chat to Mandy?"
+// popup. Dismissible and shown at most once per distinct piece of text.
+function maybeOfferMandyChat() {
+    const el = document.getElementById('summary-tough');
+    if (!el) return;
+    const text = el.value.trim();
+    if (!text || text === _mandyCheckinPromptedFor) return;
+    if (!summaryToughSoundsDistressing(text)) return;
+    const modal = document.getElementById('mandy-checkin-modal');
+    if (!modal) return;
+    _mandyCheckinPromptedFor = text;
+    modal.classList.add('active');
+}
+
 function loadWeeklyReflection() {
     try { return JSON.parse(localStorage.getItem(WEEKLY_REFLECTION_KEY) || '{}') || {}; }
     catch (_) { return {}; }
@@ -1486,6 +1527,39 @@ function setupWeeklySummary() {
             renderWeeklyTodos();
             flashWeeklySaved();
         });
+    }
+
+    // When the person finishes writing about something that wasn't so good and
+    // it sounds distressing, gently offer to chat it through with Mandy.
+    const toughEl = document.getElementById(REFLECTION_FIELDS.tough);
+    if (toughEl) {
+        // Small delay so debounced autosave settles before we check the text.
+        toughEl.addEventListener('blur', () => setTimeout(maybeOfferMandyChat, 200));
+    }
+
+    const mandyModal = document.getElementById('mandy-checkin-modal');
+    if (mandyModal) {
+        const close = () => mandyModal.classList.remove('active');
+        const yesBtn = document.getElementById('mandy-checkin-yes');
+        const noBtn = document.getElementById('mandy-checkin-no');
+
+        if (yesBtn) yesBtn.addEventListener('click', () => {
+            close();
+            const tough = (document.getElementById('summary-tough') || {}).value || '';
+            const prompt = tough.trim()
+                ? `In my weekly summary I wrote that something that wasn't so good was: "${tough.trim()}". Can we talk it through?`
+                : "Something this week wasn't so good and I'd like to talk it through.";
+            switchTab('chat');
+            // Let the chat tab mount before sending (mirrors triggerChatWithPrompt).
+            setTimeout(() => {
+                if (window.triggerChatPrompt) window.triggerChatPrompt(prompt);
+                else if (typeof triggerChatPrompt === 'function') triggerChatPrompt(prompt);
+            }, 300);
+        });
+
+        if (noBtn) noBtn.addEventListener('click', close);
+        // Tap the backdrop to dismiss.
+        mandyModal.addEventListener('click', (e) => { if (e.target === mandyModal) close(); });
     }
 }
 window.setupWeeklySummary = setupWeeklySummary;
