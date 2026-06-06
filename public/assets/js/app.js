@@ -33,6 +33,7 @@ function switchTab(tabId) {
     if (tabId === 'you') {
         if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
         if (typeof updatePastureUI         === 'function') updatePastureUI();
+        if (typeof updateWeeklySummaryUI   === 'function') updateWeeklySummaryUI();
         if (typeof updateWeeklyReportUI    === 'function') updateWeeklyReportUI();
         if (typeof updatePatternsUI        === 'function') updatePatternsUI();
     }
@@ -1268,6 +1269,224 @@ function updateWeeklyReportUI() {
     headline.textContent = buildWeeklyNarrative(wxEntries, showedUpDays);
 }
 window.updateWeeklyReportUI = updateWeeklyReportUI;
+
+// ============================================
+// Weekly Summary — a reflective, rolling check-in.
+// Free-text reflection (good / not-so-good / problem-solving) plus a small
+// to-do list for the week ahead. Everything autosaves to localStorage and the
+// to-do list rolls over: unfinished items simply stay until you clear them.
+// ============================================
+const WEEKLY_REFLECTION_KEY = 'cowch_weekly_reflection';
+const WEEKLY_TODOS_KEY = 'cowch_weekly_todos';
+const REFLECTION_FIELDS = { good: 'summary-good', tough: 'summary-tough', solve: 'summary-solve' };
+
+function loadWeeklyReflection() {
+    try { return JSON.parse(localStorage.getItem(WEEKLY_REFLECTION_KEY) || '{}') || {}; }
+    catch (_) { return {}; }
+}
+function saveWeeklyReflection(data) {
+    try { localStorage.setItem(WEEKLY_REFLECTION_KEY, JSON.stringify(data)); } catch (_) {}
+}
+function loadWeeklyTodos() {
+    try {
+        const t = JSON.parse(localStorage.getItem(WEEKLY_TODOS_KEY) || '[]');
+        return Array.isArray(t) ? t : [];
+    } catch (_) { return []; }
+}
+function saveWeeklyTodos(todos) {
+    try { localStorage.setItem(WEEKLY_TODOS_KEY, JSON.stringify(todos)); } catch (_) {}
+}
+
+function flashWeeklySaved() {
+    const el = document.getElementById('summary-saved');
+    if (!el) return;
+    el.textContent = 'Saved ✓';
+    el.classList.add('show');
+    clearTimeout(flashWeeklySaved._t);
+    flashWeeklySaved._t = setTimeout(() => { el.classList.remove('show'); }, 1600);
+}
+
+// Build a warm one-line recap of how active the week has been, reusing the
+// same data that powers Week in Bloom.
+function buildSummaryHighlights() {
+    const weekDays = weeklyDaysWindow();
+    const inWeek = (ts) => {
+        if (!ts) return false;
+        const d = new Date(ts);
+        return !isNaN(d.getTime()) && weekDays.has(streakDayKey(d));
+    };
+
+    const showedUpDays = gatherActiveDays(7).size;
+
+    let checkins = 0;
+    try {
+        checkins = JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]')
+            .filter(c => c && inWeek(c.timestamp)).length;
+    } catch (_) {}
+
+    const exCounts = {};
+    let exTotal = 0;
+    loadActivityLog().forEach(e => {
+        if (!e || !e.name || !inWeek(e.at)) return;
+        exCounts[e.name] = (exCounts[e.name] || 0) + 1;
+        exTotal++;
+    });
+    let topEx = null, topCount = 0;
+    Object.keys(exCounts).forEach(k => { if (exCounts[k] > topCount) { topCount = exCounts[k]; topEx = k; } });
+
+    if (!showedUpDays && !checkins && !exTotal) {
+        return 'Open the app a few times this week and your highlights will start to fill in here.';
+    }
+
+    const parts = [];
+    parts.push(showedUpDays === 1 ? 'shown up 1 day' : 'shown up ' + showedUpDays + ' days');
+    if (checkins) parts.push(checkins === 1 ? 'checked in once' : 'checked in ' + checkins + ' times');
+    if (exTotal) parts.push(exTotal === 1 ? 'done 1 exercise' : 'done ' + exTotal + ' exercises');
+
+    let sentence = 'This week you&rsquo;ve ';
+    if (parts.length === 1) {
+        sentence += parts[0] + '.';
+    } else if (parts.length === 2) {
+        sentence += parts[0] + ' and ' + parts[1] + '.';
+    } else {
+        sentence += parts[0] + ', ' + parts[1] + ' and ' + parts[2] + '.';
+    }
+    if (topEx && topCount > 1) {
+        const meta = (typeof EXERCISE_LABELS !== 'undefined' && EXERCISE_LABELS[topEx]) || { label: topEx };
+        sentence += ' You came back to <strong>' + meta.label + '</strong> the most.';
+    }
+    return sentence;
+}
+
+function renderWeeklyTodos() {
+    const list = document.getElementById('summary-todo-list');
+    const clearBtn = document.getElementById('summary-clear-done');
+    if (!list) return;
+    const todos = loadWeeklyTodos();
+    const esc = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    list.innerHTML = '';
+    if (!todos.length) {
+        const empty = document.createElement('div');
+        empty.className = 'summary-todo-empty';
+        empty.textContent = 'Nothing here yet — add a small plan for the week ahead.';
+        list.appendChild(empty);
+    } else {
+        todos.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'summary-todo-row' + (t.done ? ' is-done' : '');
+            row.innerHTML =
+                '<button type="button" class="summary-todo-check" data-id="' + t.id + '" ' +
+                    'aria-label="' + (t.done ? 'Mark as not done' : 'Mark as done') + '" ' +
+                    'aria-pressed="' + (t.done ? 'true' : 'false') + '">✓</button>' +
+                '<span class="summary-todo-text">' + esc(t.text) + '</span>' +
+                '<button type="button" class="summary-todo-remove" data-id="' + t.id + '" aria-label="Remove">✕</button>';
+            list.appendChild(row);
+        });
+    }
+    if (clearBtn) clearBtn.hidden = !todos.some(t => t.done);
+}
+
+// Populate the summary card from storage. Called on init and each time the
+// You tab is opened. Avoids clobbering a field the user is actively editing.
+function updateWeeklySummaryUI() {
+    const card = document.getElementById('summary-card');
+    if (!card) return;
+
+    const range = document.getElementById('summary-range');
+    if (range) {
+        const today = new Date();
+        const start = new Date(today); start.setDate(start.getDate() - 6);
+        const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        range.textContent = fmt(start) + ' – ' + fmt(today);
+    }
+
+    const highlights = document.getElementById('summary-highlights');
+    if (highlights) highlights.innerHTML = buildSummaryHighlights();
+
+    const data = loadWeeklyReflection();
+    Object.keys(REFLECTION_FIELDS).forEach(key => {
+        const el = document.getElementById(REFLECTION_FIELDS[key]);
+        if (el && el !== document.activeElement) el.value = data[key] || '';
+    });
+
+    renderWeeklyTodos();
+}
+window.updateWeeklySummaryUI = updateWeeklySummaryUI;
+
+// Wire up the summary card once. Autosaves reflection text and manages the
+// rolling to-do list.
+function setupWeeklySummary() {
+    const card = document.getElementById('summary-card');
+    if (!card || card.dataset.wired) return;
+    card.dataset.wired = '1';
+
+    // Autosave reflection fields (debounced) on input.
+    Object.keys(REFLECTION_FIELDS).forEach(key => {
+        const el = document.getElementById(REFLECTION_FIELDS[key]);
+        if (!el) return;
+        el.addEventListener('input', () => {
+            clearTimeout(el._saveTimer);
+            el._saveTimer = setTimeout(() => {
+                const data = loadWeeklyReflection();
+                data[key] = el.value;
+                data.updatedAt = Date.now();
+                saveWeeklyReflection(data);
+                flashWeeklySaved();
+            }, 500);
+        });
+    });
+
+    // Add a new to-do.
+    const form = document.getElementById('summary-todo-form');
+    const input = document.getElementById('summary-todo-input');
+    if (form && input) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            const todos = loadWeeklyTodos();
+            todos.push({ id: 'td' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text, done: false, createdAt: Date.now() });
+            saveWeeklyTodos(todos);
+            input.value = '';
+            renderWeeklyTodos();
+            flashWeeklySaved();
+        });
+    }
+
+    // Toggle / remove via delegation.
+    const list = document.getElementById('summary-todo-list');
+    if (list) {
+        list.addEventListener('click', (e) => {
+            const checkBtn = e.target.closest('.summary-todo-check');
+            const removeBtn = e.target.closest('.summary-todo-remove');
+            if (checkBtn) {
+                const id = checkBtn.dataset.id;
+                const todos = loadWeeklyTodos();
+                const t = todos.find(x => x.id === id);
+                if (t) { t.done = !t.done; t.completedAt = t.done ? Date.now() : null; }
+                saveWeeklyTodos(todos);
+                renderWeeklyTodos();
+            } else if (removeBtn) {
+                const id = removeBtn.dataset.id;
+                saveWeeklyTodos(loadWeeklyTodos().filter(x => x.id !== id));
+                renderWeeklyTodos();
+            }
+        });
+    }
+
+    // Clear completed items.
+    const clearBtn = document.getElementById('summary-clear-done');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            saveWeeklyTodos(loadWeeklyTodos().filter(t => !t.done));
+            renderWeeklyTodos();
+            flashWeeklySaved();
+        });
+    }
+}
+window.setupWeeklySummary = setupWeeklySummary;
 
 // ============================================
 // Patterns I'm noticing — gentle, non-judgmental reflections from the week
@@ -3080,6 +3299,8 @@ function init() {
     updateYourSpaceGreeting();
     updatePastureUI();
     setupPastureEdit();
+    setupWeeklySummary();
+    updateWeeklySummaryUI();
     updateWeeklyReportUI();
     updatePatternsUI();
     setupReminders();

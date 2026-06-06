@@ -1896,6 +1896,188 @@
         .patterns-empty { font-size: 0.92rem; color: var(--text-muted); font-style: italic; }
 
         /* Weekly report */
+        /* Weekly Summary — a reflective, rolling check-in above Week in Bloom */
+        .summary-card {
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+        }
+        .summary-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        .summary-head h2 { font-size: 1.1rem; font-weight: 900; margin: 0; }
+        .summary-range { font-size: 0.78rem; color: var(--text-muted); font-weight: 700; }
+        .summary-highlights {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 10px 14px;
+            border-radius: var(--radius-small);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        .summary-field { margin-bottom: var(--space-md); }
+        .summary-q {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .summary-input {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            resize: vertical;
+            min-height: 48px;
+        }
+        .summary-input:focus {
+            outline: none;
+            border-color: var(--coral);
+            box-shadow: 0 0 0 3px var(--coral-light);
+        }
+        .summary-todo { margin-top: var(--space-md); }
+        .summary-section-title {
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--coral);
+            margin: 6px 0 4px;
+        }
+        .summary-todo-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin: 0 0 8px;
+        }
+        .summary-todo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+        .summary-todo-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 8px 10px;
+        }
+        .summary-todo-check {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-warm);
+            border-radius: 6px;
+            background: var(--bg-card);
+            cursor: pointer;
+            font-size: 0.85rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            padding: 0;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .summary-todo-row.is-done .summary-todo-check {
+            background: #9BC4A7;
+            border-color: #7BA888;
+            color: #fff;
+        }
+        .summary-todo-text {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+            word-break: break-word;
+            padding-top: 1px;
+        }
+        .summary-todo-row.is-done .summary-todo-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .summary-todo-remove {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+        .summary-todo-remove:hover { color: var(--coral); }
+        .summary-todo-empty { color: var(--text-muted); font-size: 0.88rem; font-style: italic; }
+        .summary-todo-add { display: flex; gap: 8px; align-items: stretch; }
+        .summary-todo-field {
+            flex: 1;
+            min-width: 0;
+            box-sizing: border-box;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+        }
+        .summary-todo-field:focus {
+            outline: none;
+            border-color: var(--coral);
+            box-shadow: 0 0 0 3px var(--coral-light);
+        }
+        .summary-todo-btn {
+            flex-shrink: 0;
+            width: 44px;
+            background: var(--coral);
+            border: 2px solid var(--coral-dark);
+            border-radius: var(--radius-medium);
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .summary-todo-btn:active { transform: translateY(1px); }
+        .summary-clear-done {
+            margin-top: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 2px 0;
+        }
+        .summary-clear-done:hover { color: var(--coral); }
+        .summary-saved {
+            min-height: 1.1em;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #7BA888;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .summary-saved.show { opacity: 1; }
+
         .weekly-card {
             background: var(--bg-card);
             border: var(--border-thicc) solid var(--border-warm);
@@ -4296,7 +4478,44 @@
                         <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
                     </div>
 
-                    <!-- 2. Your Week in Bloom -->
+                    <!-- 2. Your Weekly Summary — reflection + rolling plans -->
+                    <div class="summary-card" id="summary-card">
+                        <div class="summary-head">
+                            <h2>Your Weekly Summary</h2>
+                            <span class="summary-range" id="summary-range"></span>
+                        </div>
+                        <p class="summary-highlights" id="summary-highlights">Your highlights will appear here as the week unfolds.</p>
+
+                        <div class="summary-field">
+                            <label class="summary-q" for="summary-good">🌟 One good thing that happened this week</label>
+                            <textarea id="summary-good" class="summary-input" rows="2" placeholder="A moment, a win, something that made you smile&hellip;"></textarea>
+                        </div>
+
+                        <div class="summary-field">
+                            <label class="summary-q" for="summary-tough">🌧️ Something that wasn&rsquo;t so good</label>
+                            <textarea id="summary-tough" class="summary-input" rows="2" placeholder="What felt hard, or didn&rsquo;t go the way you hoped?"></textarea>
+                        </div>
+
+                        <div class="summary-field">
+                            <label class="summary-q" for="summary-solve">💡 Working it through &mdash; what might help, and how could you put it into action?</label>
+                            <textarea id="summary-solve" class="summary-input" rows="2" placeholder="One small step you could take next time&hellip;"></textarea>
+                        </div>
+
+                        <div class="summary-todo">
+                            <div class="summary-section-title">📋 Plans for the week ahead</div>
+                            <p class="summary-todo-hint">Add a few small intentions. Tick them off as you go &mdash; whatever&rsquo;s left rolls into next week.</p>
+                            <div class="summary-todo-list" id="summary-todo-list"></div>
+                            <form class="summary-todo-add" id="summary-todo-form">
+                                <input type="text" id="summary-todo-input" class="summary-todo-field" placeholder="Add something for next week&hellip;" maxlength="120" autocomplete="off">
+                                <button type="submit" class="summary-todo-btn" aria-label="Add to your plans">＋</button>
+                            </form>
+                            <button type="button" class="summary-clear-done" id="summary-clear-done" hidden>Clear completed</button>
+                        </div>
+
+                        <div class="summary-saved" id="summary-saved" aria-live="polite"></div>
+                    </div>
+
+                    <!-- 3. Your Week in Bloom -->
                     <div class="weekly-card" id="weekly-card">
                         <div class="weekly-head">
                             <h2>Your Week in Bloom</h2>
