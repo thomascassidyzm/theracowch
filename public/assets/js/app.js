@@ -261,6 +261,68 @@ function streakDayKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// Parse a streakDayKey ("YYYY-MM-DD") back into a local-midnight Date, so a
+// recorded visit-day lines up with the same rolling window other sources use.
+function dayKeyToDate(key) {
+    const parts = String(key || '').split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return new Date(NaN);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+// Plain visit log. Opening the app counts as "showing up" even with no
+// check-in / exercise / chat — the Weekly Summary and pasture both promise
+// that a quiet visit still counts, so we record one day-key per calendar day.
+const VISIT_LOG_KEY = 'cowch-visit-days';
+
+function loadVisitDays() {
+    try {
+        const v = JSON.parse(localStorage.getItem(VISIT_LOG_KEY) || '[]');
+        return Array.isArray(v) ? v.filter(k => typeof k === 'string') : [];
+    } catch (_) { return []; }
+}
+
+const VISIT_LOG_BACKFILLED_KEY = 'cowch-visit-days-backfilled';
+
+// One-time seed of the visit log for users who were here before plain visits
+// were tracked. The pasture planted one item per visit-day (addedAt) and
+// records the last grow day, so those dates are a good proxy for past visits —
+// otherwise this week's already-made quiet visits would read as zero.
+function backfillVisitDaysOnce() {
+    try { if (localStorage.getItem(VISIT_LOG_BACKFILLED_KEY)) return; } catch (_) { return; }
+    const keys = new Set(loadVisitDays());
+    loadPastureItems().forEach(it => {
+        if (it && it.addedAt) {
+            const d = new Date(it.addedAt);
+            if (!isNaN(d.getTime())) keys.add(streakDayKey(d));
+        }
+    });
+    try {
+        const lastGrow = localStorage.getItem(PASTURE_LASTGROW_KEY);
+        if (lastGrow) keys.add(lastGrow);
+    } catch (_) {}
+    const cutoffKey = streakDayKey(new Date(Date.now() - 60 * 86400000));
+    const merged = Array.from(keys).filter(k => typeof k === 'string' && k >= cutoffKey);
+    try {
+        localStorage.setItem(VISIT_LOG_KEY, JSON.stringify(merged));
+        localStorage.setItem(VISIT_LOG_BACKFILLED_KEY, '1');
+    } catch (_) {}
+}
+
+// Records that the app was opened today (de-duplicated by calendar day) and
+// prunes anything older than ~60 days so storage stays bounded while the
+// rolling 7-day window always has what it needs.
+function recordVisitToday() {
+    backfillVisitDaysOnce();
+    const todayKey = streakDayKey(new Date());
+    const log = loadVisitDays();
+    if (log.indexOf(todayKey) !== -1) return;
+    log.push(todayKey);
+    const cutoffKey = streakDayKey(new Date(Date.now() - 60 * 86400000));
+    const pruned = log.filter(k => k >= cutoffKey); // ISO day-keys sort lexically
+    try { localStorage.setItem(VISIT_LOG_KEY, JSON.stringify(pruned)); } catch (_) {}
+}
+window.recordVisitToday = recordVisitToday;
+
 
 // ============================================
 // Values pasture — visual that thrives with consistent activity
@@ -270,8 +332,8 @@ function loadActivityLog() {
 }
 
 function gatherActiveDays(windowDays) {
-    // A day counts as "active" if any of: weather check-in, goal added,
-    // exercise logged in the activity log, OR chat message.
+    // A day counts as "active" if the app was opened that day (a quiet visit),
+    // OR any of: weather check-in, goal added, exercise logged, chat message.
     const days = new Set();
     const fromMs = Date.now() - windowDays * 86400000;
     function add(ts) {
@@ -280,6 +342,7 @@ function gatherActiveDays(windowDays) {
         if (isNaN(d.getTime()) || d.getTime() < fromMs) return;
         days.add(streakDayKey(d));
     }
+    loadVisitDays().forEach(k => add(dayKeyToDate(k).getTime()));
     try {
         JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]').forEach(e => add(e && e.timestamp));
     } catch (_) {}
@@ -3367,6 +3430,10 @@ function init() {
     appChatInput = document.getElementById('chat-input');
     chatSendBtn = document.getElementById('chat-send-btn');
     greetingText = document.getElementById('greeting-text');
+
+    // Record this visit first so a quiet open already counts toward the
+    // Weekly Summary "shown up" total and the pasture on this same load.
+    recordVisitToday();
 
     // Setup all functionality
     updateGreeting();
