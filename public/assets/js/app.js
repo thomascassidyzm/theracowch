@@ -34,7 +34,6 @@ function switchTab(tabId) {
         if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
         if (typeof updatePastureUI         === 'function') updatePastureUI();
         if (typeof updateWeeklySummaryUI   === 'function') updateWeeklySummaryUI();
-        if (typeof updateBalanceMeterUI    === 'function') updateBalanceMeterUI();
         if (typeof updatePatternsUI        === 'function') updatePatternsUI();
     }
 }
@@ -539,19 +538,30 @@ function pendingPastureMilestoneNote(visitDays) {
 // ── Drawing helpers: each draws into a group whose origin (0,0) is the
 //    item's base on the ground. ──
 function drawFlower(g, item) {
-    const color = PASTURE_FLOWER_COLORS[(item.variant || 0) % PASTURE_FLOWER_COLORS.length];
+    // IMAGINE flowers wear their area's colour (and grow a touch with engagement);
+    // legacy "wildflowers" (no letter) keep the original soft pastel palette.
+    const isImagine = item.letter && IMAGINE_PALETTE[item.letter];
+    const color = isImagine
+        ? IMAGINE_PALETTE[item.letter]
+        : PASTURE_FLOWER_COLORS[(item.variant || 0) % PASTURE_FLOWER_COLORS.length];
+
+    // Scale the whole flower from its base via an inner group.
+    const s = isImagine ? (item.scale || 1) : 1;
+    const fg = (s !== 1) ? document.createElementNS(NS_SVG, 'g') : g;
+    if (s !== 1) { fg.setAttribute('transform', 'scale(' + s + ')'); g.appendChild(fg); }
+
     const stem = document.createElementNS(NS_SVG, 'line');
     stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
     stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
     stem.setAttribute('stroke', '#3F8458'); stem.setAttribute('stroke-width', 1.6);
     stem.setAttribute('stroke-linecap', 'round');
-    g.appendChild(stem);
+    fg.appendChild(stem);
     const sideLeaf = document.createElementNS(NS_SVG, 'ellipse');
     sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
     sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
     sideLeaf.setAttribute('fill', '#3F8458');
     sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
-    g.appendChild(sideLeaf);
+    fg.appendChild(sideLeaf);
     for (let p = 0; p < 5; p++) {
         const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
         const petal = document.createElementNS(NS_SVG, 'circle');
@@ -559,12 +569,14 @@ function drawFlower(g, item) {
         petal.setAttribute('cy', Math.sin(a) * 4.2 - 16);
         petal.setAttribute('r', 3.4);
         petal.setAttribute('fill', color);
-        g.appendChild(petal);
+        // A faint light rim keeps the petals legible on the green grass.
+        if (isImagine) { petal.setAttribute('stroke', 'rgba(255,255,255,0.55)'); petal.setAttribute('stroke-width', 0.6); }
+        fg.appendChild(petal);
     }
     const centre = document.createElementNS(NS_SVG, 'circle');
     centre.setAttribute('cx', 0); centre.setAttribute('cy', -16); centre.setAttribute('r', 2);
     centre.setAttribute('fill', '#C9A857');
-    g.appendChild(centre);
+    fg.appendChild(centre);
 }
 function drawTree(g, item) {
     const canopyColors = ['#5FA46B', '#4F8F60', '#76B47E'];
@@ -994,12 +1006,13 @@ function renderPasture() {
 }
 
 function updatePastureUI() {
-    const card = document.getElementById('pasture-card');
-    if (!card) return;
+    // The pasture now lives in its own panel; bail if that DOM isn't present.
+    if (!document.getElementById('pasture-svg')) return;
     const countEl = document.getElementById('pasture-count');
     const blurb = document.getElementById('pasture-blurb');
     const growNote = document.getElementById('pasture-grow-note');
     const tallyEl = document.getElementById('pasture-tally');
+    const blockSub = document.getElementById('pasture-block-sub');
 
     // One-time backfill: users who had a pasture before visit-day tracking
     // get their counter seeded from their existing item count.
@@ -1015,9 +1028,18 @@ function updatePastureUI() {
     maybeRelocateCowCollisions();
 
     const grown = maybeGrowPasture();
+    syncImagineFlowers();            // turn any new IMAGINE exercises into flowers
     const items = loadPastureItems();
     const visitDays = getPastureVisitDays();
     if (countEl) countEl.textContent = items.length;
+
+    // Keep the Your-Space entry block's subtitle in step with the garden.
+    if (blockSub) {
+        const n = items.length;
+        blockSub.textContent = n === 0
+            ? 'A flower blooms for every step you take'
+            : n + (n === 1 ? ' thing' : ' things') + ' growing — tap to tend your garden';
+    }
 
     if (growNote) {
         // A freshly-crossed milestone takes priority over the daily grow note.
@@ -1523,27 +1545,33 @@ function updateWeeklySummaryUI() {
 window.updateWeeklySummaryUI = updateWeeklySummaryUI;
 
 // ============================================
-// Your Balance — one horizontal bar per IMAGINE area, length = how much the
-// user has leaned into that area lately. Driven entirely by data already
-// captured (the cowch_imagine_engagement store written when an exercise is
-// done, plus inner-weather check-ins as a mindful-noticing signal), so it
-// needs no new input. Deliberately gentle: a short bar is an invitation, not
-// a failing grade, and there's never a total score.
+// IMAGINE palette + pasture flowers. Each of the seven areas has a fixed
+// colour (shared with the home letters, domain cards and tracker). Doing an
+// IMAGINE exercise plants a flower of that area's colour in the Progress
+// Pasture, so the garden becomes a living picture of where attention has
+// gone — a sparse colour is a gentle invitation, never a scolding.
 // ============================================
 const IMAGINE_ENGAGEMENT_KEY = 'cowch_imagine_engagement';
-const BALANCE_WINDOW_DAYS = 14;   // a fortnight smooths out day-to-day spikes
-const BALANCE_TARGET = 4;         // engagements that fill a bar to the end
 
-// Ordered to spell IMAGINE; keys match the engagement store (Interactions = I2).
-// Colours and pages mirror IMAGINE_DOMAINS so the bar matches its area.
-const BALANCE_DOMAINS = [
-    { key: 'I',  label: 'Self-care',   color: '#E88A6A', page: '/imagine/self.html' },
-    { key: 'M',  label: 'Mindfulness', color: '#7EA88B', page: '/imagine/mindfulness.html' },
-    { key: 'A',  label: 'Acceptance',  color: '#B8860B', page: '/imagine/acceptance.html' },
-    { key: 'G',  label: 'Gratitude',   color: '#DDA0DD', page: '/imagine/gratitude.html' },
-    { key: 'I2', label: 'Connection',  color: '#6B8E9F', page: '/imagine/interactions.html' },
-    { key: 'N',  label: 'Fun & play',  color: '#F4A460', page: '/imagine/nurturing.html' },
-    { key: 'E',  label: 'Exploring',   color: '#8FBC8F', page: '/imagine/exploring.html' }
+// Keys match the engagement store (Interactions = I2). The displayed letter is
+// the first character, so I2 shows as "I".
+const IMAGINE_PALETTE = {
+    I:  '#E87EA8',   // I, Me, Myself — pink
+    M:  '#5FB36A',   // Mindfulness   — green
+    A:  '#9C7CD4',   // Acceptance    — purple
+    G:  '#34B7AE',   // Gratitude     — turquoise
+    I2: '#F2C13D',   // Interactions  — yellow
+    N:  '#E8923C',   // Nurturing     — orange
+    E:  '#9AA84B'    // Exploring     — olive
+};
+const IMAGINE_LEGEND = [
+    { key: 'I',  label: 'I, Me, Myself' },
+    { key: 'M',  label: 'Mindfulness' },
+    { key: 'A',  label: 'Acceptance' },
+    { key: 'G',  label: 'Gratitude' },
+    { key: 'I2', label: 'Interactions' },
+    { key: 'N',  label: 'Nurturing' },
+    { key: 'E',  label: 'Exploring' }
 ];
 
 function loadImagineEngagement() {
@@ -1553,82 +1581,111 @@ function loadImagineEngagement() {
     } catch (_) { return {}; }
 }
 
-// Recent engagement count per IMAGINE area, over the rolling balance window.
-function balanceCountsByDomain() {
-    const data = loadImagineEngagement();
-    const fromMs = Date.now() - BALANCE_WINDOW_DAYS * 86400000;
-    const counts = {};
-    BALANCE_DOMAINS.forEach(d => {
-        const arr = Array.isArray(data[d.key]) ? data[d.key] : [];
-        counts[d.key] = arr.filter(ts => typeof ts === 'number' && ts >= fromMs).length;
-    });
-    // A mood check-in is a moment of present-moment noticing → count it toward
-    // Mindfulness, so the everyday weather check-in nudges the meter too.
+// High-water mark per area: the latest engagement timestamp already turned into
+// a flower, so each exercise plants exactly one flower (and we never replant
+// the same one even after the 30-day engagement log prunes it).
+const PASTURE_IMAGINE_HW_KEY = 'cowch-pasture-imagine-hw';
+const PASTURE_IMAGINE_CAP = 12;   // max flowers per area, to avoid overcrowding
+
+function loadPastureImagineHW() {
     try {
-        JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]').forEach(c => {
-            if (!c || !c.timestamp) return;
-            const t = new Date(c.timestamp).getTime();
-            if (!isNaN(t) && t >= fromMs) counts.M += 1;
-        });
-    } catch (_) {}
-    return counts;
+        const v = JSON.parse(localStorage.getItem(PASTURE_IMAGINE_HW_KEY) || '{}');
+        return (v && typeof v === 'object') ? v : {};
+    } catch (_) { return {}; }
 }
 
-// Render the bars from storage. Called on init and whenever the You tab opens.
-function updateBalanceMeterUI() {
-    const card = document.getElementById('balance-card');
-    if (!card) return;
-    const wrap = document.getElementById('balance-bars');
-    const nudge = document.getElementById('balance-nudge');
-    if (!wrap) return;
+// Turn any new IMAGINE engagements into colour-coded flowers. Additive only
+// (flowers are never removed automatically) and capped per area. On a user's
+// first run after this lands, the high-water marks are empty, so their recent
+// history backfills into an initial bloom.
+function syncImagineFlowers() {
+    const data = loadImagineEngagement();
+    const hw = loadPastureImagineHW();
+    const items = loadPastureItems();
+    const existing = {};
+    items.forEach(it => { if (it.letter) existing[it.letter] = (existing[it.letter] || 0) + 1; });
+    const cowPos = (typeof loadCowPos === 'function') ? loadCowPos() : null;
 
-    const counts = balanceCountsByDomain();
-    const total = BALANCE_DOMAINS.reduce((s, d) => s + counts[d.key], 0);
-
-    wrap.innerHTML = '';
-    BALANCE_DOMAINS.forEach(d => {
-        const count = counts[d.key];
-        const ratio = Math.min(count / BALANCE_TARGET, 1);
-        // Empty areas keep a faint sliver so a row never reads as a hard zero.
-        const pct = count === 0 ? 6 : Math.max(14, Math.round(ratio * 100));
-        const timesLabel = count === 0
-            ? 'no time logged in the last 2 weeks'
-            : count + ' time' + (count === 1 ? '' : 's') + ' in the last 2 weeks';
-
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'balance-row';
-        row.setAttribute('aria-label', d.label + ': ' + timesLabel + '. Tap to explore.');
-        row.innerHTML =
-            '<span class="balance-label">' + d.label + '</span>' +
-            '<span class="balance-track"><span class="balance-fill" style="background:' + d.color + ';"></span></span>';
-        row.addEventListener('click', () => { window.location.href = d.page; });
-        wrap.appendChild(row);
-
-        const fill = row.querySelector('.balance-fill');
-        requestAnimationFrame(() => { fill.style.width = pct + '%'; });
+    let planted = 0, hwChanged = false;
+    Object.keys(IMAGINE_PALETTE).forEach(letter => {
+        const raw = Array.isArray(data[letter]) ? data[letter].filter(t => typeof t === 'number') : [];
+        if (!raw.length) return;
+        raw.sort((a, b) => a - b);
+        const fresh = raw.filter(t => t > (hw[letter] || 0));
+        if (!fresh.length) return;
+        hwChanged = true;
+        const room = Math.max(0, PASTURE_IMAGINE_CAP - (existing[letter] || 0));
+        const toPlant = Math.min(fresh.length, room);
+        for (let i = 0; i < toPlant; i++) {
+            const pos = randomPasturePosition(items, cowPos);
+            items.push({
+                id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36),
+                type: 'flower',
+                letter: letter,
+                x: pos.x,
+                y: pos.y,
+                scale: 0.92 + Math.random() * 0.3,
+                addedAt: new Date().toISOString()
+            });
+            planted++;
+        }
+        hw[letter] = raw[raw.length - 1]; // advance past everything seen, even if capped
     });
+    if (planted > 0) savePastureItems(items);
+    if (hwChanged) { try { localStorage.setItem(PASTURE_IMAGINE_HW_KEY, JSON.stringify(hw)); } catch (_) {} }
+    return planted;
+}
 
-    if (!nudge) return;
-    if (total === 0) {
-        nudge.hidden = false;
-        nudge.textContent = 'Nothing to show just yet — try an exercise from any of the seven areas and your balance will start to fill in here.';
-        return;
+// The little colour key under the pasture, so it's clear which colour is which
+// part of IMAGINE.
+function renderPastureLegend() {
+    const grid = document.getElementById('pasture-legend-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    IMAGINE_LEGEND.forEach(d => {
+        const row = document.createElement('div');
+        row.className = 'pasture-legend-item';
+        row.innerHTML =
+            '<span class="pasture-legend-swatch" style="background:' + IMAGINE_PALETTE[d.key] + ';"></span>' +
+            '<span class="pasture-legend-letter">' + d.key.charAt(0) + '</span>' +
+            '<span class="pasture-legend-label">' + d.label + '</span>';
+        grid.appendChild(row);
+    });
+}
+
+// Teaser row of the seven colours on the Your-Space entry block.
+function renderPastureBlockDots() {
+    const dots = document.getElementById('pasture-block-dots');
+    if (!dots) return;
+    dots.innerHTML = '';
+    IMAGINE_LEGEND.forEach(d => {
+        const i = document.createElement('i');
+        i.style.background = IMAGINE_PALETTE[d.key];
+        dots.appendChild(i);
+    });
+}
+
+// Wire the Your-Space entry block to open the full pasture on its own screen.
+function setupPasturePanel() {
+    const block = document.getElementById('pasture-block');
+    const panel = document.getElementById('pasture-panel');
+    const back = document.getElementById('pasture-panel-back');
+    if (!block || !panel) return;
+    renderPastureBlockDots();
+    renderPastureLegend();
+    if (!block.dataset.wired) {
+        block.dataset.wired = '1';
+        block.addEventListener('click', () => {
+            updatePastureUI();              // sync + render with the latest data
+            panel.classList.add('active');
+        });
     }
-    // Gently point at the quietest area, but only if it's genuinely untouched —
-    // and frame it as an open invitation, never a shortfall.
-    let lowest = BALANCE_DOMAINS[0];
-    BALANCE_DOMAINS.forEach(d => { if (counts[d.key] < counts[lowest.key]) lowest = d; });
-    if (counts[lowest.key] === 0) {
-        nudge.hidden = false;
-        nudge.innerHTML = '<strong>' + lowest.label + '</strong> has been quiet lately. ' +
-            'No pressure at all — but if you fancy it, even a couple of minutes there could round things out.';
-    } else {
-        nudge.hidden = false;
-        nudge.textContent = 'A nicely rounded couple of weeks — you’ve touched every area. Keep doing what feels right.';
+    if (back && !back.dataset.wired) {
+        back.dataset.wired = '1';
+        back.addEventListener('click', () => panel.classList.remove('active'));
     }
 }
-window.updateBalanceMeterUI = updateBalanceMeterUI;
+window.setupPasturePanel = setupPasturePanel;
 
 // Wire up the summary card once. Autosaves reflection text and manages the
 // rolling to-do list.
@@ -2214,7 +2271,7 @@ const IMAGINE_DOMAINS = {
         letter: 'I',
         title: 'I, Me, Myself',
         subtitle: 'Self-care, boundaries & compassion',
-        color: '#E88A6A',
+        color: '#E87EA8',
         description: 'This domain is about nurturing your relationship with yourself. It includes self-care practices, setting healthy boundaries, and developing self-compassion.',
         exercises: [
             { title: '5-Minute Body Reset', description: 'Boost energy through small intentional movement', duration: '5 min', prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.' },
@@ -2227,7 +2284,7 @@ const IMAGINE_DOMAINS = {
         letter: 'M',
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
-        color: '#7EA88B',
+        color: '#5FB36A',
         description: 'Mindfulness helps you step out of autopilot and into the present moment. These exercises help calm your nervous system and anchor you in the here and now.',
         exercises: [
             { title: 'Box Breathing', description: '4-4-4-4 breathing to calm your nervous system', duration: '4 min', interactive: 'breathing', prompt: 'Can you guide me through box breathing?' },
@@ -2240,7 +2297,7 @@ const IMAGINE_DOMAINS = {
         letter: 'A',
         title: 'Acceptance',
         subtitle: 'Making peace with what is',
-        color: '#B8860B',
+        color: '#9C7CD4',
         description: 'Acceptance isn\'t about giving up - it\'s about acknowledging reality so you can respond wisely rather than react. These exercises help you make peace with what you cannot change.',
         exercises: [
             { title: 'The Wave', description: 'Watch emotions rise and fall like ocean waves', duration: '3 min', interactive: 'wave', prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.' },
@@ -2252,7 +2309,7 @@ const IMAGINE_DOMAINS = {
         letter: 'G',
         title: 'Gratitude',
         subtitle: 'Noticing the good',
-        color: '#DDA0DD',
+        color: '#34B7AE',
         description: 'Gratitude isn\'t about toxic positivity - it\'s about training your brain to notice good things alongside the difficult ones. These exercises build your appreciation muscle.',
         exercises: [
             { title: 'Notice the Small Stuff', description: 'Tune into subtle positives you might have missed', duration: '2 min', prompt: 'Can you help me with the tiny wins gratitude check? I want to notice three small things that made today even slightly better.' },
@@ -2263,7 +2320,7 @@ const IMAGINE_DOMAINS = {
         letter: 'I',
         title: 'Interactions',
         subtitle: 'Connection with others',
-        color: '#6B8E9F',
+        color: '#F2C13D',
         description: 'We\'re social creatures, and connection matters for wellbeing. These exercises help you notice your interaction patterns and take small steps toward meaningful connection.',
         exercises: [
             { title: 'How Connected Was Today?', description: 'Build awareness of your daily interaction levels', duration: '2 min', interactive: 'social', prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.' },
@@ -2275,7 +2332,7 @@ const IMAGINE_DOMAINS = {
         letter: 'N',
         title: 'Nurture Fun & Play',
         subtitle: 'Joy and lightness',
-        color: '#F4A460',
+        color: '#E8923C',
         description: 'Play isn\'t just for kids - it\'s essential for mental health. These exercises help you reconnect with joy, lightness, and your playful side.',
         exercises: [
             { title: 'Scheduled Silly Time', description: 'Interrupt seriousness with 10 minutes of play', duration: '10 min', prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.' },
@@ -2287,7 +2344,7 @@ const IMAGINE_DOMAINS = {
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#8FBC8F',
+        color: '#9AA84B',
         description: 'Growth happens at the edge of your comfort zone. These exercises help you gently stretch your boundaries and build tolerance for uncertainty.',
         exercises: [
             { title: 'What\'s Protecting You... and Limiting You?', description: 'Identify behaviours that block growth', prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.' },
@@ -3551,9 +3608,9 @@ function init() {
     updateYourSpaceGreeting();
     updatePastureUI();
     setupPastureEdit();
+    setupPasturePanel();
     setupWeeklySummary();
     updateWeeklySummaryUI();
-    updateBalanceMeterUI();
     updatePatternsUI();
     setupReminders();
     setupTabNavigation();

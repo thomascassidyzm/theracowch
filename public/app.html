@@ -846,11 +846,18 @@
 
         .imagine-mini-letter:hover,
         .imagine-mini-letter.active {
-            background: var(--coral);
-            border-color: var(--coral);
-            color: var(--text-on-coral);
             transform: scale(1.1) rotate(-3deg);
         }
+
+        /* Each IMAGINE letter wears its own colour, matching the pasture
+           flowers and the rest of the app. */
+        .imagine-mini-letter[data-domain="I"]  { background: var(--imagine-i);  border-color: var(--imagine-i);  color: #fff; }
+        .imagine-mini-letter[data-domain="M"]  { background: var(--imagine-m);  border-color: var(--imagine-m);  color: #fff; }
+        .imagine-mini-letter[data-domain="A"]  { background: var(--imagine-a);  border-color: var(--imagine-a);  color: #fff; }
+        .imagine-mini-letter[data-domain="G"]  { background: var(--imagine-g);  border-color: var(--imagine-g);  color: #fff; }
+        .imagine-mini-letter[data-domain="I2"] { background: var(--imagine-i2); border-color: var(--imagine-i2); color: #fff; }
+        .imagine-mini-letter[data-domain="N"]  { background: var(--imagine-n);  border-color: var(--imagine-n);  color: #fff; }
+        .imagine-mini-letter[data-domain="E"]  { background: var(--imagine-e);  border-color: var(--imagine-e);  color: #fff; }
 
         /* ============================================
            IMAGINE TAB - Domain Cards
@@ -1906,83 +1913,73 @@
             box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
         }
 
-        /* Your Balance — horizontal bars, one per IMAGINE area. Bar length
-           reflects recent engagement; colour is the area's own colour. Kept
-           deliberately soft so a short bar reads as an invitation, not a fail. */
-        .balance-card {
+        /* Progress Pasture entry block — a compact tappable card in Your Space
+           that opens the full garden on its own screen. */
+        .pasture-block {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            width: 100%;
+            text-align: left;
             background: var(--bg-card);
             border: var(--border-thicc) solid var(--border-warm);
             border-radius: var(--radius-chunky);
-            padding: var(--space-xl);
+            padding: var(--space-lg) var(--space-xl);
             margin-bottom: var(--space-2xl);
             box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
-        }
-        .balance-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: var(--space-md);
-            margin-bottom: var(--space-sm);
-        }
-        .balance-head h2 { font-size: 1.1rem; font-weight: 900; margin: 0; }
-        .balance-range { font-size: 0.78rem; color: var(--text-muted); font-weight: 700; }
-        .balance-intro {
-            font-size: 0.88rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-            margin: 0 0 var(--space-md);
-        }
-        .balance-bars { display: flex; flex-direction: column; gap: 10px; }
-        .balance-row {
-            display: grid;
-            grid-template-columns: 92px 1fr;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 4px 2px;
             cursor: pointer;
-            text-align: left;
-            border-radius: var(--radius-small);
-            transition: background 0.15s ease;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
-        .balance-row:hover, .balance-row:focus-visible { background: rgba(60, 46, 40, 0.05); outline: none; }
-        .balance-label {
-            font-size: 0.82rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1.2;
+        .pasture-block:hover, .pasture-block:focus-visible {
+            transform: translate(-1px, -1px);
+            box-shadow: 8px 8px 0 0 rgba(60, 46, 40, 0.20);
+            outline: none;
         }
-        .balance-track {
-            position: relative;
-            height: 16px;
-            border-radius: 999px;
-            background: rgba(60, 46, 40, 0.10);
-            overflow: hidden;
-        }
-        .balance-fill {
-            position: absolute;
+        .pasture-block:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 rgba(60, 46, 40, 0.18); }
+        .pasture-block-emoji { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
+        .pasture-block-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+        .pasture-block-text strong { font-size: 1.02rem; font-weight: 900; color: var(--text-primary); }
+        .pasture-block-text span { font-size: 0.82rem; color: var(--text-muted); }
+        .pasture-block-dots { display: flex; gap: 4px; flex-shrink: 0; }
+        .pasture-block-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+        .pasture-block-chevron { font-size: 1.6rem; color: var(--text-muted); font-weight: 900; flex-shrink: 0; }
+
+        /* Progress Pasture full-screen panel — mirrors the domain panel. */
+        .pasture-panel {
+            position: fixed;
             top: 0;
-            left: 0;
-            height: 100%;
-            border-radius: 999px;
-            width: 0;
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            right: -100%;
+            width: 100%;
+            max-width: var(--max-width);
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-primary);
+            z-index: var(--z-modal);
+            transition: right var(--transition-brutal);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
         }
-        .balance-nudge {
-            margin: var(--space-md) 0 0;
-            padding: 10px 14px;
-            background: #FDF5E8;
-            border-left: 4px solid #C9A857;
+        .pasture-panel.active { right: 0; }
+        .pasture-panel-content { padding: var(--space-lg) var(--space-xl) var(--space-2xl); }
+        /* Bigger pasture on its own screen. */
+        .pasture-panel .pasture-svg { width: 100%; height: auto; margin: var(--space-sm) 0 var(--space-md); }
+
+        /* Legend mapping each colour to its IMAGINE area. */
+        .pasture-legend {
+            margin-top: var(--space-lg);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
             border-radius: var(--radius-small);
-            font-size: 0.88rem;
-            line-height: 1.5;
-            color: var(--text-primary);
+            padding: var(--space-md) var(--space-lg);
         }
-        @media (prefers-reduced-motion: reduce) {
-            .balance-fill { transition: none; }
-        }
+        .pasture-legend-title { font-size: 0.82rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-sm); }
+        .pasture-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+        .pasture-legend-item { display: flex; align-items: center; gap: 8px; }
+        .pasture-legend-swatch { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.7) inset; }
+        .pasture-legend-letter { font-weight: 900; color: var(--text-primary); }
+        .pasture-legend-label { font-size: 0.86rem; color: var(--text-secondary); }
         .summary-head {
             display: flex;
             justify-content: space-between;
@@ -4539,33 +4536,16 @@
                         <p id="you-greeting-sub">A gentle look at your journey</p>
                     </div>
 
-                    <!-- 1. Your Growing Pasture -->
-                    <div class="pasture-card" id="pasture-card">
-                        <p class="pasture-intro">The more you attend to your wellbeing, the more your pasture will grow.</p>
-                        <div class="pasture-head">
-                            <h2>Your Growing Pasture</h2>
-                            <span class="pasture-vitality"><span class="num" id="pasture-count">0</span> things growing</span>
+                    <!-- 1. Your Progress Pasture — opens the full garden on its own screen -->
+                    <button type="button" class="pasture-block" id="pasture-block" aria-label="Open your Progress Pasture">
+                        <span class="pasture-block-emoji">🌼</span>
+                        <div class="pasture-block-text">
+                            <strong>Your Progress Pasture</strong>
+                            <span id="pasture-block-sub">A flower blooms for every step you take</span>
                         </div>
-                        <p class="pasture-blurb" id="pasture-blurb">Every day you visit, something new grows here. Watch your pasture fill in over time.</p>
-                        <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Your pasture"></svg>
-                        <div class="pasture-grow-note" id="pasture-grow-note" hidden></div>
-                        <div class="pasture-actions">
-                            <button type="button" class="pasture-edit-btn" id="pasture-edit-btn">✥ Rearrange</button>
-                            <span class="pasture-edit-hint" id="pasture-edit-hint" hidden>Drag to move · tap ✕ to remove</span>
-                        </div>
-                        <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
-                    </div>
-
-                    <!-- 2. Your Balance — gentle picture of attention across the seven areas -->
-                    <div class="balance-card" id="balance-card">
-                        <div class="balance-head">
-                            <h2>Your Balance</h2>
-                            <span class="balance-range" id="balance-range">last 2 weeks</span>
-                        </div>
-                        <p class="balance-intro">A gentle picture of where you&rsquo;ve spent time. Longer bars are areas you&rsquo;ve leaned into &mdash; shorter ones are simply an invitation, never a should. Tap any bar to explore it.</p>
-                        <div class="balance-bars" id="balance-bars"></div>
-                        <p class="balance-nudge" id="balance-nudge" hidden></p>
-                    </div>
+                        <span class="pasture-block-dots" id="pasture-block-dots" aria-hidden="true"></span>
+                        <span class="pasture-block-chevron">›</span>
+                    </button>
 
                     <!-- 3. Your Weekly Summary — reflection + rolling plans -->
                     <div class="summary-card" id="summary-card">
@@ -4719,6 +4699,33 @@
         </main>
 
         <!-- Domain Detail Panel -->
+        <!-- PROGRESS PASTURE PANEL — the full garden on its own screen -->
+        <div class="pasture-panel" id="pasture-panel">
+            <header class="domain-panel-header">
+                <button class="domain-panel-back" id="pasture-panel-back">← Back</button>
+                <div class="domain-panel-title">
+                    <h2>Your Progress Pasture</h2>
+                    <span id="pasture-panel-sub">A flower for every step you take</span>
+                </div>
+            </header>
+            <div class="pasture-panel-content">
+                <p class="pasture-blurb" id="pasture-blurb">Every step you take plants something new here. Watch your pasture fill in over time.</p>
+                <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Your pasture"></svg>
+                <div class="pasture-grow-note" id="pasture-grow-note" hidden></div>
+                <div class="pasture-actions">
+                    <button type="button" class="pasture-edit-btn" id="pasture-edit-btn">✥ Rearrange</button>
+                    <span class="pasture-edit-hint" id="pasture-edit-hint" hidden>Drag to move · tap ✕ to remove</span>
+                </div>
+                <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
+
+                <!-- Legend: which colour is which part of IMAGINE -->
+                <div class="pasture-legend" id="pasture-legend">
+                    <div class="pasture-legend-title">What the colours mean</div>
+                    <div class="pasture-legend-grid" id="pasture-legend-grid"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="domain-panel" id="domain-panel">
             <header class="domain-panel-header">
                 <button class="domain-panel-back" id="domain-panel-back">← Back</button>

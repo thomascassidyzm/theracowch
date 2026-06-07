@@ -112,15 +112,15 @@ function updateImagineTracker() {
 // Get color for IMAGINE letter
 function getColorForLetter(letter) {
     const colors = {
-        'I': '#E88A6A',
-        'M': '#7EA88B',
-        'A': '#B8860B',
-        'G': '#DDA0DD',
-        'I2': '#6B8E9F',
-        'N': '#F4A460',
-        'E': '#8FBC8F'
+        'I': '#E87EA8',
+        'M': '#5FB36A',
+        'A': '#9C7CD4',
+        'G': '#34B7AE',
+        'I2': '#F2C13D',
+        'N': '#E8923C',
+        'E': '#9AA84B'
     };
-    return colors[letter] || '#E88A6A';
+    return colors[letter] || '#E87EA8';
 }
 
 // Setup click handlers for tracker letters
@@ -996,7 +996,7 @@ function buildExerciseCard(content) {
         const bodyExercise = findExerciseByName('Daily Mini-Movement');
         if (bodyExercise && bodyExercise.url) {
             const category = IMAGINE_EXERCISES.find(c => c.exercises.includes(bodyExercise));
-            matched.push({ title: bodyExercise.title, description: bodyExercise.description, url: bodyExercise.url, duration: bodyExercise.duration, color: category ? category.color : '#E88A6A' });
+            matched.push({ title: bodyExercise.title, description: bodyExercise.description, url: bodyExercise.url, duration: bodyExercise.duration, color: category ? category.color : '#E87EA8' });
         }
     }
 
@@ -1062,7 +1062,7 @@ function createBoxBreathingCard() {
             Start Box Breathing (4 min) →
         </button>
     `;
-    card.style.setProperty('--card-accent', '#7EA88B');
+    card.style.setProperty('--card-accent', '#5FB36A');
 
     const btn = card.querySelector('.exercise-action-card-btn');
     btn.addEventListener('click', (event) => {
@@ -1702,7 +1702,7 @@ const IMAGINE_EXERCISES = [
         letter: 'I',
         title: 'I, Me, Myself',
         subtitle: 'Self-care, boundaries & compassion',
-        color: '#E88A6A', // Terracotta
+        color: '#E87EA8', // Terracotta
         exercises: [
             {
                 name: 'Daily Mini-Movement',
@@ -1763,7 +1763,7 @@ const IMAGINE_EXERCISES = [
         letter: 'M',
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
-        color: '#7EA88B', // Sage green
+        color: '#5FB36A', // Sage green
         exercises: [
             {
                 name: 'Box Breathing',
@@ -1797,7 +1797,7 @@ const IMAGINE_EXERCISES = [
         letter: 'A',
         title: 'Acceptance',
         subtitle: 'Making peace with what is',
-        color: '#B8860B', // Golden
+        color: '#9C7CD4', // Golden
         exercises: [
             {
                 name: 'Resistance Scan',
@@ -1828,7 +1828,7 @@ const IMAGINE_EXERCISES = [
         letter: 'G',
         title: 'Gratitude',
         subtitle: 'Noticing the good',
-        color: '#DDA0DD', // Soft purple
+        color: '#34B7AE', // Soft purple
         exercises: [
             {
                 name: 'Tiny Wins',
@@ -1853,7 +1853,7 @@ const IMAGINE_EXERCISES = [
         letter: 'I',
         title: 'Interactions',
         subtitle: 'Connection with others',
-        color: '#6B8E9F', // Soft blue
+        color: '#F2C13D', // Soft blue
         exercises: [
             {
                 name: 'Social Pulse Check',
@@ -1892,7 +1892,7 @@ const IMAGINE_EXERCISES = [
         letter: 'N',
         title: 'Nurture Fun & Play',
         subtitle: 'Joy and lightness',
-        color: '#F4A460', // Sandy orange
+        color: '#E8923C', // Sandy orange
         exercises: [
             {
                 name: 'Play Break',
@@ -1932,7 +1932,7 @@ const IMAGINE_EXERCISES = [
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#8FBC8F', // Dark sea green
+        color: '#9AA84B', // Dark sea green
         exercises: [
             {
                 name: 'Safety Behaviours',

@@ -48,6 +48,19 @@
     --text-on-canvas: #1F1F1F;
     --text-on-canvas-muted: #6E6863;
 
+    /* ===== IMAGINE palette ===== */
+    /* Canonical colour for each of the seven IMAGINE areas. Used by the
+       Progress Pasture flowers, the home letters, domain cards and the
+       exercise tracker so the colour coding is consistent everywhere.
+       Kept constant across themes so an area is always the same colour. */
+    --imagine-i:  var(--color-self);    /* I — I, Me, Myself : pink */
+    --imagine-m:  var(--color-mind);    /* M — Mindfulness   : green */
+    --imagine-a:  var(--color-accept);  /* A — Acceptance    : purple */
+    --imagine-g:  var(--color-thanks);  /* G — Gratitude     : turquoise */
+    --imagine-i2: var(--color-connect); /* I — Interactions  : yellow */
+    --imagine-n:  var(--color-play);    /* N — Nurturing     : orange */
+    --imagine-e:  var(--color-explore); /* E — Exploring     : olive */
+
     /* ===== Accent Colours ===== */
     /* Primary brand — warm terracotta */
     --coral: #C97B63;
@@ -92,13 +105,15 @@
     --border-subtle: rgba(31, 31, 31, 0.06);
 
     /* ===== IMAGINE Domain Colors ===== */
-    --color-self: #E88A6A;       /* I - Self Care (coral) */
-    --color-mind: #7EA88B;       /* M - Mindfulness (sage) */
-    --color-accept: #C9A857;     /* A - Acceptance (gold) */
-    --color-thanks: #B794C4;     /* G - Gratitude (lavender) */
-    --color-connect: #6B9AAF;    /* I - Interactions (blue) */
-    --color-play: #E8A86A;       /* N - Nurturing (warm orange) */
-    --color-explore: #8FBC8F;    /* E - Exploring (green) */
+    /* Canonical IMAGINE palette (keep in sync with IMAGINE_PALETTE in app.js,
+       which colours the pasture flowers). */
+    --color-self: #E87EA8;       /* I - I, Me, Myself (pink) */
+    --color-mind: #5FB36A;       /* M - Mindfulness (green) */
+    --color-accept: #9C7CD4;     /* A - Acceptance (purple) */
+    --color-thanks: #34B7AE;     /* G - Gratitude (turquoise) */
+    --color-connect: #F2C13D;    /* I - Interactions (yellow) */
+    --color-play: #E8923C;       /* N - Nurturing (orange) */
+    --color-explore: #9AA84B;    /* E - Exploring (olive) */
 
     /* ===== Brutalism Design Tokens ===== */
     --border-thicc: 5px;
