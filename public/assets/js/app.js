@@ -34,6 +34,7 @@ function switchTab(tabId) {
         if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
         if (typeof updatePastureUI         === 'function') updatePastureUI();
         if (typeof updateWeeklySummaryUI   === 'function') updateWeeklySummaryUI();
+        if (typeof updateBalanceMeterUI    === 'function') updateBalanceMeterUI();
         if (typeof updatePatternsUI        === 'function') updatePatternsUI();
     }
 }
@@ -1520,6 +1521,114 @@ function updateWeeklySummaryUI() {
     renderWeeklyTodos();
 }
 window.updateWeeklySummaryUI = updateWeeklySummaryUI;
+
+// ============================================
+// Your Balance — one horizontal bar per IMAGINE area, length = how much the
+// user has leaned into that area lately. Driven entirely by data already
+// captured (the cowch_imagine_engagement store written when an exercise is
+// done, plus inner-weather check-ins as a mindful-noticing signal), so it
+// needs no new input. Deliberately gentle: a short bar is an invitation, not
+// a failing grade, and there's never a total score.
+// ============================================
+const IMAGINE_ENGAGEMENT_KEY = 'cowch_imagine_engagement';
+const BALANCE_WINDOW_DAYS = 14;   // a fortnight smooths out day-to-day spikes
+const BALANCE_TARGET = 4;         // engagements that fill a bar to the end
+
+// Ordered to spell IMAGINE; keys match the engagement store (Interactions = I2).
+// Colours and pages mirror IMAGINE_DOMAINS so the bar matches its area.
+const BALANCE_DOMAINS = [
+    { key: 'I',  label: 'Self-care',   color: '#E88A6A', page: '/imagine/self.html' },
+    { key: 'M',  label: 'Mindfulness', color: '#7EA88B', page: '/imagine/mindfulness.html' },
+    { key: 'A',  label: 'Acceptance',  color: '#B8860B', page: '/imagine/acceptance.html' },
+    { key: 'G',  label: 'Gratitude',   color: '#DDA0DD', page: '/imagine/gratitude.html' },
+    { key: 'I2', label: 'Connection',  color: '#6B8E9F', page: '/imagine/interactions.html' },
+    { key: 'N',  label: 'Fun & play',  color: '#F4A460', page: '/imagine/nurturing.html' },
+    { key: 'E',  label: 'Exploring',   color: '#8FBC8F', page: '/imagine/exploring.html' }
+];
+
+function loadImagineEngagement() {
+    try {
+        const d = JSON.parse(localStorage.getItem(IMAGINE_ENGAGEMENT_KEY) || '{}');
+        return (d && typeof d === 'object') ? d : {};
+    } catch (_) { return {}; }
+}
+
+// Recent engagement count per IMAGINE area, over the rolling balance window.
+function balanceCountsByDomain() {
+    const data = loadImagineEngagement();
+    const fromMs = Date.now() - BALANCE_WINDOW_DAYS * 86400000;
+    const counts = {};
+    BALANCE_DOMAINS.forEach(d => {
+        const arr = Array.isArray(data[d.key]) ? data[d.key] : [];
+        counts[d.key] = arr.filter(ts => typeof ts === 'number' && ts >= fromMs).length;
+    });
+    // A mood check-in is a moment of present-moment noticing → count it toward
+    // Mindfulness, so the everyday weather check-in nudges the meter too.
+    try {
+        JSON.parse(localStorage.getItem('innerWeatherHistory') || '[]').forEach(c => {
+            if (!c || !c.timestamp) return;
+            const t = new Date(c.timestamp).getTime();
+            if (!isNaN(t) && t >= fromMs) counts.M += 1;
+        });
+    } catch (_) {}
+    return counts;
+}
+
+// Render the bars from storage. Called on init and whenever the You tab opens.
+function updateBalanceMeterUI() {
+    const card = document.getElementById('balance-card');
+    if (!card) return;
+    const wrap = document.getElementById('balance-bars');
+    const nudge = document.getElementById('balance-nudge');
+    if (!wrap) return;
+
+    const counts = balanceCountsByDomain();
+    const total = BALANCE_DOMAINS.reduce((s, d) => s + counts[d.key], 0);
+
+    wrap.innerHTML = '';
+    BALANCE_DOMAINS.forEach(d => {
+        const count = counts[d.key];
+        const ratio = Math.min(count / BALANCE_TARGET, 1);
+        // Empty areas keep a faint sliver so a row never reads as a hard zero.
+        const pct = count === 0 ? 6 : Math.max(14, Math.round(ratio * 100));
+        const timesLabel = count === 0
+            ? 'no time logged in the last 2 weeks'
+            : count + ' time' + (count === 1 ? '' : 's') + ' in the last 2 weeks';
+
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'balance-row';
+        row.setAttribute('aria-label', d.label + ': ' + timesLabel + '. Tap to explore.');
+        row.innerHTML =
+            '<span class="balance-label">' + d.label + '</span>' +
+            '<span class="balance-track"><span class="balance-fill" style="background:' + d.color + ';"></span></span>';
+        row.addEventListener('click', () => { window.location.href = d.page; });
+        wrap.appendChild(row);
+
+        const fill = row.querySelector('.balance-fill');
+        requestAnimationFrame(() => { fill.style.width = pct + '%'; });
+    });
+
+    if (!nudge) return;
+    if (total === 0) {
+        nudge.hidden = false;
+        nudge.textContent = 'Nothing to show just yet — try an exercise from any of the seven areas and your balance will start to fill in here.';
+        return;
+    }
+    // Gently point at the quietest area, but only if it's genuinely untouched —
+    // and frame it as an open invitation, never a shortfall.
+    let lowest = BALANCE_DOMAINS[0];
+    BALANCE_DOMAINS.forEach(d => { if (counts[d.key] < counts[lowest.key]) lowest = d; });
+    if (counts[lowest.key] === 0) {
+        nudge.hidden = false;
+        nudge.innerHTML = '<strong>' + lowest.label + '</strong> has been quiet lately. ' +
+            'No pressure at all — but if you fancy it, even a couple of minutes there could round things out.';
+    } else {
+        nudge.hidden = false;
+        nudge.textContent = 'A nicely rounded couple of weeks — you’ve touched every area. Keep doing what feels right.';
+    }
+}
+window.updateBalanceMeterUI = updateBalanceMeterUI;
 
 // Wire up the summary card once. Autosaves reflection text and manages the
 // rolling to-do list.
@@ -3444,6 +3553,7 @@ function init() {
     setupPastureEdit();
     setupWeeklySummary();
     updateWeeklySummaryUI();
+    updateBalanceMeterUI();
     updatePatternsUI();
     setupReminders();
     setupTabNavigation();
