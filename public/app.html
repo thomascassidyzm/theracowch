@@ -1913,9 +1913,9 @@
             box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
         }
 
-        /* Progress Pasture entry block — a compact tappable card in Your Space
-           that opens the full garden on its own screen. */
-        .pasture-block {
+        /* Your Space entry block — a compact tappable card that opens a fuller
+           screen on its own (shared by the Progress Pasture and Weekly Summary). */
+        .space-block {
             display: flex;
             align-items: center;
             gap: var(--space-md);
@@ -1930,22 +1930,23 @@
             cursor: pointer;
             transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
-        .pasture-block:hover, .pasture-block:focus-visible {
+        .space-block:hover, .space-block:focus-visible {
             transform: translate(-1px, -1px);
             box-shadow: 8px 8px 0 0 rgba(60, 46, 40, 0.20);
             outline: none;
         }
-        .pasture-block:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 rgba(60, 46, 40, 0.18); }
-        .pasture-block-emoji { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
-        .pasture-block-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-        .pasture-block-text strong { font-size: 1.02rem; font-weight: 900; color: var(--text-primary); }
-        .pasture-block-text span { font-size: 0.82rem; color: var(--text-muted); }
-        .pasture-block-dots { display: flex; gap: 4px; flex-shrink: 0; }
-        .pasture-block-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
-        .pasture-block-chevron { font-size: 1.6rem; color: var(--text-muted); font-weight: 900; flex-shrink: 0; }
+        .space-block:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 rgba(60, 46, 40, 0.18); }
+        .space-block-emoji { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
+        .space-block-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+        .space-block-text strong { font-size: 1.02rem; font-weight: 900; color: var(--text-primary); }
+        .space-block-text span { font-size: 0.82rem; color: var(--text-muted); }
+        .space-block-dots { display: flex; gap: 4px; flex-shrink: 0; }
+        .space-block-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+        .space-block-chevron { font-size: 1.6rem; color: var(--text-muted); font-weight: 900; flex-shrink: 0; }
 
-        /* Progress Pasture full-screen panel — mirrors the domain panel. */
-        .pasture-panel {
+        /* Full-screen slide-in panels for Your Space (pasture, summary) — mirror
+           the domain panel. */
+        .pasture-panel, .summary-panel {
             position: fixed;
             top: 0;
             right: -100%;
@@ -1961,8 +1962,11 @@
             display: flex;
             flex-direction: column;
         }
-        .pasture-panel.active { right: 0; }
-        .pasture-panel-content { padding: var(--space-lg) var(--space-xl) var(--space-2xl); }
+        .pasture-panel.active, .summary-panel.active { right: 0; }
+        .pasture-panel-content, .summary-panel-content { padding: var(--space-lg) var(--space-xl) var(--space-2xl); }
+        /* Inside its panel the summary card is flush — the panel is the chrome. */
+        .summary-panel .summary-card { border: none; box-shadow: none; padding: 0; margin: 0; background: none; border-radius: 0; }
+        .summary-panel .summary-head { display: none; } /* panel header already shows the title */
         /* Bigger pasture on its own screen. */
         .pasture-panel .pasture-svg { width: 100%; height: auto; margin: var(--space-sm) 0 var(--space-md); }
 
@@ -4537,52 +4541,25 @@
                     </div>
 
                     <!-- 1. Your Progress Pasture — opens the full garden on its own screen -->
-                    <button type="button" class="pasture-block" id="pasture-block" aria-label="Open your Progress Pasture">
-                        <span class="pasture-block-emoji">🌼</span>
-                        <div class="pasture-block-text">
+                    <button type="button" class="space-block" id="pasture-block" aria-label="Open your Progress Pasture">
+                        <span class="space-block-emoji">🌼</span>
+                        <div class="space-block-text">
                             <strong>Your Progress Pasture</strong>
                             <span id="pasture-block-sub">A flower blooms for every step you take</span>
                         </div>
-                        <span class="pasture-block-dots" id="pasture-block-dots" aria-hidden="true"></span>
-                        <span class="pasture-block-chevron">›</span>
+                        <span class="space-block-dots" id="pasture-block-dots" aria-hidden="true"></span>
+                        <span class="space-block-chevron">›</span>
                     </button>
 
-                    <!-- 3. Your Weekly Summary — reflection + rolling plans -->
-                    <div class="summary-card" id="summary-card">
-                        <div class="summary-head">
-                            <h2>Your Weekly Summary</h2>
-                            <span class="summary-range" id="summary-range"></span>
+                    <!-- 3. Your Weekly Summary — opens its own screen, like the pasture -->
+                    <button type="button" class="space-block" id="summary-block" aria-label="Open your Weekly Summary">
+                        <span class="space-block-emoji">📔</span>
+                        <div class="space-block-text">
+                            <strong>Your Weekly Summary</strong>
+                            <span id="summary-block-sub">Reflect on your week and set intentions</span>
                         </div>
-                        <p class="summary-highlights" id="summary-highlights">Your highlights will appear here as the week unfolds.</p>
-
-                        <div class="summary-field">
-                            <label class="summary-q" for="summary-good">🌟 One good thing that happened this week</label>
-                            <textarea id="summary-good" class="summary-input" rows="2" placeholder="A moment, a win, something that made you smile&hellip;"></textarea>
-                        </div>
-
-                        <div class="summary-field">
-                            <label class="summary-q" for="summary-tough">🌧️ Something that wasn&rsquo;t so good</label>
-                            <textarea id="summary-tough" class="summary-input" rows="2" placeholder="What felt hard, or didn&rsquo;t go the way you hoped?"></textarea>
-                        </div>
-
-                        <div class="summary-field">
-                            <label class="summary-q" for="summary-solve">💡 Working it through &mdash; what might help, and how could you put it into action?</label>
-                            <textarea id="summary-solve" class="summary-input" rows="2" placeholder="One small step you could take next time&hellip;"></textarea>
-                        </div>
-
-                        <div class="summary-todo">
-                            <div class="summary-section-title">📋 Plans for the week ahead</div>
-                            <p class="summary-todo-hint">Add a few small intentions. Tick them off as you go &mdash; whatever&rsquo;s left rolls into next week.</p>
-                            <div class="summary-todo-list" id="summary-todo-list"></div>
-                            <form class="summary-todo-add" id="summary-todo-form">
-                                <input type="text" id="summary-todo-input" class="summary-todo-field" placeholder="Add something for next week&hellip;" maxlength="120" autocomplete="off">
-                                <button type="submit" class="summary-todo-btn" aria-label="Add to your plans">＋</button>
-                            </form>
-                            <button type="button" class="summary-clear-done" id="summary-clear-done" hidden>Clear completed</button>
-                        </div>
-
-                        <div class="summary-saved" id="summary-saved" aria-live="polite"></div>
-                    </div>
+                        <span class="space-block-chevron">›</span>
+                    </button>
 
                     <!-- Patterns I'm noticing -->
                     <div class="patterns-card" id="patterns-card">
@@ -4722,6 +4699,50 @@
                 <div class="pasture-legend" id="pasture-legend">
                     <div class="pasture-legend-title">What the colours mean</div>
                     <div class="pasture-legend-grid" id="pasture-legend-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WEEKLY SUMMARY PANEL — reflection + rolling plans on its own screen -->
+        <div class="summary-panel" id="summary-panel">
+            <header class="domain-panel-header">
+                <button class="domain-panel-back" id="summary-panel-back">← Back</button>
+                <div class="domain-panel-title">
+                    <h2>Your Weekly Summary</h2>
+                    <span id="summary-range"></span>
+                </div>
+            </header>
+            <div class="summary-panel-content">
+                <div class="summary-card" id="summary-card">
+                    <p class="summary-highlights" id="summary-highlights">Your highlights will appear here as the week unfolds.</p>
+
+                    <div class="summary-field">
+                        <label class="summary-q" for="summary-good">🌟 One good thing that happened this week</label>
+                        <textarea id="summary-good" class="summary-input" rows="2" placeholder="A moment, a win, something that made you smile&hellip;"></textarea>
+                    </div>
+
+                    <div class="summary-field">
+                        <label class="summary-q" for="summary-tough">🌧️ Something that wasn&rsquo;t so good</label>
+                        <textarea id="summary-tough" class="summary-input" rows="2" placeholder="What felt hard, or didn&rsquo;t go the way you hoped?"></textarea>
+                    </div>
+
+                    <div class="summary-field">
+                        <label class="summary-q" for="summary-solve">💡 Working it through &mdash; what might help, and how could you put it into action?</label>
+                        <textarea id="summary-solve" class="summary-input" rows="2" placeholder="One small step you could take next time&hellip;"></textarea>
+                    </div>
+
+                    <div class="summary-todo">
+                        <div class="summary-section-title">📋 Plans for the week ahead</div>
+                        <p class="summary-todo-hint">Add a few small intentions. Tick them off as you go &mdash; whatever&rsquo;s left rolls into next week.</p>
+                        <div class="summary-todo-list" id="summary-todo-list"></div>
+                        <form class="summary-todo-add" id="summary-todo-form">
+                            <input type="text" id="summary-todo-input" class="summary-todo-field" placeholder="Add something for next week&hellip;" maxlength="120" autocomplete="off">
+                            <button type="submit" class="summary-todo-btn" aria-label="Add to your plans">＋</button>
+                        </form>
+                        <button type="button" class="summary-clear-done" id="summary-clear-done" hidden>Clear completed</button>
+                    </div>
+
+                    <div class="summary-saved" id="summary-saved" aria-live="polite"></div>
                 </div>
             </div>
         </div>

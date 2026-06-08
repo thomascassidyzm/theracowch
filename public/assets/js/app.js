@@ -1541,8 +1541,39 @@ function updateWeeklySummaryUI() {
     });
 
     renderWeeklyTodos();
+
+    // Keep the Your-Space entry block's subtitle in step with the summary.
+    const blockSub = document.getElementById('summary-block-sub');
+    if (blockSub) {
+        const pending = loadWeeklyTodos().filter(t => t && !t.done).length;
+        const started = Object.keys(REFLECTION_FIELDS).some(k => (data[k] || '').trim());
+        blockSub.textContent = pending > 0
+            ? pending + (pending === 1 ? ' plan' : ' plans') + ' for the week ahead — tap to review'
+            : (started ? 'Tap to add to this week’s reflection'
+                       : 'Reflect on your week and set intentions');
+    }
 }
 window.updateWeeklySummaryUI = updateWeeklySummaryUI;
+
+// Wire the Your-Space entry block to open the Weekly Summary on its own screen.
+function setupSummaryPanel() {
+    const block = document.getElementById('summary-block');
+    const panel = document.getElementById('summary-panel');
+    const back = document.getElementById('summary-panel-back');
+    if (!block || !panel) return;
+    if (!block.dataset.wired) {
+        block.dataset.wired = '1';
+        block.addEventListener('click', () => {
+            updateWeeklySummaryUI();          // refresh with the latest before opening
+            panel.classList.add('active');
+        });
+    }
+    if (back && !back.dataset.wired) {
+        back.dataset.wired = '1';
+        back.addEventListener('click', () => panel.classList.remove('active'));
+    }
+}
+window.setupSummaryPanel = setupSummaryPanel;
 
 // ============================================
 // IMAGINE palette + pasture flowers. Each of the seven areas has a fixed
@@ -3610,6 +3641,7 @@ function init() {
     setupPastureEdit();
     setupPasturePanel();
     setupWeeklySummary();
+    setupSummaryPanel();
     updateWeeklySummaryUI();
     updatePatternsUI();
     setupReminders();
