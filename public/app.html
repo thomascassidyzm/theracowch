@@ -3731,10 +3731,29 @@
                 font-size: var(--font-size-xl);
             }
 
+            /* Compact the IMAGINE tab on phones so all seven domains (I M A G
+               I N E) fit on screen with only a small scroll. Larger screens
+               keep the roomier layout above. */
+            .imagine-header { margin-bottom: var(--space-md); }
+            .imagine-header h1 { font-size: 2rem; margin-bottom: 2px; }
+            .imagine-header h1::after { height: 5px; bottom: -5px; }
+            .imagine-header p { font-size: var(--font-size-sm); margin-top: var(--space-xs); }
+
+            #tab-imagine .exercises-cta { margin-top: var(--space-md); padding-top: var(--space-md); }
+            #tab-imagine .exercises-cta-btn { padding: var(--space-sm) var(--space-md); }
+            #tab-imagine .exercises-cta-icon { font-size: 1.5rem; }
+
+            .domain-cards { gap: var(--space-sm); }
+            .domain-card { padding: var(--space-sm) var(--space-md); }
+            .domain-card-header { gap: var(--space-sm); }
             .domain-letter {
-                width: 50px;
-                height: 50px;
+                width: 44px;
+                height: 44px;
+                font-size: 1.5rem;
             }
+            .domain-card-title h3 { font-size: var(--font-size-base); margin-bottom: 0; }
+            .domain-card-title span { font-size: var(--font-size-xs); }
+            .domain-card-arrow { font-size: var(--font-size-xl); }
 
             .tool-card-text strong {
                 font-size: var(--font-size-base);
