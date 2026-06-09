@@ -3616,6 +3616,279 @@ function renderValuesChart() {
 }
 
 // ============================================
+// WELLNESS DASHBOARD
+// A simple 30-day tracker for the seven things people most often want to keep
+// an eye on: mood, anxiety, sleep, connection, self-care, gratitude and
+// values-based action. Each is a quick 1–5 daily self-rating, stored on-device
+// under its own localStorage key. Purely additive — it doesn't touch the
+// weather check-ins, pasture, weekly summary or anything else.
+// ============================================
+const WELLNESS_LOG_KEY = 'cowch_wellness_log_v1';
+
+// Order here drives both the check-in and the trends. `invert: true` marks a
+// metric where a *lower* score is the healthier direction (anxiety), so its
+// trend colouring flips.
+const WELLNESS_METRICS = [
+    { key: 'mood',       emoji: '🙂', label: 'Mood',                low: 'Very low',     high: 'Great',           color: '#E8923C' },
+    { key: 'anxiety',    emoji: '😰', label: 'Anxiety',             low: 'Calm',         high: 'Very anxious',    color: '#9C7CD4', invert: true },
+    { key: 'sleep',      emoji: '😴', label: 'Sleep',               low: 'Poor',         high: 'Great',           color: '#5B8DEF' },
+    { key: 'connection', emoji: '🤝', label: 'Connection',          low: 'Isolated',     high: 'Connected',       color: '#E87EA8' },
+    { key: 'selfcare',   emoji: '🛁', label: 'Self-care',           low: 'Neglected',    high: 'Nurtured',        color: '#34B7AE' },
+    { key: 'gratitude',  emoji: '🙏', label: 'Gratitude',           low: 'Hard to find', high: 'Abundant',        color: '#F2C13D' },
+    { key: 'values',     emoji: '🎯', label: 'Values-based action', low: 'Off track',    high: 'Lived my values', color: '#5FB36A' }
+];
+
+function wdDayKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function loadWellnessLog() {
+    try {
+        const v = JSON.parse(localStorage.getItem(WELLNESS_LOG_KEY) || '[]');
+        return Array.isArray(v) ? v : [];
+    } catch (_) { return []; }
+}
+function saveWellnessLog(log) {
+    try { localStorage.setItem(WELLNESS_LOG_KEY, JSON.stringify(log.slice(-180))); } catch (_) {}
+}
+
+// Today's entry (or null).
+function getTodayWellness() {
+    const key = wdDayKey(new Date());
+    return loadWellnessLog().find(e => e && e.day === key) || null;
+}
+
+function flashWellnessSaved(msg) {
+    const el = document.getElementById('wd-saved');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(flashWellnessSaved._t);
+    flashWellnessSaved._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// Pull selected pill values out of the DOM and upsert today's entry. Merges
+// with anything already logged today, so a second pass can fill in more areas.
+function saveTodayWellness() {
+    const scores = {};
+    WELLNESS_METRICS.forEach(m => {
+        const sel = document.querySelector('#wd-row-' + m.key + ' .wd-pill.selected');
+        if (sel) scores[m.key] = parseInt(sel.dataset.value, 10);
+    });
+    if (!Object.keys(scores).length) {
+        flashWellnessSaved('Tap a number for at least one area first.');
+        return;
+    }
+    const log = loadWellnessLog();
+    const key = wdDayKey(new Date());
+    const now = new Date().toISOString();
+    const existing = log.find(e => e && e.day === key);
+    if (existing) {
+        existing.scores = Object.assign({}, existing.scores, scores);
+        existing.at = now;
+    } else {
+        log.push({ day: key, at: now, scores: scores });
+    }
+    saveWellnessLog(log);
+    flashWellnessSaved('Saved ✓');
+    renderWellnessCharts();
+    updateWellnessBlockSub();
+}
+
+// Build the seven 1–5 pill rows, pre-filling today's saved values.
+function renderWellnessInputs() {
+    const wrap = document.getElementById('wd-metric-inputs');
+    if (!wrap) return;
+    const today = getTodayWellness();
+    wrap.innerHTML = '';
+    WELLNESS_METRICS.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'wd-row';
+        row.id = 'wd-row-' + m.key;
+        const saved = (today && today.scores) ? today.scores[m.key] : null;
+        let pills = '';
+        for (let v = 1; v <= 5; v++) {
+            pills += '<button type="button" class="wd-pill' + (saved === v ? ' selected' : '') +
+                '" data-value="' + v + '" style="--wd-color:' + m.color + '" ' +
+                'aria-pressed="' + (saved === v ? 'true' : 'false') + '" ' +
+                'aria-label="' + m.label + ' ' + v + ' of 5">' + v + '</button>';
+        }
+        row.innerHTML =
+            '<div class="wd-row-head"><span class="wd-row-emoji">' + m.emoji + '</span>' +
+            '<span class="wd-row-label">' + m.label + '</span></div>' +
+            '<div class="wd-pills">' + pills + '</div>' +
+            '<div class="wd-scale-ends"><span>1 · ' + m.low + '</span><span>' + m.high + ' · 5</span></div>';
+        wrap.appendChild(row);
+    });
+
+    // One selection per row (delegated; wrap element persists across rebuilds).
+    if (!wrap.dataset.wired) {
+        wrap.dataset.wired = '1';
+        wrap.addEventListener('click', (e) => {
+            const pill = e.target.closest('.wd-pill');
+            if (!pill) return;
+            const row = pill.closest('.wd-row');
+            row.querySelectorAll('.wd-pill').forEach(p => {
+                p.classList.remove('selected');
+                p.setAttribute('aria-pressed', 'false');
+            });
+            pill.classList.add('selected');
+            pill.setAttribute('aria-pressed', 'true');
+        });
+    }
+}
+
+// Per-metric 30-day sparkline plus average and a trend arrow.
+function renderWellnessCharts() {
+    const charts = document.getElementById('wd-charts');
+    const empty = document.getElementById('wd-empty');
+    if (!charts) return;
+
+    const log = loadWellnessLog();
+
+    // 30-day window of day keys, oldest → today.
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        days.push(wdDayKey(d));
+    }
+    const byDay = {};
+    log.forEach(e => { if (e && e.day) byDay[e.day] = e; });
+
+    const anyData = days.some(k => byDay[k] && byDay[k].scores);
+    if (empty) empty.style.display = anyData ? 'none' : 'block';
+    charts.style.display = anyData ? '' : 'none';
+    if (!anyData) { charts.innerHTML = ''; return; }
+
+    const W = 300, H = 44, padT = 6, padB = 8;
+    const xAt = i => (i / 29) * W;
+    const yAt = v => (H - padB) - ((v - 1) / 4) * (H - padT - padB);
+
+    charts.innerHTML = '';
+    WELLNESS_METRICS.forEach(m => {
+        const series = days.map(k => {
+            const e = byDay[k];
+            const v = (e && e.scores) ? e.scores[m.key] : undefined;
+            return (typeof v === 'number') ? v : null;
+        });
+        const present = series.filter(v => v !== null);
+        if (!present.length) return; // skip metrics never logged
+
+        const avg = present.reduce((a, b) => a + b, 0) / present.length;
+
+        // Trend: recent half vs earlier half of the logged points.
+        const half = Math.max(1, Math.floor(present.length / 2));
+        const recent = present.slice(-half);
+        const earlier = present.slice(0, Math.max(1, present.length - half));
+        const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+        const earlierAvg = earlier.reduce((a, b) => a + b, 0) / earlier.length;
+        const delta = recentAvg - earlierAvg;
+        let arrow = '→', dir = 'flat';
+        if (delta > 0.25) { arrow = '↗'; dir = 'up'; }
+        else if (delta < -0.25) { arrow = '↘'; dir = 'down'; }
+        // For anxiety (invert), a downward trend is the welcome one.
+        const good = m.invert ? (dir === 'down') : (dir === 'up');
+        const bad  = m.invert ? (dir === 'up')   : (dir === 'down');
+        const trendClass = dir === 'flat' ? 'flat' : (good ? 'good' : (bad ? 'bad' : 'flat'));
+
+        const pts = [];
+        series.forEach((v, i) => { if (v !== null) pts.push({ x: xAt(i), y: yAt(v) }); });
+        const poly = pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+        const dots = pts.map(p => '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="2.6" fill="' + m.color + '"/>').join('');
+        const guides = [1, 3, 5].map(v => {
+            const y = yAt(v).toFixed(1);
+            return '<line x1="0" y1="' + y + '" x2="' + W + '" y2="' + y + '" stroke="rgba(60,46,40,0.08)" stroke-width="1"/>';
+        }).join('');
+
+        const card = document.createElement('div');
+        card.className = 'wd-chart';
+        card.innerHTML =
+            '<div class="wd-chart-head">' +
+                '<span class="wd-chart-emoji">' + m.emoji + '</span>' +
+                '<span class="wd-chart-label">' + m.label + '</span>' +
+                '<span class="wd-chart-stats">' +
+                    '<span class="wd-chart-avg">avg ' + avg.toFixed(1) + '</span>' +
+                    '<span class="wd-chart-trend wd-trend-' + trendClass + '" aria-hidden="true">' + arrow + '</span>' +
+                '</span>' +
+            '</div>' +
+            '<svg class="wd-spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" ' +
+                'aria-label="' + m.label + ': average ' + avg.toFixed(1) + ' out of 5 over ' + present.length + ' logged days">' +
+                guides +
+                (pts.length > 1 ? '<polyline points="' + poly + '" fill="none" stroke="' + m.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' : '') +
+                dots +
+            '</svg>' +
+            '<div class="wd-chart-foot"><span>' + m.low + '</span>' +
+                '<span class="wd-chart-count">' + present.length + ' day' + (present.length === 1 ? '' : 's') + ' logged</span>' +
+                '<span>' + m.high + '</span></div>';
+        charts.appendChild(card);
+    });
+}
+
+// Keep the Your-Space entry block's subtitle in step with the log.
+function updateWellnessBlockSub() {
+    const sub = document.getElementById('wellness-block-sub');
+    if (!sub) return;
+    const log = loadWellnessLog();
+    if (!log.length) {
+        sub.textContent = 'Track mood, sleep, connection & more over 30 days';
+        return;
+    }
+    const todayD = new Date(); todayD.setHours(0, 0, 0, 0);
+    const cutoff = new Date(todayD); cutoff.setDate(cutoff.getDate() - 29);
+    const recent = log.filter(e => {
+        const d = new Date(e.day + 'T00:00:00');
+        return !isNaN(d.getTime()) && d >= cutoff;
+    });
+    const n = recent.length;
+    const checkedToday = !!getTodayWellness();
+    sub.textContent = checkedToday
+        ? 'Checked in today · ' + n + ' day' + (n === 1 ? '' : 's') + ' tracked'
+        : n + ' day' + (n === 1 ? '' : 's') + ' tracked — add today’s check-in';
+}
+
+// Refresh the whole panel (range header + inputs + charts + entry block).
+function updateWellnessUI() {
+    const range = document.getElementById('wellness-range');
+    if (range) {
+        const today = new Date();
+        const start = new Date(today); start.setDate(start.getDate() - 29);
+        const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        range.textContent = fmt(start) + ' – ' + fmt(today);
+    }
+    renderWellnessInputs();
+    renderWellnessCharts();
+    updateWellnessBlockSub();
+}
+window.updateWellnessUI = updateWellnessUI;
+
+// Wire the Your-Space entry block to open the dashboard on its own screen.
+function setupWellnessPanel() {
+    const block = document.getElementById('wellness-block');
+    const panel = document.getElementById('wellness-panel');
+    const back = document.getElementById('wellness-panel-back');
+    const saveBtn = document.getElementById('wd-save-btn');
+    if (!block || !panel) return;
+    if (!block.dataset.wired) {
+        block.dataset.wired = '1';
+        block.addEventListener('click', () => {
+            updateWellnessUI();
+            panel.classList.add('active');
+        });
+    }
+    if (back && !back.dataset.wired) {
+        back.dataset.wired = '1';
+        back.addEventListener('click', () => panel.classList.remove('active'));
+    }
+    if (saveBtn && !saveBtn.dataset.wired) {
+        saveBtn.dataset.wired = '1';
+        saveBtn.addEventListener('click', saveTodayWellness);
+    }
+    updateWellnessBlockSub();
+}
+window.setupWellnessPanel = setupWellnessPanel;
+
+// ============================================
 // Initialize
 // ============================================
 
@@ -3643,6 +3916,7 @@ function init() {
     setupWeeklySummary();
     setupSummaryPanel();
     updateWeeklySummaryUI();
+    setupWellnessPanel();
     updatePatternsUI();
     setupReminders();
     setupTabNavigation();

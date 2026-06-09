@@ -1970,6 +1970,110 @@
         /* Bigger pasture on its own screen. */
         .pasture-panel .pasture-svg { width: 100%; height: auto; margin: var(--space-sm) 0 var(--space-md); }
 
+        /* ── Wellness Dashboard panel — mirrors the pasture/summary panels ── */
+        .wellness-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: var(--max-width);
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-primary);
+            z-index: var(--z-modal);
+            transition: right var(--transition-brutal);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+        }
+        .wellness-panel.active { right: 0; }
+        .wellness-panel-content {
+            padding: var(--space-lg) var(--space-xl);
+            padding-bottom: calc(var(--tab-bar-height) + var(--space-2xl) + env(safe-area-inset-bottom));
+        }
+
+        /* Today's check-in card */
+        .wd-checkin {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        .wd-checkin-head h3 { font-size: 1.05rem; font-weight: 900; color: var(--text-primary); margin: 0 0 4px; }
+        .wd-checkin-sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--space-md); line-height: 1.45; }
+
+        .wd-row { margin-bottom: var(--space-md); }
+        .wd-row-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .wd-row-emoji { font-size: 1.1rem; line-height: 1; }
+        .wd-row-label { font-size: 0.9rem; font-weight: 800; color: var(--text-primary); }
+        .wd-pills { display: flex; gap: 6px; }
+        .wd-pill {
+            flex: 1;
+            min-width: 0;
+            height: 42px;
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+        }
+        .wd-pill:hover { border-color: var(--wd-color, var(--coral)); }
+        .wd-pill.selected {
+            background: var(--wd-color, var(--coral));
+            border-color: var(--wd-color, var(--coral));
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .wd-scale-ends { display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.7rem; color: var(--text-muted); }
+
+        .wd-save-btn {
+            width: 100%;
+            margin-top: var(--space-sm);
+            padding: 12px;
+            background: var(--coral, #C97B63);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-medium);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.12s ease, filter 0.12s ease;
+        }
+        .wd-save-btn:hover { filter: brightness(1.05); }
+        .wd-save-btn:active { transform: translateY(1px); }
+        .wd-saved { text-align: center; font-size: 0.82rem; font-weight: 700; color: var(--coral); margin-top: 8px; min-height: 1em; opacity: 0; transition: opacity 0.2s ease; }
+        .wd-saved.show { opacity: 1; }
+
+        /* 30-day trend charts */
+        .wd-trends-title { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; color: var(--coral); margin: 0 0 var(--space-md); }
+        .wd-empty { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; background: var(--bg-secondary); border-radius: var(--radius-medium); padding: var(--space-md); }
+        .wd-charts { display: flex; flex-direction: column; gap: var(--space-md); }
+        .wd-chart {
+            background: var(--bg-card);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: var(--space-md);
+        }
+        .wd-chart-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .wd-chart-emoji { font-size: 1rem; line-height: 1; }
+        .wd-chart-label { font-size: 0.88rem; font-weight: 800; color: var(--text-primary); flex: 1; }
+        .wd-chart-stats { display: flex; align-items: center; gap: 8px; }
+        .wd-chart-avg { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+        .wd-chart-trend { font-size: 1rem; font-weight: 900; line-height: 1; }
+        .wd-trend-good { color: #3FAE6A; }
+        .wd-trend-bad { color: #D46A6A; }
+        .wd-trend-flat { color: var(--text-muted); }
+        .wd-spark { width: 100%; height: 44px; display: block; }
+        .wd-chart-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.68rem; color: var(--text-muted); }
+        .wd-chart-count { font-weight: 700; flex-shrink: 0; }
+
         /* Legend mapping each colour to its IMAGINE area. */
         .pasture-legend {
             margin-top: var(--space-lg);
@@ -4561,6 +4665,16 @@
                         <span class="space-block-chevron">›</span>
                     </button>
 
+                    <!-- 2. Your Wellness Dashboard — 30-day tracker of mood, anxiety, sleep & more -->
+                    <button type="button" class="space-block" id="wellness-block" aria-label="Open your Wellness Dashboard">
+                        <span class="space-block-emoji">📊</span>
+                        <div class="space-block-text">
+                            <strong>Your Wellness Dashboard</strong>
+                            <span id="wellness-block-sub">Track mood, sleep, connection &amp; more over 30 days</span>
+                        </div>
+                        <span class="space-block-chevron">›</span>
+                    </button>
+
                     <!-- Patterns I'm noticing -->
                     <div class="patterns-card" id="patterns-card">
                         <div class="patterns-head">
@@ -4743,6 +4857,36 @@
                     </div>
 
                     <div class="summary-saved" id="summary-saved" aria-live="polite"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WELLNESS DASHBOARD PANEL — daily check-in + 30-day trends -->
+        <div class="wellness-panel" id="wellness-panel">
+            <header class="domain-panel-header">
+                <button class="domain-panel-back" id="wellness-panel-back">← Back</button>
+                <div class="domain-panel-title">
+                    <h2>Wellness Dashboard</h2>
+                    <span id="wellness-range"></span>
+                </div>
+            </header>
+            <div class="wellness-panel-content">
+                <!-- Today's check-in -->
+                <div class="wd-checkin" id="wd-checkin">
+                    <div class="wd-checkin-head">
+                        <h3>Today&rsquo;s check-in</h3>
+                        <p class="wd-checkin-sub">Rate each from 1 to 5. It only takes a minute, and the trends below build up over time.</p>
+                    </div>
+                    <div class="wd-metric-inputs" id="wd-metric-inputs"></div>
+                    <button type="button" class="wd-save-btn" id="wd-save-btn">Save today&rsquo;s check-in</button>
+                    <div class="wd-saved" id="wd-saved" aria-live="polite"></div>
+                </div>
+
+                <!-- 30-day trends -->
+                <div class="wd-trends" id="wd-trends">
+                    <h3 class="wd-trends-title">Last 30 days</h3>
+                    <div class="wd-empty" id="wd-empty">Log your first check-in above and your trends will start to appear here.</div>
+                    <div class="wd-charts" id="wd-charts"></div>
                 </div>
             </div>
         </div>
