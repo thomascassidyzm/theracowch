@@ -116,7 +116,7 @@ function getColorForLetter(letter) {
         'M': '#5BB4E0',
         'A': '#9C7CD4',
         'G': '#34B7AE',
-        'I2': '#F2C13D',
+        'I2': '#FFD21E',
         'N': '#E8923C',
         'E': '#9AA84B'
     };
@@ -1853,7 +1853,7 @@ const IMAGINE_EXERCISES = [
         letter: 'I',
         title: 'Interactions',
         subtitle: 'Connection with others',
-        color: '#F2C13D', // Soft blue
+        color: '#FFD21E', // Bright yellow
         exercises: [
             {
                 name: 'Social Pulse Check',

@@ -1591,7 +1591,7 @@ const IMAGINE_PALETTE = {
     M:  '#5BB4E0',   // Mindfulness   — light blue
     A:  '#9C7CD4',   // Acceptance    — purple
     G:  '#34B7AE',   // Gratitude     — turquoise
-    I2: '#F2C13D',   // Interactions  — yellow
+    I2: '#FFD21E',   // Interactions  — bright yellow
     N:  '#E8923C',   // Nurturing     — orange
     E:  '#9AA84B'    // Exploring     — olive
 };
@@ -2351,7 +2351,7 @@ const IMAGINE_DOMAINS = {
         letter: 'I',
         title: 'Interactions',
         subtitle: 'Connection with others',
-        color: '#F2C13D',
+        color: '#FFD21E',
         description: 'We\'re social creatures, and connection matters for wellbeing. These exercises help you notice your interaction patterns and take small steps toward meaningful connection.',
         exercises: [
             { title: 'How Connected Was Today?', description: 'Build awareness of your daily interaction levels', duration: '2 min', interactive: 'social', prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.' },
