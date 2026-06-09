@@ -113,7 +113,7 @@ function updateImagineTracker() {
 function getColorForLetter(letter) {
     const colors = {
         'I': '#E87EA8',
-        'M': '#5FB36A',
+        'M': '#5BB4E0',
         'A': '#9C7CD4',
         'G': '#34B7AE',
         'I2': '#F2C13D',
@@ -1062,7 +1062,7 @@ function createBoxBreathingCard() {
             Start Box Breathing (4 min) →
         </button>
     `;
-    card.style.setProperty('--card-accent', '#5FB36A');
+    card.style.setProperty('--card-accent', '#5BB4E0');
 
     const btn = card.querySelector('.exercise-action-card-btn');
     btn.addEventListener('click', (event) => {
@@ -1763,7 +1763,7 @@ const IMAGINE_EXERCISES = [
         letter: 'M',
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
-        color: '#5FB36A', // Sage green
+        color: '#5BB4E0', // Light blue
         exercises: [
             {
                 name: 'Box Breathing',

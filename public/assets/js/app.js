@@ -1588,7 +1588,7 @@ const IMAGINE_ENGAGEMENT_KEY = 'cowch_imagine_engagement';
 // the first character, so I2 shows as "I".
 const IMAGINE_PALETTE = {
     I:  '#E87EA8',   // I, Me, Myself — pink
-    M:  '#5FB36A',   // Mindfulness   — green
+    M:  '#5BB4E0',   // Mindfulness   — light blue
     A:  '#9C7CD4',   // Acceptance    — purple
     G:  '#34B7AE',   // Gratitude     — turquoise
     I2: '#F2C13D',   // Interactions  — yellow
@@ -2315,7 +2315,7 @@ const IMAGINE_DOMAINS = {
         letter: 'M',
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
-        color: '#5FB36A',
+        color: '#5BB4E0',
         description: 'Mindfulness helps you step out of autopilot and into the present moment. These exercises help calm your nervous system and anchor you in the here and now.',
         exercises: [
             { title: 'Box Breathing', description: '4-4-4-4 breathing to calm your nervous system', duration: '4 min', interactive: 'breathing', prompt: 'Can you guide me through box breathing?' },

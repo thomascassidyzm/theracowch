@@ -54,7 +54,7 @@
        exercise tracker so the colour coding is consistent everywhere.
        Kept constant across themes so an area is always the same colour. */
     --imagine-i:  var(--color-self);    /* I — I, Me, Myself : pink */
-    --imagine-m:  var(--color-mind);    /* M — Mindfulness   : green */
+    --imagine-m:  var(--color-mind);    /* M — Mindfulness   : light blue */
     --imagine-a:  var(--color-accept);  /* A — Acceptance    : purple */
     --imagine-g:  var(--color-thanks);  /* G — Gratitude     : turquoise */
     --imagine-i2: var(--color-connect); /* I — Interactions  : yellow */
@@ -108,7 +108,7 @@
     /* Canonical IMAGINE palette (keep in sync with IMAGINE_PALETTE in app.js,
        which colours the pasture flowers). */
     --color-self: #E87EA8;       /* I - I, Me, Myself (pink) */
-    --color-mind: #5FB36A;       /* M - Mindfulness (green) */
+    --color-mind: #5BB4E0;       /* M - Mindfulness (light blue) */
     --color-accept: #9C7CD4;     /* A - Acceptance (purple) */
     --color-thanks: #34B7AE;     /* G - Gratitude (turquoise) */
     --color-connect: #F2C13D;    /* I - Interactions (yellow) */
