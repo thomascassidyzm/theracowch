@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   // Origin lock + CORS — same rationale as api/chat.js: a public, account-less
   // endpoint fronting a billed Anthropic key, locked to theracowch.com.
   const origin = req.headers.origin;
-  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com'];
+  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com', 'https://cowch.app', 'https://www.cowch.app'];
   let originOk = !origin || allowedOrigins.includes(origin);
   if (origin && !originOk) {
     try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }

@@ -104,7 +104,7 @@ export default async function handler(req, res) {
   // to stop it being used as a free Claude proxy / running up the bill.
   // Same-origin and installed-PWA requests send no Origin header → allowed.
   const origin = req.headers.origin;
-  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com'];
+  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com', 'https://cowch.app', 'https://www.cowch.app'];
   let originOk = !origin || allowedOrigins.includes(origin);
   if (origin && !originOk) {
     try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }
