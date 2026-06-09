@@ -117,8 +117,8 @@ function getColorForLetter(letter) {
         'A': '#9C7CD4',
         'G': '#34B7AE',
         'I2': '#FFD21E',
-        'N': '#E8923C',
-        'E': '#9AA84B'
+        'N': '#F2802E',
+        'E': '#A51C30'
     };
     return colors[letter] || '#E87EA8';
 }
@@ -1892,7 +1892,7 @@ const IMAGINE_EXERCISES = [
         letter: 'N',
         title: 'Nurture Fun & Play',
         subtitle: 'Joy and lightness',
-        color: '#E8923C', // Sandy orange
+        color: '#F2802E', // Orange
         exercises: [
             {
                 name: 'Play Break',
@@ -1932,7 +1932,7 @@ const IMAGINE_EXERCISES = [
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#9AA84B', // Dark sea green
+        color: '#A51C30', // Cherry red
         exercises: [
             {
                 name: 'Safety Behaviours',

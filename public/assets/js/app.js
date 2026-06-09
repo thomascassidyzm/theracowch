@@ -1592,8 +1592,8 @@ const IMAGINE_PALETTE = {
     A:  '#9C7CD4',   // Acceptance    — purple
     G:  '#34B7AE',   // Gratitude     — turquoise
     I2: '#FFD21E',   // Interactions  — bright yellow
-    N:  '#E8923C',   // Nurturing     — orange
-    E:  '#9AA84B'    // Exploring     — olive
+    N:  '#F2802E',   // Nurturing     — orange
+    E:  '#A51C30'    // Exploring     — cherry red
 };
 const IMAGINE_LEGEND = [
     { key: 'I',  label: 'I, Me, Myself' },
@@ -2363,7 +2363,7 @@ const IMAGINE_DOMAINS = {
         letter: 'N',
         title: 'Nurture Fun & Play',
         subtitle: 'Joy and lightness',
-        color: '#E8923C',
+        color: '#F2802E',
         description: 'Play isn\'t just for kids - it\'s essential for mental health. These exercises help you reconnect with joy, lightness, and your playful side.',
         exercises: [
             { title: 'Scheduled Silly Time', description: 'Interrupt seriousness with 10 minutes of play', duration: '10 min', prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.' },
@@ -2375,7 +2375,7 @@ const IMAGINE_DOMAINS = {
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#9AA84B',
+        color: '#A51C30',
         description: 'Growth happens at the edge of your comfort zone. These exercises help you gently stretch your boundaries and build tolerance for uncertainty.',
         exercises: [
             { title: 'What\'s Protecting You... and Limiting You?', description: 'Identify behaviours that block growth', prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.' },
