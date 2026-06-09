@@ -1593,7 +1593,7 @@ const IMAGINE_PALETTE = {
     G:  '#34B7AE',   // Gratitude     — turquoise
     I2: '#FFD21E',   // Interactions  — bright yellow
     N:  '#F2802E',   // Nurturing     — orange
-    E:  '#A51C30'    // Exploring     — cherry red
+    E:  '#F25C6A'    // Exploring     — light red
 };
 const IMAGINE_LEGEND = [
     { key: 'I',  label: 'I, Me, Myself' },
@@ -2375,7 +2375,7 @@ const IMAGINE_DOMAINS = {
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#A51C30',
+        color: '#F25C6A',
         description: 'Growth happens at the edge of your comfort zone. These exercises help you gently stretch your boundaries and build tolerance for uncertainty.',
         exercises: [
             { title: 'What\'s Protecting You... and Limiting You?', description: 'Identify behaviours that block growth', prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.' },

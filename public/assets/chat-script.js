@@ -118,7 +118,7 @@ function getColorForLetter(letter) {
         'G': '#34B7AE',
         'I2': '#FFD21E',
         'N': '#F2802E',
-        'E': '#A51C30'
+        'E': '#F25C6A'
     };
     return colors[letter] || '#E87EA8';
 }
@@ -1932,7 +1932,7 @@ const IMAGINE_EXERCISES = [
         letter: 'E',
         title: 'Explore',
         subtitle: 'Growth and discovery',
-        color: '#A51C30', // Cherry red
+        color: '#F25C6A', // Light red
         exercises: [
             {
                 name: 'Safety Behaviours',

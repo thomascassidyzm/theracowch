@@ -59,7 +59,7 @@
     --imagine-g:  var(--color-thanks);  /* G — Gratitude     : turquoise */
     --imagine-i2: var(--color-connect); /* I — Interactions  : yellow */
     --imagine-n:  var(--color-play);    /* N — Nurturing     : orange */
-    --imagine-e:  var(--color-explore); /* E — Exploring     : cherry red */
+    --imagine-e:  var(--color-explore); /* E — Exploring     : light red */
 
     /* ===== Accent Colours ===== */
     /* Primary brand — warm terracotta */
@@ -113,7 +113,7 @@
     --color-thanks: #34B7AE;     /* G - Gratitude (turquoise) */
     --color-connect: #FFD21E;    /* I - Interactions (bright yellow) */
     --color-play: #F2802E;       /* N - Nurturing (orange) */
-    --color-explore: #A51C30;    /* E - Exploring (cherry red) */
+    --color-explore: #F25C6A;    /* E - Exploring (light red) */
 
     /* ===== Brutalism Design Tokens ===== */
     --border-thicc: 5px;
