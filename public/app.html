@@ -12,7 +12,8 @@
         (function() {
             try {
                 var t = localStorage.getItem('cowch-theme');
-                if (t === 'warm' || t === 'cool' || t === 'peachy') {
+                var valid = ['warm', 'cool', 'peachy', 'blossom', 'lagoon', 'sunset'];
+                if (valid.indexOf(t) !== -1) {
                     if (t !== 'peachy') document.documentElement.dataset.theme = t;
                 }
             } catch (e) {}
@@ -2492,12 +2493,14 @@
 
         .theme-options {
             display: flex;
+            flex-wrap: wrap;
             gap: var(--space-sm);
             margin-bottom: var(--space-sm);
         }
 
         .theme-option {
-            flex: 1;
+            flex: 1 1 28%;
+            min-width: 84px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -2547,6 +2550,16 @@
         }
         .theme-swatch-cool {
             background: linear-gradient(135deg, #EEF4FA 0%, #EEF4FA 50%, #6E92B8 50%, #6E92B8 100%);
+        }
+        /* IMAGINE-combo skins — the swatch shows the actual domain colours */
+        .theme-swatch-blossom {
+            background: linear-gradient(135deg, #E87EA8 0%, #E87EA8 50%, #5BB4E0 50%, #5BB4E0 100%);
+        }
+        .theme-swatch-lagoon {
+            background: linear-gradient(135deg, #9C7CD4 0%, #9C7CD4 50%, #34B7AE 50%, #34B7AE 100%);
+        }
+        .theme-swatch-sunset {
+            background: linear-gradient(135deg, #FFD21E 0%, #FFD21E 33%, #F2802E 33%, #F2802E 66%, #F25C6A 66%, #F25C6A 100%);
         }
 
         .theme-name { font-size: var(--font-size-xs); }
@@ -3672,6 +3685,7 @@
             font-weight: var(--font-weight-bold);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -3704,6 +3718,21 @@
            ============================================ */
 
         @media (max-width: 480px) {
+            /* Pull the tab bar in from the screen edges and tighten the
+               labels so the longest one ("Your Space") sits comfortably on
+               one line and clears the right edge on a phone. */
+            .tab-bar {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+            .tab-btn {
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+            .tab-btn span {
+                letter-spacing: 0.02em;
+            }
+
             .greeting-section {
                 gap: var(--space-md);
                 padding-right: min(180px, 46vw);
@@ -4776,6 +4805,18 @@
                             <button type="button" class="theme-option" data-theme-choice="cool" aria-label="Hopeful — Gentle Horizon blue theme">
                                 <span class="theme-swatch theme-swatch-cool"></span>
                                 <span class="theme-name">Hopeful</span>
+                            </button>
+                            <button type="button" class="theme-option" data-theme-choice="blossom" aria-label="Blossom — I, Me, Myself pink and Mindfulness blue">
+                                <span class="theme-swatch theme-swatch-blossom"></span>
+                                <span class="theme-name">Blossom</span>
+                            </button>
+                            <button type="button" class="theme-option" data-theme-choice="lagoon" aria-label="Lagoon — Acceptance purple and Gratitude turquoise">
+                                <span class="theme-swatch theme-swatch-lagoon"></span>
+                                <span class="theme-name">Lagoon</span>
+                            </button>
+                            <button type="button" class="theme-option" data-theme-choice="sunset" aria-label="Sunset — Interactions yellow, Nurturing orange and Exploring red">
+                                <span class="theme-swatch theme-swatch-sunset"></span>
+                                <span class="theme-name">Sunset</span>
                             </button>
                         </div>
                     </div>

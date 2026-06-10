@@ -357,3 +357,178 @@
     --shadow-md: 0 4px 12px rgba(32, 48, 64, 0.06);
     --shadow-lg: 0 12px 32px rgba(32, 48, 64, 0.08);
 }
+
+/* ============================================
+   IMAGINE-DOMAIN SKINS — combine the colours of paired IMAGINE letters.
+   The seven domains split into three groups: I+M, A+G, and I(nteractions)+N+E.
+   The canonical --imagine-* / --color-* tokens are NOT touched, so the domain
+   colour coding stays consistent; these only re-skin the app chrome.
+   ============================================ */
+
+/* "Blossom" — I (pink) + M (light blue) */
+[data-theme="blossom"] {
+    --bg-canvas: #FBF3F7;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F2DEEA;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F8EAF1;
+    --bg-elevated: #FFFFFF;
+    --bg-dark: #1F1F1F;
+
+    --bg-mandy-message: #FFFFFF;
+    --bg-user-message: var(--coral);
+
+    /* Primary brand — rosy pink (I) */
+    --coral: #CB6191;
+    --coral-rgb: 203, 97, 145;
+    --coral-dark: #B84F7F;
+    --coral-light: #F2A8C4;
+    --coral-glow: rgba(203, 97, 145, 0.22);
+
+    /* Secondary CTA family — light blue (M) */
+    --amber: #4FA8D8;
+    --amber-dark: #3E93C4;
+    --amber-light: #BFE2F2;
+    --amber-glow: rgba(79, 168, 216, 0.22);
+
+    /* Tertiary CTA family — softer blue (M) */
+    --sage: #5BB4E0;
+    --sage-dark: #459ECB;
+    --sage-light: #C7E6F4;
+    --sage-glow: rgba(91, 180, 224, 0.22);
+
+    --highlight: #4FA8D8;
+    --highlight-dark: #3E93C4;
+    --highlight-light: #BFE2F2;
+    --highlight-glow: rgba(79, 168, 216, 0.22);
+
+    --text-primary: #3A2733;
+    --text-secondary: #3A2733;
+    --text-muted: #7A6470;
+    --text-on-coral: #FFFFFF;
+    --text-on-canvas: #3A2733;
+    --text-on-canvas-muted: #7A6470;
+
+    --border-warm: #E8D3DE;
+    --border-subtle: rgba(58, 39, 51, 0.08);
+
+    --shadow-brutal: 0 6px 18px rgba(58, 39, 51, 0.06);
+    --shadow-brutal-coral: 0 6px 22px rgba(203, 97, 145, 0.22);
+    --shadow-brutal-hover: 0 12px 32px rgba(58, 39, 51, 0.10);
+    --shadow-soft: 0 4px 16px rgba(58, 39, 51, 0.06);
+    --shadow-sm: 0 1px 2px rgba(58, 39, 51, 0.04);
+    --shadow-md: 0 4px 12px rgba(58, 39, 51, 0.06);
+    --shadow-lg: 0 12px 32px rgba(58, 39, 51, 0.08);
+}
+
+/* "Lagoon" — A (purple) + G (turquoise) */
+[data-theme="lagoon"] {
+    --bg-canvas: #F0F4F7;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #DCE7EC;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #E8EFF3;
+    --bg-elevated: #FFFFFF;
+    --bg-dark: #1F1F1F;
+
+    --bg-mandy-message: #FFFFFF;
+    --bg-user-message: var(--coral);
+
+    /* Primary brand — soft purple (A) */
+    --coral: #8A6BC6;
+    --coral-rgb: 138, 107, 198;
+    --coral-dark: #7757B4;
+    --coral-light: #C8B6E8;
+    --coral-glow: rgba(138, 107, 198, 0.22);
+
+    /* Secondary CTA family — turquoise (G) */
+    --amber: #2FA59C;
+    --amber-dark: #25867F;
+    --amber-light: #A7E0DB;
+    --amber-glow: rgba(52, 183, 174, 0.22);
+
+    /* Tertiary CTA family — brighter turquoise (G) */
+    --sage: #34B7AE;
+    --sage-dark: #2A9D95;
+    --sage-light: #BCE6E2;
+    --sage-glow: rgba(52, 183, 174, 0.22);
+
+    --highlight: #2FA59C;
+    --highlight-dark: #25867F;
+    --highlight-light: #A7E0DB;
+    --highlight-glow: rgba(52, 183, 174, 0.22);
+
+    --text-primary: #2C2640;
+    --text-secondary: #2C2640;
+    --text-muted: #5F6478;
+    --text-on-coral: #FFFFFF;
+    --text-on-canvas: #2C2640;
+    --text-on-canvas-muted: #5F6478;
+
+    --border-warm: #D2DEE2;
+    --border-subtle: rgba(44, 38, 64, 0.08);
+
+    --shadow-brutal: 0 6px 18px rgba(44, 38, 64, 0.06);
+    --shadow-brutal-coral: 0 6px 22px rgba(138, 107, 198, 0.22);
+    --shadow-brutal-hover: 0 12px 32px rgba(44, 38, 64, 0.10);
+    --shadow-soft: 0 4px 16px rgba(44, 38, 64, 0.06);
+    --shadow-sm: 0 1px 2px rgba(44, 38, 64, 0.04);
+    --shadow-md: 0 4px 12px rgba(44, 38, 64, 0.06);
+    --shadow-lg: 0 12px 32px rgba(44, 38, 64, 0.08);
+}
+
+/* "Sunset" — I (Interactions, yellow) + N (orange) + E (light red) */
+[data-theme="sunset"] {
+    --bg-canvas: #FDF6EC;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FBE6CF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #FDF0DD;
+    --bg-elevated: #FFFFFF;
+    --bg-dark: #1F1F1F;
+
+    --bg-mandy-message: #FFFFFF;
+    --bg-user-message: var(--coral);
+
+    /* Primary brand — warm orange (N) */
+    --coral: #E5722A;
+    --coral-rgb: 229, 114, 42;
+    --coral-dark: #D2631F;
+    --coral-light: #F7B07A;
+    --coral-glow: rgba(229, 114, 42, 0.24);
+
+    /* Secondary CTA family — light red (E) */
+    --amber: #ED5565;
+    --amber-dark: #DA4152;
+    --amber-light: #F7AAB2;
+    --amber-glow: rgba(237, 85, 101, 0.22);
+
+    /* Tertiary CTA family — golden yellow (I — Interactions) */
+    --sage: #E9A60F;
+    --sage-dark: #D2940A;
+    --sage-light: #FCE08A;
+    --sage-glow: rgba(255, 210, 30, 0.26);
+
+    --highlight: #ED5565;
+    --highlight-dark: #DA4152;
+    --highlight-light: #F7AAB2;
+    --highlight-glow: rgba(237, 85, 101, 0.22);
+
+    --text-primary: #3A2A1C;
+    --text-secondary: #3A2A1C;
+    --text-muted: #7C6552;
+    --text-on-coral: #FFFFFF;
+    --text-on-canvas: #3A2A1C;
+    --text-on-canvas-muted: #7C6552;
+
+    --border-warm: #ECD8BF;
+    --border-subtle: rgba(58, 42, 28, 0.08);
+
+    --shadow-brutal: 0 6px 18px rgba(58, 42, 28, 0.06);
+    --shadow-brutal-coral: 0 6px 22px rgba(229, 114, 42, 0.24);
+    --shadow-brutal-hover: 0 12px 32px rgba(58, 42, 28, 0.10);
+    --shadow-soft: 0 4px 16px rgba(58, 42, 28, 0.06);
+    --shadow-sm: 0 1px 2px rgba(58, 42, 28, 0.04);
+    --shadow-md: 0 4px 12px rgba(58, 42, 28, 0.06);
+    --shadow-lg: 0 12px 32px rgba(58, 42, 28, 0.08);
+}

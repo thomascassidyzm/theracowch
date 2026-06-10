@@ -2852,7 +2852,7 @@ function setupThemePicker() {
     const buttons = document.querySelectorAll('.theme-option[data-theme-choice]');
     if (!buttons.length) return;
 
-    const VALID = ['peachy', 'warm', 'cool'];
+    const VALID = ['peachy', 'warm', 'cool', 'blossom', 'lagoon', 'sunset'];
     let saved = 'peachy';
     try {
         const t = localStorage.getItem('cowch-theme');
