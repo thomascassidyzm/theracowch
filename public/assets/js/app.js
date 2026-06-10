@@ -364,8 +364,9 @@ function gatherActiveDays(windowDays) {
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
 // ── Pasture growth garden: a cumulative scene where each new day visited
-//    plants one new thing. Flowers first; once a few are growing, little
-//    trees and grass tufts join in. Items are draggable + deletable. ──
+//    plants one new thing. A gentle first flower, then a varied mix —
+//    little birds, ladybirds, hedgehogs, trees and grass tufts — so the
+//    scene gets visually interesting fast. Items are draggable + deletable. ──
 const PASTURE_ITEMS_KEY    = 'cowch-pasture-items-v1';
 const PASTURE_LASTGROW_KEY = 'cowch-pasture-lastgrow';
 const PASTURE_VISITDAYS_KEY = 'cowch-pasture-visitdays';
@@ -390,6 +391,9 @@ function getPastureVisitDays() {
 }
 const PASTURE_FLOWER_COLORS = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF',
                                '#FFC1A4', '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
+// Cheerful default plumage for birds planted by the daily-growth path (the
+// IMAGINE path tints them with their area's colour instead — see drawBird).
+const PASTURE_BIRD_COLORS = ['#6FB7E0', '#E8915C', '#7FC8A0', '#D98AB0', '#F2C14E'];
 
 function loadPastureItems() {
     try {
@@ -402,14 +406,17 @@ function savePastureItems(items) {
     try { localStorage.setItem(PASTURE_ITEMS_KEY, JSON.stringify(items)); } catch (_) {}
 }
 
-// The 1-based index of the item being added decides its kind. First few are
-// flowers; from the 5th onward little trees (every 5th) and grass tufts
-// (every 3rd) start appearing too.
+// The 1-based index of the item being added decides its kind. The very first
+// sprout is a familiar flower, but from day two onward we cycle through a
+// lively mix — birds, ladybirds, hedgehogs, grass and the odd tree — so the
+// pasture stops looking like nothing but flowers almost immediately.
+const PASTURE_TYPE_CYCLE = [
+    'ladybird', 'flower', 'bird', 'grass', 'hedgehog',
+    'flower', 'bird', 'tree', 'ladybird', 'grass'
+];
 function nextPastureItemType(n) {
-    if (n <= 4) return 'flower';
-    if (n % 5 === 0) return 'tree';
-    if (n % 3 === 0) return 'grass';
-    return 'flower';
+    if (n <= 1) return 'flower';        // first sprout stays gentle + familiar
+    return PASTURE_TYPE_CYCLE[(n - 2) % PASTURE_TYPE_CYCLE.length];
 }
 
 // Pasture playable area (origin coords for items)
@@ -422,7 +429,12 @@ function pastureAvoidZones(items, cowPos) {
     const zones = [];
     if (cowPos) zones.push({ x: cowPos.x + 2, y: cowPos.y + 4, r: 30 });
     (items || []).forEach(it => {
-        const r = it.type === 'tree' ? 20 : (it.type === 'grass' ? 14 : 15);
+        let r = 15;
+        if (it.type === 'tree') r = 20;
+        else if (it.type === 'grass') r = 14;
+        else if (it.type === 'bird') r = 17;
+        else if (it.type === 'hedgehog') r = 16;
+        else if (it.type === 'ladybird') r = 12;
         zones.push({ x: it.x, y: it.y, r });
     });
     return zones;
@@ -507,7 +519,9 @@ function maybeGrowPasture() {
         y: pos.y,
         variant: type === 'flower'
             ? Math.floor(Math.random() * PASTURE_FLOWER_COLORS.length)
-            : Math.floor(Math.random() * 3),
+            : (type === 'bird'
+                ? Math.floor(Math.random() * PASTURE_BIRD_COLORS.length)
+                : Math.floor(Math.random() * 3)),
         addedAt: new Date().toISOString()
     };
     items.push(item);
@@ -607,6 +621,112 @@ function drawGrass(g, item) {
         p.setAttribute('fill', 'none'); p.setAttribute('stroke-linecap', 'round');
         g.appendChild(p);
     });
+}
+// A little perched bird. Like the flower, an IMAGINE bird wears its area's
+// colour (mindfulness → light blue, gratitude → turquoise, …); a bird planted
+// by the daily-growth path picks a cheerful default plumage instead.
+function drawBird(g, item) {
+    const isImagine = item.letter && IMAGINE_PALETTE[item.letter];
+    const color = isImagine
+        ? IMAGINE_PALETTE[item.letter]
+        : PASTURE_BIRD_COLORS[(item.variant || 0) % PASTURE_BIRD_COLORS.length];
+
+    const s = isImagine ? (item.scale || 1) : 1;
+    const fg = (s !== 1) ? document.createElementNS(NS_SVG, 'g') : g;
+    if (s !== 1) { fg.setAttribute('transform', 'scale(' + s + ')'); g.appendChild(fg); }
+
+    // Twiggy legs down to the ground.
+    [-1.5, 1.5].forEach(lx => {
+        const leg = document.createElementNS(NS_SVG, 'line');
+        leg.setAttribute('x1', lx); leg.setAttribute('y1', 0);
+        leg.setAttribute('x2', lx); leg.setAttribute('y2', -4);
+        leg.setAttribute('stroke', '#C9892F'); leg.setAttribute('stroke-width', 1.2);
+        leg.setAttribute('stroke-linecap', 'round');
+        fg.appendChild(leg);
+    });
+    // Tail feathers pointing back-left.
+    const tail = document.createElementNS(NS_SVG, 'path');
+    tail.setAttribute('d', 'M -4 -7 L -12 -9 L -4 -12 Z');
+    tail.setAttribute('fill', color);
+    fg.appendChild(tail);
+    // Plump body.
+    const body = document.createElementNS(NS_SVG, 'ellipse');
+    body.setAttribute('cx', 0); body.setAttribute('cy', -9);
+    body.setAttribute('rx', 6.5); body.setAttribute('ry', 7.5);
+    body.setAttribute('fill', color);
+    if (isImagine) { body.setAttribute('stroke', 'rgba(255,255,255,0.5)'); body.setAttribute('stroke-width', 0.6); }
+    fg.appendChild(body);
+    // A soft wing shading on the body.
+    const wing = document.createElementNS(NS_SVG, 'ellipse');
+    wing.setAttribute('cx', -1); wing.setAttribute('cy', -9);
+    wing.setAttribute('rx', 3.6); wing.setAttribute('ry', 5);
+    wing.setAttribute('fill', 'rgba(0,0,0,0.12)');
+    fg.appendChild(wing);
+    // Head.
+    const head = document.createElementNS(NS_SVG, 'circle');
+    head.setAttribute('cx', 4); head.setAttribute('cy', -16); head.setAttribute('r', 4.5);
+    head.setAttribute('fill', color);
+    if (isImagine) { head.setAttribute('stroke', 'rgba(255,255,255,0.5)'); head.setAttribute('stroke-width', 0.6); }
+    fg.appendChild(head);
+    // Beak pointing right.
+    const beak = document.createElementNS(NS_SVG, 'path');
+    beak.setAttribute('d', 'M 8 -16.5 L 13 -15.5 L 8 -14 Z');
+    beak.setAttribute('fill', '#F4A024');
+    fg.appendChild(beak);
+    // Eye.
+    const eye = document.createElementNS(NS_SVG, 'circle');
+    eye.setAttribute('cx', 5.4); eye.setAttribute('cy', -17); eye.setAttribute('r', 1);
+    eye.setAttribute('fill', '#2A2A2A');
+    fg.appendChild(eye);
+}
+// A small ladybird resting on the grass — iconic red with black spots.
+function drawLadybird(g, item) {
+    const body = document.createElementNS(NS_SVG, 'ellipse');
+    body.setAttribute('cx', 0); body.setAttribute('cy', -6);
+    body.setAttribute('rx', 7); body.setAttribute('ry', 6);
+    body.setAttribute('fill', '#E0463C');
+    g.appendChild(body);
+    // Black head poking up.
+    const head = document.createElementNS(NS_SVG, 'circle');
+    head.setAttribute('cx', 0); head.setAttribute('cy', -12); head.setAttribute('r', 2.6);
+    head.setAttribute('fill', '#222');
+    g.appendChild(head);
+    // Wing divide.
+    const divide = document.createElementNS(NS_SVG, 'line');
+    divide.setAttribute('x1', 0); divide.setAttribute('y1', -11.5);
+    divide.setAttribute('x2', 0); divide.setAttribute('y2', -0.5);
+    divide.setAttribute('stroke', '#222'); divide.setAttribute('stroke-width', 1);
+    g.appendChild(divide);
+    // Spots.
+    [[-3.6, -7.5], [3.6, -7.5], [-3, -3.8], [3, -3.8]].forEach(sp => {
+        const c = document.createElementNS(NS_SVG, 'circle');
+        c.setAttribute('cx', sp[0]); c.setAttribute('cy', sp[1]); c.setAttribute('r', 1.4);
+        c.setAttribute('fill', '#222');
+        g.appendChild(c);
+    });
+}
+// A friendly hedgehog: a spiky brown mound with a little face peeking out.
+function drawHedgehog(g, item) {
+    const body = document.createElementNS(NS_SVG, 'path');
+    body.setAttribute('d',
+        'M -11 0 Q -12 -8 -6 -10 L -5 -6 L -2.5 -11 L 0 -7 ' +
+        'L 2.5 -12 L 5 -7.5 L 7 -11 Q 12 -8 11 0 Z');
+    body.setAttribute('fill', '#8A6A4A');
+    g.appendChild(body);
+    // Lighter face poking out to the right.
+    const face = document.createElementNS(NS_SVG, 'ellipse');
+    face.setAttribute('cx', 9); face.setAttribute('cy', -2.5);
+    face.setAttribute('rx', 4); face.setAttribute('ry', 3.2);
+    face.setAttribute('fill', '#D8C0A4');
+    g.appendChild(face);
+    const nose = document.createElementNS(NS_SVG, 'circle');
+    nose.setAttribute('cx', 12.5); nose.setAttribute('cy', -2); nose.setAttribute('r', 1.1);
+    nose.setAttribute('fill', '#3A2A1E');
+    g.appendChild(nose);
+    const eye = document.createElementNS(NS_SVG, 'circle');
+    eye.setAttribute('cx', 8.5); eye.setAttribute('cy', -3.6); eye.setAttribute('r', 0.9);
+    eye.setAttribute('fill', '#3A2A1E');
+    g.appendChild(eye);
 }
 
 function clientToPastureSvg(svg, clientX, clientY) {
@@ -859,6 +979,9 @@ function buildPastureItemNode(item, ctx) {
 
     if (item.type === 'tree') drawTree(g, item);
     else if (item.type === 'grass') drawGrass(g, item);
+    else if (item.type === 'bird') drawBird(g, item);
+    else if (item.type === 'ladybird') drawLadybird(g, item);
+    else if (item.type === 'hedgehog') drawHedgehog(g, item);
     else drawFlower(g, item);
 
     if (ctx.editing) {
@@ -867,7 +990,12 @@ function buildPastureItemNode(item, ctx) {
         // Delete badge floats above the item
         const badge = document.createElementNS(NS_SVG, 'g');
         badge.setAttribute('class', 'pasture-delete-badge');
-        const topY = item.type === 'tree' ? -38 : (item.type === 'grass' ? -22 : -26);
+        let topY = -26;
+        if (item.type === 'tree') topY = -38;
+        else if (item.type === 'grass') topY = -22;
+        else if (item.type === 'bird') topY = -24;
+        else if (item.type === 'hedgehog') topY = -16;
+        else if (item.type === 'ladybird') topY = -18;
         badge.setAttribute('transform', `translate(8, ${topY})`);
         const bc = document.createElementNS(NS_SVG, 'circle');
         bc.setAttribute('cx', 0); bc.setAttribute('cy', 0); bc.setAttribute('r', 7);
@@ -1028,7 +1156,7 @@ function updatePastureUI() {
     maybeRelocateCowCollisions();
 
     const grown = maybeGrowPasture();
-    syncImagineFlowers();            // turn any new IMAGINE exercises into flowers
+    syncImagineFlowers();            // turn any new IMAGINE exercises into colour-coded birds + flowers
     const items = loadPastureItems();
     const visitDays = getPastureVisitDays();
     if (countEl) countEl.textContent = items.length;
@@ -1037,7 +1165,7 @@ function updatePastureUI() {
     if (blockSub) {
         const n = items.length;
         blockSub.textContent = n === 0
-            ? 'A flower blooms for every step you take'
+            ? 'Something new appears for every step you take'
             : n + (n === 1 ? ' thing' : ' things') + ' growing — tap to tend your garden';
     }
 
@@ -1048,7 +1176,7 @@ function updatePastureUI() {
             growNote.hidden = false;
             growNote.textContent = milestoneNote;
         } else if (grown) {
-            const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿' };
+            const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿', bird: 'a little bird 🐦', ladybird: 'a ladybird 🐞', hedgehog: 'a hedgehog 🦔' };
             growNote.hidden = false;
             growNote.textContent = 'Today your pasture grew ' + (labelByType[grown.item.type] || 'something new') + '!';
         } else {
@@ -1576,11 +1704,12 @@ function setupSummaryPanel() {
 window.setupSummaryPanel = setupSummaryPanel;
 
 // ============================================
-// IMAGINE palette + pasture flowers. Each of the seven areas has a fixed
+// IMAGINE palette + pasture critters. Each of the seven areas has a fixed
 // colour (shared with the home letters, domain cards and tracker). Doing an
-// IMAGINE exercise plants a flower of that area's colour in the Progress
-// Pasture, so the garden becomes a living picture of where attention has
-// gone — a sparse colour is a gentle invitation, never a scolding.
+// IMAGINE exercise plants something in that area's colour — a bird or a
+// flower — in the Progress Pasture, so the garden becomes a living picture of
+// where attention has gone — a sparse colour is a gentle invitation, never a
+// scolding.
 // ============================================
 const IMAGINE_ENGAGEMENT_KEY = 'cowch_imagine_engagement';
 
@@ -1625,8 +1754,8 @@ function loadPastureImagineHW() {
     } catch (_) { return {}; }
 }
 
-// Turn any new IMAGINE engagements into colour-coded flowers. Additive only
-// (flowers are never removed automatically) and capped per area. On a user's
+// Turn any new IMAGINE engagements into colour-coded birds + flowers. Additive
+// only (items are never removed automatically) and capped per area. On a user's
 // first run after this lands, the high-water marks are empty, so their recent
 // history backfills into an initial bloom.
 function syncImagineFlowers() {
@@ -1645,13 +1774,19 @@ function syncImagineFlowers() {
         const fresh = raw.filter(t => t > (hw[letter] || 0));
         if (!fresh.length) return;
         hwChanged = true;
-        const room = Math.max(0, PASTURE_IMAGINE_CAP - (existing[letter] || 0));
+        const already = existing[letter] || 0;
+        const room = Math.max(0, PASTURE_IMAGINE_CAP - already);
         const toPlant = Math.min(fresh.length, room);
         for (let i = 0; i < toPlant; i++) {
             const pos = randomPasturePosition(items, cowPos);
+            // Mix it up: the first engagement in an area arrives as a bird in
+            // that area's colour (mindfulness → light blue, …) to catch the
+            // eye, then birds and flowers alternate so it never reads as a
+            // field of identical flowers. Both wear the IMAGINE colour.
+            const type = ((already + i) % 2 === 0) ? 'bird' : 'flower';
             items.push({
                 id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36),
-                type: 'flower',
+                type: type,
                 letter: letter,
                 x: pos.x,
                 y: pos.y,
