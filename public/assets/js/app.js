@@ -2033,14 +2033,110 @@ function buildWeeklyPatterns() {
         }
     }
 
-    return patterns.slice(0, 3);
+    // Low-score nudges come first — they're the most useful and actionable.
+    const lowSuggestions = buildLowScoreSuggestions(inWeek);
+    return lowSuggestions.concat(patterns).slice(0, 4);
 }
+
+// When a tracked wellbeing score (mood, values-based action, anxiety, etc.) has
+// been sitting low this week, surface a gentle, actionable nudge: a chat with
+// Mandy and/or an IMAGINE exercise sized to feel safe rather than daunting —
+// grounding first when something scary is looming, or a small behavioural step
+// instead of a big taxing one. Scores are 1–5; "low" is roughly the bottom
+// third (≈ 0–4 out of 10).
+const LOW_SCORE_SUGGESTIONS = {
+    mood: {
+        emoji: '🫂',
+        text: 'Your mood has been sitting low this week. That deserves some gentleness, not pressure.',
+        actions: [
+            { kind: 'exercise', label: 'Try 5-4-3-2-1 grounding', href: '/exercises/grounding-54321.html' },
+            { kind: 'chat', label: 'Talk it through with Mandy', prompt: "My mood has been low this week and I'm not totally sure why. Can we talk about it?" }
+        ]
+    },
+    anxiety: {
+        emoji: '🌬️',
+        invert: true,
+        text: 'Anxiety has been running high this week. If something big is looming — a hard conversation, asking for a promotion, an interview — it helps to feel safe in your body first.',
+        actions: [
+            { kind: 'exercise', label: 'Ground yourself first', href: '/exercises/grounding-54321.html' },
+            { kind: 'chat', label: 'Tell Mandy what feels scary', prompt: "I'm feeling really anxious about something I have to face — like a difficult conversation or a big ask. Can you help me feel steadier before I tackle it?" }
+        ]
+    },
+    values: {
+        emoji: '🎯',
+        text: "You've felt off-track from your values lately. A small, low-stakes step often beats a big daunting one.",
+        actions: [
+            { kind: 'exercise', label: 'Take one small step', href: '/exercises/comfort-ladder.html' },
+            { kind: 'chat', label: 'Plan a gentle next step with Mandy', prompt: "I've been feeling off-track from my values. Can you help me pick one small, less daunting step — maybe a little behavioural experiment — to get back on track?" }
+        ]
+    },
+    connection: {
+        emoji: '🤝',
+        text: 'Connection has felt thin this week. Reaching out can feel like a lot, so it helps to start small.',
+        actions: [
+            { kind: 'chat', label: 'Talk it over with Mandy', prompt: "I've been feeling disconnected and a bit isolated lately. Can we talk about a gentle way to reach out to someone?" }
+        ]
+    },
+    selfcare: {
+        emoji: '🛁',
+        text: 'Self-care has dipped this week. Even one tiny kindness to yourself counts.',
+        actions: [
+            { kind: 'exercise', label: 'One-minute reset', href: '/exercises/minute-reset.html' },
+            { kind: 'chat', label: 'Talk it through with Mandy', prompt: "I've been neglecting my self-care this week. Can you help me find one small thing to do for myself?" }
+        ]
+    }
+};
+
+// Average each configured metric over the week's wellness check-ins and, where a
+// score has been sitting low (or anxiety high), return its actionable suggestion.
+// Needs at least 2 days of data for a metric before it'll flag anything.
+function buildLowScoreSuggestions(inWeek) {
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem(WELLNESS_LOG_KEY) || '[]'); } catch (_) {}
+    if (!Array.isArray(log) || !log.length) return [];
+
+    const week = log.filter(e => e && e.scores && inWeek(e.at));
+    if (!week.length) return [];
+
+    const out = [];
+    Object.keys(LOW_SCORE_SUGGESTIONS).forEach(key => {
+        const cfg = LOW_SCORE_SUGGESTIONS[key];
+        const vals = week.map(e => e.scores[key]).filter(v => typeof v === 'number');
+        if (vals.length < 2) return;
+        const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+        const isLow = cfg.invert ? avg >= 3.7 : avg <= 2.3;
+        if (!isLow) return;
+        out.push({ emoji: cfg.emoji, text: cfg.text, actions: cfg.actions });
+    });
+    return out;
+}
+
+// Jump to the chat tab and send Mandy a prefilled opener — used by the
+// actionable nudges in "Patterns I'm noticing".
+window.startChatAbout = function (prompt) {
+    if (typeof switchTab === 'function') switchTab('chat');
+    history.replaceState(null, '', '#chat');
+    setTimeout(function () {
+        if (typeof window.triggerChatPrompt === 'function') window.triggerChatPrompt(prompt);
+    }, 250);
+};
 
 function updatePatternsUI() {
     const card = document.getElementById('patterns-card');
     if (!card) return;
     const list = document.getElementById('patterns-list');
     const patterns = buildWeeklyPatterns();
+
+    // One delegated handler for the chat nudges (rows are rebuilt each render).
+    if (!list.dataset.chatWired) {
+        list.dataset.chatWired = '1';
+        list.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-chat-prompt]');
+            if (!btn) return;
+            window.startChatAbout(btn.getAttribute('data-chat-prompt'));
+        });
+    }
+
     list.innerHTML = '';
     if (patterns.length === 0) {
         const e = document.createElement('div');
@@ -2052,7 +2148,41 @@ function updatePatternsUI() {
     patterns.forEach(p => {
         const row = document.createElement('div');
         row.className = 'pattern-item';
-        row.innerHTML = '<span class="pattern-emoji">' + p.emoji + '</span><span class="pattern-text">' + p.text + '</span>';
+
+        const emoji = document.createElement('span');
+        emoji.className = 'pattern-emoji';
+        emoji.textContent = p.emoji;
+        row.appendChild(emoji);
+
+        const body = document.createElement('div');
+        body.className = 'pattern-body';
+
+        const text = document.createElement('span');
+        text.className = 'pattern-text';
+        text.textContent = p.text;
+        body.appendChild(text);
+
+        if (p.actions && p.actions.length) {
+            const actions = document.createElement('div');
+            actions.className = 'pattern-actions';
+            p.actions.forEach(a => {
+                let el;
+                if (a.kind === 'exercise') {
+                    el = document.createElement('a');
+                    el.href = a.href;
+                } else {
+                    el = document.createElement('button');
+                    el.type = 'button';
+                    el.setAttribute('data-chat-prompt', a.prompt);
+                }
+                el.className = 'pattern-action';
+                el.textContent = a.label;
+                actions.appendChild(el);
+            });
+            body.appendChild(actions);
+        }
+
+        row.appendChild(body);
         list.appendChild(row);
     });
 }
