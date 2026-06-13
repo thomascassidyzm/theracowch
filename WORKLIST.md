@@ -43,6 +43,11 @@ workflow ships it).
 - **The honest-CBT voice.** How do we sound like genuine help — warm, useful,
   grounded in Mandy's real approach — while staying clearly on the non-clinical
   side of the line? This is a wording *design* problem, not find-and-replace.
+  _A first claims-safety audit shipped 14 Jun (`docs/claims-audit.md`): the AI no
+  longer calls itself a therapist, the legal pages are exemplary, branding aligned
+  to "companion", and `vision.html` was removed. The open part is the deeper
+  voice question — how far the AI should speak AS the named clinician vs. in her
+  approach (Mandy's call)._
 - **What "validated" actually means.** Pick the few signals that would tell us
   this is working (someone came back; someone said it helped; a wellbeing team
   said yes) and ignore vanity metrics.
