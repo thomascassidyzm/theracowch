@@ -79,3 +79,32 @@ Merge `audit/claims-safety` → `main` (Vercel auto-deploys main). The branch al
 gets a Vercel **preview deployment** at its own URL, so Mandy can try the new
 chat voice before it goes live. Say the word and I'll merge, or tweak the wording
 first.
+
+---
+
+## Addendum — 14 Jun 2026 (shipped)
+
+Tom approved and the audit went live. Two follow-ups, also shipped:
+
+- **Removed `vision.html`** (publicly-reachable internal pricing deck) and aligned
+  all branding **"wellness coach" → "wellbeing companion"** (manifest/meta/share/
+  og-image) — the AI now self-identifies as a companion, so "coach" was inconsistent.
+
+- **The deeper prompt fix.** Tom noted the chat engine is built on hundreds of
+  hours of Mandy's real session transcripts (the authentic voice is the asset),
+  **but it must proactively reaffirm this is general wellbeing support, not
+  therapy.** Investigation showed the system prompt is assembled as
+  `[imagine-framework-prompts-enhanced.txt] + [api/chat.js template]` — and the
+  **`.txt` base** (the authoritative opening) still framed the AI as "ENHANCED
+  THERAPEUTIC AI", "a qualified therapist", "ACTIVE THERAPEUTIC COACH" / "therapeutic
+  AI", *contradicting* the chat.js tail. Fixed in the `.txt`: identity reframed to
+  "AI wellbeing companion … general wellbeing support, NOT therapy" (voice/approach
+  still credited to the real Mandy), added "never call yourself a therapist" to the
+  NEVER list, neutralised the footer. In `api/chat.js`: strengthened the identity
+  line and added a **proactive reaffirmation rule** to SAFETY & BOUNDARIES (reaffirm
+  "general wellbeing support, not therapy" naturally — not every message, but
+  whenever the user treats it as therapy / asks for diagnosis or a treatment
+  decision — then route to a real therapist/doctor). Removed the orphaned, unused
+  `public/imagine-framework-prompts.txt` (also carried the old framing). All crisis
+  handling, anti-diagnostic rules and guardrails preserved. The authentic Mandy
+  *voice/style* content was not touched.
