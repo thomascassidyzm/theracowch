@@ -102,7 +102,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 10px;
         }
 
         .gratitude-star-label {
@@ -593,14 +593,45 @@
             countDisplay.textContent = starData.length;
         }
 
+        // Pick a position that keeps a star (and its label) clear of the others.
+        // Labels sit directly below each star, so vertical gaps are weighted to
+        // need more clearance than horizontal ones. Uses rejection sampling and
+        // falls back to the roomiest candidate when the sky gets crowded.
+        function findStarPosition() {
+            var minX = 12, maxX = 88;   // keep centered labels on-screen
+            var minY = 10, maxY = 64;   // leave room for the label beneath
+            var vWeight = 0.6;          // <1 => demand extra vertical separation
+            var goodEnough = 20;        // accept once this far from every star
+            var best = null, bestDist = -1;
+
+            for (var attempt = 0; attempt < 80; attempt++) {
+                var cx = minX + Math.random() * (maxX - minX);
+                var cy = minY + Math.random() * (maxY - minY);
+                var nearest = Infinity;
+                for (var k = 0; k < starData.length; k++) {
+                    var dx = cx - starData[k].x;
+                    var dy = (cy - starData[k].y) / vWeight;
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < nearest) nearest = dist;
+                }
+                if (nearest > bestDist) {
+                    bestDist = nearest;
+                    best = { x: cx, y: cy };
+                }
+                if (nearest >= goodEnough) break;
+            }
+            return best;
+        }
+
         function addGratitude() {
             var text = input.value.trim();
             if (text && starData.length < maxStars) {
                 var colors = ['#ffd700', '#fff8e7', '#ffe066', '#ffec8b'];
+                var pos = findStarPosition();
                 var data = {
                     text: text,
-                    x: 8 + Math.random() * 84,
-                    y: 8 + Math.random() * 60,
+                    x: pos.x,
+                    y: pos.y,
                     size: 24 + Math.random() * 20,
                     color: colors[Math.floor(Math.random() * colors.length)]
                 };
