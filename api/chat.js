@@ -13,9 +13,13 @@ async function getImagineFrameworkPrompts() {
   try {
     // Fetch ENHANCED IMAGINE framework training data with wellness interventions
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://theracowch.com';
-    // NOTE: filename is versioned (.v2) to bust Vercel's edge cache, which
-    // serves stale static .txt bodies across deploys (ignores query strings).
-    // The no-store header in vercel.json keeps future edits at this path fresh.
+    // ⚠️ Vercel edge-caches this static .txt and serves it stale across deploys
+    // (x-vercel-cache HIT; query strings ignored; vercel.json headers do NOT
+    // override caching for public/ static files — both rule orders were tried).
+    // So to CHANGE the system prompt you MUST bump this filename version
+    // (v2 -> v3 ...) and rename the file, or the live AI keeps the old prompt.
+    // Proper fix (TODO): read the prompt from a bundled module instead of fetching
+    // a public file over HTTP — removes the cache trap and the public exposure.
     const response = await fetch(`${baseUrl}/imagine-framework-prompts-enhanced.v2.txt`);
     if (!response.ok) {
       throw new Error('Failed to fetch IMAGINE framework prompts');
