@@ -93,6 +93,8 @@
 
     el.querySelector('[data-action="install"]').addEventListener('click', onBannerInstall);
     el.querySelector('[data-action="dismiss"]').addEventListener('click', onBannerDismiss);
+
+    if (window.cowchTrack) window.cowchTrack('install_banner_shown');
   }
 
   function hideBanner() {
@@ -139,6 +141,8 @@
 
     const flow = pickFlow();
     guideStep = 0;
+
+    if (window.cowchTrack) window.cowchTrack('install_guide_opened', { flow: flow });
 
     const el = document.createElement('div');
     el.className = 'cowch-install-overlay';

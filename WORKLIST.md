@@ -70,7 +70,9 @@ workflow ships it).
   lets a wellbeing team clear Cowch without a heavy DPIA, because there's no
   student data to process.
 - A **campus on-ramp** for Mandy's talks: a scannable, attributable link/QR
-  straight into the app, and a simple printable card.
+  straight into the app, and a simple printable card. Use
+  `cowch.app/?utm_source=surrey-talk` — that attributes both natively in Vercel
+  *and* in our telemetry `source` property (see below).
 - A **warm welcome for shared/invited arrivals** — a recipient shouldn't land
   cold in the chat; "someone thought this might help you," once, then in.
 - A **gentle, once-only share nudge** after a genuinely good moment.
@@ -78,6 +80,15 @@ workflow ships it).
   that 404), confirm the social card renders everywhere.
 - A **light, consent-aware way to capture feedback/testimonials** from early
   users and the pilot.
+- **Telemetry — ✅ first pass shipped (13 Jun 2026).** Validation signals now flow
+  to Vercel Web Analytics (privacy-safe, no message/journal content): `chat_started`,
+  `exercise_open`/`domain_open`, `returned` (coarse bucket), `install_banner_shown`,
+  `install_guide_opened`, `pwa_installed`, `share` — each carries a first-touch
+  `source` from `?ref=`/`utm_source`. **Follow-up:** the exercise & IMAGINE pages
+  themselves have *no* analytics (only 6/32 even load `activity-log.js`), so we
+  currently see *opens from the app* but not page-views or completions on those
+  pages. Lighting them up (a shared snippet + a completion event) is the next
+  increment if the open-rate signal proves worth deepening.
 
 ## Directions to move in  *(the longer arc — keep pulling toward these)*
 

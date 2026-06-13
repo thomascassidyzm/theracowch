@@ -635,6 +635,13 @@ async function handleSendMessage() {
         window.CowchInstall.markEngagement();
     }
 
+    // Telemetry: first message this session — the activation signal.
+    // No message content is ever sent, just the event.
+    if (!window.__cowchChatTracked && window.cowchTrack) {
+        window.__cowchChatTracked = true;
+        window.cowchTrack('chat_started');
+    }
+
     // Track in therapy profile (for compression)
     if (window.TherapyProfile) {
         window.TherapyProfile.addToHistory({ role: 'user', content: message });
