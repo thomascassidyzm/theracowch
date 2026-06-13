@@ -1,7 +1,7 @@
 {
-  "name": "Cowch - Your AI Wellness Coach",
+  "name": "Cowch - Your AI Wellbeing Companion",
   "short_name": "Cowch",
-  "description": "Chat with Mandy, your compassionate AI wellness coach. Genuine conversation, wellness support, always here when you need it.",
+  "description": "Chat with Mandy, your compassionate AI wellbeing companion. Genuine conversation, wellness support, always here when you need it.",
   "start_url": "/app.html",
   "display": "standalone",
   "background_color": "#1A1A1A",
@@ -48,7 +48,7 @@
     {
       "name": "Chat with Mandy",
       "short_name": "Chat",
-      "description": "Start a conversation with your AI wellness coach",
+      "description": "Start a conversation with your AI wellbeing companion",
       "url": "/app.html",
       "icons": [{ "src": "/icons/chat-icon.png", "sizes": "96x96" }]
     }

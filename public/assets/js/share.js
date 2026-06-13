@@ -13,9 +13,9 @@
   'use strict';
 
   var SHARE_URL = 'https://cowch.app/';
-  var SHARE_TITLE = 'Cowch — your pocket wellness coach';
+  var SHARE_TITLE = 'Cowch — your pocket wellbeing companion';
   var SHARE_TEXT =
-    "Mandy's a warm AI wellness coach built on a real CBT therapist's approach — " +
+    "Mandy's a warm AI wellbeing companion built on a real CBT therapist's approach — " +
     "free, private, and always there when you need her. Have a look:";
 
   function canShare() {
