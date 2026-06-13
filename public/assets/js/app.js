@@ -2840,6 +2840,19 @@ function isInStandaloneMode() {
 }
 
 function setupSettingsButtons() {
+    // Share Cowch — native share sheet on mobile, copy-link fallback elsewhere.
+    // Routes through the share helper (window.CowchShare). Two entry points:
+    // the prominent pill in the Your Space header, and the Settings button.
+    const fireShare = () => {
+        if (window.CowchShare && window.CowchShare.share) {
+            window.CowchShare.share();
+        }
+    };
+    ['you-share-btn', 'settings-share-btn'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', fireShare);
+    });
+
     // Show install button on every platform unless already installed.
     // Routes through the unified PWA install guide (window.CowchInstall).
     const installBtn = document.getElementById('settings-install-btn');

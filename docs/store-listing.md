@@ -49,7 +49,7 @@ Declare the following under **App Privacy → Data Collection**.
 
 - **Diagnostics** — Crash data, performance data (only via Apple's default crash reporting)
 - **Identifiers** — Device ID, only if/when Apple's sign-in-to-device APIs require it
-- **Usage Data** — App interactions, only if you later add analytics. **Today: not collected.**
+- **Usage Data** — The **web app** uses Vercel Web Analytics: aggregate, cookieless product analytics (page views, install / share events), no personal data and no cross-site tracking. If this is bundled into a native build, declare it as **Product Interaction** under App Activity and revisit the tables below.
 
 ### Data used to track: NONE
 
