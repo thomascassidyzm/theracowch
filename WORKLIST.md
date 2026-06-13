@@ -85,13 +85,12 @@ workflow ships it).
   that 404), confirm the social card renders everywhere.
 - A **light, consent-aware way to capture feedback/testimonials** from early
   users and the pilot.
-- **Make the chat system prompt load reliably (tech debt).** `api/chat.js`
-  fetches the prompt base over HTTP from a public `.txt`, which Vercel
-  edge-caches — so prompt edits silently don't go live unless you **bump the
-  filename version** (`…-enhanced.v2.txt` → `v3`, and update the fetch in
-  chat.js). For a claims-sensitive app, a prompt fix that silently doesn't deploy
-  is a real risk. Proper fix: load the prompt from a bundled module (no HTTP, no
-  public exposure). Until then, version-bump on every prompt edit.
+- **Chat system prompt loading — ✅ FIXED (14 Jun 2026).** The prompt now lives in
+  **`lib/prompt-base.js`** (a bundled ESM module that `api/chat.js` imports), so
+  edits deploy reliably and it's no longer served publicly. **To change the chat
+  prompt, edit `lib/prompt-base.js`** (not a public `.txt`, no CDN cache, no
+  filename version-bump). Replaced the old fetch-a-public-`.txt` loader that
+  Vercel edge-cached stale.
 - **Telemetry — ✅ first pass shipped (13 Jun 2026).** Validation signals now flow
   to Vercel Web Analytics (privacy-safe, no message/journal content): `chat_started`,
   `exercise_open`/`domain_open`, `returned` (coarse bucket), `install_banner_shown`,
