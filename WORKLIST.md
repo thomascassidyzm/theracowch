@@ -97,8 +97,10 @@ workflow ships it).
 
 ## Only a human can do these (Tom / Mandy)
 
-- Turn on **Vercel Web Analytics** in the dashboard, or the analytics we shipped
-  stay dark.
+- ~~Turn on **Vercel Web Analytics** in the dashboard~~ ✅ DONE (13 Jun 2026) —
+  enabled + redeployed; `/_vercel/insights/script.js` serves on cowch.app. Page
+  views flow now; custom events (`pwa_installed`, `share`) appear under Analytics
+  → Events (may need a Pro plan to display).
 - Mandy's **warm seed** — the blog post + email to her list, in her words.
 - Confirm the **Surrey contact + a talk date**, and whether the pilot runs via a
   talk, a society, or the wellbeing service (loop in Psychology for a measure).
