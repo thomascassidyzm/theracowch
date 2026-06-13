@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["health", "wellness", "medical"],
+  "categories": ["health", "wellness"],
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
