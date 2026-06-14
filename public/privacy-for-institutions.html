@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cowch &amp; student data | One-page summary for universities</title>
+    <meta name="description" content="How Cowch handles student data: journals stay on the student's own device, no central student database, no accounts required. A one-page summary for wellbeing and data-protection teams.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0; color: #2D2D2D; line-height: 1.6; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 820px; margin: 0 auto; padding-bottom: 48px; }
+
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 44px; height: 44px; border-radius: 12px; }
+        .brand b { font-size: 1.35rem; font-weight: 900; }
+        .brand span { display: block; font-size: 0.85rem; color: #7A6556; font-weight: 700; margin-top: -2px; }
+        .print-btn {
+            padding: 10px 18px; background: #FFE1B6; color: #2D2D2D; font-family: inherit;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            border: 4px solid #F5A66E; box-shadow: 5px 5px 0 rgba(60,46,40,0.18);
+        }
+        .print-btn:hover { transform: translate(2px,2px); box-shadow: 3px 3px 0 rgba(60,46,40,0.18); }
+
+        h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 900; margin-bottom: 10px; line-height: 1.15; }
+        .lede { color: #5C4432; margin-bottom: 22px; font-weight: 600; font-size: 1.08rem; }
+        h2 { font-size: 1.2rem; font-weight: 900; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+        p, li { font-size: 1rem; margin-bottom: 10px; }
+        ul { padding-left: 22px; }
+        strong { font-weight: 700; }
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+
+        .headline {
+            background: #E9F3EA; border: 4px solid #2D5C38; padding: 18px 22px;
+            box-shadow: 8px 8px 0 rgba(45,92,56,0.18); margin: 20px 0 26px; font-size: 1.05rem;
+        }
+
+        /* simple data-flow diagram */
+        .flow { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 18px 0 26px; }
+        .flow-row { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; }
+        .node { flex: 1 1 240px; background: #FDF5E8; border: 3px solid #2D2D2D; padding: 13px 15px; }
+        .node.local { background: #E9F3EA; border-color: #2D5C38; }
+        .node b { display: block; margin-bottom: 3px; }
+        .node span { font-size: 0.92rem; color: #5C4432; }
+
+        table { width: 100%; border-collapse: collapse; margin: 14px 0 24px; font-size: 0.95rem; }
+        th, td { text-align: left; padding: 9px 12px; border: 2px solid #2D2D2D; vertical-align: top; }
+        th { background: #FDF5E8; font-weight: 900; }
+
+        .footnote { margin-top: 26px; font-size: 0.88rem; color: #7A6556; }
+
+        @media print {
+            body { background: #fff; padding: 0; font-size: 11.5pt; }
+            .print-btn { display: none; }
+            .headline, .node { box-shadow: none; }
+            a { color: #2D2D2D; text-decoration: underline; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="brand">
+                <img src="/icons/icon-192x192.png" alt="" onerror="this.style.display='none'">
+                <div>
+                    <b>Cowch</b>
+                    <span>Student data — a one-page summary</span>
+                </div>
+            </div>
+            <button type="button" class="print-btn" onclick="window.print()">Print / Save PDF</button>
+        </div>
+
+        <h1>How Cowch handles student data</h1>
+        <p class="lede">A short summary for wellbeing and data-protection teams. The headline: there is essentially <strong>no student data for the institution to process</strong>.</p>
+
+        <div class="headline">
+            Endorsing, linking to, or sharing Cowch does <strong>not</strong> create a data-processing relationship for your institution. Students use Cowch directly; their journals and chat history live on their own device; we hold no central student database and require no account to use it. So there is no student personal data flowing through you to assess.
+        </div>
+
+        <h2>Where data lives</h2>
+        <div class="flow">
+            <div class="flow-row">
+                <div class="node local"><b>On the student's device</b><span>Journal entries, exercise inputs, chat history, preferences and progress &mdash; stored in their own browser. They stay on that device unless the student exports them.</span></div>
+            </div>
+            <div class="flow-row">
+                <div class="node"><b>In transit, briefly → AI provider (Anthropic, US)</b><span>When a student messages Mandy, that message + recent context is sent over TLS purely to generate a reply. Not stored long-term by us; not used to train AI models (per provider contract).</span></div>
+                <div class="node"><b>Hosting / CDN (Vercel)</b><span>Serves the app and passes requests through. Short-term operational logs only.</span></div>
+            </div>
+            <div class="flow-row">
+                <div class="node"><b>Aggregate analytics (cookieless)</b><span>Anonymous, aggregate usage only (e.g. visits, installs). No cookies, no cross-site tracking, no personal data, and never message or journal content.</span></div>
+            </div>
+        </div>
+
+        <h2>What Cowch does <em>not</em> do</h2>
+        <ul>
+            <li>No central database of student identities or content.</li>
+            <li>No account, login, name or email required for a student to use it.</li>
+            <li>No selling of data, no advertising, no AI training on user content.</li>
+            <li>No tracking of students across other websites.</li>
+        </ul>
+
+        <h2>Safeguarding &amp; clinical safety — set expectations clearly</h2>
+        <p>Cowch is a <strong>non-clinical wellbeing tool</strong>. It does not diagnose, assess, triage, or monitor risk, and it is <strong>not</strong> a crisis or safety system. Its &ldquo;Need help now?&rdquo; button signposts students to national crisis lines (and can be pointed at your own services). Because it is non-clinical and is not procured by the institution as a health-IT system, it does not bring the institution into clinical-safety standards such as DTAC or DCB0129. It is for adults (18+) and is not a replacement for therapy or medical care.</p>
+
+        <h2>At a glance</h2>
+        <table>
+            <tr><th>Question</th><th>Answer</th></tr>
+            <tr><td>Does the institution process student data via Cowch?</td><td><strong>No.</strong> Students use it directly; content stays on their device.</td></tr>
+            <tr><td>Is a DPIA / data-sharing agreement needed to endorse it?</td><td>No data-processing relationship is created, so there is nothing to assess. We're glad to answer any questions in writing.</td></tr>
+            <tr><td>Where do student messages go?</td><td>To the AI provider over TLS, only to generate a reply. Not stored long-term; not used for training.</td></tr>
+            <tr><td>Are there accounts / logins?</td><td>No account required to use Cowch.</td></tr>
+            <tr><td>Is it a medical device / clinical tool?</td><td>No — a non-clinical wellbeing tool. No diagnosis, treatment, or risk monitoring.</td></tr>
+        </table>
+
+        <p>Full detail is in our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Use</a>. Questions from a DPO or wellbeing lead are welcome: <a href="mailto:contact@thoughtsonlifeandlove.com">contact@thoughtsonlifeandlove.com</a>.</p>
+
+        <p class="footnote">See also: <a href="/for-universities.html">Cowch for universities (overview)</a> &middot; <a href="/privacy.html">Privacy Policy</a> &middot; <a href="/terms.html">Terms of Use</a> &middot; <a href="/accessibility.html">Accessibility</a>.</p>
+    </div>
+</body>
+</html>
