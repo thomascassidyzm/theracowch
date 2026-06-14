@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cowch for universities | A free wellbeing companion for students</title>
+    <meta name="description" content="Cowch is a free, private, non-clinical wellbeing companion for students, built on the approach of a real BABCP-accredited therapist. It complements your existing support — it is not therapy.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0;
+            color: #2D2D2D;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 820px; margin: 0 auto; padding-bottom: 48px; }
+
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 44px; height: 44px; border-radius: 12px; }
+        .brand b { font-size: 1.35rem; font-weight: 900; }
+        .brand span { display: block; font-size: 0.85rem; color: #7A6556; font-weight: 700; margin-top: -2px; }
+        .print-btn {
+            padding: 10px 18px; background: #FFE1B6; color: #2D2D2D; text-decoration: none;
+            font-family: inherit; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            border: 4px solid #F5A66E; box-shadow: 5px 5px 0 rgba(60,46,40,0.18);
+        }
+        .print-btn:hover { transform: translate(2px,2px); box-shadow: 3px 3px 0 rgba(60,46,40,0.18); }
+
+        h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 900; margin-bottom: 10px; line-height: 1.15; }
+        .lede { color: #5C4432; margin-bottom: 24px; font-weight: 600; font-size: 1.12rem; }
+        h2 { font-size: 1.3rem; font-weight: 900; margin: 30px 0 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+        p, li { font-size: 1rem; margin-bottom: 10px; }
+        ul { padding-left: 22px; }
+        strong { font-weight: 700; }
+        a { color: #E35B32; font-weight: 700; }
+        a:hover { opacity: 0.8; }
+
+        .callout {
+            background: #FDF5E8; border-left: 5px solid #C9A857;
+            padding: 16px 20px; margin: 20px 0; font-size: 0.98rem;
+        }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px; margin: 18px 0 24px;
+        }
+        .tile { background: #FDF5E8; border: 3px solid #2D2D2D; padding: 14px 16px; }
+        .tile strong { display: block; margin-bottom: 4px; }
+        .tile span { font-size: 0.95rem; color: #5C4432; }
+
+        .ask {
+            background: #FFEFE2; border: 4px solid #2D2D2D; padding: 22px 24px;
+            box-shadow: 8px 8px 0 rgba(60,46,40,0.18); margin: 26px 0;
+        }
+        .ask h2 { margin-top: 0; }
+
+        .contact { margin-top: 30px; padding-top: 18px; border-top: 3px dashed #D8C4B0; font-weight: 700; }
+        .footnote { margin-top: 26px; font-size: 0.88rem; color: #7A6556; }
+
+        @media print {
+            body { background: #fff; padding: 0; font-size: 11.5pt; }
+            .print-btn { display: none; }
+            .ask, .tile, .callout { box-shadow: none; }
+            h2 { margin-top: 18px; }
+            a { color: #2D2D2D; text-decoration: underline; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="brand">
+                <img src="/icons/icon-192x192.png" alt="" onerror="this.style.display='none'">
+                <div>
+                    <b>Cowch</b>
+                    <span>For university wellbeing teams</span>
+                </div>
+            </div>
+            <button type="button" class="print-btn" onclick="window.print()">Print / Save PDF</button>
+        </div>
+
+        <h1>A free wellbeing companion for your students — built by a real therapist.</h1>
+        <p class="lede">Cowch is a warm, private, <strong>non-clinical</strong> wellbeing app, free for students. It isn't therapy and never claims to be — it complements the support you already provide, and points students toward real help when they need it.</p>
+
+        <div class="callout">
+            <strong>What Cowch is — and isn't.</strong> Cowch is a wellbeing-support tool, not a clinical service. It does <strong>not</strong> diagnose or treat, is not a crisis service, and is not a replacement for counselling, a GP, or emergency services. Its <strong>&ldquo;Need help now?&rdquo;</strong> button routes students to national crisis lines, and can be pointed at your own services. For adults (18+).
+        </div>
+
+        <h2>The gap it fills</h2>
+        <p>Most students who are struggling never reach a wellbeing service — and even those who do still need something for the long stretches <strong>between appointments and out of hours</strong>. Cowch is the everyday layer beneath your service: a calm, always-available companion a student can open at 2am — free, private, and on any phone.</p>
+
+        <h2>What it is</h2>
+        <ul>
+            <li><strong>Mandy</strong> &mdash; a warm AI wellbeing companion built on the voice and CBT/ACT-<em>informed</em> approach of a real, BABCP-accredited therapist.</li>
+            <li><strong>The IMAGINE framework</strong> &mdash; seven everyday domains of wellbeing, each with tiny exercises (box breathing, 5-4-3-2-1 grounding, gratitude, tiny wins).</li>
+            <li><strong>A private, on-device journal</strong> &mdash; entries stay on the student's own phone.</li>
+            <li><strong>&ldquo;Need help now?&rdquo;</strong> &mdash; one-tap routing to crisis support.</li>
+            <li><strong>No friction</strong> &mdash; installs from a link, no app store, no cost.</li>
+        </ul>
+
+        <h2>Why it's easy to say yes to</h2>
+        <div class="grid">
+            <div class="tile"><strong>Free</strong><span>No contract, no procurement, no budget line.</span></div>
+            <div class="tile"><strong>No student data to process</strong><span>Journals stay on the student's device; Cowch holds no central student database — so endorsing it needs no heavy DPIA. <a href="/privacy-for-institutions.html">One-page summary →</a></span></div>
+            <div class="tile"><strong>Complements, doesn't replace</strong><span>Sits alongside your counselling, helpline &amp; crisis services and signposts to them.</span></div>
+            <div class="tile"><strong>Built by someone real</strong><span>A named, accredited therapist's approach — not a generic chatbot.</span></div>
+        </div>
+
+        <h2>Built by Mandy Kloppers</h2>
+        <p>Mandy is a <strong>BABCP-accredited CBT therapist</strong> with over two decades of experience and a top-ranked UK mental-health blog (<a href="https://thoughtsonlifeandlove.com" target="_blank" rel="noopener">thoughtsonlifeandlove.com</a>). Cowch carries her voice and approach, and is explicit with every student that it is wellbeing support — not therapy.</p>
+
+        <div class="ask">
+            <h2>The ask — a small, evaluated pilot</h2>
+            <ul>
+                <li>Offer Cowch to a contained group of students (say <strong>~50</strong>) &mdash; via a talk, a society, or your wellbeing channels.</li>
+                <li>Run a simple <strong>before/after wellbeing measure</strong> (e.g. WEMWBS), ideally with your psychology department &mdash; so you get real evidence and we learn what genuinely helps.</li>
+                <li>Free, low-effort, low-risk: a concrete wellbeing initiative you can point to, and something genuinely useful for students &mdash; now.</li>
+            </ul>
+        </div>
+
+        <div class="contact">
+            Mandy Kloppers &middot; <a href="mailto:contact@thoughtsonlifeandlove.com">contact@thoughtsonlifeandlove.com</a> &middot; <a href="https://cowch.app">cowch.app</a>
+        </div>
+
+        <p class="footnote">See also: <a href="/privacy-for-institutions.html">How Cowch handles student data (one page)</a> &middot; <a href="/privacy.html">Privacy Policy</a> &middot; <a href="/terms.html">Terms of Use</a>.</p>
+    </div>
+</body>
+</html>
