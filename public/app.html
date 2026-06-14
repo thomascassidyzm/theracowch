@@ -56,6 +56,7 @@
     <link rel="stylesheet" href="/assets/css/components.css">
     <link rel="stylesheet" href="/assets/css/pages/chat.css">
     <link rel="stylesheet" href="/assets/css/pwa-install.css">
+    <link rel="stylesheet" href="/assets/css/calf.css">
 
     <style>
         /* ============================================
@@ -4310,6 +4311,10 @@
             <!-- HOME TAB -->
             <div class="tab-panel active" id="tab-home">
                 <div class="home-tab">
+                    <!-- Your calf — the on-device companion (populated by calf.js).
+                         Shows an invitation until welcomed, then the living calf card. -->
+                    <div id="calf-home" class="calf-home-slot"></div>
+
                     <!-- Greeting with Mandy Avatar -->
                     <div class="greeting-section">
                         <div class="avatar-container">
@@ -6803,6 +6808,9 @@
         </div>
     </div>
 
+    <!-- Calf welcome / birth flow overlay (full-screen, populated by calf.js) -->
+    <div id="calf-welcome" class="calf-welcome" hidden aria-hidden="true" role="dialog" aria-label="Meet your calf"></div>
+
     <!-- External JavaScript -->
     <!-- Vercel Web Analytics (cookieless, no personal data).
          Requires Web Analytics to be enabled for this project in the Vercel
@@ -6817,6 +6825,7 @@
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=54"></script>
     <script src="/assets/js/app.js?v=83"></script>
+    <script src="/assets/js/calf.js?v=1"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
          ready). Styled to match the app; sits above everything, no layout shift. -->
