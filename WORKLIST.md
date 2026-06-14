@@ -38,8 +38,8 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 
 ## 🔨 To build   (claimable — one line, link the plan)
 
-- [ ] **University-facing pitch surface** — turn the copy-ready one-pager (`docs/marketing-strategy.md` Appendix A) into something Mandy can hand over / show / print (a `/for-universities` page, not in the main app nav).
-- [ ] **One-page institutional privacy / data-flow statement** — lets a wellbeing team clear Cowch fast (no student data processed). The DPIA-killer.
+- [x] @claude-local 06-14 **University-facing pitch surface — SHIPPED** (`public/for-universities.html`): brand-styled, print-friendly, noindex, not in app nav — the gap / what-it-is / why-yes / the ask (~50-student evaluated pilot). From `docs/marketing-strategy.md` App. A.
+- [x] @claude-local 06-14 **One-page institutional privacy / data-flow statement — SHIPPED** (`public/privacy-for-institutions.html`): on-device, no central student DB, no DTAC/DCB0129 trigger, at-a-glance Q&A — the DPIA-killer.
 - [ ] **Campus on-ramp for Mandy's talks** — a scannable QR + a printable card to `cowch.app/?utm_source=surrey-talk` (attributes natively in Vercel *and* in the telemetry `source` property).
 - [ ] **Warm welcome for shared/invited arrivals** — a `?ref=*` first-visit nudge ("someone thought this might help you", once, then in); reuse `window.CowchInstall`.
 - [ ] **Gentle, once-only share nudge** after a genuinely good moment (calls `window.CowchShare.share()`; a `localStorage` flag so it never nags).
