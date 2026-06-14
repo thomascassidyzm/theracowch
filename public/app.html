@@ -4311,10 +4311,6 @@
             <!-- HOME TAB -->
             <div class="tab-panel active" id="tab-home">
                 <div class="home-tab">
-                    <!-- Your calf — the on-device companion (populated by calf.js).
-                         Shows an invitation until welcomed, then the living calf card. -->
-                    <div id="calf-home" class="calf-home-slot"></div>
-
                     <!-- Greeting with Mandy Avatar -->
                     <div class="greeting-section">
                         <div class="avatar-container">
@@ -4942,6 +4938,10 @@
                 </div>
             </header>
             <div class="pasture-panel-content">
+                <!-- Your calf grazes at the top of the pasture (populated by calf.js).
+                     Shows an invitation until welcomed, then the living calf card. -->
+                <div id="calf-home" class="calf-home-slot"></div>
+
                 <p class="pasture-blurb" id="pasture-blurb">Every step you take plants something new here. Watch your pasture fill in over time.</p>
                 <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Your pasture"></svg>
                 <div class="pasture-grow-note" id="pasture-grow-note" hidden></div>
@@ -6825,7 +6825,7 @@
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=54"></script>
     <script src="/assets/js/app.js?v=83"></script>
-    <script src="/assets/js/calf.js?v=1"></script>
+    <script src="/assets/js/calf.js?v=2"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
          ready). Styled to match the app; sits above everything, no layout shift. -->

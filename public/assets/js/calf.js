@@ -391,15 +391,19 @@
     render(
       '<div class="calf-stage-art pop-in">' + calfSvg('beam') + '</div>' +
       '<h2>' + esc(name) + ' is so glad to meet you' + you + '.</h2>' +
-      '<p>You\'ll find ' + esc(name) + ' on your home screen. Spend a moment together whenever you like — there\'s no streak to keep up.</p>' +
+      '<p>You\'ll find ' + esc(name) + ' grazing in your Progress Pasture, over in Your Space. Spend a moment together whenever you like — there\'s no streak to keep up.</p>' +
       '<div class="calf-actions">' +
-        '<button class="calf-btn calf-btn-primary" id="calf-done">Take me home</button>' +
+        '<button class="calf-btn calf-btn-primary" id="calf-done">Visit the pasture</button>' +
       '</div>'
     );
     $('#calf-done').addEventListener('click', function () {
       closeWelcome();
       renderHome();
-      try { var t = document.querySelector('.tab-btn[data-tab="home"]'); if (t) t.click(); } catch (_) {}
+      // The calf now lives in the pasture — take them to Your Space and open it.
+      try {
+        var t = document.querySelector('.tab-btn[data-tab="you"]'); if (t) t.click();
+        var block = document.getElementById('pasture-block'); if (block) block.click();
+      } catch (_) {}
     });
   }
 
@@ -411,7 +415,8 @@
   }
 
   // ============================================================
-  // HOME CARD
+  // PASTURE CARD  (the calf's home base — lives in the Progress
+  // Pasture panel, under Your Space; #calf-home is its mount point)
   // ============================================================
   var moodCared = [
     'is snuggled up, happy you came by.',
