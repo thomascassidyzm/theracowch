@@ -1,5 +1,21 @@
 # CLAUDE.md
 
+## Start here (every session)
+
+Read **[`WORKLIST.md`](./WORKLIST.md)** (repo root) — the shared, multi-agent "what's
+next" for this repo (directions / things to build / areas to think through). Before
+starting anything substantial, **claim your item there** (`[ ]`→`[~] @you MM-DD`, a
+one-line commit) so parallel agents don't double-grab it; the full protocol is in its
+header. It sits on top of the deploy rail below.
+
+> ⚠️ **Hard rail — the claims line.** Cowch is a **non-clinical wellbeing product**.
+> Never frame it (in copy, the app, meta tags, or the chat prompt) as therapy / a
+> therapist / treatment / diagnosis / "CBT for [a condition]". Use "wellbeing
+> companion, built on a real therapist's approach, CBT/ACT-informed, *not* a
+> replacement for therapy", with crisis routing to humans; 18+. The chat system
+> prompt lives in **`lib/prompt-base.js`** (bundled — edit there, not a public file).
+> Why: `docs/marketing-strategy.md` §3 + `docs/claims-audit.md`.
+
 ## What this project actually is
 
 A **plain static site** plus a handful of **Vercel serverless functions**.

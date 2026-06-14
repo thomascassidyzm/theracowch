@@ -1,133 +1,82 @@
-# Cowch — working brief
+# WORKLIST — theracowch (cowch.app) · shared, multi-agent. READ THIS HEADER BEFORE EDITING.
 
-**For:** Claude Code on the web, running as **Opus 4.8** — a thinking partner,
-not a ticket-taker. Decide what matters, decompose it yourself, and hand the
-detailed/mechanical execution down to Sonnet or Haiku. Don't wait for
-hand-holding; do wait on the few human calls flagged at the end.
+The live "what's next" for this repo, for **all** agents (local, cloud/web, any account).
+Coarse on purpose — for Opus: **directions, things to build, areas to think through.** One line per
+item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sharing-and-marketing.md`,
+`docs/claims-audit.md`), don't inline it. This is *not* a bug tracker or a subtask list, and it sits
+**on top of** the deploy rail in `CLAUDE.md` — it doesn't restate it.
 
-**The mission:** a careful, mission-led **soft launch to validate** Cowch, with a
-beachhead of **UK university students**. Mandy Kloppers — a real BABCP-accredited
-therapist — is going into the **University of Surrey** (Guildford, local to her)
-in person. Free for students. No rush to monetise. People need something like
-this; the job is to get it to them well, not fast.
+### How to use (the whole protocol)
 
-**Read for the full picture:** `docs/marketing-strategy.md` (strategy + sources +
-a copy-ready university pilot one-pager), `docs/sharing-and-marketing.md`
-(share/install already shipped), `CLAUDE.md` (no build step; only `public/` +
-`api/` reach the live site; work on a `claude/*` branch and the auto-merge
-workflow ships it).
+**Status marks** — one box + a suffix, nothing else:
+- `[ ]` open — free to grab
+- `[~] @handle MM-DD` — claimed / in progress (e.g. `[~] @web-acctB 06-14`)
+- `[x] @handle MM-DD` — done (leave it; the groomer archives it)
+- `[!] @handle MM-DD — why` — blocked / parked
 
----
+`@handle` = a stable tag you pick for yourself (`@tom-local`, `@cloud-3`, `@web-acctB`). Date = today, `MM-DD`.
 
-## Fixed constraints — these bound every decision
+- **Grab:** flip `[ ]`→`[~] @you MM-DD` and commit **only that one line** (`worklist: claim <slug>`). If it's already `[~]`, pick another. A `[~]` older than **5 days** with no branch behind it is stale — re-grab it, note `(was @x, stale)`.
+- **Add:** append `[ ]` to the **end** of the relevant section. Never renumber/reorder/reflow existing lines (append-only keeps merges trivial).
+- **Finish:** flip `[~]`→`[x] @you MM-DD`, same one-line commit.
+- **Merge conflicts here are always two independent line edits → keep BOTH, strip the markers.** Never overwrite the other side. Don't bundle worklist edits with code commits.
+- **Branch hygiene** (inherits `CLAUDE.md`): work on a `claude/*` branch; it auto-merges **wholesale to `main`** (→ Vercel deploys `cowch.app`). So **never** add your claim/commit onto someone else's `claude/*` branch, and never bundle a claim with a code change. **No build step** — only `public/` + `api/` reach the live site; bump `public/sw.js` `CACHE_NAME` if you change served assets.
 
-1. **The claims line (non-negotiable).** Cowch is a **non-clinical wellbeing
-   product**. Under MHRA 2025 guidance the *claims* are what make software a
-   medical device; the ASA bans treat/cure claims; Illinois bans advertising "AI
-   therapy". So never frame Cowch as therapy / a therapist / treatment /
-   diagnosis / "CBT for [a condition]"; do frame it as a wellbeing companion,
-   *built by* a real therapist, CBT/ACT-**informed**, **not a replacement for
-   therapy**, with crisis routing to humans. 18+. (Full reasoning in the strategy
-   doc, §3.) If something can't be done without crossing this line, stop and say so.
-2. **Free for students. Mission-led pace.** Never paywall the student crisis.
-   Validate first; don't optimise for growth or revenue yet.
-3. **Privacy is the architecture, not a feature.** On-device by design — it's
-   also the thing that makes universities able to say yes. Don't erode it.
-4. **Ship via the repo's flow** (`claude/*` branch → auto-merge → Vercel). Bump
-   `sw.js` `CACHE_NAME`/`BUILD_DATE` if you change served assets.
+⚠️ **The claims line is a hard rail — read before touching any user-facing copy or the chat prompt.** Cowch is a **non-clinical wellbeing product**: never frame it as therapy / a therapist / treatment / diagnosis / "CBT for [a condition]"; always "wellbeing companion, built on a real therapist's approach, CBT/ACT-**informed**, *not* a replacement for therapy", with crisis routing to humans. 18+. The chat system prompt lives in **`lib/prompt-base.js`** (edit there — it's bundled, not a public file; no version-bump). Full reasoning: `docs/marketing-strategy.md` §3 + `docs/claims-audit.md`.
 
 ---
 
-## Areas to think through  *(judgment — reason it out, propose, ask Tom if it's his call)*
+## 🧭 Directions / bets   (the why — changes rarely)
 
-- **The honest-CBT voice.** How do we sound like genuine help — warm, useful,
-  grounded in Mandy's real approach — while staying clearly on the non-clinical
-  side of the line? This is a wording *design* problem, not find-and-replace.
-  _A first claims-safety audit shipped 14 Jun (`docs/claims-audit.md`): the AI no
-  longer calls itself a therapist, the legal pages are exemplary, branding aligned
-  to "companion", and `vision.html` was removed. The open part is the deeper
-  voice question — how far the AI should speak AS the named clinician vs. in her
-  approach (Mandy's call)._
-- **What "validated" actually means.** Pick the few signals that would tell us
-  this is working (someone came back; someone said it helped; a wellbeing team
-  said yes) and ignore vanity metrics.
-- **The crisis answer.** Nail the one paragraph a university wellbeing team needs
-  to hear about "what happens if a student is in crisis?" — Cowch routes to
-  humans, it does not detect, triage, or own safety. Get this exactly right; it
-  gates trust.
-- **How warm is too warm.** Mandy's voice should feel like a real person's
-  *approach*, not a synthetic friend to confide in *instead of* people (the thing
-  regulators are worried about). Where's that line, in tone and in features?
-- **Complement, not replacement.** How Cowch describes its relationship to a
-  university's existing services so it's true *and* makes adoption easy.
-- **The Surrey pilot's shape.** Bottom-up (talks → install) vs top-down (Centre
-  for Wellbeing endorsement); the lightest evaluation that's still credible (a
-  simple pre/post wellbeing measure?); how to gather consenting testimonials.
-- **When money enters, later.** How a paid layer could appear for the *general*
-  audience and as a bridge to Mandy's 1:1 therapy — without ever betraying
-  free-for-students.
+- **Mission-led soft launch to *validate*** — not growth, not revenue yet. Free for students; never paywall the student crisis. → `docs/marketing-strategy.md`
+- **Beachhead = UK university students, Surrey first.** Mandy is local to Guildford and already works there; Surrey's Mental-Health-Charter submission (~Sept 2026) is the timing hook. Sit *outside* the clinical-procurement frame; complement existing services, don't replace them. → `docs/marketing-strategy.md` §5
+- **Own the position: real therapist, NOT AI therapy, private by design.** The AI-therapy backlash is the trust advantage. Stay non-clinical in product *and* marketing — that's also what keeps us off the medical-device line. → `docs/claims-audit.md`
+- **Privacy is the architecture, not a feature.** On-device journals; a university can endorse with no heavy DPIA *because* there's no student data to process. Don't erode it.
+- **Universities as a repeatable channel:** Surrey → a portable pilot playbook → other local / Charter universities.
+- **Mandy's audience is the compounding engine:** warm (blog → email) seeds everything; social scales the stories that land; paid ads only ever *amplify* a proven message.
+- **The ethical deep-end:** Cowch as a warm, honest bridge to real human help, including Mandy's own 1:1 practice.
 
-## Stuff to build  *(near-term outcomes — you decide the how)*
+## 🔨 To build   (claimable — one line, link the plan)
 
-- A **university-facing pitch surface** (the one-pager in the strategy doc,
-  Appendix A, made into something Mandy can actually hand over / show / print).
-- A **one-page privacy / data-flow statement** for institutions — the thing that
-  lets a wellbeing team clear Cowch without a heavy DPIA, because there's no
-  student data to process.
-- A **campus on-ramp** for Mandy's talks: a scannable, attributable link/QR
-  straight into the app, and a simple printable card. Use
-  `cowch.app/?utm_source=surrey-talk` — that attributes both natively in Vercel
-  *and* in our telemetry `source` property (see below).
-- A **warm welcome for shared/invited arrivals** — a recipient shouldn't land
-  cold in the chat; "someone thought this might help you," once, then in.
-- A **gentle, once-only share nudge** after a genuinely good moment.
-- **Install & preview polish** — real screenshots (the manifest references some
-  that 404), confirm the social card renders everywhere.
-- A **light, consent-aware way to capture feedback/testimonials** from early
-  users and the pilot.
-- **Chat system prompt loading — ✅ FIXED (14 Jun 2026).** The prompt now lives in
-  **`lib/prompt-base.js`** (a bundled ESM module that `api/chat.js` imports), so
-  edits deploy reliably and it's no longer served publicly. **To change the chat
-  prompt, edit `lib/prompt-base.js`** (not a public `.txt`, no CDN cache, no
-  filename version-bump). Replaced the old fetch-a-public-`.txt` loader that
-  Vercel edge-cached stale.
-- **Telemetry — ✅ first pass shipped (13 Jun 2026).** Validation signals now flow
-  to Vercel Web Analytics (privacy-safe, no message/journal content): `chat_started`,
-  `exercise_open`/`domain_open`, `returned` (coarse bucket), `install_banner_shown`,
-  `install_guide_opened`, `pwa_installed`, `share` — each carries a first-touch
-  `source` from `?ref=`/`utm_source`. **Follow-up:** the exercise & IMAGINE pages
-  themselves have *no* analytics (only 6/32 even load `activity-log.js`), so we
-  currently see *opens from the app* but not page-views or completions on those
-  pages. Lighting them up (a shared snippet + a completion event) is the next
-  increment if the open-rate signal proves worth deepening.
+- [ ] **University-facing pitch surface** — turn the copy-ready one-pager (`docs/marketing-strategy.md` Appendix A) into something Mandy can hand over / show / print (a `/for-universities` page, not in the main app nav).
+- [ ] **One-page institutional privacy / data-flow statement** — lets a wellbeing team clear Cowch fast (no student data processed). The DPIA-killer.
+- [ ] **Campus on-ramp for Mandy's talks** — a scannable QR + a printable card to `cowch.app/?utm_source=surrey-talk` (attributes natively in Vercel *and* in the telemetry `source` property).
+- [ ] **Warm welcome for shared/invited arrivals** — a `?ref=*` first-visit nudge ("someone thought this might help you", once, then in); reuse `window.CowchInstall`.
+- [ ] **Gentle, once-only share nudge** after a genuinely good moment (calls `window.CowchShare.share()`; a `localStorage` flag so it never nags).
+- [ ] **Install & preview polish** — real screenshots (`manifest.json` references `/screenshots/*` that 404); confirm the social card renders everywhere.
+- [ ] **Light, consent-aware feedback / testimonial capture** from early users + the pilot.
+- [ ] **Exercise/IMAGINE page analytics** — those pages have *no* analytics (only 6/32 even load `activity-log.js`); we see app-side opens, not their page-views/completions. Light them up only if the open-rate signal proves worth deepening.
+- [x] @claude-local 06-13 **Share→install loop + social preview cards — SHIPPED.** `CowchShare` (native sheet / copy+toast), two entry points (YOU-tab pill + Settings); OG/Twitter cards on `index.html`+`app.html` with a brand 1200×630 `og-image.png`. → `docs/sharing-and-marketing.md`
+- [x] @claude-local 06-13 **Validation telemetry (first pass) — SHIPPED.** Privacy-safe Vercel events: `chat_started`, `exercise_open`/`domain_open`, `returned`, install funnel, `share` — each with a first-touch `source`. Vercel Web Analytics enabled (Pro). → `docs/sharing-and-marketing.md`
+- [x] @claude-local 06-14 **Claims-safety pass — SHIPPED.** Audited all copy + the chat system prompt (AI no longer calls itself a therapist; proactively reaffirms "general wellbeing support, not therapy"); removed `vision.html`; aligned "coach"→"companion"; moved the prompt into a bundled `lib/prompt-base.js`. → `docs/claims-audit.md`
 
-## Directions to move in  *(the longer arc — keep pulling toward these)*
+## 🤔 Areas to think through   (open design — link the think-piece)
 
-- **Own the position:** real therapist, *not* AI therapy, private by design —
-  turn the AI-therapy backlash into the brand's trust advantage.
-- **Universities as a repeatable channel:** Surrey first → a portable pilot
-  playbook → other local / Mental-Health-Charter universities.
-- **Mandy's audience as the compounding engine:** a sustainable content cadence
-  in her voice (blog → email → social), seeding everything else.
-- **Earn an evidence trail** from pilots over time — modest and honest — since
-  that's exactly what the paid incumbents lean on and Cowch currently can't claim.
-- **The ethical deep-end:** Cowch as a warm, honest bridge to real human help,
-  including Mandy's own 1:1 practice.
-- **Practitioner referrals** as a slow, compounding layer alongside everything.
+- [ ] **How far the AI speaks AS Mandy** — the named, credentialed clinician vs. *in her approach*. Softened in the audit, not fully resolved — **Mandy's call**. → `docs/claims-audit.md`
+- [ ] **What "validated" actually means** — pick the few signals that say it's working (someone came back; someone said it helped; a wellbeing team said yes) and ignore vanity metrics.
+- [ ] **The crisis answer** — the one paragraph a wellbeing team needs: Cowch routes to humans, does *not* detect / triage / own safety. Gates university trust.
+- [ ] **How warm is too warm** — Mandy's voice as a real person's *approach*, not a synthetic friend to confide in *instead of* people (the FTC parasocial worry). Where's the line, in tone and in features?
+- [ ] **Complement, not replacement** — how Cowch describes its relationship to a university's existing services so it's true *and* easy to adopt.
+- [ ] **The Surrey pilot's shape** — bottom-up (talks → install) vs top-down (Centre for Wellbeing endorsement); the lightest credible evaluation (pre/post wellbeing measure?); consenting testimonials. → `docs/marketing-strategy.md` §5
+- [ ] **When money enters, later** — a paid layer for the *general* audience + a bridge to Mandy's 1:1, without ever betraying free-for-students.
+
+## 🚧 In flight / don't collide
+
+- The chat system prompt now lives in **`lib/prompt-base.js`** (bundled, imported by `api/chat.js`). Edit *that* file to change the prompt — NOT a public `.txt`, no version-bump, no CDN cache. Don't reintroduce the fetch-a-public-file loader.
+- All marketing/claims work to date is merged to `main` and live — nothing half-shipped to coordinate around right now.
+
+## ⛔ Blocked / parked
+
+- [!] @mandy 06-14 **Warm seed** — the blog post + email to her list, in her words. The first channel; everything else leans on it.
+- [!] @tom 06-14 **Surrey: confirm the contact + a talk date** — Centre for Wellbeing owner; whether the pilot runs via a talk / society / wellbeing service (loop in the School of Psychology for a measure).
+- [!] @tom 06-14 **Mandy reviews the live chat voice** — she may want it warmer or more arm's-length now the reaffirmation is live.
+- [!] @tom 06-14 **Prime the social-preview caches** after any OG change — run `cowch.app` through the FB / Twitter / LinkedIn debuggers once (links in `docs/sharing-and-marketing.md`).
+
+## ✅ Done (archive — groomer-managed, don't hand-edit)
+
+- 2026-06-14 — Claims-safety audit + proactive not-therapy reaffirmation; chat prompt bundled to `lib/prompt-base.js`; `vision.html` removed; "coach"→"companion".
+- 2026-06-13 — Share→install loop, social preview cards, Vercel Web Analytics (enabled, Pro) + validation telemetry; marketing strategy (`docs/marketing-strategy.md`) + this worklist.
 
 ---
 
-## Only a human can do these (Tom / Mandy)
-
-- ~~Turn on **Vercel Web Analytics** in the dashboard~~ ✅ DONE (13 Jun 2026) —
-  enabled + redeployed; `/_vercel/insights/script.js` serves on cowch.app. Page
-  views flow now; custom events (`pwa_installed`, `share`) display under Analytics
-  → Events (account is on the Pro plan, so custom events are supported).
-- Mandy's **warm seed** — the blog post + email to her list, in her words.
-- Confirm the **Surrey contact + a talk date**, and whether the pilot runs via a
-  talk, a society, or the wellbeing service (loop in Psychology for a measure).
-- Prime the **social-preview caches** after any card change (debugger links in
-  `docs/sharing-and-marketing.md`).
-
-_Keep this file honest: as directions get decided or things get built, update it
-so it stays the shared picture — not a stale checklist._
+*Cross-repo: this is the theracowch worklist, same shape as `ssi-learning-app`'s. A daily repo-only "groomer" routine can archive `[x]`s, free stale `[~]`s, and surface shipped/dead items as a commit for review — it never silently rewrites live intent.*
