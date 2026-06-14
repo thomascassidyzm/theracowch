@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan to try Cowch | Talk card</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!--
+      Printable "scan to try Cowch" card for Mandy's campus talks.
+      QR encodes: https://cowch.app/?utm_source=surrey-talk  (attributes installs to the talk,
+      natively in Vercel Web Analytics AND in our telemetry `source` property).
+      To make a version for another talk/university: regenerate the QR with a different
+      utm_source and drop it in /qr/ — see /qr/README.md.
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: #FFF6F0; color: #2D2D2D; line-height: 1.5;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 24px; gap: 18px;
+        }
+        .print-btn {
+            padding: 10px 18px; background: #FFE1B6; color: #2D2D2D; font-family: inherit;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            border: 4px solid #F5A66E; box-shadow: 5px 5px 0 rgba(60,46,40,0.18);
+        }
+        .print-btn:hover { transform: translate(2px,2px); box-shadow: 3px 3px 0 rgba(60,46,40,0.18); }
+
+        .card {
+            width: min(92vw, 460px); background: #FDF5E8;
+            border: 5px solid #2D2D2D; border-radius: 28px;
+            box-shadow: 10px 10px 0 rgba(60,46,40,0.18);
+            padding: 34px 30px 26px; text-align: center;
+        }
+        .brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+        .brand img { width: 48px; height: 48px; border-radius: 13px; }
+        .brand b { font-size: 1.7rem; font-weight: 900; }
+
+        .headline { font-size: 1.9rem; font-weight: 900; margin: 10px 0 2px; }
+        .free { font-size: 1rem; font-weight: 700; color: #2D5C38; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 18px; }
+
+        .qr-panel {
+            background: #fff; border: 4px solid #2D2D2D; border-radius: 16px;
+            padding: 14px; display: inline-block; margin-bottom: 18px;
+        }
+        .qr-panel img { display: block; width: 240px; height: 240px; image-rendering: pixelated; }
+
+        .tagline { font-size: 1.12rem; font-weight: 700; margin-bottom: 6px; }
+        .url { font-size: 1.15rem; font-weight: 900; color: #E35B32; letter-spacing: 0.02em; }
+
+        .smallprint {
+            margin-top: 18px; padding-top: 14px; border-top: 2px dashed #D8C4B0;
+            font-size: 0.82rem; color: #6B5847; line-height: 1.45;
+        }
+        .smallprint strong { color: #2D2D2D; }
+
+        @media print {
+            body { background: #fff; padding: 0; min-height: auto; justify-content: flex-start; }
+            .print-btn { display: none; }
+            .card { box-shadow: none; width: 100%; max-width: 540px; margin: 0 auto; border-width: 4px; }
+            .qr-panel img { width: 300px; height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <button type="button" class="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+    <div class="card">
+        <div class="brand">
+            <img src="/icons/icon-192x192.png" alt="" onerror="this.style.display='none'">
+            <b>Cowch</b>
+        </div>
+
+        <div class="headline">Scan to try Cowch</div>
+        <div class="free">Free · Private · On your phone</div>
+
+        <div class="qr-panel">
+            <img src="/qr/cowch-surrey-talk.svg" alt="QR code — opens cowch.app">
+        </div>
+
+        <p class="tagline">A calmer space in your pocket —<br>built by a real therapist.</p>
+        <p class="url">cowch.app</p>
+
+        <p class="smallprint">
+            Cowch is a <strong>wellbeing companion — not therapy</strong>, and not a replacement for it. For 18+.<br>
+            Need help now? <strong>Samaritans 116 123</strong> · text <strong>SHOUT to 85258</strong>.
+        </p>
+    </div>
+</body>
+</html>
