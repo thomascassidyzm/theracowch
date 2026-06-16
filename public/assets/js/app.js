@@ -3907,13 +3907,69 @@ const WELLNESS_LOG_KEY = 'cowch_wellness_log_v1';
 // metric where a *lower* score is the healthier direction (anxiety), so its
 // trend colouring flips.
 const WELLNESS_METRICS = [
-    { key: 'mood',       emoji: '🙂', label: 'Mood',                low: 'Very low',     high: 'Great',           color: '#E8923C' },
-    { key: 'anxiety',    emoji: '😰', label: 'Anxiety',             low: 'Calm',         high: 'Very anxious',    color: '#9C7CD4', invert: true },
-    { key: 'sleep',      emoji: '😴', label: 'Sleep',               low: 'Poor',         high: 'Great',           color: '#5B8DEF' },
-    { key: 'connection', emoji: '🤝', label: 'Connection',          low: 'Isolated',     high: 'Connected',       color: '#E87EA8' },
-    { key: 'selfcare',   emoji: '🛁', label: 'Self-care',           low: 'Neglected',    high: 'Nurtured',        color: '#34B7AE' },
-    { key: 'gratitude',  emoji: '🙏', label: 'Gratitude',           low: 'Hard to find', high: 'Abundant',        color: '#F2C13D' },
-    { key: 'values',     emoji: '🎯', label: 'Values-based action', low: 'Off track',    high: 'Lived my values', color: '#5FB36A' }
+    {
+        key: 'mood', emoji: '🙂', label: 'Mood', low: 'Very low', high: 'Great', color: '#E8923C',
+        tipLead: 'Gentle ways to lift your mood',
+        tips: [
+            'Get outside for a short walk — even ten minutes of daylight and movement can shift how you feel.',
+            'Do one small thing you usually enjoy, however tiny — a song, a cup of tea, a few pages of a book.',
+            'Reach out to someone you trust. A quick message counts.'
+        ]
+    },
+    {
+        key: 'anxiety', emoji: '😰', label: 'Anxiety', low: 'Calm', high: 'Very anxious', color: '#9C7CD4', invert: true,
+        tipLead: 'Gentle ways to ease anxiety',
+        tips: [
+            'Try slow breathing: breathe in for four, out for six, for a minute or two.',
+            'Name what’s in your control right now, and gently set the rest down.',
+            'Ground yourself: notice five things you can see, four you can hear, three you can touch.'
+        ]
+    },
+    {
+        key: 'sleep', emoji: '😴', label: 'Sleep', low: 'Poor', high: 'Great', color: '#5B8DEF',
+        tipLead: 'Sleep hygiene tips',
+        tips: [
+            'Keep a regular routine — similar sleep and wake times, even at weekends.',
+            'If you can’t fall asleep after about 20 minutes, get up and do something calm and non-stimulating. Only go back to bed when you feel tired.',
+            'Keep things that overstimulate you out of the bedroom, so your brain learns to associate your bed with sleep and rest.'
+        ]
+    },
+    {
+        key: 'connection', emoji: '🤝', label: 'Connection', low: 'Isolated', high: 'Connected', color: '#E87EA8',
+        tipLead: 'Gentle ways to feel more connected',
+        tips: [
+            'Send one message to someone you’ve been meaning to reach.',
+            'Suggest a small, low-pressure plan — a coffee or a walk.',
+            'Let someone know you appreciate them.'
+        ]
+    },
+    {
+        key: 'selfcare', emoji: '🛁', label: 'Self-care', low: 'Neglected', high: 'Nurtured', color: '#34B7AE',
+        tipLead: 'Gentle ways to nurture yourself',
+        tips: [
+            'Pick one small kindness for yourself today — a proper meal, a warm shower, an early night.',
+            'Move your body in a way that feels good, not punishing.',
+            'Give yourself permission to rest without having to earn it.'
+        ]
+    },
+    {
+        key: 'gratitude', emoji: '🙏', label: 'Gratitude', low: 'Hard to find', high: 'Abundant', color: '#F2C13D',
+        tipLead: 'Gentle ways to grow gratitude',
+        tips: [
+            'Note three small things that went okay today, however ordinary.',
+            'Tell someone specifically what you’re grateful for.',
+            'Notice one good thing in the moment, as it happens.'
+        ]
+    },
+    {
+        key: 'values', emoji: '🎯', label: 'Values-based action', low: 'Off track', high: 'Lived my values', color: '#5FB36A',
+        tipLead: 'Gentle ways to live your values',
+        tips: [
+            'Name one value that matters to you, and take a tiny step that honours it.',
+            'Ask yourself: what would the person I want to be do next?',
+            'Progress over perfection — small, consistent actions add up.'
+        ]
+    }
 ];
 
 function wdDayKey(d) {
@@ -4098,7 +4154,16 @@ function renderWellnessCharts() {
             '</svg>' +
             '<div class="wd-chart-foot"><span>' + m.low + '</span>' +
                 '<span class="wd-chart-count">' + present.length + ' day' + (present.length === 1 ? '' : 's') + ' logged</span>' +
-                '<span>' + m.high + '</span></div>';
+                '<span>' + m.high + '</span></div>' +
+            (Array.isArray(m.tips) && m.tips.length
+                ? '<details class="wd-chart-tips">' +
+                      '<summary class="wd-chart-tips-summary"><span class="wd-chart-tips-bulb">💡</span>' +
+                          (m.tipLead || 'Ideas to support this') + '</summary>' +
+                      '<ul class="wd-chart-tips-list">' +
+                          m.tips.map(t => '<li>' + t + '</li>').join('') +
+                      '</ul>' +
+                  '</details>'
+                : '');
         charts.appendChild(card);
     });
 }
