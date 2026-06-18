@@ -1957,7 +1957,7 @@ function setupWeeklySummary() {
             close();
             const tough = (document.getElementById('summary-auto-thoughts') || {}).value || '';
             const prompt = tough.trim()
-                ? `In my weekly summary I noticed this negative automatic thought: "${tough.trim()}". Can we talk it through?`
+                ? `Reviewing my week, I noticed this negative automatic thought: "${tough.trim()}". Can we talk it through?`
                 : "I've been having some negative automatic thoughts and I'd like to talk it through.";
             switchTab('chat');
             // Let the chat tab mount before sending (mirrors triggerChatWithPrompt).
