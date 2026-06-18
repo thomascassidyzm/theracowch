@@ -1491,7 +1491,7 @@ window.updateWeeklyReportUI = updateWeeklyReportUI;
 // ============================================
 const WEEKLY_REFLECTION_KEY = 'cowch_weekly_reflection';
 const WEEKLY_TODOS_KEY = 'cowch_weekly_todos';
-const REFLECTION_FIELDS = { autoThoughts: 'summary-auto-thoughts', thinkingErrors: 'summary-thinking-errors' };
+const REFLECTION_FIELDS = { autoThoughts: 'summary-auto-thoughts', thinkingErrors: 'summary-thinking-errors', problemSolve: 'summary-problem-solve' };
 
 // Words/phrases in the "negative automatic thoughts" reflection that suggest
 // the week genuinely weighed on the person. When one shows up we gently offer
