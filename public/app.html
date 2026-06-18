@@ -72,7 +72,11 @@
             min-height: 100dvh;
             background: var(--bg-canvas);
             position: relative;
-            padding-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
+            /* Reserve the fixed tab bar's full height (it adds a --border-thicc
+               top border on top of --tab-bar-height) plus a comfortable gap, so
+               the bottom-most item on every tab — e.g. the last exercise/card on
+               Your Space — clears the nav instead of tucking under it. */
+            padding-bottom: calc(var(--tab-bar-height) + var(--border-thicc) + var(--space-2xl) + env(safe-area-inset-bottom));
         }
 
         /* Tab Content Area */
