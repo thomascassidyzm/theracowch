@@ -1491,9 +1491,9 @@ window.updateWeeklyReportUI = updateWeeklyReportUI;
 // ============================================
 const WEEKLY_REFLECTION_KEY = 'cowch_weekly_reflection';
 const WEEKLY_TODOS_KEY = 'cowch_weekly_todos';
-const REFLECTION_FIELDS = { good: 'summary-good', tough: 'summary-tough', solve: 'summary-solve' };
+const REFLECTION_FIELDS = { autoThoughts: 'summary-auto-thoughts', thinkingErrors: 'summary-thinking-errors' };
 
-// Words/phrases in the "something that wasn't so good" reflection that suggest
+// Words/phrases in the "negative automatic thoughts" reflection that suggest
 // the week genuinely weighed on the person. When one shows up we gently offer
 // a chat with Mandy — see maybeOfferMandyChat(). The field is negative-only by
 // design, so we lean toward stronger distress signals rather than mild grumbles.
@@ -1520,10 +1520,10 @@ function summaryToughSoundsDistressing(text) {
 // reappear every time the field loses focus without a change.
 let _mandyCheckinPromptedFor = '';
 
-// If the "tough" reflection sounds distressing, surface the "chat to Mandy?"
-// popup. Dismissible and shown at most once per distinct piece of text.
+// If the automatic-thoughts reflection sounds distressing, surface the "chat to
+// Mandy?" popup. Dismissible and shown at most once per distinct piece of text.
 function maybeOfferMandyChat() {
-    const el = document.getElementById('summary-tough');
+    const el = document.getElementById('summary-auto-thoughts');
     if (!el) return;
     const text = el.value.trim();
     if (!text || text === _mandyCheckinPromptedFor) return;
@@ -1924,12 +1924,27 @@ function setupWeeklySummary() {
         });
     }
 
-    // When the person finishes writing about something that wasn't so good and
+    // When the person finishes writing about a negative automatic thought and
     // it sounds distressing, gently offer to chat it through with Mandy.
-    const toughEl = document.getElementById(REFLECTION_FIELDS.tough);
+    const toughEl = document.getElementById(REFLECTION_FIELDS.autoThoughts);
     if (toughEl) {
         // Small delay so debounced autosave settles before we check the text.
         toughEl.addEventListener('blur', () => setTimeout(maybeOfferMandyChat, 200));
+    }
+
+    // "What are errors in thinking?" → open the reference modal.
+    const errorsLink = document.getElementById('summary-errors-link');
+    const errorsModal = document.getElementById('errors-thinking-modal');
+    if (errorsLink && errorsModal) {
+        const closeErrors = () => errorsModal.classList.remove('active');
+        errorsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            errorsModal.classList.add('active');
+        });
+        const errorsCloseBtn = document.getElementById('errors-thinking-close');
+        if (errorsCloseBtn) errorsCloseBtn.addEventListener('click', closeErrors);
+        // Tap the backdrop to dismiss.
+        errorsModal.addEventListener('click', (e) => { if (e.target === errorsModal) closeErrors(); });
     }
 
     const mandyModal = document.getElementById('mandy-checkin-modal');
@@ -1940,10 +1955,10 @@ function setupWeeklySummary() {
 
         if (yesBtn) yesBtn.addEventListener('click', () => {
             close();
-            const tough = (document.getElementById('summary-tough') || {}).value || '';
+            const tough = (document.getElementById('summary-auto-thoughts') || {}).value || '';
             const prompt = tough.trim()
-                ? `In my weekly summary I wrote that something that wasn't so good was: "${tough.trim()}". Can we talk it through?`
-                : "Something this week wasn't so good and I'd like to talk it through.";
+                ? `In my weekly summary I noticed this negative automatic thought: "${tough.trim()}". Can we talk it through?`
+                : "I've been having some negative automatic thoughts and I'd like to talk it through.";
             switchTab('chat');
             // Let the chat tab mount before sending (mirrors triggerChatWithPrompt).
             setTimeout(() => {

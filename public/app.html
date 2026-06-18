@@ -2228,6 +2228,84 @@
             border-color: var(--coral);
             box-shadow: 0 0 0 3px var(--coral-light);
         }
+        .summary-q-hint { margin: 0 0 8px; }
+        .summary-errors-link {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--coral);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        /* Errors in Thinking reference modal */
+        .errors-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(12, 10, 8, 0.6);
+            z-index: var(--z-modal);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            -webkit-overflow-scrolling: touch;
+        }
+        .errors-modal.active { display: flex; }
+        .errors-modal-content {
+            position: relative;
+            background: var(--bg-card);
+            border: var(--border-thicc) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            box-shadow: 6px 6px 0 0 rgba(60, 46, 40, 0.18);
+            padding: var(--space-xl);
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            max-height: 85dvh;
+            overflow-y: auto;
+        }
+        .errors-modal-close {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .errors-modal-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm);
+            padding-right: 1.5rem;
+        }
+        .errors-modal-intro {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin: 0 0 var(--space-md);
+        }
+        .errors-list {
+            margin: 0 0 var(--space-md);
+            padding-left: 1.1rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: var(--text-primary);
+        }
+        .errors-list li { margin-bottom: 10px; }
+        .errors-list li strong { font-weight: 900; }
+        .errors-modal-note {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 12px 14px;
+            border-radius: var(--radius-small);
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin: 0;
+        }
         .summary-todo { margin-top: var(--space-md); }
         .summary-section-title {
             font-size: 0.78rem;
@@ -4997,18 +5075,14 @@
                     <p class="summary-highlights" id="summary-highlights">Your highlights will appear here as the week unfolds.</p>
 
                     <div class="summary-field">
-                        <label class="summary-q" for="summary-good">🌟 One good thing that happened this week</label>
-                        <textarea id="summary-good" class="summary-input" rows="2" placeholder="A moment, a win, something that made you smile&hellip;"></textarea>
+                        <label class="summary-q" for="summary-auto-thoughts">Have you noticed any negative automatic thoughts this past week?</label>
+                        <textarea id="summary-auto-thoughts" class="summary-input" rows="3" placeholder="Relationship issues, finances, lack of progress, self-criticism&hellip;"></textarea>
                     </div>
 
                     <div class="summary-field">
-                        <label class="summary-q" for="summary-tough">🌧️ Something that wasn&rsquo;t so good</label>
-                        <textarea id="summary-tough" class="summary-input" rows="2" placeholder="What felt hard, or didn&rsquo;t go the way you hoped?"></textarea>
-                    </div>
-
-                    <div class="summary-field">
-                        <label class="summary-q" for="summary-solve">💡 Working it through &mdash; what might help, and how could you put it into action?</label>
-                        <textarea id="summary-solve" class="summary-input" rows="2" placeholder="One small step you could take next time&hellip;"></textarea>
+                        <label class="summary-q" for="summary-thinking-errors">Noticed any errors in thinking that you can dismiss?</label>
+                        <p class="summary-q-hint"><a href="#" class="summary-errors-link" id="summary-errors-link">What are errors in thinking? →</a></p>
+                        <textarea id="summary-thinking-errors" class="summary-input" rows="3" placeholder="Name any you can let go of&hellip;"></textarea>
                     </div>
 
                     <div class="summary-todo">
@@ -6814,6 +6888,28 @@
                 <button class="btn-confirm btn-confirm-cancel" id="mandy-checkin-no">No</button>
                 <button class="btn-confirm btn-confirm-ok" id="mandy-checkin-yes">Yes</button>
             </div>
+        </div>
+    </div>
+
+    <!-- "Errors in Thinking" reference — opened from the weekly summary's
+         thinking-errors question. A reflective, non-clinical reference. -->
+    <div class="errors-modal" id="errors-thinking-modal" role="dialog" aria-modal="true" aria-labelledby="errors-thinking-title">
+        <div class="errors-modal-content">
+            <button type="button" class="errors-modal-close" id="errors-thinking-close" aria-label="Close">✕</button>
+            <h2 class="errors-modal-title" id="errors-thinking-title">Errors in thinking</h2>
+            <p class="errors-modal-intro">When we&rsquo;re stressed, our minds slip into familiar thinking traps. These are some of the most common ones &mdash; see if any feel familiar.</p>
+            <ul class="errors-list">
+                <li><strong>Catastrophising</strong> &mdash; jumping to the worst possible outcome and treating it as certain.</li>
+                <li><strong>Mind reading</strong> &mdash; assuming you know what others are thinking, usually that it&rsquo;s something negative about you.</li>
+                <li><strong>Predicting the future</strong> &mdash; being sure things will go badly before they&rsquo;ve happened.</li>
+                <li><strong>Personalisation</strong> &mdash; taking the blame for things that aren&rsquo;t really yours to own.</li>
+                <li><strong>Self-criticism</strong> &mdash; speaking to yourself far more harshly than you ever would a friend.</li>
+                <li><strong>Musts and shoulds</strong> &mdash; rigid rules about how you or others &ldquo;must&rdquo; behave that leave you feeling guilty or let down.</li>
+                <li><strong>Black-and-white thinking</strong> &mdash; seeing things as all-or-nothing, with no middle ground.</li>
+                <li><strong>Over-generalisation</strong> &mdash; taking one event as proof of an &ldquo;always&rdquo; or &ldquo;never&rdquo; pattern.</li>
+                <li><strong>Emotional reasoning</strong> &mdash; assuming that because something <em>feels</em> true, it must <em>be</em> true.</li>
+            </ul>
+            <p class="errors-modal-note">All of these can be dismissed. They&rsquo;re based on fears and insecurities &mdash; they are <strong>not facts</strong>.</p>
         </div>
     </div>
 
