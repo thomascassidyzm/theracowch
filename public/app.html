@@ -2036,7 +2036,7 @@
             flex-direction: column;
         }
         .pasture-panel.active, .summary-panel.active { right: 0; }
-        .pasture-panel-content, .summary-panel-content { padding: var(--space-lg) var(--space-xl) calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px)); }
+        .pasture-panel-content, .summary-panel-content { padding: var(--space-lg) var(--space-xl) calc(var(--space-2xl) + var(--space-xl) + env(safe-area-inset-bottom, 0px)); }
         /* Inside its panel the summary card is flush — the panel is the chrome. */
         .summary-panel .summary-card { border: none; box-shadow: none; padding: 0; margin: 0; background: none; border-radius: 0; }
         .summary-panel .summary-head { display: none; } /* panel header already shows the title */
