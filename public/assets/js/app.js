@@ -427,7 +427,7 @@ const PASTURE_Y_MIN = 116, PASTURE_Y_MAX = 166;
 // footprint plus every existing item.
 function pastureAvoidZones(items, cowPos) {
     const zones = [];
-    if (cowPos) zones.push({ x: cowPos.x + 2, y: cowPos.y + 4, r: 30 });
+    if (cowPos) zones.push({ x: cowPos.x + 2, y: cowPos.y + 4, r: 33 });
     (items || []).forEach(it => {
         let r = 15;
         if (it.type === 'tree') r = 20;
@@ -850,7 +850,94 @@ function buildPastureScenery(svg, vit) {
 }
 
 const PASTURE_COW_KEY = 'cowch-pasture-cow-v1';
-const COW_SVG = `
+
+// ── MuMu, the pasture companion ──────────────────────────────────────────
+// MuMu is drawn fresh on every render so they can *grow* (scale up gently as
+// the user tends their IMAGINE areas) and wear small tokens of whatever the
+// user has been working on most — so the cow quietly reflects what's happening
+// in their life. Non-clinical, on-device: this just reads the same engagement
+// log that plants the flowers.
+
+// How wide MuMu's smile reads, by a 0..1 "joy" level.
+function cowMouth(joy) {
+    if (joy >= 0.66) return '<path d="M -3.6 7.3 Q 0 12.2 3.6 7.3" stroke="#C98A78" stroke-width="1.1" fill="none" stroke-linecap="round"/>';
+    if (joy >= 0.33) return '<path d="M -3 7.7 Q 0 10.7 3 7.7" stroke="#C98A78" stroke-width="1" fill="none" stroke-linecap="round"/>';
+    return '<path d="M -2.5 8 Q 0 9.6 2.5 8" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>';
+}
+
+// A small token MuMu wears/carries for an IMAGINE area the user is tending.
+// Letters match IMAGINE_PALETTE (I, M, A, G, I2, N, E). Coordinates are in
+// MuMu's local space (body centred ~ (2,8); head centred ~ (-13,-5)).
+function cowAccessory(letter) {
+    switch (letter) {
+        case 'I':  // I, Me, Myself — a little hand mirror (self-reflection)
+            return '<g transform="translate(1.5,-3)">' +
+                '<circle cx="0" cy="0" r="3.4" fill="#CFE6F4" stroke="#7A6253" stroke-width="0.8"/>' +
+                '<path d="M -1.7 -1.6 L 0.8 0.9" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round"/>' +
+                '<rect x="-0.8" y="3" width="1.6" height="4.6" rx="0.8" fill="#7A6253" transform="rotate(22 0 4)"/>' +
+            '</g>';
+        case 'M':  // Mindfulness — a calm lotus floating above, rising sparkles
+            return '<g transform="translate(-13,-18)">' +
+                '<ellipse cx="0" cy="1.6" rx="5" ry="2.1" fill="#5BB4E0" opacity="0.9"/>' +
+                '<ellipse cx="0" cy="0" rx="2.2" ry="4" fill="#9ED2EE"/>' +
+                '<ellipse cx="-3" cy="1" rx="2" ry="3" fill="#7FC0E4" transform="rotate(-32 -3 1)"/>' +
+                '<ellipse cx="3" cy="1" rx="2" ry="3" fill="#7FC0E4" transform="rotate(32 3 1)"/>' +
+                '<circle cx="0" cy="0.6" r="1.2" fill="#FFE08A"/>' +
+                '<circle cx="-5.5" cy="-3" r="0.7" fill="#5BB4E0"/><circle cx="5.5" cy="-4.2" r="0.6" fill="#5BB4E0"/>' +
+            '</g>';
+        case 'A':  // Acceptance — a leaf drifting by on the breeze
+            return '<g transform="translate(7,-15) rotate(18)">' +
+                '<path d="M0 0 Q5 -4.6 10 0 Q5 4.6 0 0 Z" fill="#7CC59A" stroke="#4E9E72" stroke-width="0.5"/>' +
+                '<path d="M1.6 0 H8.4" stroke="#4E9E72" stroke-width="0.5"/>' +
+            '</g>';
+        case 'G':  // Gratitude — a little journal & pencil (pen and paper)
+            return '<g transform="translate(-25,14)">' +
+                '<rect x="0" y="0" width="9" height="7" rx="1" fill="#FFF6EC" stroke="#C9BCA9" stroke-width="0.6"/>' +
+                '<line x1="1.6" y1="2.4" x2="7.4" y2="2.4" stroke="#C9BCA9" stroke-width="0.5"/>' +
+                '<line x1="1.6" y1="4.4" x2="7.4" y2="4.4" stroke="#C9BCA9" stroke-width="0.5"/>' +
+                '<g transform="rotate(40 10 3)"><rect x="9.2" y="-1.2" width="1.4" height="7.6" rx="0.6" fill="#F2A33C"/>' +
+                '<path d="M9.2 -1.2 L10.6 -1.2 L9.9 -2.7 Z" fill="#7A6253"/></g>' +
+            '</g>';
+        case 'I2': // Interactions — a smaller cow friend alongside
+            return '<g transform="translate(25,8) scale(0.55)">' +
+                '<ellipse cx="0" cy="8" rx="14" ry="9" fill="#FFFFFF"/>' +
+                '<ellipse cx="-5" cy="5" rx="5" ry="4" fill="#E0A3B4"/>' +
+                '<rect x="-7" y="14" width="2.6" height="6" rx="1.3" fill="#9E8576"/>' +
+                '<rect x="4" y="14" width="2.6" height="6" rx="1.3" fill="#9E8576"/>' +
+                '<g transform="translate(11,-3)">' +
+                    '<ellipse cx="-7" cy="-3" rx="3.4" ry="2.1" fill="#FFFFFF" transform="rotate(-38 -7 -3)"/>' +
+                    '<ellipse cx="7" cy="-3" rx="3.4" ry="2.1" fill="#FFFFFF" transform="rotate(38 7 -3)"/>' +
+                    '<circle cx="0" cy="0" r="8" fill="#FFFFFF"/>' +
+                    '<ellipse cx="-4" cy="-2" rx="3.4" ry="3.2" fill="#E0A3B4"/>' +
+                    '<circle cx="-3" cy="-0.5" r="1.4" fill="#3C2E28"/>' +
+                    '<circle cx="3.6" cy="-0.5" r="1.4" fill="#3C2E28"/>' +
+                    '<ellipse cx="0" cy="4.6" rx="5.4" ry="3.6" fill="#FFD9C7"/>' +
+                    '<path d="M -2 7 Q 0 8.4 2 7" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>' +
+                '</g>' +
+            '</g>';
+        case 'N':  // Nurturing & play — a balloon bobbing on a string
+            return '<g>' +
+                '<path d="M 10 0 Q 17 -10 19 -16.5" stroke="#C98A78" stroke-width="0.5" fill="none"/>' +
+                '<ellipse cx="19" cy="-21" rx="5" ry="6" fill="#F2802E"/>' +
+                '<path d="M 17 -24.5 Q 18.8 -26.5 19 -22.5" fill="#FBC89A" opacity="0.8"/>' +
+                '<path d="M 19 -15.2 l -1.4 1.6 l 2.8 0 z" fill="#F2802E"/>' +
+            '</g>';
+        case 'E':  // Exploring — binoculars raised to the eyes
+            return '<g stroke="#3C2E28" stroke-width="0.7">' +
+                '<circle cx="-16.5" cy="-6" r="3.1" fill="#5B4636"/>' +
+                '<circle cx="-8.5" cy="-6" r="3.1" fill="#5B4636"/>' +
+                '<rect x="-14" y="-6.7" width="3" height="1.4" fill="#3C2E28" stroke="none"/>' +
+                '<circle cx="-16.5" cy="-6" r="1.3" fill="#9ED2EE" stroke="none"/>' +
+                '<circle cx="-8.5" cy="-6" r="1.3" fill="#9ED2EE" stroke="none"/>' +
+            '</g>';
+        default: return '';
+    }
+}
+
+// Build MuMu's artwork at a given joy level, wearing `accessories` (letters).
+function cowArt(joy, accessories) {
+    const acc = (accessories || []).map(cowAccessory).join('');
+    return `
         <!-- body -->
         <ellipse cx="2" cy="8" rx="17" ry="11" fill="#FFFFFF"/>
         <ellipse cx="8" cy="5" rx="6" ry="5" fill="#A77B52"/>
@@ -885,9 +972,34 @@ const COW_SVG = `
             <ellipse cx="0" cy="5.5" rx="6.5" ry="4.4" fill="#FFD9C7"/>
             <ellipse cx="-2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
             <ellipse cx="2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
-            <!-- gentle smile -->
-            <path d="M -2.5 8 Q 0 9.6 2.5 8" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>
-        </g>`;
+            <!-- smile (widens with joy) -->
+            ${cowMouth(joy)}
+        </g>
+        ${acc}`;
+}
+
+// Read the IMAGINE engagement log into per-area counts, a total, and the
+// top areas the user is tending right now (drives MuMu's growth + tokens).
+function cowEngagement() {
+    const data = (typeof loadImagineEngagement === 'function') ? loadImagineEngagement() : {};
+    const letters = ['I', 'M', 'A', 'G', 'I2', 'N', 'E'];
+    const counts = {};
+    let total = 0;
+    letters.forEach(l => {
+        const n = Array.isArray(data[l]) ? data[l].length : 0;
+        counts[l] = n; total += n;
+    });
+    // Show the two most-tended areas, so MuMu stays readable, not cluttered.
+    const top = letters.filter(l => counts[l] > 0)
+        .sort((a, b) => counts[b] - counts[a])
+        .slice(0, 2);
+    return { counts, total, top };
+}
+
+function cowName() {
+    try { const c = JSON.parse(localStorage.getItem('cowch_calf')); if (c && c.calfName) return c.calfName; } catch (_) {}
+    return 'Your cow';
+}
 
 function loadCowPos() {
     try {
@@ -932,20 +1044,33 @@ function makePastureDraggable(g, pos, svg, onCommit) {
 
 function buildCowNode(ctx) {
     const pos = loadCowPos();
+    const eng = cowEngagement();
+    // Joy: grows with overall tending, with a lift for the play/self areas the
+    // user linked to "a bigger smile".
+    const joy = Math.min(1, eng.total / 14 +
+        (eng.top.indexOf('N') !== -1 ? 0.25 : 0) +
+        (eng.top.indexOf('I') !== -1 ? 0.15 : 0));
+    // Growth: MuMu starts small and grows up to ~1.28× as the pasture fills.
+    const scale = 1 + Math.min(0.28, eng.total * 0.02);
+
     const g = document.createElementNS(NS_SVG, 'g');
     g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
     g.classList.add('pasture-item', 'pasture-cow');
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', cowName() + ' grazing in your pasture');
     if (ctx.editing) {
         // Big transparent hit-area over the whole cow for easy grabbing
+        // (sized for a grown MuMu so it stays draggable).
         const hit = document.createElementNS(NS_SVG, 'rect');
-        hit.setAttribute('x', -26); hit.setAttribute('y', -24);
-        hit.setAttribute('width', 54); hit.setAttribute('height', 48);
+        hit.setAttribute('x', -34); hit.setAttribute('y', -32);
+        hit.setAttribute('width', 70); hit.setAttribute('height', 60);
         hit.setAttribute('fill', 'transparent');
         hit.setAttribute('class', 'pasture-hit');
         g.appendChild(hit);
     }
     const art = document.createElementNS(NS_SVG, 'g');
-    art.innerHTML = COW_SVG;
+    art.setAttribute('transform', `scale(${scale.toFixed(3)})`);
+    art.innerHTML = cowArt(joy, eng.top);
     g.appendChild(art);
     if (ctx.editing) {
         g.classList.add('editing');
