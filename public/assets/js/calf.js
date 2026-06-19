@@ -473,19 +473,14 @@
     }
 
     slot.innerHTML =
-      '<div class="calf-card" id="calf-card">' +
-        '<div class="calf-card-top">' +
-          '<div class="calf-stage" id="calf-pet" role="button" tabindex="0" aria-label="Pet ' + esc(c.calfName) + '">' +
-            calfSvg(stage.expr) +
-            '<span class="calf-pop" id="calf-pop"></span>' +
-          '</div>' +
-          '<div class="calf-meta">' +
-            '<h2 class="calf-name">' + esc(c.calfName || 'Your calf') + '</h2>' +
-            '<p class="calf-mood">' + esc(c.calfName || 'Your calf') + ' ' + esc(mood) + '</p>' +
-            '<div class="calf-growth">' +
-              '<div class="calf-growth-bar"><div class="calf-growth-fill" id="calf-fill"></div></div>' +
-              '<span class="calf-growth-label">' + esc(label) + '</span>' +
-            '</div>' +
+      '<div class="calf-card calf-card-merged" id="calf-card">' +
+        '<div class="calf-meta">' +
+          '<h2 class="calf-name">' + esc(c.calfName || 'Your calf') + '</h2>' +
+          '<p class="calf-mood">' + esc(c.calfName || 'Your calf') + ' ' + esc(mood) + '</p>' +
+          '<p class="calf-grazing">That’s them grazing in your pasture below. 🌿</p>' +
+          '<div class="calf-growth">' +
+            '<div class="calf-growth-bar"><div class="calf-growth-fill" id="calf-fill"></div></div>' +
+            '<span class="calf-growth-label">' + esc(label) + '</span>' +
           '</div>' +
         '</div>' +
         '<button class="calf-cta" id="calf-care-toggle">🤍 Spend a moment with ' + esc(c.calfName || 'them') + '</button>' +
@@ -501,11 +496,6 @@
 
     // animate the growth bar
     requestAnimationFrame(function () { var f = document.getElementById('calf-fill'); if (f) f.style.width = pct + '%'; });
-
-    // pet interaction
-    var pet = document.getElementById('calf-pet');
-    pet.addEventListener('click', petCalf);
-    pet.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); petCalf(); } });
 
     // care menu toggle
     var toggle = document.getElementById('calf-care-toggle');
@@ -524,18 +514,6 @@
     return '<button class="calf-care-btn" data-href="' + href + '">' +
       '<span class="ico">' + ico + '</span>' +
       '<strong>' + title + '</strong><span>' + sub + '</span></button>';
-  }
-
-  var petLines = ['mmm 🐮', 'happy moo!', '💛', 'so cosy', '*nuzzle*', 'hehe'];
-  var petTick = 0;
-  function petCalf() {
-    var pet = document.getElementById('calf-pet');
-    var pop = document.getElementById('calf-pop');
-    if (pet) { pet.classList.remove('calf-bounce'); void pet.offsetWidth; pet.classList.add('calf-bounce'); }
-    if (pop) {
-      pop.textContent = petLines[petTick++ % petLines.length];
-      pop.classList.remove('show'); void pop.offsetWidth; pop.classList.add('show');
-    }
   }
 
   // Record a care touch for today (de-duplicated per calendar day). Drives

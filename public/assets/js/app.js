@@ -1001,6 +1001,12 @@ function cowName() {
     return 'Your cow';
 }
 
+// Days the user has "spent a moment" with their cow (from the companion store).
+// Counts toward MuMu's growth too, so the care actions visibly grow them.
+function cowCareDays() {
+    try { const c = JSON.parse(localStorage.getItem('cowch_calf')); return (c && c.careDays && c.careDays.length) || 0; } catch (_) { return 0; }
+}
+
 function loadCowPos() {
     try {
         const p = JSON.parse(localStorage.getItem(PASTURE_COW_KEY));
@@ -1045,19 +1051,23 @@ function makePastureDraggable(g, pos, svg, onCommit) {
 function buildCowNode(ctx) {
     const pos = loadCowPos();
     const eng = cowEngagement();
-    // Joy: grows with overall tending, with a lift for the play/self areas the
+    const name = cowName();
+    const named = name && name !== 'Your cow';
+    // Growth comes from showing up: IMAGINE engagement + days spent caring.
+    const growth = eng.total + cowCareDays() * 2;
+    // Joy: grows with showing up, with a lift for the play/self areas the
     // user linked to "a bigger smile".
-    const joy = Math.min(1, eng.total / 14 +
+    const joy = Math.min(1, growth / 14 +
         (eng.top.indexOf('N') !== -1 ? 0.25 : 0) +
         (eng.top.indexOf('I') !== -1 ? 0.15 : 0));
     // Growth: MuMu starts small and grows up to ~1.28× as the pasture fills.
-    const scale = 1 + Math.min(0.28, eng.total * 0.02);
+    const scale = 1 + Math.min(0.28, growth * 0.02);
 
     const g = document.createElementNS(NS_SVG, 'g');
     g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
     g.classList.add('pasture-item', 'pasture-cow');
     g.setAttribute('role', 'img');
-    g.setAttribute('aria-label', cowName() + ' grazing in your pasture');
+    g.setAttribute('aria-label', (named ? name : 'Your cow') + ' grazing in your pasture');
     if (ctx.editing) {
         // Big transparent hit-area over the whole cow for easy grabbing
         // (sized for a grown MuMu so it stays draggable).
@@ -1072,11 +1082,56 @@ function buildCowNode(ctx) {
     art.setAttribute('transform', `scale(${scale.toFixed(3)})`);
     art.innerHTML = cowArt(joy, eng.top);
     g.appendChild(art);
+
+    // The cow IS the user's named companion — show their name on a little name
+    // tag beneath them so the pasture cow and the companion above are one.
+    if (named) {
+        const t = document.createElementNS(NS_SVG, 'text');
+        t.setAttribute('x', (2 * scale).toFixed(1));
+        t.setAttribute('y', (24 * scale + 11).toFixed(1));
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('font-family', 'Gabarito, system-ui, sans-serif');
+        t.setAttribute('font-size', '9');
+        t.setAttribute('font-weight', '800');
+        t.setAttribute('fill', '#5B4636');
+        t.setAttribute('stroke', '#FFF6EC');
+        t.setAttribute('stroke-width', '2.4');
+        t.setAttribute('paint-order', 'stroke');
+        t.setAttribute('class', 'pasture-cow-name');
+        t.textContent = name;
+        g.appendChild(t);
+    }
+
     if (ctx.editing) {
         g.classList.add('editing');
         makePastureDraggable(g, pos, ctx.svg, saveCowPos);
+    } else {
+        // Tap the cow for a gentle hello (a little heart floats up).
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', () => petPastureCow(g, scale));
     }
     return g;
+}
+
+// A light, pressure-free delight: tapping MuMu floats a heart up from them.
+function petPastureCow(g, scale) {
+    if (pastureEditing) return;
+    const t = document.createElementNS(NS_SVG, 'text');
+    const x = (2 * scale).toFixed(1);
+    t.setAttribute('x', x);
+    t.setAttribute('y', -12);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '13');
+    t.textContent = '💛';
+    const up = document.createElementNS(NS_SVG, 'animate');
+    up.setAttribute('attributeName', 'y'); up.setAttribute('from', '-12'); up.setAttribute('to', '-30');
+    up.setAttribute('dur', '0.8s'); up.setAttribute('fill', 'freeze');
+    const fade = document.createElementNS(NS_SVG, 'animate');
+    fade.setAttribute('attributeName', 'opacity'); fade.setAttribute('from', '1'); fade.setAttribute('to', '0');
+    fade.setAttribute('dur', '0.8s'); fade.setAttribute('fill', 'freeze');
+    t.appendChild(up); t.appendChild(fade);
+    g.appendChild(t);
+    setTimeout(() => { try { g.removeChild(t); } catch (_) {} }, 820);
 }
 
 let pastureEditing = false;

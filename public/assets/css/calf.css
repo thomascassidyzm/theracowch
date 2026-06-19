@@ -58,7 +58,11 @@
     color: var(--text-primary, #1F1F1F);
     line-height: 1.1;
 }
-.calf-mood { margin: .2rem 0 .6rem; color: var(--text-muted, #6E6863); font-size: var(--font-size-sm,.9rem); }
+.calf-mood { margin: .2rem 0 .35rem; color: var(--text-muted, #6E6863); font-size: var(--font-size-sm,.9rem); }
+.calf-grazing { margin: 0 0 .7rem; color: var(--text-muted, #6E6863); font-size: .82rem; line-height: 1.4; opacity: .92; }
+/* Merged card: the cow now lives in the pasture below, so the card is a slim
+   companion strip (name · mood · growth · care) with no second illustration. */
+.calf-card-merged { padding-bottom: 1.1rem; }
 
 .calf-growth { display: flex; align-items: center; gap: .5rem; }
 .calf-growth-bar {
