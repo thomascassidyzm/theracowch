@@ -109,27 +109,30 @@ function updateGreeting() {
 // Daily Quotes
 // ============================================
 
+// These aren't generic affirmations — each one names a real trap or pattern
+// and offers something concrete to try. Written in Mandy's voice: the kind of
+// observation that makes you pause and actually think about your own life.
 const MANDY_QUOTES = [
-    "Sometimes the bravest thing we can do is simply show up for ourselves. You're here, and that matters.",
-    "You don't have to have it all figured out. Taking one small step is enough.",
-    "Your feelings are valid, even the messy ones. They're part of being human.",
-    "Rest isn't a reward for productivity. It's a basic need, and you deserve it.",
-    "You've survived 100% of your hardest days so far. That's remarkable.",
-    "Progress isn't always visible. Sometimes growth happens in the quiet moments.",
-    "Be gentle with yourself today. You're doing harder things than anyone knows.",
-    "It's okay to not be okay. What matters is that you're still here, still trying.",
-    "Your worth isn't measured by what you accomplish. You matter just as you are.",
-    "Small moments of peace add up. Even one deep breath is a gift to yourself.",
-    "You don't have to earn rest or joy. They're already yours to claim.",
-    "Some days just showing up is the victory. And that's more than enough.",
-    "Healing isn't linear. It's okay to have setbacks while moving forward.",
-    "The fact that you're looking after yourself right now? That takes courage.",
-    "You're allowed to outgrow old versions of yourself. Change is natural.",
-    "Not every day needs to be productive. Some days are for simply being.",
-    "Your struggles don't define you, but how you treat yourself through them does.",
-    "It's okay to ask for help. Strength includes knowing when you need support.",
-    "You're not behind in life. You're exactly where you need to be right now.",
-    "Every emotion you feel is trying to tell you something. Listen gently."
+    "One of the biggest traps in relationships is not repairing often enough — small hurts go unspoken and quietly harden into resentment. Don't wait for the big talk. Mend the little things the same day, and show your partner appreciation while you're at it.",
+    "Your bedroom teaches your brain what to expect there. If it's also where you scroll, watch TV, and answer emails, it learns to stay alert. Keep the screens out and let that room mean one thing: rest. Your sleep will follow.",
+    "Notice how much of your stress is about something happening right now, versus something you're imagining might happen. Most worry lives in the future. Naming that gap — 'this hasn't happened yet' — can give you a surprising amount of room to breathe.",
+    "We often treat ourselves the way we'd never treat a friend. Next time you catch that harsh inner voice, ask: would I say this to someone I love? If not, it probably isn't true — it's just loud.",
+    "Avoidance feels like relief, but it quietly makes the thing scarier. Every time you dodge what you're dreading, you teach your brain it's genuinely dangerous. Doing one small piece of it does the opposite — it shrinks.",
+    "Resentment is often a boundary you never said out loud. Before you blame someone for taking too much, ask honestly: did I ever actually tell them no? Saying it kindly and early prevents a lot of slow-burning anger.",
+    "We chase happiness like it's a destination, but it tends to arrive sideways — while you're absorbed in something that matters to you. Stop asking 'am I happy yet?' and notice what makes you lose track of time. Do more of that.",
+    "When you say yes to something out of guilt, you're often saying no to something you actually care about. Every yes has a cost. Make sure you can name what this one is costing before you give it.",
+    "Comparison almost always pits your behind-the-scenes against someone else's highlight reel. You're measuring your full messy reality against their edited best moment. It was never a fair contest — stop entering it.",
+    "The story you tell yourself about an event shapes how you feel far more than the event itself. Two people can lose the same job and feel completely differently. Get curious about your interpretation — it's the part you can actually change.",
+    "Rumination feels productive, like you're solving something. But replaying a worry on a loop isn't problem-solving — it's just suffering twice. If there's an action, take it. If there isn't, the thinking is the problem, not the solution.",
+    "Gratitude isn't about pretending things are fine. It's about widening the lens so the good stuff is actually in frame too. Name three real things tonight — small and specific — and watch what it does to how the day felt.",
+    "A lot of anxiety is your body doing its job too well, treating a deadline like a predator. It isn't broken — it's protective. Thank it, then remind it you're not in danger. You can be nervous and still completely safe.",
+    "Perfectionism isn't high standards — it's fear wearing a respectable coat. The fear of not being enough keeps you polishing instead of finishing. Done and imperfect beats perfect and never, almost every time.",
+    "When someone hurts you, the urge is to go quiet or go loud. There's a third option: tell them plainly how it landed, without attacking them. 'When that happened, I felt…' opens a door that blame slams shut.",
+    "Your feelings are real information, but they're not always accurate facts. Feeling like a failure isn't the same as being one. Let the feeling visit, listen to what it's pointing at, but don't hand it the steering wheel.",
+    "Rest isn't what you earn after you've collapsed — it's what stops you collapsing. Waiting until you're depleted means you only ever recover, never get ahead. Build small pauses in before you need them.",
+    "We assume people can tell what we need, then feel let down when they can't read our minds. Most people genuinely want to show up for you — they just need to be told how. Asking directly isn't weak. It's clear.",
+    "Most of what you're dreading, you've survived a version of before. Think back: the last thing that felt unbearable — you're still here. That's not luck. It's evidence about what you're actually capable of handling.",
+    "The way you talk to yourself becomes the background hum of your whole day. You wouldn't keep a friend who narrated your every flaw. Start noticing that voice, and gently — repeatedly — choose a kinder one."
 ];
 
 function updateDailyQuote() {
