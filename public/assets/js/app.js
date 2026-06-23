@@ -132,7 +132,17 @@ const MANDY_QUOTES = [
     "Rest isn't what you earn after you've collapsed — it's what stops you collapsing. Waiting until you're depleted means you only ever recover, never get ahead. Build small pauses in before you need them.",
     "We assume people can tell what we need, then feel let down when they can't read our minds. Most people genuinely want to show up for you — they just need to be told how. Asking directly isn't weak. It's clear.",
     "Most of what you're dreading, you've survived a version of before. Think back: the last thing that felt unbearable — you're still here. That's not luck. It's evidence about what you're actually capable of handling.",
-    "The way you talk to yourself becomes the background hum of your whole day. You wouldn't keep a friend who narrated your every flaw. Start noticing that voice, and gently — repeatedly — choose a kinder one."
+    "The way you talk to yourself becomes the background hum of your whole day. You wouldn't keep a friend who narrated your every flaw. Start noticing that voice, and gently — repeatedly — choose a kinder one.",
+    "Anger is often pain that's run out of patience. Underneath 'how dare they' there's usually a 'that hurt' or 'I was scared'. Get curious about what the anger is guarding, and you'll know what actually needs saying.",
+    "You can't pour from an empty cup, but you also can't fill it by feeling guilty about needing to. Looking after yourself isn't what you do instead of caring for others — it's what makes that care sustainable.",
+    "Trying to control what other people think of you is a full-time job with no pay and no end. You get a say in your actions, not their conclusions. Let them be wrong about you sometimes — it's astonishingly freeing.",
+    "Big changes rarely fail because the goal was wrong — they fail because the first step was too big. Shrink it until it's almost embarrassingly small. Consistency beats intensity, and small things done daily become who you are.",
+    "Numbing one feeling numbs them all. You can't selectively switch off the sadness and keep the joy — the same dial controls both. Letting yourself feel the hard things is the price of feeling the good ones fully.",
+    "Saying 'I'm fine' on autopilot can become a way of hiding from yourself. Tonight, actually check: how am I, really? You can't tend to a feeling you won't let yourself name.",
+    "We replay our mistakes far longer than anyone else remembers them. That cringe you still feel? The other person forgot it years ago. You're serving a sentence in a court that's long since adjourned.",
+    "Boundaries aren't walls to keep people out — they're the signposts that let people get close to you safely. 'I can't do that, but here's what I can' is an act of connection, not rejection.",
+    "Joy is easy to postpone — you tell yourself you'll relax once everything's handled. But 'handled' never quite arrives. Let yourself enjoy something today, unearned and unfinished. That's not a reward for later; it's the point of now.",
+    "Most worry is a tax you pay on a disaster that never arrives. You suffer the hard thing fully in your imagination, then often suffer it again if it happens. If it never comes, you paid for nothing. Spend that energy on today instead."
 ];
 
 function updateDailyQuote() {
