@@ -641,68 +641,43 @@ function pastureTelescope(x, yGround) {
 // Build the cow's full artwork for a pose, at a given joy (0..1), drawn at the
 // group origin = seat on the ground.
 function buildCowArt(poseKey, joy, gratitudeWords) {
-    let preBody = '', arms = '', headOpts = { eyes: 'open', mouth: 'smile' }, front = '', extras = '';
-
+    // The cow is the 🐮 emoji, big and centred. Each IMAGINE pose keeps its
+    // surrounding context (glow, lotus, crossed-out worries, a thank-you card,
+    // friends, a balloon, a telescope) so the pasture still mirrors what the
+    // user is tending.
+    let preBody = '', glow = '', front = '', extras = '';
     switch (poseKey) {
         case 'selfcare':
-            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
-            headOpts = { eyes: 'open', mouth: 'big', blush: true, glow: true };
-            extras = pastureSparkles([[-60, -150], [60, -160], [-72, -92], [72, -102], [0, -198]]);
+            glow = '<circle cx="0" cy="-104" r="92" fill="#FFE7A0" opacity="0.4"/>';
+            extras = pastureSparkles([[-72, -150], [72, -160], [-88, -84], [88, -96], [0, -206]]);
             break;
         case 'mindfulness':
-            // Crossed legs in front, hooves resting palm-up in a calm mudra.
-            arms = '<path d="M -34 -2 Q 0 -24 34 -2" stroke="#FFFFFF" stroke-width="13" fill="none" stroke-linecap="round"/>' +
-                   '<path d="M 34 -2 Q 0 -20 -34 -2" stroke="#F1E5D8" stroke-width="11" fill="none" stroke-linecap="round" opacity="0.85"/>' +
-                   cowArm(-1, -40, -40) + cowArm(1, 40, -40) +
-                   '<circle cx="-40" cy="-45" r="3.4" fill="#FFE08A"/><circle cx="40" cy="-45" r="3.4" fill="#FFE08A"/>';
-            headOpts = { eyes: 'closed', mouth: 'calm' };
-            extras = pastureLotus(0, -200) + pastureSparkles([[-32, -184], [32, -192]]);
+            extras = pastureLotus(0, -204) + pastureSparkles([[-46, -186], [46, -194]]);
             break;
         case 'acceptance':
-            // Hooves pressed together; around the cow, things we cannot control,
-            // each crossed out — a reminder to stay centred.
-            arms = '<path d="M -30 -96 Q -14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-                   '<path d="M 30 -96 Q 14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-                   '<ellipse cx="0" cy="-58" rx="10" ry="13" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
-            headOpts = { eyes: 'closed', mouth: 'calm' };
-            extras = pastureCantControl(-90, -150, 'cloud') + pastureCantControl(90, -150, 'people') + pastureCantControl(0, -204, 'clock');
+            extras = pastureCantControl(-98, -150, 'cloud') + pastureCantControl(98, -150, 'people') + pastureCantControl(0, -208, 'clock');
             break;
         case 'gratitude':
-            arms = cowArm(-1, -20, -44) + cowArm(1, 20, -44);
-            front = pastureThankCard(0, -50);
-            headOpts = { eyes: 'open', mouth: 'smile', blush: true };
+            front = pastureThankCard(0, -34);
             extras = pastureGratitudeFloat(gratitudeWords);
             break;
         case 'interactions':
-            preBody = pastureFriendCow(-100, 4, 0.6, '#F7B2C5') + pastureFriendCow(104, 8, 0.5, '#9ED2EE');
-            arms = cowArm(-1, -22, -34) +
-                   '<path d="M 30 -96 Q 50 -112 56 -134" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-                   '<ellipse cx="56" cy="-136" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
-            headOpts = { eyes: 'open', mouth: 'smile' };
-            extras = '<text x="66" y="-150" font-size="16" text-anchor="middle">👋</text>';
+            preBody = '<text x="-106" y="-16" font-size="84" text-anchor="middle">🐮</text>' +
+                      '<text x="108" y="-8" font-size="72" text-anchor="middle">🐮</text>';
+            extras = '<text x="78" y="-150" font-size="22" text-anchor="middle">👋</text>';
             break;
         case 'nurturing':
-            arms = cowArm(-1, -22, -34) +
-                   '<path d="M 30 -96 Q 46 -110 50 -126" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-                   '<ellipse cx="50" cy="-128" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
-            headOpts = { eyes: 'open', mouth: 'big', blush: true };
-            extras = pastureBalloon(50, -128);
+            extras = pastureBalloon(58, -150);
             break;
         case 'exploring':
-            arms = cowArm(-1, -22, -34) +
-                   '<path d="M 30 -96 Q 46 -120 42 -142" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-                   '<ellipse cx="42" cy="-144" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
-            headOpts = { eyes: 'open', mouth: 'smile', glasses: true };
-            extras = pastureMagnifier(44, -150) + pastureTelescope(-96, -16);
+            extras = pastureMagnifier(60, -148) + pastureTelescope(-106, -10);
             break;
         default:
-            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
-            headOpts = { eyes: 'open', mouth: 'smile' };
+            break;
     }
-
-    return '<ellipse cx="0" cy="2" rx="66" ry="12" fill="#3C2E28" opacity="0.12"/>' + preBody + cowBody() + arms +
-        '<g transform="translate(0, -150)">' + cowHead(headOpts) + '</g>' +
-        front + extras;
+    const cow = '<text x="0" y="-60" font-size="150" text-anchor="middle">🐮</text>';
+    return '<ellipse cx="0" cy="2" rx="70" ry="13" fill="#3C2E28" opacity="0.12"/>' +
+        glow + preBody + cow + front + extras;
 }
 
 function clientToPastureSvg(svg, clientX, clientY) {
