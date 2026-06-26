@@ -526,9 +526,7 @@ function cowHead(opts) {
          '<path d="M -17 -30 Q -23 -44 -11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
          '<path d="M 17 -30 Q 23 -44 11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
          '<ellipse cx="0" cy="1" rx="43" ry="41" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
-         '<path d="M -9 -34 Q -3 -48 1 -36 Q 5 -48 10 -35" stroke="#3E3A44" stroke-width="3.4" fill="none" stroke-linecap="round"/>' +
-         '<path d="M 7 -22 Q 2 -12 17 -12 Q 35 -12 37 -25 Q 37 -38 19 -38 Q 10 -38 7 -22 Z" fill="#3E3A44"/>' +
-         '<path d="M -36 -18 Q -40 -6 -30 -2 Q -22 0 -20 -10 Q -21 -20 -30 -20 Q -34 -20 -36 -18 Z" fill="#3E3A44" opacity="0.9"/>';
+         '<path d="M -9 -34 Q -3 -48 1 -36 Q 5 -48 10 -35" stroke="#3E3A44" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
     s += '<ellipse cx="-26" cy="12" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.75' : '0.5') + '"/>' +
          '<ellipse cx="26" cy="12" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.75' : '0.5') + '"/>';
     s += cowEyes(opts.eyes || 'open');
