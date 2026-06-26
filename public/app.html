@@ -1807,7 +1807,7 @@
         .pasture-svg {
             display: block;
             width: 100%;
-            height: 180px;
+            height: 280px;
             background: linear-gradient(180deg, #DCEDF6 0%, #E7F4DE 38%, #C9E1A1 100%);
             border: 2px solid var(--border-warm);
             border-radius: var(--radius-medium);
@@ -2191,6 +2191,119 @@
         .pasture-legend-swatch { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.7) inset; }
         .pasture-legend-letter { font-weight: 900; color: var(--text-primary); }
         .pasture-legend-label { font-size: 0.86rem; color: var(--text-secondary); }
+
+        /* IMAGINE icon row — icons (not nature) showing where attention has gone.
+           Tap one to put the cow into that pose. */
+        .pasture-icons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: var(--space-md);
+        }
+        .pasture-icon {
+            --area: var(--coral);
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 2px solid var(--border-warm);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            touch-action: manipulation;
+            opacity: 0.5;
+            filter: grayscale(0.55);
+            transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .pasture-icon.tended {
+            opacity: 1;
+            filter: none;
+            border-color: var(--area);
+            box-shadow: 0 0 0 1px var(--area) inset;
+        }
+        .pasture-icon.active {
+            opacity: 1;
+            filter: none;
+            transform: translateY(-2px) scale(1.08);
+            border-color: var(--area);
+            background: color-mix(in srgb, var(--area) 16%, var(--bg-card));
+            box-shadow: 0 4px 12px color-mix(in srgb, var(--area) 40%, transparent);
+        }
+        .pasture-icon:hover { opacity: 1; filter: none; }
+        .pasture-icon-glyph { font-size: 1.2rem; line-height: 1; }
+        .pasture-icon-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 3px;
+            border-radius: 8px;
+            background: var(--area);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 900;
+            line-height: 16px;
+            text-align: center;
+            box-shadow: 0 0 0 1.5px var(--bg-card);
+        }
+
+        /* Gratitude pose: add a few thank-yous to float around the cow */
+        .pasture-gratitude { margin-bottom: var(--space-md); }
+        .pasture-gratitude-form { display: flex; gap: 8px; }
+        .pasture-gratitude-input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 12px;
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-small);
+            background: var(--bg-card);
+            font-family: inherit;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+        }
+        .pasture-gratitude-btn {
+            flex-shrink: 0;
+            width: 40px;
+            border: none;
+            border-radius: var(--radius-small);
+            background: var(--coral);
+            color: var(--text-on-coral, #fff);
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .pasture-gratitude-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .pasture-grat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px 4px 10px;
+            background: #FDF5E8;
+            border: 1.5px solid #E2C58A;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            color: var(--text-primary);
+        }
+        .pasture-grat-x {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.08);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1;
+            cursor: pointer;
+        }
         .summary-head {
             display: flex;
             justify-content: space-between;
@@ -4897,10 +5010,10 @@
 
                     <!-- 2. Your Progress Pasture — opens the full garden on its own screen -->
                     <button type="button" class="space-block" id="pasture-block" aria-label="Open your Progress Pasture">
-                        <span class="space-block-emoji">🌼</span>
+                        <span class="space-block-emoji">🐮</span>
                         <div class="space-block-text">
                             <strong>Your Progress Pasture</strong>
-                            <span id="pasture-block-sub">A flower blooms for every step you take</span>
+                            <span id="pasture-block-sub">Meet your cow — see how you’re tending each part of you</span>
                         </div>
                         <span class="space-block-dots" id="pasture-block-dots" aria-hidden="true"></span>
                         <span class="space-block-chevron">›</span>
@@ -5053,7 +5166,7 @@
                 <button class="domain-panel-back" id="pasture-panel-back">← Back</button>
                 <div class="domain-panel-title">
                     <h2>Your Progress Pasture</h2>
-                    <span id="pasture-panel-sub">A flower for every step you take</span>
+                    <span id="pasture-panel-sub">Your cow reflects what you’re tending</span>
                 </div>
             </header>
             <div class="pasture-panel-content">
@@ -5061,16 +5174,22 @@
                      Shows an invitation until welcomed, then the living calf card. -->
                 <div id="calf-home" class="calf-home-slot"></div>
 
-                <p class="pasture-blurb" id="pasture-blurb">Every step you take plants something new here. Watch your pasture fill in over time.</p>
-                <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Your pasture"></svg>
-                <div class="pasture-grow-note" id="pasture-grow-note" hidden></div>
-                <div class="pasture-actions">
-                    <button type="button" class="pasture-edit-btn" id="pasture-edit-btn">✥ Rearrange</button>
-                    <span class="pasture-edit-hint" id="pasture-edit-hint" hidden>Drag to move · tap ✕ to remove</span>
+                <p class="pasture-blurb" id="pasture-blurb">Meet your cow — tap an icon below to see how you’re tending each part of you.</p>
+                <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 280" preserveAspectRatio="xMidYMid meet" aria-label="Your cow in your pasture"></svg>
+                <div class="pasture-icons" id="pasture-icons" role="group" aria-label="The seven parts of IMAGINE — tap to see your cow"></div>
+
+                <!-- Gratitude pose: add a few thank-yous to float around the cow -->
+                <div class="pasture-gratitude" id="pasture-gratitude" hidden>
+                    <form class="pasture-gratitude-form" id="pasture-gratitude-form">
+                        <input type="text" id="pasture-gratitude-input" class="pasture-gratitude-input" placeholder="Something you’re thankful for&hellip;" maxlength="22" autocomplete="off">
+                        <button type="submit" class="pasture-gratitude-btn" aria-label="Add a thank-you">＋</button>
+                    </form>
+                    <div class="pasture-gratitude-list" id="pasture-gratitude-list"></div>
                 </div>
+
                 <p class="pasture-tally" id="pasture-tally">You have shown up <strong>0</strong> times so far. Investing in yourself is good for you 🤩</p>
 
-                <p class="pasture-cow-note">Your cow grows as you show up — and carries a little token of whatever you’re tending most (a journal for gratitude, binoculars for exploring, a friend for connection…).</p>
+                <p class="pasture-cow-note">Your cow sits with you and reflects what you’re tending — a glowing grin for self-care, a yoga pose for mindfulness, hooves together for acceptance, a thank-you for gratitude, a friend for connection, a telescope for exploring.</p>
 
                 <!-- Legend: which colour is which part of IMAGINE -->
                 <div class="pasture-legend" id="pasture-legend">

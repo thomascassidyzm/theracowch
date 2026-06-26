@@ -1,7 +1,7 @@
-const CACHE_NAME = 'cowch-wellness-v171';
+const CACHE_NAME = 'cowch-wellness-v172';
 // Human-readable build date, surfaced in Settings via the GET_VERSION message
 // below so users can confirm at a glance which build they're running.
-const BUILD_DATE = '23 Jun 2026';
+const BUILD_DATE = '26 Jun 2026';
 const urlsToCache = [
   '/',
   '/app.html',

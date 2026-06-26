@@ -376,24 +376,17 @@ function gatherActiveDays(windowDays) {
 
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
-// ── Pasture growth garden: a cumulative scene where each new day visited
-//    plants one new thing. A gentle first flower, then a varied mix —
-//    little birds, ladybirds, hedgehogs, trees and grass tufts — so the
-//    scene gets visually interesting fast. Items are draggable + deletable. ──
-const PASTURE_ITEMS_KEY    = 'cowch-pasture-items-v1';
+// ── Progress is now told through the cow, the cow, not planted scenery ───────
+// We keep a couple of legacy keys: older builds planted one "item" per visit
+// day, and recordVisitToday() still backfills the visit log from those dates.
+const PASTURE_ITEMS_KEY    = 'cowch-pasture-items-v1';   // legacy — read only
 const PASTURE_LASTGROW_KEY = 'cowch-pasture-lastgrow';
 const PASTURE_VISITDAYS_KEY = 'cowch-pasture-visitdays';
-const PASTURE_MILESTONES_SEEN_KEY = 'cowch-pasture-milestones-seen';
 
-// Time-based progression, measured in distinct days the user has grown the
-// pasture (one per visit-day). Layers ambient scenery on top of the daily
-// planted flowers/trees/grass.
-const PASTURE_MILESTONES = [
-    { key: 'butterflies', days: 15, note: '🦋 Butterflies have found your pasture!' },   // week 3
-    { key: 'featuretree', days: 22, note: '🌳 A grand tree has taken root in your pasture!' }, // week 4
-    { key: 'stream',      days: 29, note: '💧 A little stream now runs through your pasture.' }, // month 2
-    { key: 'birdhouse',   days: 57, note: '🏠 A birdhouse has appeared in your pasture!' }  // month 3
-];
+// Which IMAGINE area the cow was last showing, and the few thank-yous the user
+// has written for the gratitude pose. Both on-device only.
+const PASTURE_POSE_KEY      = 'cowch-pasture-pose-v1';
+const PASTURE_GRATITUDE_KEY = 'cowch-pasture-gratitude-v1';
 
 function getPastureVisitDays() {
     try {
@@ -402,12 +395,10 @@ function getPastureVisitDays() {
     } catch (_) {}
     return 0;
 }
-const PASTURE_FLOWER_COLORS = ['#F7B2C5', '#FFD56B', '#F6A5C0', '#FFB07A', '#E8A0BF',
-                               '#FFC1A4', '#FFEC9E', '#C5E1A5', '#FFB6B6', '#D9A6F0'];
-// Cheerful default plumage for birds planted by the daily-growth path (the
-// IMAGINE path tints them with their area's colour instead — see drawBird).
-const PASTURE_BIRD_COLORS = ['#6FB7E0', '#E8915C', '#7FC8A0', '#D98AB0', '#F2C14E'];
 
+// Legacy reader: older builds planted one item per visit day. Nothing plants
+// anything now, but recordVisitToday() still reads these dates to backfill the
+// visit log, so the reader stays.
 function loadPastureItems() {
     try {
         const arr = JSON.parse(localStorage.getItem(PASTURE_ITEMS_KEY) || '[]');
@@ -415,331 +406,286 @@ function loadPastureItems() {
     } catch (_) {}
     return [];
 }
-function savePastureItems(items) {
-    try { localStorage.setItem(PASTURE_ITEMS_KEY, JSON.stringify(items)); } catch (_) {}
-}
 
-// The 1-based index of the item being added decides its kind. The very first
-// sprout is a familiar flower, but from day two onward we cycle through a
-// lively mix — birds, ladybirds, hedgehogs, grass and the odd tree — so the
-// pasture stops looking like nothing but flowers almost immediately.
-const PASTURE_TYPE_CYCLE = [
-    'ladybird', 'flower', 'bird', 'grass', 'hedgehog',
-    'flower', 'bird', 'tree', 'ladybird', 'grass'
-];
-function nextPastureItemType(n) {
-    if (n <= 1) return 'flower';        // first sprout stays gentle + familiar
-    return PASTURE_TYPE_CYCLE[(n - 2) % PASTURE_TYPE_CYCLE.length];
-}
-
-// Pasture playable area (origin coords for items)
-const PASTURE_X_MIN = 26, PASTURE_X_MAX = 334;
-const PASTURE_Y_MIN = 116, PASTURE_Y_MAX = 166;
-
-// Build a list of {x, y, r} zones a new item should avoid: the cow's
-// footprint plus every existing item.
-function pastureAvoidZones(items, cowPos) {
-    const zones = [];
-    if (cowPos) zones.push({ x: cowPos.x + 2, y: cowPos.y + 4, r: 33 });
-    (items || []).forEach(it => {
-        let r = 15;
-        if (it.type === 'tree') r = 20;
-        else if (it.type === 'grass') r = 14;
-        else if (it.type === 'bird') r = 17;
-        else if (it.type === 'hedgehog') r = 16;
-        else if (it.type === 'ladybird') r = 12;
-        zones.push({ x: it.x, y: it.y, r });
-    });
-    return zones;
-}
-
-function pastureIsClear(x, y, zones) {
-    for (const z of zones) {
-        const dx = x - z.x, dy = y - z.y;
-        if (dx * dx + dy * dy < z.r * z.r) return false;
-    }
-    return true;
-}
-
-function randomPasturePosition(items, cowPos) {
-    const zones = pastureAvoidZones(items, cowPos);
-    // Try plenty of random spots that don't collide with anything.
-    for (let i = 0; i < 60; i++) {
-        const x = PASTURE_X_MIN + Math.random() * (PASTURE_X_MAX - PASTURE_X_MIN);
-        const y = PASTURE_Y_MIN + Math.random() * (PASTURE_Y_MAX - PASTURE_Y_MIN);
-        if (pastureIsClear(x, y, zones)) return { x, y };
-    }
-    // Fallback: pick the spot from a few samples that's furthest from any zone.
-    let best = null, bestD = -Infinity;
-    for (let i = 0; i < 12; i++) {
-        const x = PASTURE_X_MIN + Math.random() * (PASTURE_X_MAX - PASTURE_X_MIN);
-        const y = PASTURE_Y_MIN + Math.random() * (PASTURE_Y_MAX - PASTURE_Y_MIN);
-        let minD = Infinity;
-        for (const z of zones) {
-            const dx = x - z.x, dy = y - z.y;
-            const d = dx * dx + dy * dy;
-            if (d < minD) minD = d;
-        }
-        if (minD > bestD) { bestD = minD; best = { x, y }; }
-    }
-    return best || { x: 180, y: 130 };
-}
-
-// One-time fix-up: relocate any item currently sitting on top of the cow.
-// Future placements use the avoidance above; this just rescues the current
-// state for users whose pasture grew before the avoidance was added.
-const PASTURE_RELOCATED_KEY = 'cowch-pasture-relocated-v1';
-function maybeRelocateCowCollisions() {
-    try { if (localStorage.getItem(PASTURE_RELOCATED_KEY) === '1') return; } catch (_) {}
-    const items = loadPastureItems();
-    if (items.length) {
-        const cowPos = loadCowPos();
-        const cowZ = { x: cowPos.x + 2, y: cowPos.y + 4, r: 24 };
-        let changed = false;
-        items.forEach((it, idx) => {
-            const dx = it.x - cowZ.x, dy = it.y - cowZ.y;
-            if (dx * dx + dy * dy < cowZ.r * cowZ.r) {
-                const others = items.filter((_, j) => j !== idx);
-                const np = randomPasturePosition(others, cowPos);
-                it.x = np.x; it.y = np.y;
-                changed = true;
-            }
-        });
-        if (changed) savePastureItems(items);
-    }
-    try { localStorage.setItem(PASTURE_RELOCATED_KEY, '1'); } catch (_) {}
-}
-
-// Adds one item if today is a new calendar day since the last growth, and
-// ticks the monotonic visit-day counter that drives milestone unlocks.
-// Returns { item, visitDays } or null if nothing happened today.
-function maybeGrowPasture() {
+// Ticks the monotonic visit-day counter once per calendar day. Returns true
+// the first time it runs on a new day.
+function maybeTickVisitDay() {
     const todayKey = streakDayKey(new Date());
     let last = null;
     try { last = localStorage.getItem(PASTURE_LASTGROW_KEY); } catch (_) {}
-    if (last === todayKey) return null;
-
+    if (last === todayKey) return false;
     const visitDays = getPastureVisitDays() + 1;
-    try { localStorage.setItem(PASTURE_VISITDAYS_KEY, String(visitDays)); } catch (_) {}
-
-    const items = loadPastureItems();
-    const type = nextPastureItemType(items.length + 1);
-    const pos = randomPasturePosition(items, loadCowPos());
-    const item = {
-        id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1000).toString(36),
-        type,
-        x: pos.x,
-        y: pos.y,
-        variant: type === 'flower'
-            ? Math.floor(Math.random() * PASTURE_FLOWER_COLORS.length)
-            : (type === 'bird'
-                ? Math.floor(Math.random() * PASTURE_BIRD_COLORS.length)
-                : Math.floor(Math.random() * 3)),
-        addedAt: new Date().toISOString()
-    };
-    items.push(item);
-    savePastureItems(items);
-    try { localStorage.setItem(PASTURE_LASTGROW_KEY, todayKey); } catch (_) {}
-    return { item, visitDays };
+    try {
+        localStorage.setItem(PASTURE_VISITDAYS_KEY, String(visitDays));
+        localStorage.setItem(PASTURE_LASTGROW_KEY, todayKey);
+    } catch (_) {}
+    return true;
 }
 
-// Returns the note for the highest not-yet-announced milestone the user has
-// now reached, or null. Marks it announced.
-function pendingPastureMilestoneNote(visitDays) {
-    let seen = [];
-    try { seen = JSON.parse(localStorage.getItem(PASTURE_MILESTONES_SEEN_KEY) || '[]'); } catch (_) {}
-    if (!Array.isArray(seen)) seen = [];
-    let note = null;
-    PASTURE_MILESTONES.forEach(m => {
-        if (visitDays >= m.days && seen.indexOf(m.key) === -1) {
-            seen.push(m.key);
-            note = m.note; // last (highest) crossed wins the headline
-        }
-    });
-    if (note) {
-        try { localStorage.setItem(PASTURE_MILESTONES_SEEN_KEY, JSON.stringify(seen)); } catch (_) {}
+// The seven IMAGINE areas, each with the the cow pose it puts the cow into and
+// the chip icon that represents progress (icons, not nature). Keys match
+// IMAGINE_PALETTE (Interactions = I2).
+const PASTURE_POSES = [
+    { key: 'I',  pose: 'selfcare',     icon: '✨', label: 'I, Me, Myself', blurb: 'Your cow is glowing and grinning — a moment of looking after yourself.' },
+    { key: 'M',  pose: 'mindfulness',  icon: '🧘', label: 'Mindfulness',   blurb: 'Your cow settles into a calm yoga pose. Breathe along with them.' },
+    { key: 'A',  pose: 'acceptance',   icon: '☮️', label: 'Acceptance',    blurb: 'Hooves together, centred — letting go of what can’t be changed.' },
+    { key: 'G',  pose: 'gratitude',    icon: '🙏', label: 'Gratitude',     blurb: 'A thank-you from your cow. Add a few of your own below.' },
+    { key: 'I2', pose: 'interactions', icon: '👋', label: 'Interactions',  blurb: 'Your cow and a friend or two — connection matters.' },
+    { key: 'N',  pose: 'nurturing',    icon: '🎈', label: 'Nurturing',     blurb: 'Play and rest — a balloon and a big happy smile.' },
+    { key: 'E',  pose: 'exploring',    icon: '🔭', label: 'Exploring',     blurb: 'Glasses on, telescope up — curious about the world.' }
+];
+
+function poseForKey(key) {
+    return PASTURE_POSES.find(p => p.key === key) || PASTURE_POSES[0];
+}
+
+// Which area the cow is currently showing. Defaults to whatever the user last
+// viewed; falls back to the area they have tended most, then to self-care.
+let pastureActivePose = null;
+function getPastureActivePose() {
+    if (pastureActivePose) return pastureActivePose;
+    try {
+        const saved = localStorage.getItem(PASTURE_POSE_KEY);
+        if (saved && PASTURE_POSES.some(p => p.key === saved)) { pastureActivePose = saved; return saved; }
+    } catch (_) {}
+    const top = (typeof cowEngagement === 'function') ? cowEngagement().top[0] : null;
+    pastureActivePose = top || 'I';
+    return pastureActivePose;
+}
+function setPastureActivePose(key) {
+    pastureActivePose = key;
+    try { localStorage.setItem(PASTURE_POSE_KEY, key); } catch (_) {}
+}
+
+// The few thank-yous the user has written, shown floating around the cow in the
+// gratitude pose. Capped so the scene stays readable.
+function loadGratitudeWords() {
+    try { const a = JSON.parse(localStorage.getItem(PASTURE_GRATITUDE_KEY) || '[]'); return Array.isArray(a) ? a.filter(s => typeof s === 'string') : []; } catch (_) { return []; }
+}
+function saveGratitudeWords(arr) {
+    try { localStorage.setItem(PASTURE_GRATITUDE_KEY, JSON.stringify((arr || []).slice(0, 6))); } catch (_) {}
+}
+
+// ── the cow's artwork — a big cow sitting forward, facing you ────────────────
+// Everything below is drawn in a local space whose origin (0,0) is the seat on
+// the ground, with up = negative y. the cow changes POSE to reflect the IMAGINE
+// area being viewed (self-care grin, a yoga pose, acceptance, gratitude,
+// interactions, nurturing, exploring) — the pasture mirrors what the user is
+// tending rather than planting scenery.
+
+// Eyes by mood. 'happy' = joyful upward arcs; 'open' = round; 'closed' = serene.
+function cowEyes(style) {
+    if (style === 'closed') {
+        return '<path d="M -16 -3 Q -10 2 -4 -3" stroke="#3C2E28" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+               '<path d="M 4 -3 Q 10 2 16 -3" stroke="#3C2E28" stroke-width="2" fill="none" stroke-linecap="round"/>';
     }
-    return note;
-}
-
-// ── Drawing helpers: each draws into a group whose origin (0,0) is the
-//    item's base on the ground. ──
-function drawFlower(g, item) {
-    // IMAGINE flowers wear their area's colour (and grow a touch with engagement);
-    // legacy "wildflowers" (no letter) keep the original soft pastel palette.
-    const isImagine = item.letter && IMAGINE_PALETTE[item.letter];
-    const color = isImagine
-        ? IMAGINE_PALETTE[item.letter]
-        : PASTURE_FLOWER_COLORS[(item.variant || 0) % PASTURE_FLOWER_COLORS.length];
-
-    // Scale the whole flower from its base via an inner group.
-    const s = isImagine ? (item.scale || 1) : 1;
-    const fg = (s !== 1) ? document.createElementNS(NS_SVG, 'g') : g;
-    if (s !== 1) { fg.setAttribute('transform', 'scale(' + s + ')'); g.appendChild(fg); }
-
-    const stem = document.createElementNS(NS_SVG, 'line');
-    stem.setAttribute('x1', 0); stem.setAttribute('y1', 0);
-    stem.setAttribute('x2', 0); stem.setAttribute('y2', -14);
-    stem.setAttribute('stroke', '#3F8458'); stem.setAttribute('stroke-width', 1.6);
-    stem.setAttribute('stroke-linecap', 'round');
-    fg.appendChild(stem);
-    const sideLeaf = document.createElementNS(NS_SVG, 'ellipse');
-    sideLeaf.setAttribute('cx', 3); sideLeaf.setAttribute('cy', -8);
-    sideLeaf.setAttribute('rx', 2.5); sideLeaf.setAttribute('ry', 1.2);
-    sideLeaf.setAttribute('fill', '#3F8458');
-    sideLeaf.setAttribute('transform', 'rotate(30 3 -8)');
-    fg.appendChild(sideLeaf);
-    for (let p = 0; p < 5; p++) {
-        const a = (p / 5) * Math.PI * 2 - Math.PI / 2;
-        const petal = document.createElementNS(NS_SVG, 'circle');
-        petal.setAttribute('cx', Math.cos(a) * 4.2);
-        petal.setAttribute('cy', Math.sin(a) * 4.2 - 16);
-        petal.setAttribute('r', 3.4);
-        petal.setAttribute('fill', color);
-        // A faint light rim keeps the petals legible on the green grass.
-        if (isImagine) { petal.setAttribute('stroke', 'rgba(255,255,255,0.55)'); petal.setAttribute('stroke-width', 0.6); }
-        fg.appendChild(petal);
+    if (style === 'happy') {
+        return '<path d="M -17 -1 Q -10 -10 -3 -1" stroke="#3C2E28" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+               '<path d="M 3 -1 Q 10 -10 17 -1" stroke="#3C2E28" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
     }
-    const centre = document.createElementNS(NS_SVG, 'circle');
-    centre.setAttribute('cx', 0); centre.setAttribute('cy', -16); centre.setAttribute('r', 2);
-    centre.setAttribute('fill', '#C9A857');
-    fg.appendChild(centre);
+    return '<circle cx="-10" cy="-3" r="4.4" fill="#3C2E28"/><circle cx="10" cy="-3" r="4.4" fill="#3C2E28"/>' +
+           '<circle cx="-8.5" cy="-4.6" r="1.5" fill="#FFFFFF"/><circle cx="11.5" cy="-4.6" r="1.5" fill="#FFFFFF"/>';
 }
-function drawTree(g, item) {
-    const canopyColors = ['#5FA46B', '#4F8F60', '#76B47E'];
-    const cc = canopyColors[(item.variant || 0) % canopyColors.length];
-    const trunk = document.createElementNS(NS_SVG, 'rect');
-    trunk.setAttribute('x', -2.5); trunk.setAttribute('y', -16);
-    trunk.setAttribute('width', 5); trunk.setAttribute('height', 18);
-    trunk.setAttribute('rx', 2); trunk.setAttribute('fill', '#6B4B30');
-    g.appendChild(trunk);
-    [{ x: 0, y: -22, r: 11 }, { x: -8, y: -17, r: 8 }, { x: 8, y: -17, r: 8 }, { x: 0, y: -28, r: 8 }].forEach(c => {
-        const e = document.createElementNS(NS_SVG, 'circle');
-        e.setAttribute('cx', c.x); e.setAttribute('cy', c.y); e.setAttribute('r', c.r);
-        e.setAttribute('fill', cc);
-        g.appendChild(e);
-    });
-}
-function drawGrass(g, item) {
-    const greens = ['#5FA46B', '#6FB37A', '#4F8F60'];
-    const col = greens[(item.variant || 0) % greens.length];
-    const blades = [
-        'M -6 0 Q -7 -10 -4 -14', 'M -2 0 Q -3 -13 0 -18',
-        'M 2 0 Q 3 -12 6 -15', 'M 6 0 Q 8 -8 10 -11'
-    ];
-    blades.forEach(d => {
-        const p = document.createElementNS(NS_SVG, 'path');
-        p.setAttribute('d', d);
-        p.setAttribute('stroke', col); p.setAttribute('stroke-width', 2.2);
-        p.setAttribute('fill', 'none'); p.setAttribute('stroke-linecap', 'round');
-        g.appendChild(p);
-    });
-}
-// A little perched bird. Like the flower, an IMAGINE bird wears its area's
-// colour (mindfulness → light blue, gratitude → turquoise, …); a bird planted
-// by the daily-growth path picks a cheerful default plumage instead.
-function drawBird(g, item) {
-    const isImagine = item.letter && IMAGINE_PALETTE[item.letter];
-    const color = isImagine
-        ? IMAGINE_PALETTE[item.letter]
-        : PASTURE_BIRD_COLORS[(item.variant || 0) % PASTURE_BIRD_COLORS.length];
 
-    const s = isImagine ? (item.scale || 1) : 1;
-    const fg = (s !== 1) ? document.createElementNS(NS_SVG, 'g') : g;
-    if (s !== 1) { fg.setAttribute('transform', 'scale(' + s + ')'); g.appendChild(fg); }
+// Mouth by mood. 'big' = wide open grin; 'smile' = friendly; 'calm' = small.
+function cowGrin(style) {
+    if (style === 'big')   return '<path d="M -17 19 Q 0 40 17 19 Q 0 30 -17 19 Z" fill="#B5615A"/><path d="M -10 26 Q 0 31 10 26" fill="#FF9FA8"/>';
+    if (style === 'smile') return '<path d="M -13 21 Q 0 33 13 21" stroke="#B5615A" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+    return '<path d="M -8 23 Q 0 28 8 23" stroke="#B5615A" stroke-width="2" fill="none" stroke-linecap="round"/>';
+}
 
-    // Twiggy legs down to the ground.
-    [-1.5, 1.5].forEach(lx => {
-        const leg = document.createElementNS(NS_SVG, 'line');
-        leg.setAttribute('x1', lx); leg.setAttribute('y1', 0);
-        leg.setAttribute('x2', lx); leg.setAttribute('y2', -4);
-        leg.setAttribute('stroke', '#C9892F'); leg.setAttribute('stroke-width', 1.2);
-        leg.setAttribute('stroke-linecap', 'round');
-        fg.appendChild(leg);
-    });
-    // Tail feathers pointing back-left.
-    const tail = document.createElementNS(NS_SVG, 'path');
-    tail.setAttribute('d', 'M -4 -7 L -12 -9 L -4 -12 Z');
-    tail.setAttribute('fill', color);
-    fg.appendChild(tail);
-    // Plump body.
-    const body = document.createElementNS(NS_SVG, 'ellipse');
-    body.setAttribute('cx', 0); body.setAttribute('cy', -9);
-    body.setAttribute('rx', 6.5); body.setAttribute('ry', 7.5);
-    body.setAttribute('fill', color);
-    if (isImagine) { body.setAttribute('stroke', 'rgba(255,255,255,0.5)'); body.setAttribute('stroke-width', 0.6); }
-    fg.appendChild(body);
-    // A soft wing shading on the body.
-    const wing = document.createElementNS(NS_SVG, 'ellipse');
-    wing.setAttribute('cx', -1); wing.setAttribute('cy', -9);
-    wing.setAttribute('rx', 3.6); wing.setAttribute('ry', 5);
-    wing.setAttribute('fill', 'rgba(0,0,0,0.12)');
-    fg.appendChild(wing);
-    // Head.
-    const head = document.createElementNS(NS_SVG, 'circle');
-    head.setAttribute('cx', 4); head.setAttribute('cy', -16); head.setAttribute('r', 4.5);
-    head.setAttribute('fill', color);
-    if (isImagine) { head.setAttribute('stroke', 'rgba(255,255,255,0.5)'); head.setAttribute('stroke-width', 0.6); }
-    fg.appendChild(head);
-    // Beak pointing right.
-    const beak = document.createElementNS(NS_SVG, 'path');
-    beak.setAttribute('d', 'M 8 -16.5 L 13 -15.5 L 8 -14 Z');
-    beak.setAttribute('fill', '#F4A024');
-    fg.appendChild(beak);
-    // Eye.
-    const eye = document.createElementNS(NS_SVG, 'circle');
-    eye.setAttribute('cx', 5.4); eye.setAttribute('cy', -17); eye.setAttribute('r', 1);
-    eye.setAttribute('fill', '#2A2A2A');
-    fg.appendChild(eye);
+// The head, centred at the group origin. opts: { eyes, mouth, blush, glow, glasses }.
+function cowHead(opts) {
+    opts = opts || {};
+    let s = '';
+    if (opts.glow) s += '<circle cx="0" cy="2" r="58" fill="#FFE7A0" opacity="0.4"/>';
+    s += '<ellipse cx="-44" cy="-4" rx="16" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2" transform="rotate(-30 -44 -4)"/>' +
+         '<ellipse cx="-44" cy="-4" rx="8" ry="4" fill="#F7B2C5" transform="rotate(-30 -44 -4)"/>' +
+         '<ellipse cx="44" cy="-4" rx="16" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2" transform="rotate(30 44 -4)"/>' +
+         '<ellipse cx="44" cy="-4" rx="8" ry="4" fill="#F7B2C5" transform="rotate(30 44 -4)"/>' +
+         '<path d="M -17 -30 Q -23 -44 -11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+         '<path d="M 17 -30 Q 23 -44 11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+         '<ellipse cx="0" cy="0" rx="41" ry="39" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
+         '<path d="M -8 -33 Q -3 -46 1 -35 Q 5 -46 9 -34" stroke="#3E3A44" stroke-width="3.2" fill="none" stroke-linecap="round"/>' +
+         '<path d="M 2 -16 Q -3 3 14 7 Q 33 7 35 -10 Q 35 -27 16 -27 Q 5 -27 2 -16 Z" fill="#3E3A44"/>';
+    if (opts.blush) {
+        s += '<ellipse cx="-25" cy="11" rx="7" ry="4.5" fill="#FFB3C1" opacity="0.7"/>' +
+             '<ellipse cx="25" cy="11" rx="7" ry="4.5" fill="#FFB3C1" opacity="0.7"/>';
+    }
+    s += '<circle cx="-10" cy="-3" r="6.6" fill="#FFFFFF"/><circle cx="10" cy="-3" r="6.6" fill="#FFFFFF"/>';
+    s += cowEyes(opts.eyes || 'open');
+    s += '<ellipse cx="0" cy="20" rx="26" ry="18" fill="#FFD9C7"/>' +
+         '<ellipse cx="-9" cy="18" rx="3.4" ry="4.6" fill="#C98A78"/>' +
+         '<ellipse cx="9" cy="18" rx="3.4" ry="4.6" fill="#C98A78"/>';
+    s += cowGrin(opts.mouth || 'smile');
+    if (opts.glasses) {
+        s += '<g stroke="#3C2E28" stroke-width="2.2" fill="rgba(160,210,240,0.32)" stroke-linecap="round">' +
+             '<circle cx="-10" cy="-3" r="9"/><circle cx="10" cy="-3" r="9"/>' +
+             '<path d="M -1 -3 H 1" fill="none"/><path d="M -19 -5 l -7 -3" fill="none"/><path d="M 19 -5 l 7 -3" fill="none"/>' +
+             '</g>';
+    }
+    return s;
 }
-// A small ladybird resting on the grass — iconic red with black spots.
-function drawLadybird(g, item) {
-    const body = document.createElementNS(NS_SVG, 'ellipse');
-    body.setAttribute('cx', 0); body.setAttribute('cy', -6);
-    body.setAttribute('rx', 7); body.setAttribute('ry', 6);
-    body.setAttribute('fill', '#E0463C');
-    g.appendChild(body);
-    // Black head poking up.
-    const head = document.createElementNS(NS_SVG, 'circle');
-    head.setAttribute('cx', 0); head.setAttribute('cy', -12); head.setAttribute('r', 2.6);
-    head.setAttribute('fill', '#222');
-    g.appendChild(head);
-    // Wing divide.
-    const divide = document.createElementNS(NS_SVG, 'line');
-    divide.setAttribute('x1', 0); divide.setAttribute('y1', -11.5);
-    divide.setAttribute('x2', 0); divide.setAttribute('y2', -0.5);
-    divide.setAttribute('stroke', '#222'); divide.setAttribute('stroke-width', 1);
-    g.appendChild(divide);
-    // Spots.
-    [[-3.6, -7.5], [3.6, -7.5], [-3, -3.8], [3, -3.8]].forEach(sp => {
-        const c = document.createElementNS(NS_SVG, 'circle');
-        c.setAttribute('cx', sp[0]); c.setAttribute('cy', sp[1]); c.setAttribute('r', 1.4);
-        c.setAttribute('fill', '#222');
-        g.appendChild(c);
-    });
+
+// The seated body, hind legs and tail — shared by every pose.
+function cowBody() {
+    return '<path d="M 56 -54 Q 80 -44 72 -14" stroke="#A77B52" stroke-width="3.2" fill="none" stroke-linecap="round"/>' +
+        '<circle cx="72" cy="-12" r="4.5" fill="#A77B52"/>' +
+        '<path d="M -58 -4 Q -76 -64 -42 -104 Q 0 -132 42 -104 Q 76 -64 58 -4 Q 30 6 0 4 Q -30 6 -58 -4 Z" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
+        '<path d="M -36 -58 Q -40 -40 -22 -34 Q -4 -30 0 -50 Q -2 -70 -20 -72 Q -36 -70 -36 -58 Z" fill="#3E3A44" opacity="0.92"/>' +
+        '<path d="M 16 -34 Q 12 -20 26 -16 Q 40 -14 42 -28 Q 42 -42 28 -42 Q 19 -42 16 -34 Z" fill="#3E3A44" opacity="0.9"/>' +
+        '<ellipse cx="-46" cy="-2" rx="15" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>' +
+        '<ellipse cx="46" cy="-2" rx="15" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>' +
+        '<path d="M -49 2 v 4 M -43 1 v 4" stroke="#C98A78" stroke-width="1.4" stroke-linecap="round"/>' +
+        '<path d="M 43 2 v 4 M 49 1 v 4" stroke="#C98A78" stroke-width="1.4" stroke-linecap="round"/>';
 }
-// A friendly hedgehog: a spiky brown mound with a little face peeking out.
-function drawHedgehog(g, item) {
-    const body = document.createElementNS(NS_SVG, 'path');
-    body.setAttribute('d',
-        'M -11 0 Q -12 -8 -6 -10 L -5 -6 L -2.5 -11 L 0 -7 ' +
-        'L 2.5 -12 L 5 -7.5 L 7 -11 Q 12 -8 11 0 Z');
-    body.setAttribute('fill', '#8A6A4A');
-    g.appendChild(body);
-    // Lighter face poking out to the right.
-    const face = document.createElementNS(NS_SVG, 'ellipse');
-    face.setAttribute('cx', 9); face.setAttribute('cy', -2.5);
-    face.setAttribute('rx', 4); face.setAttribute('ry', 3.2);
-    face.setAttribute('fill', '#D8C0A4');
-    g.appendChild(face);
-    const nose = document.createElementNS(NS_SVG, 'circle');
-    nose.setAttribute('cx', 12.5); nose.setAttribute('cy', -2); nose.setAttribute('r', 1.1);
-    nose.setAttribute('fill', '#3A2A1E');
-    g.appendChild(nose);
-    const eye = document.createElementNS(NS_SVG, 'circle');
-    eye.setAttribute('cx', 8.5); eye.setAttribute('cy', -3.6); eye.setAttribute('r', 0.9);
-    eye.setAttribute('fill', '#3A2A1E');
-    g.appendChild(eye);
+
+// A foreleg from the shoulder to a hoof at (hx,hy). side = -1 left, +1 right.
+function cowArm(side, hx, hy) {
+    const sx = side * 30, sy = -96, cx = side * 36, cy = -62;
+    return '<path d="M ' + sx + ' ' + sy + ' Q ' + cx + ' ' + cy + ' ' + hx + ' ' + hy + '" stroke="#FFFFFF" stroke-width="13" fill="none" stroke-linecap="round"/>' +
+           '<ellipse cx="' + hx + '" cy="' + hy + '" rx="9" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+}
+
+function pastureSparkles(pts) {
+    return (pts || []).map(p => '<text x="' + p[0] + '" y="' + p[1] + '" font-size="13" text-anchor="middle" opacity="0.9">✨</text>').join('');
+}
+function pastureLotus(x, y) {
+    return '<g transform="translate(' + x + ',' + y + ')">' +
+        '<ellipse cx="0" cy="3" rx="13" ry="4.5" fill="#5BB4E0" opacity="0.9"/>' +
+        '<ellipse cx="0" cy="0" rx="5" ry="10" fill="#9ED2EE"/>' +
+        '<ellipse cx="-8" cy="2" rx="4.5" ry="8" fill="#7FC0E4" transform="rotate(-34 -8 2)"/>' +
+        '<ellipse cx="8" cy="2" rx="4.5" ry="8" fill="#7FC0E4" transform="rotate(34 8 2)"/>' +
+        '<circle cx="0" cy="1" r="2.6" fill="#FFE08A"/></g>';
+}
+// A round token of something we cannot control, crossed out with a red ✗.
+function pastureCantControl(x, y, kind) {
+    const glyph = kind === 'cloud' ? '🌧️' : (kind === 'people' ? '👥' : '⏰');
+    return '<g transform="translate(' + x + ',' + y + ')" opacity="0.95">' +
+        '<circle cx="0" cy="0" r="16" fill="#FFFFFF" stroke="#D8CFC4" stroke-width="1.5"/>' +
+        '<text x="0" y="6" font-size="17" text-anchor="middle">' + glyph + '</text>' +
+        '<circle cx="0" cy="0" r="15" fill="none" stroke="#E0463C" stroke-width="3"/>' +
+        '<path d="M -11 -11 L 11 11" stroke="#E0463C" stroke-width="3" stroke-linecap="round"/></g>';
+}
+function pastureThankCard(x, y) {
+    return '<g transform="translate(' + x + ',' + y + ') rotate(-4)">' +
+        '<rect x="-27" y="-18" width="54" height="34" rx="4" fill="#FFF6EC" stroke="#C9A857" stroke-width="1.6"/>' +
+        '<path d="M -27 -16 L 0 1 L 27 -16" fill="none" stroke="#E2C58A" stroke-width="1.2"/>' +
+        '<text x="0" y="2" font-size="9.5" font-weight="800" text-anchor="middle" fill="#B5615A" font-family="Gabarito, system-ui, sans-serif">Thank you</text>' +
+        '<text x="0" y="13" font-size="9" text-anchor="middle">💛</text></g>';
+}
+function pastureGratitudeFloat(words) {
+    words = (words || []).slice(0, 6);
+    if (!words.length) return '';
+    const slots = [[-96,-176],[96,-184],[-108,-108],[108,-116],[-56,-216],[56,-216]];
+    return words.map(function (w, i) {
+        const p = slots[i % slots.length];
+        const t = String(w).slice(0, 22).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return '<text x="' + p[0] + '" y="' + p[1] + '" font-size="11" font-weight="700" text-anchor="middle" fill="#5B4636" stroke="#FFF6EC" stroke-width="3" paint-order="stroke" font-family="Gabarito, system-ui, sans-serif">' + t + '</text>';
+    }).join('');
+}
+// A smaller cow friend, seated, at ground position (x, yGround).
+function pastureFriendCow(x, yGround, scale, earColor) {
+    return '<g transform="translate(' + x + ',' + yGround + ') scale(' + scale + ')">' +
+        '<path d="M -40 -2 Q -52 -48 -28 -78 Q 0 -98 28 -78 Q 52 -48 40 -2 Q 0 8 -40 -2 Z" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
+        '<ellipse cx="-14" cy="-44" rx="12" ry="17" fill="' + earColor + '" opacity="0.85"/>' +
+        '<g transform="translate(0,-104)">' +
+            '<ellipse cx="-30" cy="-2" rx="11" ry="6.5" fill="#FFFFFF" transform="rotate(-30 -30 -2)"/>' +
+            '<ellipse cx="30" cy="-2" rx="11" ry="6.5" fill="#FFFFFF" transform="rotate(30 30 -2)"/>' +
+            '<ellipse cx="0" cy="0" rx="28" ry="26" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.4"/>' +
+            '<ellipse cx="13" cy="-5" rx="11" ry="10" fill="' + earColor + '"/>' +
+            '<circle cx="-8" cy="-2" r="3.2" fill="#3C2E28"/><circle cx="8" cy="-2" r="3.2" fill="#3C2E28"/>' +
+            '<ellipse cx="0" cy="14" rx="17" ry="12" fill="#FFD9C7"/>' +
+            '<path d="M -9 15 Q 0 23 9 15" stroke="#B5615A" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+        '</g></g>';
+}
+function pastureBalloon(hx, hy) {
+    return '<path d="M ' + hx + ' ' + hy + ' Q ' + (hx + 12) + ' ' + (hy - 34) + ' ' + (hx + 16) + ' ' + (hy - 58) + '" stroke="#C98A78" stroke-width="1" fill="none"/>' +
+        '<ellipse cx="' + (hx + 16) + '" cy="' + (hy - 70) + '" rx="16" ry="19" fill="#F2802E"/>' +
+        '<path d="M ' + (hx + 8) + ' ' + (hy - 80) + ' Q ' + (hx + 13) + ' ' + (hy - 86) + ' ' + (hx + 16) + ' ' + (hy - 78) + '" fill="#FBC89A" opacity="0.8"/>' +
+        '<path d="M ' + (hx + 16) + ' ' + (hy - 51) + ' l -3 4 l 6 0 z" fill="#F2802E"/>';
+}
+function pastureMagnifier(hx, hy) {
+    return '<g transform="translate(' + hx + ',' + hy + ')">' +
+        '<circle cx="0" cy="0" r="13" fill="rgba(160,210,240,0.45)" stroke="#6B4B30" stroke-width="3.5"/>' +
+        '<path d="M -6 -5 a 8 8 0 0 1 6 -4" stroke="#FFFFFF" stroke-width="1.4" fill="none" opacity="0.8"/>' +
+        '<path d="M 9 9 L 22 22" stroke="#6B4B30" stroke-width="5" stroke-linecap="round"/></g>';
+}
+function pastureTelescope(x, yGround) {
+    return '<g transform="translate(' + x + ',' + yGround + ')">' +
+        '<line x1="2" y1="0" x2="-6" y2="-42" stroke="#7A6253" stroke-width="3"/>' +
+        '<line x1="-12" y1="0" x2="-3" y2="-42" stroke="#7A6253" stroke-width="3"/>' +
+        '<g transform="translate(-4,-48) rotate(34)">' +
+            '<rect x="-6" y="-7" width="34" height="13" rx="6" fill="#3C6E8F"/>' +
+            '<rect x="24" y="-9" width="13" height="17" rx="3" fill="#2A5470"/>' +
+            '<circle cx="33" cy="-1" r="4" fill="#9ED2EE"/></g></g>';
+}
+
+// Build the cow's full artwork for a pose, at a given joy (0..1), drawn at the
+// group origin = seat on the ground.
+function buildCowArt(poseKey, joy, gratitudeWords) {
+    let preBody = '', arms = '', headOpts = { eyes: 'open', mouth: 'smile' }, front = '', extras = '';
+
+    switch (poseKey) {
+        case 'selfcare':
+            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
+            headOpts = { eyes: 'happy', mouth: 'big', blush: true, glow: true };
+            extras = pastureSparkles([[-60, -150], [60, -160], [-72, -92], [72, -102], [0, -198]]);
+            break;
+        case 'mindfulness':
+            // Crossed legs in front, hooves resting palm-up in a calm mudra.
+            arms = '<path d="M -34 -2 Q 0 -24 34 -2" stroke="#FFFFFF" stroke-width="13" fill="none" stroke-linecap="round"/>' +
+                   '<path d="M 34 -2 Q 0 -20 -34 -2" stroke="#F1E5D8" stroke-width="11" fill="none" stroke-linecap="round" opacity="0.85"/>' +
+                   cowArm(-1, -40, -40) + cowArm(1, 40, -40) +
+                   '<circle cx="-40" cy="-45" r="3.4" fill="#FFE08A"/><circle cx="40" cy="-45" r="3.4" fill="#FFE08A"/>';
+            headOpts = { eyes: 'closed', mouth: 'calm' };
+            extras = pastureLotus(0, -200) + pastureSparkles([[-32, -184], [32, -192]]);
+            break;
+        case 'acceptance':
+            // Hooves pressed together; around the cow, things we cannot control,
+            // each crossed out — a reminder to stay centred.
+            arms = '<path d="M -30 -96 Q -14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<path d="M 30 -96 Q 14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="0" cy="-58" rx="10" ry="13" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'closed', mouth: 'calm' };
+            extras = pastureCantControl(-90, -150, 'cloud') + pastureCantControl(90, -150, 'people') + pastureCantControl(0, -204, 'clock');
+            break;
+        case 'gratitude':
+            arms = cowArm(-1, -20, -44) + cowArm(1, 20, -44);
+            front = pastureThankCard(0, -50);
+            headOpts = { eyes: 'happy', mouth: 'smile', blush: true };
+            extras = pastureGratitudeFloat(gratitudeWords);
+            break;
+        case 'interactions':
+            preBody = pastureFriendCow(-100, 4, 0.6, '#F7B2C5') + pastureFriendCow(104, 8, 0.5, '#9ED2EE');
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 50 -112 56 -134" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="56" cy="-136" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'happy', mouth: 'smile' };
+            extras = '<text x="66" y="-150" font-size="16" text-anchor="middle">👋</text>';
+            break;
+        case 'nurturing':
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 46 -110 50 -126" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="50" cy="-128" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'happy', mouth: 'big', blush: true };
+            extras = pastureBalloon(50, -128);
+            break;
+        case 'exploring':
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 46 -120 42 -142" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="42" cy="-144" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'open', mouth: 'smile', glasses: true };
+            extras = pastureMagnifier(44, -150) + pastureTelescope(-96, -16);
+            break;
+        default:
+            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
+            headOpts = { eyes: 'open', mouth: 'smile' };
+    }
+
+    return preBody + cowBody() + arms +
+        '<g transform="translate(0, -150)">' + cowHead(headOpts) + '</g>' +
+        front + extras;
 }
 
 function clientToPastureSvg(svg, clientX, clientY) {
@@ -850,149 +796,26 @@ function buildPastureScenery(svg, vit) {
     }
 
     const hill = document.createElementNS(NS_SVG, 'path');
-    hill.setAttribute('d', 'M 0 90 Q 90 60 180 86 T 360 92 L 360 180 L 0 180 Z');
+    hill.setAttribute('d', 'M 0 196 Q 90 166 180 192 T 360 198 L 360 280 L 0 280 Z');
     hill.setAttribute('fill', p.hill);
     svg.appendChild(hill);
 
     const ground = document.createElementNS(NS_SVG, 'path');
-    ground.setAttribute('d', 'M 0 130 Q 80 116 160 128 T 360 130 L 360 180 L 0 180 Z');
+    ground.setAttribute('d', 'M 0 234 Q 80 222 160 232 T 360 234 L 360 280 L 0 280 Z');
     ground.setAttribute('fill', p.ground);
     svg.appendChild(ground);
 
     // The cow is rendered separately (renderPasture) so it can be dragged.
 }
 
-const PASTURE_COW_KEY = 'cowch-pasture-cow-v1';
-
-// ── MuMu, the pasture companion ──────────────────────────────────────────
-// MuMu is drawn fresh on every render so they can *grow* (scale up gently as
-// the user tends their IMAGINE areas) and wear small tokens of whatever the
-// user has been working on most — so the cow quietly reflects what's happening
-// in their life. Non-clinical, on-device: this just reads the same engagement
-// log that plants the flowers.
-
-// How wide MuMu's smile reads, by a 0..1 "joy" level.
-function cowMouth(joy) {
-    if (joy >= 0.66) return '<path d="M -3.6 7.3 Q 0 12.2 3.6 7.3" stroke="#C98A78" stroke-width="1.1" fill="none" stroke-linecap="round"/>';
-    if (joy >= 0.33) return '<path d="M -3 7.7 Q 0 10.7 3 7.7" stroke="#C98A78" stroke-width="1" fill="none" stroke-linecap="round"/>';
-    return '<path d="M -2.5 8 Q 0 9.6 2.5 8" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>';
-}
-
-// A small token MuMu wears/carries for an IMAGINE area the user is tending.
-// Letters match IMAGINE_PALETTE (I, M, A, G, I2, N, E). Coordinates are in
-// MuMu's local space (body centred ~ (2,8); head centred ~ (-13,-5)).
-function cowAccessory(letter) {
-    switch (letter) {
-        case 'I':  // I, Me, Myself — a little hand mirror (self-reflection)
-            return '<g transform="translate(1.5,-3)">' +
-                '<circle cx="0" cy="0" r="3.4" fill="#CFE6F4" stroke="#7A6253" stroke-width="0.8"/>' +
-                '<path d="M -1.7 -1.6 L 0.8 0.9" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round"/>' +
-                '<rect x="-0.8" y="3" width="1.6" height="4.6" rx="0.8" fill="#7A6253" transform="rotate(22 0 4)"/>' +
-            '</g>';
-        case 'M':  // Mindfulness — a calm lotus floating above, rising sparkles
-            return '<g transform="translate(-13,-18)">' +
-                '<ellipse cx="0" cy="1.6" rx="5" ry="2.1" fill="#5BB4E0" opacity="0.9"/>' +
-                '<ellipse cx="0" cy="0" rx="2.2" ry="4" fill="#9ED2EE"/>' +
-                '<ellipse cx="-3" cy="1" rx="2" ry="3" fill="#7FC0E4" transform="rotate(-32 -3 1)"/>' +
-                '<ellipse cx="3" cy="1" rx="2" ry="3" fill="#7FC0E4" transform="rotate(32 3 1)"/>' +
-                '<circle cx="0" cy="0.6" r="1.2" fill="#FFE08A"/>' +
-                '<circle cx="-5.5" cy="-3" r="0.7" fill="#5BB4E0"/><circle cx="5.5" cy="-4.2" r="0.6" fill="#5BB4E0"/>' +
-            '</g>';
-        case 'A':  // Acceptance — a leaf drifting by on the breeze
-            return '<g transform="translate(7,-15) rotate(18)">' +
-                '<path d="M0 0 Q5 -4.6 10 0 Q5 4.6 0 0 Z" fill="#7CC59A" stroke="#4E9E72" stroke-width="0.5"/>' +
-                '<path d="M1.6 0 H8.4" stroke="#4E9E72" stroke-width="0.5"/>' +
-            '</g>';
-        case 'G':  // Gratitude — a little journal & pencil (pen and paper)
-            return '<g transform="translate(-25,14)">' +
-                '<rect x="0" y="0" width="9" height="7" rx="1" fill="#FFF6EC" stroke="#C9BCA9" stroke-width="0.6"/>' +
-                '<line x1="1.6" y1="2.4" x2="7.4" y2="2.4" stroke="#C9BCA9" stroke-width="0.5"/>' +
-                '<line x1="1.6" y1="4.4" x2="7.4" y2="4.4" stroke="#C9BCA9" stroke-width="0.5"/>' +
-                '<g transform="rotate(40 10 3)"><rect x="9.2" y="-1.2" width="1.4" height="7.6" rx="0.6" fill="#F2A33C"/>' +
-                '<path d="M9.2 -1.2 L10.6 -1.2 L9.9 -2.7 Z" fill="#7A6253"/></g>' +
-            '</g>';
-        case 'I2': // Interactions — a smaller cow friend alongside
-            return '<g transform="translate(25,8) scale(0.55)">' +
-                '<ellipse cx="0" cy="8" rx="14" ry="9" fill="#FFFFFF"/>' +
-                '<ellipse cx="-5" cy="5" rx="5" ry="4" fill="#E0A3B4"/>' +
-                '<rect x="-7" y="14" width="2.6" height="6" rx="1.3" fill="#9E8576"/>' +
-                '<rect x="4" y="14" width="2.6" height="6" rx="1.3" fill="#9E8576"/>' +
-                '<g transform="translate(11,-3)">' +
-                    '<ellipse cx="-7" cy="-3" rx="3.4" ry="2.1" fill="#FFFFFF" transform="rotate(-38 -7 -3)"/>' +
-                    '<ellipse cx="7" cy="-3" rx="3.4" ry="2.1" fill="#FFFFFF" transform="rotate(38 7 -3)"/>' +
-                    '<circle cx="0" cy="0" r="8" fill="#FFFFFF"/>' +
-                    '<ellipse cx="-4" cy="-2" rx="3.4" ry="3.2" fill="#E0A3B4"/>' +
-                    '<circle cx="-3" cy="-0.5" r="1.4" fill="#3C2E28"/>' +
-                    '<circle cx="3.6" cy="-0.5" r="1.4" fill="#3C2E28"/>' +
-                    '<ellipse cx="0" cy="4.6" rx="5.4" ry="3.6" fill="#FFD9C7"/>' +
-                    '<path d="M -2 7 Q 0 8.4 2 7" stroke="#C98A78" stroke-width="0.9" fill="none" stroke-linecap="round"/>' +
-                '</g>' +
-            '</g>';
-        case 'N':  // Nurturing & play — a balloon bobbing on a string
-            return '<g>' +
-                '<path d="M 10 0 Q 17 -10 19 -16.5" stroke="#C98A78" stroke-width="0.5" fill="none"/>' +
-                '<ellipse cx="19" cy="-21" rx="5" ry="6" fill="#F2802E"/>' +
-                '<path d="M 17 -24.5 Q 18.8 -26.5 19 -22.5" fill="#FBC89A" opacity="0.8"/>' +
-                '<path d="M 19 -15.2 l -1.4 1.6 l 2.8 0 z" fill="#F2802E"/>' +
-            '</g>';
-        case 'E':  // Exploring — binoculars raised to the eyes
-            return '<g stroke="#3C2E28" stroke-width="0.7">' +
-                '<circle cx="-16.5" cy="-6" r="3.1" fill="#5B4636"/>' +
-                '<circle cx="-8.5" cy="-6" r="3.1" fill="#5B4636"/>' +
-                '<rect x="-14" y="-6.7" width="3" height="1.4" fill="#3C2E28" stroke="none"/>' +
-                '<circle cx="-16.5" cy="-6" r="1.3" fill="#9ED2EE" stroke="none"/>' +
-                '<circle cx="-8.5" cy="-6" r="1.3" fill="#9ED2EE" stroke="none"/>' +
-            '</g>';
-        default: return '';
-    }
-}
-
-// Build MuMu's artwork at a given joy level, wearing `accessories` (letters).
-function cowArt(joy, accessories) {
-    const acc = (accessories || []).map(cowAccessory).join('');
-    return `
-        <!-- body -->
-        <ellipse cx="2" cy="8" rx="17" ry="11" fill="#FFFFFF"/>
-        <ellipse cx="8" cy="5" rx="6" ry="5" fill="#A77B52"/>
-        <ellipse cx="-4" cy="11" rx="4" ry="3" fill="#A77B52"/>
-        <!-- legs -->
-        <rect x="-8" y="16" width="3" height="6" rx="1.5" fill="#7A6253"/>
-        <rect x="-1" y="17" width="3" height="6" rx="1.5" fill="#7A6253"/>
-        <rect x="7"  y="17" width="3" height="6" rx="1.5" fill="#7A6253"/>
-        <rect x="13" y="16" width="3" height="6" rx="1.5" fill="#7A6253"/>
-        <!-- tail -->
-        <path d="M 18 4 Q 24 6 22 13" stroke="#A77B52" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        <!-- head (front-facing, cute) -->
-        <g transform="translate(-13, -5)">
-            <!-- ears -->
-            <ellipse cx="-9" cy="-3" rx="4.2" ry="2.6" fill="#FFFFFF" transform="rotate(-38 -9 -3)"/>
-            <ellipse cx="-8.5" cy="-3" rx="2" ry="1.2" fill="#F7B2C5" transform="rotate(-38 -9 -3)"/>
-            <ellipse cx="9" cy="-3" rx="4.2" ry="2.6" fill="#FFFFFF" transform="rotate(38 9 -3)"/>
-            <ellipse cx="8.5" cy="-3" rx="2" ry="1.2" fill="#F7B2C5" transform="rotate(38 9 -3)"/>
-            <!-- little horns -->
-            <path d="M -3.5 -8 Q -4.5 -11 -2.5 -12" stroke="#E8C98A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-            <path d="M 3.5 -8 Q 4.5 -11 2.5 -12" stroke="#E8C98A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-            <!-- head -->
-            <circle cx="0" cy="0" r="9.5" fill="#FFFFFF"/>
-            <!-- brown patch over one eye -->
-            <ellipse cx="4.5" cy="-2" rx="4.2" ry="4" fill="#A77B52"/>
-            <!-- eyes -->
-            <circle cx="-3.5" cy="-1" r="1.7" fill="#3C2E28"/>
-            <circle cx="4.5" cy="-1" r="1.7" fill="#3C2E28"/>
-            <circle cx="-3" cy="-1.6" r="0.6" fill="#FFFFFF"/>
-            <circle cx="5" cy="-1.6" r="0.6" fill="#FFFFFF"/>
-            <!-- muzzle -->
-            <ellipse cx="0" cy="5.5" rx="6.5" ry="4.4" fill="#FFD9C7"/>
-            <ellipse cx="-2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
-            <ellipse cx="2.2" cy="5.5" rx="0.9" ry="1.1" fill="#C98A78"/>
-            <!-- smile (widens with joy) -->
-            ${cowMouth(joy)}
-        </g>
-        ${acc}`;
-}
+// ── the cow, the pasture companion ──────────────────────────────────────────
+// the cow's artwork now lives in buildCowArt() (above): a large, front-facing
+// cow that sits forward and takes on a different pose for whichever IMAGINE
+// area the user is viewing. The engagement readers that drive their growth and
+// default pose follow.
 
 // Read the IMAGINE engagement log into per-area counts, a total, and the
-// top areas the user is tending right now (drives MuMu's growth + tokens).
+// top areas the user is tending right now (drives the cow's growth + tokens).
 function cowEngagement() {
     const data = (typeof loadImagineEngagement === 'function') ? loadImagineEngagement() : {};
     const letters = ['I', 'M', 'A', 'G', 'I2', 'N', 'E'];
@@ -1002,7 +825,7 @@ function cowEngagement() {
         const n = Array.isArray(data[l]) ? data[l].length : 0;
         counts[l] = n; total += n;
     });
-    // Show the two most-tended areas, so MuMu stays readable, not cluttered.
+    // Show the two most-tended areas, so the cow stays readable, not cluttered.
     const top = letters.filter(l => counts[l] > 0)
         .sort((a, b) => counts[b] - counts[a])
         .slice(0, 2);
@@ -1015,129 +838,73 @@ function cowName() {
 }
 
 // Days the user has "spent a moment" with their cow (from the companion store).
-// Counts toward MuMu's growth too, so the care actions visibly grow them.
+// Counts toward the cow's growth too, so the care actions visibly grow them.
 function cowCareDays() {
     try { const c = JSON.parse(localStorage.getItem('cowch_calf')); return (c && c.careDays && c.careDays.length) || 0; } catch (_) { return 0; }
 }
 
-function loadCowPos() {
-    try {
-        const p = JSON.parse(localStorage.getItem(PASTURE_COW_KEY));
-        if (p && typeof p.x === 'number' && typeof p.y === 'number') return p;
-    } catch (_) {}
-    return { x: 62, y: 138 };
-}
-function saveCowPos(p) {
-    try { localStorage.setItem(PASTURE_COW_KEY, JSON.stringify(p)); } catch (_) {}
-}
-
-// Shared drag: g is positioned at translate(pos.x,pos.y); updates pos live
-// and calls onCommit(pos) when the drag ends.
-function makePastureDraggable(g, pos, svg, onCommit) {
-    let dragging = false, sP = null, sX = 0, sY = 0;
-    g.addEventListener('pointerdown', e => {
-        if (e.target.closest('.pasture-delete-badge')) return;
-        dragging = true;
-        g.classList.add('dragging');
-        try { g.setPointerCapture(e.pointerId); } catch (_) {}
-        sP = clientToPastureSvg(svg, e.clientX, e.clientY);
-        sX = pos.x; sY = pos.y;
-    });
-    g.addEventListener('pointermove', e => {
-        if (!dragging) return;
-        const p = clientToPastureSvg(svg, e.clientX, e.clientY);
-        pos.x = Math.max(14, Math.min(346, sX + (p.x - sP.x)));
-        pos.y = Math.max(104, Math.min(174, sY + (p.y - sP.y)));
-        g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
-    });
-    function endDrag(e) {
-        if (!dragging) return;
-        dragging = false;
-        g.classList.remove('dragging');
-        try { g.releasePointerCapture(e.pointerId); } catch (_) {}
-        if (onCommit) onCommit(pos);
-    }
-    g.addEventListener('pointerup', endDrag);
-    g.addEventListener('pointercancel', endDrag);
-}
+// the cow sits forward, centred in the pasture, in whichever IMAGINE pose is
+// active — drawn fresh each render so the pose, joy and gentle growth update.
+const PASTURE_COW_CX = 180;
+const PASTURE_COW_GROUND = 246;
 
 function buildCowNode(ctx) {
-    const pos = loadCowPos();
     const eng = cowEngagement();
     const name = cowName();
     const named = name && name !== 'Your cow';
+    const meta = poseForKey(getPastureActivePose());
+
     // Growth comes from showing up: IMAGINE engagement + days spent caring.
     const growth = eng.total + cowCareDays() * 2;
-    // Joy: grows with showing up, with a lift for the play/self areas the
-    // user linked to "a bigger smile".
-    const joy = Math.min(1, growth / 14 +
-        (eng.top.indexOf('N') !== -1 ? 0.25 : 0) +
-        (eng.top.indexOf('I') !== -1 ? 0.15 : 0));
-    // Growth: MuMu starts small and grows up to ~1.28× as the pasture fills.
-    const scale = 1 + Math.min(0.28, growth * 0.02);
+    const joy = Math.min(1, growth / 14 + 0.3);
+    // the cow is already large; grows a touch more as the user shows up.
+    const scale = 1 + Math.min(0.10, growth * 0.008);
 
     const g = document.createElementNS(NS_SVG, 'g');
-    g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+    g.setAttribute('transform', 'translate(' + PASTURE_COW_CX + ', ' + PASTURE_COW_GROUND + ')');
     g.classList.add('pasture-item', 'pasture-cow');
     g.setAttribute('role', 'img');
-    g.setAttribute('aria-label', (named ? name : 'Your cow') + ' grazing in your pasture');
-    if (ctx.editing) {
-        // Big transparent hit-area over the whole cow for easy grabbing
-        // (sized for a grown MuMu so it stays draggable).
-        const hit = document.createElementNS(NS_SVG, 'rect');
-        hit.setAttribute('x', -34); hit.setAttribute('y', -32);
-        hit.setAttribute('width', 70); hit.setAttribute('height', 60);
-        hit.setAttribute('fill', 'transparent');
-        hit.setAttribute('class', 'pasture-hit');
-        g.appendChild(hit);
-    }
+    g.setAttribute('aria-label', (named ? name : 'Your cow') + ' — ' + meta.label);
+
     const art = document.createElementNS(NS_SVG, 'g');
-    art.setAttribute('transform', `scale(${scale.toFixed(3)})`);
-    art.innerHTML = cowArt(joy, eng.top);
+    art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
+    art.innerHTML = buildCowArt(meta.pose, joy, loadGratitudeWords());
     g.appendChild(art);
 
-    // The cow IS the user's named companion — show their name on a little name
-    // tag beneath them so the pasture cow and the companion above are one.
+    // The cow IS the user's named companion — a little name tag beneath them.
     if (named) {
         const t = document.createElementNS(NS_SVG, 'text');
-        t.setAttribute('x', (2 * scale).toFixed(1));
-        t.setAttribute('y', (24 * scale + 11).toFixed(1));
+        t.setAttribute('x', '0');
+        t.setAttribute('y', '24');
         t.setAttribute('text-anchor', 'middle');
         t.setAttribute('font-family', 'Gabarito, system-ui, sans-serif');
-        t.setAttribute('font-size', '9');
+        t.setAttribute('font-size', '12');
         t.setAttribute('font-weight', '800');
         t.setAttribute('fill', '#5B4636');
         t.setAttribute('stroke', '#FFF6EC');
-        t.setAttribute('stroke-width', '2.4');
+        t.setAttribute('stroke-width', '3');
         t.setAttribute('paint-order', 'stroke');
         t.setAttribute('class', 'pasture-cow-name');
         t.textContent = name;
         g.appendChild(t);
     }
 
-    if (ctx.editing) {
-        g.classList.add('editing');
-        makePastureDraggable(g, pos, ctx.svg, saveCowPos);
-    } else {
-        // Tap the cow for a gentle hello (a little heart floats up).
-        g.style.cursor = 'pointer';
-        g.addEventListener('click', () => petPastureCow(g, scale));
-    }
+    // Tap the cow for a gentle hello (a little heart floats up).
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => petPastureCow(g, scale));
     return g;
 }
 
-// A light, pressure-free delight: tapping MuMu floats a heart up from them.
+// A light, pressure-free delight: tapping the cow floats a heart up from them.
 function petPastureCow(g, scale) {
-    if (pastureEditing) return;
     const t = document.createElementNS(NS_SVG, 'text');
-    const x = (2 * scale).toFixed(1);
-    t.setAttribute('x', x);
-    t.setAttribute('y', -12);
+    t.setAttribute('x', '0');
+    t.setAttribute('y', '-150');
     t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('font-size', '13');
+    t.setAttribute('font-size', '20');
     t.textContent = '💛';
     const up = document.createElementNS(NS_SVG, 'animate');
-    up.setAttribute('attributeName', 'y'); up.setAttribute('from', '-12'); up.setAttribute('to', '-30');
+    up.setAttribute('attributeName', 'y'); up.setAttribute('from', '-150'); up.setAttribute('to', '-186');
     up.setAttribute('dur', '0.8s'); up.setAttribute('fill', 'freeze');
     const fade = document.createElementNS(NS_SVG, 'animate');
     fade.setAttribute('attributeName', 'opacity'); fade.setAttribute('from', '1'); fade.setAttribute('to', '0');
@@ -1147,196 +914,64 @@ function petPastureCow(g, scale) {
     setTimeout(() => { try { g.removeChild(t); } catch (_) {} }, 820);
 }
 
-let pastureEditing = false;
-
-function buildPastureItemNode(item, ctx) {
-    // ctx: { editing, svg, items, onDelete }
-    const g = document.createElementNS(NS_SVG, 'g');
-    g.setAttribute('transform', `translate(${item.x}, ${item.y})`);
-    g.classList.add('pasture-item');
-    g.dataset.id = item.id;
-
-    // In edit mode, a transparent hit-area gives a large, reliable grab
-    // target (the actual petals/blades/trunk are thin and hard to hit).
-    if (ctx.editing) {
-        const hit = document.createElementNS(NS_SVG, 'rect');
-        const h = item.type === 'tree' ? 40 : (item.type === 'grass' ? 24 : 28);
-        hit.setAttribute('x', -14);
-        hit.setAttribute('y', -h);
-        hit.setAttribute('width', 28);
-        hit.setAttribute('height', h + 6);
-        hit.setAttribute('fill', 'transparent');
-        hit.setAttribute('class', 'pasture-hit');
-        g.appendChild(hit);
-    }
-
-    if (item.type === 'tree') drawTree(g, item);
-    else if (item.type === 'grass') drawGrass(g, item);
-    else if (item.type === 'bird') drawBird(g, item);
-    else if (item.type === 'ladybird') drawLadybird(g, item);
-    else if (item.type === 'hedgehog') drawHedgehog(g, item);
-    else drawFlower(g, item);
-
-    if (ctx.editing) {
-        g.classList.add('editing');
-
-        // Delete badge floats above the item
-        const badge = document.createElementNS(NS_SVG, 'g');
-        badge.setAttribute('class', 'pasture-delete-badge');
-        let topY = -26;
-        if (item.type === 'tree') topY = -38;
-        else if (item.type === 'grass') topY = -22;
-        else if (item.type === 'bird') topY = -24;
-        else if (item.type === 'hedgehog') topY = -16;
-        else if (item.type === 'ladybird') topY = -18;
-        badge.setAttribute('transform', `translate(8, ${topY})`);
-        const bc = document.createElementNS(NS_SVG, 'circle');
-        bc.setAttribute('cx', 0); bc.setAttribute('cy', 0); bc.setAttribute('r', 7);
-        bc.setAttribute('fill', '#E35B32');
-        const bx = document.createElementNS(NS_SVG, 'text');
-        bx.setAttribute('x', 0); bx.setAttribute('y', 3.5);
-        bx.setAttribute('text-anchor', 'middle');
-        bx.setAttribute('fill', '#fff');
-        bx.setAttribute('font-size', '11');
-        bx.setAttribute('font-weight', '900');
-        bx.textContent = '×';
-        badge.appendChild(bc); badge.appendChild(bx);
-        badge.addEventListener('pointerdown', e => { e.stopPropagation(); });
-        badge.addEventListener('click', e => {
-            e.stopPropagation();
-            ctx.onDelete(item.id);
-        });
-        g.appendChild(badge);
-
-        // Drag to move (shared helper saves the whole items array on commit)
-        makePastureDraggable(g, item, ctx.svg, () => savePastureItems(ctx.items));
-    }
-
-    return g;
-}
-
-// Ambient milestone scenery that sits BEHIND the planted items + cow.
-function renderPastureBackFeatures(svg, visitDays) {
-    // Month 2: a little stream across the lower pasture
-    if (visitDays >= 29) {
-        const stream = document.createElementNS(NS_SVG, 'path');
-        stream.setAttribute('d', 'M -10 150 Q 80 142 150 156 T 370 150 L 370 174 Q 220 166 150 172 Q 70 177 -10 168 Z');
-        stream.setAttribute('fill', '#9CD3E8');
-        stream.setAttribute('opacity', '0.9');
-        svg.appendChild(stream);
-        const shine = document.createElementNS(NS_SVG, 'path');
-        shine.setAttribute('d', 'M 20 156 Q 90 150 150 160 T 340 156');
-        shine.setAttribute('stroke', '#D6EEF7');
-        shine.setAttribute('stroke-width', '2');
-        shine.setAttribute('fill', 'none');
-        shine.setAttribute('opacity', '0.8');
-        svg.appendChild(shine);
-    }
-    // Week 4: a grand feature tree on the right
-    if (visitDays >= 22) {
-        const g = document.createElementNS(NS_SVG, 'g');
-        g.setAttribute('transform', 'translate(322, 108)');
-        g.innerHTML = `
-            <rect x="-4" y="-2" width="8" height="30" rx="3" fill="#6B4B30"/>
-            <circle cx="0" cy="-12" r="17" fill="#5FA46B"/>
-            <circle cx="-13" cy="-3" r="12" fill="#4F8F60"/>
-            <circle cx="13" cy="-3" r="12" fill="#6FB37A"/>
-            <circle cx="0" cy="-24" r="12" fill="#76B47E"/>`;
-        svg.appendChild(g);
-    }
-    // Month 3: a birdhouse on a post, left side
-    if (visitDays >= 57) {
-        const g = document.createElementNS(NS_SVG, 'g');
-        g.setAttribute('transform', 'translate(36, 104)');
-        g.innerHTML = `
-            <rect x="-1.5" y="0" width="3" height="40" fill="#7A6253"/>
-            <polygon points="-13,-12 13,-12 0,-25" fill="#9B6B43"/>
-            <rect x="-11" y="-12" width="22" height="18" rx="2" fill="#C98A5E"/>
-            <circle cx="0" cy="-2" r="4" fill="#3C2E28"/>
-            <rect x="-1" y="6" width="2" height="6" fill="#7A6253"/>`;
-        svg.appendChild(g);
-    }
-}
-
-// Butterflies fly in FRONT of everything (week 3+).
-function renderPastureButterflies(svg, visitDays) {
-    if (visitDays < 15) return;
-    // Butterflies don't fly at night — let them rest with the user.
-    if (getPastureTimeOfDay() === 'night') return;
-    const spots = [{ x: 120, y: 66 }, { x: 250, y: 58 }, { x: 300, y: 92 }];
-    const colors = ['#F7B2C5', '#FFD56B', '#D9A6F0'];
-    const count = visitDays >= 29 ? 3 : 2;
-    for (let i = 0; i < count; i++) {
-        const s = spots[i];
-        const outer = document.createElementNS(NS_SVG, 'g');
-        outer.setAttribute('transform', `translate(${s.x}, ${s.y})`);
-        const inner = document.createElementNS(NS_SVG, 'g');
-        inner.setAttribute('class', 'pasture-butterfly');
-        inner.style.animationDelay = (i * 1.3) + 's';
-        const c = colors[i % colors.length];
-        inner.innerHTML = `
-            <ellipse cx="-2.6" cy="-1" rx="2.6" ry="3.4" fill="${c}"/>
-            <ellipse cx="2.6" cy="-1" rx="2.6" ry="3.4" fill="${c}"/>
-            <ellipse cx="-2.2" cy="2.5" rx="2" ry="2.4" fill="${c}" opacity="0.85"/>
-            <ellipse cx="2.2" cy="2.5" rx="2" ry="2.4" fill="${c}" opacity="0.85"/>
-            <line x1="0" y1="-3.5" x2="0" y2="3.5" stroke="#3C2E28" stroke-width="1"/>`;
-        outer.appendChild(inner);
-        svg.appendChild(outer);
-    }
-}
+// (The old planted-item nodes, milestone scenery and butterflies were removed
+//  when the pasture moved to telling progress through the cow and the IMAGINE
+//  icon row instead of nature.)
 
 function renderPasture() {
     const svg = document.getElementById('pasture-svg');
     if (!svg) return;
-    const items = loadPastureItems();
-    const visitDays = getPastureVisitDays();
+    const eng = cowEngagement();
     svg.innerHTML = '';
-    svg.classList.toggle('editing', pastureEditing);
+    // Backdrop only — no planted scenery. Brightness lifts with engagement.
+    buildPastureScenery(svg, Math.min(1, eng.total / 16));
+    // the cow, large and forward, in the active pose.
+    svg.appendChild(buildCowNode({ svg }));
+}
 
-    // Fuller pasture (more items) → brighter scenery, capped at 12.
-    buildPastureScenery(svg, Math.min(1, items.length / 12));
-
-    // Milestone scenery behind the cow + items.
-    renderPastureBackFeatures(svg, visitDays);
-
-    // Cow sits behind the planted items but is itself draggable in edit mode.
-    svg.appendChild(buildCowNode({ editing: pastureEditing, svg }));
-
-    // Draw back-to-front: smaller y (further back) first.
-    const ordered = items.slice().sort((a, b) => a.y - b.y);
-    const items_ref = items; // keep the array identity for drag-save
-    ordered.forEach((item, i) => {
-        const node = buildPastureItemNode(item, {
-            editing: pastureEditing,
-            svg,
-            items: items_ref,
-            onDelete: (id) => {
-                const next = loadPastureItems().filter(it => it.id !== id);
-                savePastureItems(next);
-                const countEl = document.getElementById('pasture-count');
-                if (countEl) countEl.textContent = next.length;
-                renderPasture();
-            }
+// The IMAGINE icon row beneath the cow — icons (not nature) showing where the
+// user's attention has gone. Tap one to put the cow into that pose.
+function renderPastureIcons() {
+    const row = document.getElementById('pasture-icons');
+    if (!row) return;
+    const eng = cowEngagement();
+    const active = getPastureActivePose();
+    row.innerHTML = '';
+    PASTURE_POSES.forEach(p => {
+        const n = eng.counts[p.key] || 0;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pasture-icon' + (p.key === active ? ' active' : '') + (n > 0 ? ' tended' : '');
+        btn.style.setProperty('--area', IMAGINE_PALETTE[p.key]);
+        btn.setAttribute('aria-pressed', p.key === active ? 'true' : 'false');
+        btn.setAttribute('aria-label', p.label + (n ? ' — tended ' + n + ' time' + (n === 1 ? '' : 's') : ' — not yet tended'));
+        btn.innerHTML = '<span class="pasture-icon-glyph">' + p.icon + '</span>' +
+                        (n > 0 ? '<span class="pasture-icon-count">' + n + '</span>' : '');
+        btn.addEventListener('click', () => {
+            setPastureActivePose(p.key);
+            renderPasture();
+            renderPastureIcons();
+            updatePasturePoseUI();
         });
-        node.style.animationDelay = (i * 0.04) + 's';
-        svg.appendChild(node);
+        row.appendChild(btn);
     });
+}
 
-    // Butterflies flutter in front of everything.
-    renderPastureButterflies(svg, visitDays);
+// Keep the blurb + gratitude controls in step with the active pose.
+function updatePasturePoseUI() {
+    const meta = poseForKey(getPastureActivePose());
+    const blurb = document.getElementById('pasture-blurb');
+    if (blurb) blurb.textContent = meta.blurb;
+    const grat = document.getElementById('pasture-gratitude');
+    if (grat) grat.hidden = (meta.key !== 'G');
 }
 
 function updatePastureUI() {
-    // The pasture now lives in its own panel; bail if that DOM isn't present.
+    // The pasture lives in its own panel; bail if that DOM isn't present.
     if (!document.getElementById('pasture-svg')) return;
-    const countEl = document.getElementById('pasture-count');
-    const blurb = document.getElementById('pasture-blurb');
-    const growNote = document.getElementById('pasture-grow-note');
-    const tallyEl = document.getElementById('pasture-tally');
-    const blockSub = document.getElementById('pasture-block-sub');
 
-    // One-time backfill: users who had a pasture before visit-day tracking
-    // get their counter seeded from their existing item count.
+    // One-time backfill: users who had a pasture before visit-day tracking get
+    // their counter seeded from their old item count.
     try {
         if (localStorage.getItem(PASTURE_VISITDAYS_KEY) === null) {
             const existing = loadPastureItems().length;
@@ -1344,57 +979,25 @@ function updatePastureUI() {
         }
     } catch (_) {}
 
-    // One-time rescue: nudge any item that's currently sitting on top of
-    // the cow off it (legacy pasture before the avoidance was added).
-    maybeRelocateCowCollisions();
+    maybeTickVisitDay();
 
-    const grown = maybeGrowPasture();
-    syncImagineFlowers();            // turn any new IMAGINE exercises into colour-coded birds + flowers
-    const items = loadPastureItems();
     const visitDays = getPastureVisitDays();
-    if (countEl) countEl.textContent = items.length;
-
-    // Keep the Your-Space entry block's subtitle in step with the garden.
-    if (blockSub) {
-        const n = items.length;
-        blockSub.textContent = n === 0
-            ? 'Something new appears for every step you take'
-            : n + (n === 1 ? ' thing' : ' things') + ' growing — tap to tend your garden';
-    }
-
-    if (growNote) {
-        // A freshly-crossed milestone takes priority over the daily grow note.
-        const milestoneNote = grown ? pendingPastureMilestoneNote(visitDays) : null;
-        if (milestoneNote) {
-            growNote.hidden = false;
-            growNote.textContent = milestoneNote;
-        } else if (grown) {
-            const labelByType = { flower: 'a new flower 🌸', tree: 'a little tree 🌳', grass: 'a tuft of grass 🌿', bird: 'a little bird 🐦', ladybird: 'a ladybird 🐞', hedgehog: 'a hedgehog 🦔' };
-            growNote.hidden = false;
-            growNote.textContent = 'Today your pasture grew ' + (labelByType[grown.item.type] || 'something new') + '!';
-        } else {
-            growNote.hidden = true;
-        }
-    }
-
-    if (blurb) {
-        if (items.length === 0) {
-            blurb.textContent = 'Every day you visit, something new grows here. Your first sprout appears today.';
-        } else if (items.length === 1) {
-            blurb.textContent = 'Your first sprout! Come back tomorrow and the pasture keeps growing.';
-        } else {
-            const next = PASTURE_MILESTONES.find(m => visitDays < m.days);
-            const nextHint = next ? ' Keep visiting — more appears as the weeks go by.' : '';
-            blurb.textContent = items.length + ' things growing. Tap “Rearrange” to move or remove anything.' + nextHint;
-        }
-    }
-
-    // Tally of distinct days the user has shown up.
+    const tallyEl = document.getElementById('pasture-tally');
     if (tallyEl) {
-        const n = Math.max(visitDays, items.length);
+        const n = Math.max(visitDays, 1);
         tallyEl.innerHTML = 'You have shown up <strong>' + n + '</strong> time' + (n === 1 ? '' : 's') + ' so far. Investing in yourself is good for you 🤩';
     }
 
+    // Keep the Your-Space entry block's subtitle in step.
+    const blockSub = document.getElementById('pasture-block-sub');
+    if (blockSub) {
+        blockSub.textContent = cowEngagement().total === 0
+            ? 'Meet your cow — see how you’re tending each part of you'
+            : 'See how your cow reflects what you’re tending';
+    }
+
+    renderPastureIcons();
+    updatePasturePoseUI();
     renderPasture();
 }
 window.updatePastureUI = updatePastureUI;
@@ -1431,19 +1034,53 @@ function updateYourSpaceGreeting() {
 }
 window.updateYourSpaceGreeting = updateYourSpaceGreeting;
 
-function setupPastureEdit() {
-    const btn = document.getElementById('pasture-edit-btn');
-    const hint = document.getElementById('pasture-edit-hint');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-        pastureEditing = !pastureEditing;
-        btn.classList.toggle('active', pastureEditing);
-        btn.textContent = pastureEditing ? '✓ Done' : '✥ Rearrange';
-        if (hint) hint.hidden = !pastureEditing;
-        renderPasture();
+// Gratitude pose controls: add / remove the thank-yous that float around the cow.
+function renderGratitudeChips() {
+    const wrap = document.getElementById('pasture-gratitude-list');
+    if (!wrap) return;
+    const words = loadGratitudeWords();
+    wrap.innerHTML = '';
+    words.forEach((w, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'pasture-grat-chip';
+        chip.textContent = w;
+        const x = document.createElement('button');
+        x.type = 'button';
+        x.className = 'pasture-grat-x';
+        x.setAttribute('aria-label', 'Remove ' + w);
+        x.textContent = '×';
+        x.addEventListener('click', () => {
+            const next = loadGratitudeWords();
+            next.splice(i, 1);
+            saveGratitudeWords(next);
+            renderGratitudeChips();
+            renderPasture();
+        });
+        chip.appendChild(x);
+        wrap.appendChild(chip);
     });
 }
-window.setupPastureEdit = setupPastureEdit;
+
+function setupPastureControls() {
+    const form = document.getElementById('pasture-gratitude-form');
+    const input = document.getElementById('pasture-gratitude-input');
+    if (form && !form.dataset.wired) {
+        form.dataset.wired = '1';
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const v = (input.value || '').trim();
+            if (!v) return;
+            const words = loadGratitudeWords();
+            words.push(v);
+            saveGratitudeWords(words);
+            input.value = '';
+            renderGratitudeChips();
+            renderPasture();
+        });
+    }
+    renderGratitudeChips();
+}
+window.setupPastureControls = setupPastureControls;
 
 
 // ============================================
@@ -1934,66 +1571,9 @@ function loadImagineEngagement() {
     } catch (_) { return {}; }
 }
 
-// High-water mark per area: the latest engagement timestamp already turned into
-// a flower, so each exercise plants exactly one flower (and we never replant
-// the same one even after the 30-day engagement log prunes it).
-const PASTURE_IMAGINE_HW_KEY = 'cowch-pasture-imagine-hw';
-const PASTURE_IMAGINE_CAP = 12;   // max flowers per area, to avoid overcrowding
-
-function loadPastureImagineHW() {
-    try {
-        const v = JSON.parse(localStorage.getItem(PASTURE_IMAGINE_HW_KEY) || '{}');
-        return (v && typeof v === 'object') ? v : {};
-    } catch (_) { return {}; }
-}
-
-// Turn any new IMAGINE engagements into colour-coded birds + flowers. Additive
-// only (items are never removed automatically) and capped per area. On a user's
-// first run after this lands, the high-water marks are empty, so their recent
-// history backfills into an initial bloom.
-function syncImagineFlowers() {
-    const data = loadImagineEngagement();
-    const hw = loadPastureImagineHW();
-    const items = loadPastureItems();
-    const existing = {};
-    items.forEach(it => { if (it.letter) existing[it.letter] = (existing[it.letter] || 0) + 1; });
-    const cowPos = (typeof loadCowPos === 'function') ? loadCowPos() : null;
-
-    let planted = 0, hwChanged = false;
-    Object.keys(IMAGINE_PALETTE).forEach(letter => {
-        const raw = Array.isArray(data[letter]) ? data[letter].filter(t => typeof t === 'number') : [];
-        if (!raw.length) return;
-        raw.sort((a, b) => a - b);
-        const fresh = raw.filter(t => t > (hw[letter] || 0));
-        if (!fresh.length) return;
-        hwChanged = true;
-        const already = existing[letter] || 0;
-        const room = Math.max(0, PASTURE_IMAGINE_CAP - already);
-        const toPlant = Math.min(fresh.length, room);
-        for (let i = 0; i < toPlant; i++) {
-            const pos = randomPasturePosition(items, cowPos);
-            // Mix it up: the first engagement in an area arrives as a bird in
-            // that area's colour (mindfulness → light blue, …) to catch the
-            // eye, then birds and flowers alternate so it never reads as a
-            // field of identical flowers. Both wear the IMAGINE colour.
-            const type = ((already + i) % 2 === 0) ? 'bird' : 'flower';
-            items.push({
-                id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36),
-                type: type,
-                letter: letter,
-                x: pos.x,
-                y: pos.y,
-                scale: 0.92 + Math.random() * 0.3,
-                addedAt: new Date().toISOString()
-            });
-            planted++;
-        }
-        hw[letter] = raw[raw.length - 1]; // advance past everything seen, even if capped
-    });
-    if (planted > 0) savePastureItems(items);
-    if (hwChanged) { try { localStorage.setItem(PASTURE_IMAGINE_HW_KEY, JSON.stringify(hw)); } catch (_) {} }
-    return planted;
-}
+// (The IMAGINE engagement → planted-flowers sync was removed: progress is now
+//  shown through the cow's pose and the IMAGINE icon row, read live from the same
+//  engagement log via cowEngagement(). loadImagineEngagement() stays below.)
 
 // The little colour key under the pasture, so it's clear which colour is which
 // part of IMAGINE.
@@ -4462,7 +4042,7 @@ function init() {
     setupDailyThought();
     updateYourSpaceGreeting();
     updatePastureUI();
-    setupPastureEdit();
+    setupPastureControls();
     setupPasturePanel();
     setupWeeklySummary();
     setupSummaryPanel();
