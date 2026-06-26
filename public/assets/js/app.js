@@ -475,35 +475,21 @@ function saveGratitudeWords(arr) {
 
 // Eyes by mood. 'happy' = joyful upward arcs; 'open' = round; 'closed' = serene.
 function cowEyes(style) {
-    // Three lashes flaring from the outer-upper corner of an eye (dir: -1 left, +1 right).
-    function lashes(cx, dir) {
-        const x = cx + dir * 6.5;
-        return '<path d="M ' + x + ' -8 q ' + (dir * 4) + ' -3.5 ' + (dir * 6) + ' -4.5" stroke="#3C2E28" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
-               '<path d="M ' + (x - dir * 1.5) + ' -10 q ' + (dir * 4) + ' -2.5 ' + (dir * 6) + ' -2" stroke="#3C2E28" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
-               '<path d="M ' + (x - dir * 3.5) + ' -11.5 q ' + (dir * 3.5) + ' -1.5 ' + (dir * 5) + ' -0.5" stroke="#3C2E28" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
-    }
     if (style === 'closed') {
-        return [-10, 10].map(function (cx, i) {
-            const dir = i === 0 ? -1 : 1;
-            return '<path d="M ' + (cx - 6.5) + ' -3 Q ' + cx + ' 3.5 ' + (cx + 6.5) + ' -3" stroke="#3C2E28" stroke-width="2.2" fill="none" stroke-linecap="round"/>' + lashes(cx, dir);
+        return [-11, 11].map(function (cx) {
+            return '<path d="M ' + (cx - 6) + ' -3 Q ' + cx + ' 3 ' + (cx + 6) + ' -3" stroke="#2B2B2B" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
         }).join('');
     }
     if (style === 'happy') {
-        return [-10, 10].map(function (cx, i) {
-            const dir = i === 0 ? -1 : 1;
-            return '<path d="M ' + (cx - 7) + ' -1 Q ' + cx + ' -11 ' + (cx + 7) + ' -1" stroke="#3C2E28" stroke-width="2.8" fill="none" stroke-linecap="round"/>' + lashes(cx, dir);
+        return [-11, 11].map(function (cx) {
+            return '<path d="M ' + (cx - 7) + ' -2 Q ' + cx + ' -11 ' + (cx + 7) + ' -2" stroke="#2B2B2B" stroke-width="3" fill="none" stroke-linecap="round"/>';
         }).join('');
     }
-    // open — big, round, sparkly
-    return [-10, 10].map(function (cx, i) {
-        const dir = i === 0 ? -1 : 1;
-        return '<ellipse cx="' + cx + '" cy="-3" rx="6.8" ry="8.2" fill="#FFFFFF"/>' +
-               '<ellipse cx="' + cx + '" cy="-2" rx="5.5" ry="6.8" fill="#3C2E28"/>' +
-               '<ellipse cx="' + cx + '" cy="-1.4" rx="3.6" ry="4.6" fill="#5A4632"/>' +
-               '<circle cx="' + (cx - 1.9) + '" cy="-5" r="2.2" fill="#FFFFFF"/>' +
-               '<circle cx="' + (cx + 1.9) + '" cy="0.8" r="1.05" fill="#FFFFFF" opacity="0.85"/>' +
-               '<path d="M ' + (cx - 6.4) + ' -8.6 Q ' + cx + ' -12 ' + (cx + 6.4) + ' -8.6" stroke="#3C2E28" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.65"/>' +
-               lashes(cx, dir);
+    // open — big glossy ovals, like the cow emoji's eyes
+    return [-11, 11].map(function (cx) {
+        return '<ellipse cx="' + cx + '" cy="-3" rx="5.8" ry="8" fill="#2B2B2B"/>' +
+               '<circle cx="' + (cx - 1.9) + '" cy="-6.4" r="2" fill="#FFFFFF"/>' +
+               '<circle cx="' + (cx + 1.8) + '" cy="0.4" r="0.9" fill="#FFFFFF" opacity="0.8"/>';
     }).join('');
 }
 
@@ -518,27 +504,36 @@ function cowGrin(style) {
 function cowHead(opts) {
     opts = opts || {};
     let s = '';
-    if (opts.glow) s += '<circle cx="0" cy="2" r="58" fill="#FFE7A0" opacity="0.4"/>';
-    s += '<ellipse cx="-44" cy="-4" rx="16" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2" transform="rotate(-30 -44 -4)"/>' +
-         '<ellipse cx="-44" cy="-4" rx="8" ry="4" fill="#F7B2C5" transform="rotate(-30 -44 -4)"/>' +
-         '<ellipse cx="44" cy="-4" rx="16" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2" transform="rotate(30 44 -4)"/>' +
-         '<ellipse cx="44" cy="-4" rx="8" ry="4" fill="#F7B2C5" transform="rotate(30 44 -4)"/>' +
-         '<path d="M -17 -30 Q -23 -44 -11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
-         '<path d="M 17 -30 Q 23 -44 11 -48" stroke="#E8C98A" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
-         '<ellipse cx="0" cy="1" rx="43" ry="41" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
-         '<path d="M -9 -34 Q -3 -48 1 -36 Q 5 -48 10 -35" stroke="#3E3A44" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
-    s += '<ellipse cx="-26" cy="12" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.75' : '0.5') + '"/>' +
-         '<ellipse cx="26" cy="12" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.75' : '0.5') + '"/>';
+    if (opts.glow) s += '<circle cx="0" cy="0" r="58" fill="#FFE7A0" opacity="0.4"/>';
+    // Ears (behind the face) — soft pink, out to the sides
+    s += '<ellipse cx="-42" cy="7" rx="14" ry="9" fill="#E89AA6" stroke="#D2818E" stroke-width="1" transform="rotate(26 -42 7)"/>' +
+         '<ellipse cx="-42" cy="7" rx="7" ry="4" fill="#C97683" transform="rotate(26 -42 7)"/>' +
+         '<ellipse cx="42" cy="7" rx="14" ry="9" fill="#E89AA6" stroke="#D2818E" stroke-width="1" transform="rotate(-26 42 7)"/>' +
+         '<ellipse cx="42" cy="7" rx="7" ry="4" fill="#C97683" transform="rotate(-26 42 7)"/>';
+    // Horns (behind the face) — small beige
+    s += '<path d="M -20 -32 Q -28 -43 -16 -47" stroke="#E8D2A6" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+         '<path d="M 20 -32 Q 28 -43 16 -47" stroke="#E8D2A6" stroke-width="5.5" fill="none" stroke-linecap="round"/>';
+    // Face base (white)
+    s += '<ellipse cx="0" cy="1" rx="43" ry="41" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>';
+    // Tan crown / hood with a softly wavy fringe — the emoji's signature top
+    s += '<path d="M -42 -13 Q -45 -33 -22 -43 Q 0 -49 22 -43 Q 45 -33 42 -13 Q 31 -11 22 -15 Q 11 -11 0 -14 Q -11 -11 -22 -15 Q -31 -11 -42 -13 Z" fill="#C98E5A"/>';
+    // Little brown forelock on the crown
+    s += '<path d="M -8 -40 Q -3 -52 1 -41 Q 5 -52 9 -39" stroke="#8A5A3A" stroke-width="3.6" fill="none" stroke-linecap="round"/>';
+    // Cheeks
+    s += '<ellipse cx="-27" cy="9" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.8' : '0.55') + '"/>' +
+         '<ellipse cx="27" cy="9" rx="7.5" ry="5" fill="#FFB3C1" opacity="' + (opts.blush ? '0.8' : '0.55') + '"/>';
+    // Eyes (reactive)
     s += cowEyes(opts.eyes || 'open');
-    s += '<ellipse cx="0" cy="21" rx="25" ry="17" fill="#FFD9C7"/>' +
-         '<ellipse cx="-8" cy="16" rx="5" ry="2.6" fill="#FFFFFF" opacity="0.4"/>' +
-         '<ellipse cx="-9" cy="20" rx="3.2" ry="4.4" fill="#C98A78"/>' +
-         '<ellipse cx="9" cy="20" rx="3.2" ry="4.4" fill="#C98A78"/>';
+    // Muzzle — big soft pink, with a shine and two nostrils
+    s += '<ellipse cx="0" cy="21" rx="24" ry="16.5" fill="#F2B2BE"/>' +
+         '<ellipse cx="-8" cy="15" rx="5" ry="2.6" fill="#FFFFFF" opacity="0.45"/>' +
+         '<ellipse cx="-8.5" cy="20" rx="2.6" ry="3.8" fill="#B97C86"/>' +
+         '<ellipse cx="8.5" cy="20" rx="2.6" ry="3.8" fill="#B97C86"/>';
     s += cowGrin(opts.mouth || 'smile');
     if (opts.glasses) {
         s += '<g stroke="#3C2E28" stroke-width="2.2" fill="rgba(160,210,240,0.32)" stroke-linecap="round">' +
-             '<circle cx="-10" cy="-3" r="9"/><circle cx="10" cy="-3" r="9"/>' +
-             '<path d="M -1 -3 H 1" fill="none"/><path d="M -19 -5 l -7 -3" fill="none"/><path d="M 19 -5 l 7 -3" fill="none"/>' +
+             '<circle cx="-11" cy="-3" r="9.5"/><circle cx="11" cy="-3" r="9.5"/>' +
+             '<path d="M -1.5 -3 H 1.5" fill="none"/><path d="M -20.5 -5 l -7 -3" fill="none"/><path d="M 20.5 -5 l 7 -3" fill="none"/>' +
              '</g>';
     }
     return s;
@@ -546,15 +541,14 @@ function cowHead(opts) {
 
 // The seated body, hind legs and tail — shared by every pose.
 function cowBody() {
-    return '<path d="M 56 -54 Q 80 -44 72 -14" stroke="#A77B52" stroke-width="3.2" fill="none" stroke-linecap="round"/>' +
-        '<circle cx="72" cy="-12" r="4.5" fill="#A77B52"/>' +
+    return '<path d="M 56 -54 Q 80 -44 72 -14" stroke="#C98E5A" stroke-width="3.2" fill="none" stroke-linecap="round"/>' +
+        '<path d="M 70 -16 q 7 3 3 9 q -5 2 -7 -3 q -1 -5 4 -6 Z" fill="#8A5A3A"/>' +
         '<path d="M -58 -4 Q -76 -64 -42 -104 Q 0 -132 42 -104 Q 76 -64 58 -4 Q 30 6 0 4 Q -30 6 -58 -4 Z" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.6"/>' +
-        '<path d="M -36 -58 Q -40 -40 -22 -34 Q -4 -30 0 -50 Q -2 -70 -20 -72 Q -36 -70 -36 -58 Z" fill="#3E3A44" opacity="0.92"/>' +
-        '<path d="M 16 -34 Q 12 -20 26 -16 Q 40 -14 42 -28 Q 42 -42 28 -42 Q 19 -42 16 -34 Z" fill="#3E3A44" opacity="0.9"/>' +
+        '<ellipse cx="0" cy="-26" rx="27" ry="30" fill="#FFF3E2" opacity="0.7"/>' +
         '<ellipse cx="-46" cy="-2" rx="15" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>' +
         '<ellipse cx="46" cy="-2" rx="15" ry="9" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>' +
-        '<path d="M -49 2 v 4 M -43 1 v 4" stroke="#C98A78" stroke-width="1.4" stroke-linecap="round"/>' +
-        '<path d="M 43 2 v 4 M 49 1 v 4" stroke="#C98A78" stroke-width="1.4" stroke-linecap="round"/>';
+        '<path d="M -49 2 v 4 M -43 1 v 4" stroke="#C98E5A" stroke-width="1.4" stroke-linecap="round"/>' +
+        '<path d="M 43 2 v 4 M 49 1 v 4" stroke="#C98E5A" stroke-width="1.4" stroke-linecap="round"/>';
 }
 
 // A foreleg from the shoulder to a hoof at (hx,hy). side = -1 left, +1 right.
@@ -641,43 +635,65 @@ function pastureTelescope(x, yGround) {
 // Build the cow's full artwork for a pose, at a given joy (0..1), drawn at the
 // group origin = seat on the ground.
 function buildCowArt(poseKey, joy, gratitudeWords) {
-    // The cow is the 🐮 emoji, big and centred. Each IMAGINE pose keeps its
-    // surrounding context (glow, lotus, crossed-out worries, a thank-you card,
-    // friends, a balloon, a telescope) so the pasture still mirrors what the
-    // user is tending.
-    let preBody = '', glow = '', front = '', extras = '';
+    let preBody = '', arms = '', headOpts = { eyes: 'open', mouth: 'smile' }, front = '', extras = '';
+
     switch (poseKey) {
         case 'selfcare':
-            glow = '<circle cx="0" cy="-104" r="92" fill="#FFE7A0" opacity="0.4"/>';
-            extras = pastureSparkles([[-72, -150], [72, -160], [-88, -84], [88, -96], [0, -206]]);
+            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
+            headOpts = { eyes: 'open', mouth: 'big', blush: true, glow: true };
+            extras = pastureSparkles([[-60, -150], [60, -160], [-72, -92], [72, -102], [0, -198]]);
             break;
         case 'mindfulness':
-            extras = pastureLotus(0, -204) + pastureSparkles([[-46, -186], [46, -194]]);
+            arms = '<path d="M -34 -2 Q 0 -24 34 -2" stroke="#FFFFFF" stroke-width="13" fill="none" stroke-linecap="round"/>' +
+                   '<path d="M 34 -2 Q 0 -20 -34 -2" stroke="#F1E5D8" stroke-width="11" fill="none" stroke-linecap="round" opacity="0.85"/>' +
+                   cowArm(-1, -40, -40) + cowArm(1, 40, -40) +
+                   '<circle cx="-40" cy="-45" r="3.4" fill="#FFE08A"/><circle cx="40" cy="-45" r="3.4" fill="#FFE08A"/>';
+            headOpts = { eyes: 'closed', mouth: 'calm' };
+            extras = pastureLotus(0, -200) + pastureSparkles([[-32, -184], [32, -192]]);
             break;
         case 'acceptance':
-            extras = pastureCantControl(-98, -150, 'cloud') + pastureCantControl(98, -150, 'people') + pastureCantControl(0, -208, 'clock');
+            arms = '<path d="M -30 -96 Q -14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<path d="M 30 -96 Q 14 -70 0 -56" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="0" cy="-58" rx="10" ry="13" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'closed', mouth: 'calm' };
+            extras = pastureCantControl(-90, -150, 'cloud') + pastureCantControl(90, -150, 'people') + pastureCantControl(0, -204, 'clock');
             break;
         case 'gratitude':
-            front = pastureThankCard(0, -34);
+            arms = cowArm(-1, -20, -44) + cowArm(1, 20, -44);
+            front = pastureThankCard(0, -50);
+            headOpts = { eyes: 'open', mouth: 'smile', blush: true };
             extras = pastureGratitudeFloat(gratitudeWords);
             break;
         case 'interactions':
-            preBody = '<text x="-106" y="-16" font-size="84" text-anchor="middle">🐮</text>' +
-                      '<text x="108" y="-8" font-size="72" text-anchor="middle">🐮</text>';
-            extras = '<text x="78" y="-150" font-size="22" text-anchor="middle">👋</text>';
+            preBody = pastureFriendCow(-100, 4, 0.6, '#F7B2C5') + pastureFriendCow(104, 8, 0.5, '#9ED2EE');
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 50 -112 56 -134" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="56" cy="-136" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'open', mouth: 'smile' };
+            extras = '<text x="66" y="-150" font-size="16" text-anchor="middle">👋</text>';
             break;
         case 'nurturing':
-            extras = pastureBalloon(58, -150);
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 46 -110 50 -126" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="50" cy="-128" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'open', mouth: 'big', blush: true };
+            extras = pastureBalloon(50, -128);
             break;
         case 'exploring':
-            extras = pastureMagnifier(60, -148) + pastureTelescope(-106, -10);
+            arms = cowArm(-1, -22, -34) +
+                   '<path d="M 30 -96 Q 46 -120 42 -142" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+                   '<ellipse cx="42" cy="-144" rx="8.5" ry="7" fill="#FFFFFF" stroke="#EADFD2" stroke-width="1.2"/>';
+            headOpts = { eyes: 'open', mouth: 'smile', glasses: true };
+            extras = pastureMagnifier(44, -150) + pastureTelescope(-96, -16);
             break;
         default:
-            break;
+            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
+            headOpts = { eyes: 'open', mouth: 'smile' };
     }
-    const cow = '<text x="0" y="-60" font-size="150" text-anchor="middle">🐮</text>';
-    return '<ellipse cx="0" cy="2" rx="70" ry="13" fill="#3C2E28" opacity="0.12"/>' +
-        glow + preBody + cow + front + extras;
+
+    return '<ellipse cx="0" cy="2" rx="66" ry="12" fill="#3C2E28" opacity="0.12"/>' + preBody + cowBody() + arms +
+        '<g transform="translate(0, -150)">' + cowHead(headOpts) + '</g>' +
+        front + extras;
 }
 
 function clientToPastureSvg(svg, clientX, clientY) {
