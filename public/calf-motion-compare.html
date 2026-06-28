@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Cowch calf — motion comparison</title>
+<style>
+  :root{
+    --cream:#F7F1E7; --coral:#F0916F; --pink:#FFB7D0; --ink:#3C2E28;
+    --green:#2D5C38; --card:#fff; --beige:#EFE2CC;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:#FAF6EE; padding:24px 16px 64px;
+  }
+  header{max-width:980px; margin:0 auto 8px}
+  h1{font-size:1.35rem; margin:0 0 4px}
+  .sub{color:#7a6b60; margin:0 0 18px; font-size:.95rem}
+  .grid{
+    max-width:980px; margin:0 auto; display:grid; gap:18px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  }
+  .card{
+    background:var(--card); border-radius:22px; padding:18px;
+    box-shadow:0 6px 24px rgba(60,46,40,.10); display:flex; flex-direction:column; gap:12px;
+  }
+  .card h2{font-size:1rem; margin:0; display:flex; align-items:center; gap:8px}
+  .badge{font-size:.7rem; font-weight:600; color:var(--green); background:#E5F0E8;
+    padding:2px 8px; border-radius:999px}
+  .stage{
+    position:relative; width:100%; aspect-ratio:1/1; border-radius:18px;
+    background:radial-gradient(circle at 50% 40%, #fff 0%, var(--beige) 100%);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .stage img, .stage video{width:100%; height:100%; object-fit:contain; display:block}
+  .missing{color:#9a8c80; font-size:.85rem; text-align:center; padding:0 16px}
+  .missing code{background:#f0e8da; padding:2px 6px; border-radius:6px; font-size:.78rem}
+  .meta{display:flex; justify-content:space-between; align-items:center; font-size:.82rem; color:#7a6b60}
+  .size{font-variant-numeric:tabular-nums}
+  .note{font-size:.82rem; color:#7a6b60; margin:2px 0 0}
+  .breathe{animation:breathe 4.2s ease-in-out infinite; transform-origin:50% 90%}
+  @keyframes breathe{
+    0%,100%{transform:translateY(0) scale(1)}
+    50%{transform:translateY(-2%) scale(1.025)}
+  }
+  details{max-width:980px; margin:26px auto 0; background:#fff; border-radius:16px;
+    padding:14px 18px; box-shadow:0 4px 16px rgba(60,46,40,.07)}
+  summary{cursor:pointer; font-weight:600}
+  pre{white-space:pre-wrap; background:#FAF6EE; padding:12px; border-radius:10px;
+    font-size:.82rem; line-height:1.45; margin:10px 0 0}
+  .controls{max-width:980px; margin:0 auto 18px; display:flex; gap:10px; flex-wrap:wrap}
+  .controls button{font:inherit; border:1px solid #e3d8c8; background:#fff; color:var(--ink);
+    padding:7px 14px; border-radius:999px; cursor:pointer}
+  .controls button.on{background:var(--coral); color:#fff; border-color:var(--coral)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐮 Cowch calf — motion comparison</h1>
+  <p class="sub">Same calf, three ways, on the real card background. Flip expressions below.
+    Static frames are live; drop a <code>.webp</code>/<code>.mp4</code> loop into
+    <code>/assets/calf/</code> to fill the motion cards.</p>
+</header>
+
+<div class="controls">
+  <span style="align-self:center;color:#7a6b60;font-size:.85rem">Expression:</span>
+  <button data-expr="sleepy">sleepy</button>
+  <button data-expr="content">content</button>
+  <button data-expr="happy" class="on">happy</button>
+  <button data-expr="beam">beam</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>1 · Static + CSS <span class="badge">~free</span></h2>
+    <div class="stage">
+      <img id="png" class="breathe" alt="">
+      <div class="missing" id="png-miss" hidden></div>
+    </div>
+    <div class="meta"><span>frame + CSS breathe</span><span class="size" id="png-size">—</span></div>
+    <p class="note">The shipped still frame with a gentle breathe/scale loop. No extra assets.</p>
+  </div>
+
+  <div class="card">
+    <h2>2 · Animated WebP <span class="badge">light</span></h2>
+    <div class="stage">
+      <img id="webp" alt="">
+      <div class="missing" id="webp-miss" hidden></div>
+    </div>
+    <div class="meta"><span>looping -loop.webp</span><span class="size" id="webp-size">—</span></div>
+    <p class="note">A seamless idle loop. Plays in an <code>&lt;img&gt;</code> — no app code change.</p>
+  </div>
+
+  <div class="card">
+    <h2>3 · Looping video <span class="badge">richest</span></h2>
+    <div class="stage">
+      <video id="mp4" autoplay loop muted playsinline></video>
+      <div class="missing" id="mp4-miss" hidden></div>
+    </div>
+    <div class="meta"><span>looping .mp4</span><span class="size" id="mp4-size">—</span></div>
+    <p class="note">Most alive, heaviest. Needs a <code>&lt;video&gt;</code> swap in calf.js.</p>
+  </div>
+</div>
+
+<details>
+  <summary>Image-to-video prompt (Veo / Kling / Runway) — seamless idle loop</summary>
+  <pre>Animate the attached cow-calf image into a seamless ~3-second looping idle.
+Keep the character, style, colours, framing and background 100% identical — do not
+change the art style or redraw the calf. Motion only: very subtle, calm breathing
+(soft rise and fall of the chest/body), one slow gentle blink, the faintest ear
+twitch. No camera movement, no zoom, no background change. The last frame must
+match the first frame exactly so it loops perfectly. Gentle, soothing, minimal —
+this is a calm wellbeing companion, not an energetic cartoon.</pre>
+  <p class="note">Export two ways to fill cards 2 &amp; 3: a looping <strong>&lt;expr&gt;-loop.webp</strong>
+    (smaller, plays in an &lt;img&gt;) and a looping muted <strong>&lt;expr&gt;.mp4</strong>.</p>
+</details>
+
+<script>
+  function paths(expr){
+    return {
+      png:  '/assets/calf/' + expr + '.webp',       // the shipped still frame
+      webp: '/assets/calf/' + expr + '-loop.webp',  // optional animated loop
+      mp4:  '/assets/calf/' + expr + '.mp4'         // optional video loop
+    };
+  }
+  function human(bytes){
+    if (bytes == null) return '—';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
+    return (bytes/1024/1024).toFixed(2) + ' MB';
+  }
+  async function weigh(url, el){
+    try{
+      var r = await fetch(url, {cache:'no-store'});
+      if (!r.ok) { el.textContent = '—'; return false; }
+      var b = await r.blob();
+      el.textContent = human(b.size);
+      return true;
+    }catch(_){ el.textContent = '—'; return false; }
+  }
+  async function setMedia(id, url, sizeId){
+    var node = document.getElementById(id);
+    var miss = document.getElementById(id + '-miss');
+    var ok = await weigh(url, document.getElementById(sizeId));
+    if (ok){
+      node.hidden = false; miss.hidden = true;
+      if (node.tagName === 'VIDEO'){ node.src = url; node.load(); node.play().catch(function(){}); }
+      else { node.src = url; }
+    } else {
+      node.hidden = true; miss.hidden = false;
+      miss.innerHTML = 'Not added yet —<br>drop <code>' + url.split('/').pop() + '</code> in';
+    }
+  }
+  function load(expr){
+    var p = paths(expr);
+    setMedia('png',  p.png,  'png-size');
+    setMedia('webp', p.webp, 'webp-size');
+    setMedia('mp4',  p.mp4,  'mp4-size');
+  }
+  document.querySelectorAll('.controls button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.controls button').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      load(b.dataset.expr);
+    });
+  });
+  load('happy');
+</script>
+</body>
+</html>

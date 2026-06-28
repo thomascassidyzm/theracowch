@@ -93,8 +93,48 @@
   }
 
   // ---------- calf artwork ----------
+  // The calf is drawn from a rendered frame (a 3D plush portrait, one per
+  // expression) when present, falling back to the inline SVG below if a frame
+  // is missing. Drop PNG/WebP into /assets/calf/ named per CALF_FRAMES. The
+  // four expressions double as the growth stages (see STAGES).
+  var CALF_FRAMES = {
+    sleepy:  '/assets/calf/sleepy.webp',   // Newborn / resting
+    content: '/assets/calf/content.webp',  // Finding their feet / calm
+    happy:   '/assets/calf/happy.webp',    // Bright & playful
+    beam:    '/assets/calf/beam.webp'      // Thriving / joyful
+  };
+
+  // Render the calf as an <img> of the rendered frame, with a graceful
+  // fallback: if the file 404s, the <img> swaps itself for the inline SVG.
+  function calfArt(expr, cls) {
+    var key = CALF_FRAMES[expr] ? expr : 'happy';
+    return '<img class="calf-img' + (cls ? ' ' + cls : '') + '" src="' + CALF_FRAMES[key] + '" ' +
+      'alt="" aria-hidden="true" draggable="false" data-expr="' + key + '" ' +
+      'style="width:100%;height:100%;object-fit:contain;display:block" ' +
+      "onerror=\"this.onerror=null;this.outerHTML=window.CowchCalf._svg(this.getAttribute('data-expr'));\">";
+  }
+
+  // Cross-fade the calf inside a container to a new expression — for live
+  // mood changes within a session, without re-rendering the whole card.
+  function setCalfExpr(container, expr) {
+    if (!container) return;
+    var next = document.createElement('div');
+    next.innerHTML = calfArt(expr);
+    next.style.cssText = 'position:absolute;inset:0;opacity:0;transition:opacity .45s ease';
+    if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+    container.appendChild(next);
+    requestAnimationFrame(function () { next.style.opacity = '1'; });
+    setTimeout(function () {
+      Array.prototype.slice.call(container.children).forEach(function (el) {
+        if (el !== next) { try { container.removeChild(el); } catch (_) {} }
+      });
+      next.style.position = ''; next.style.transition = '';
+    }, 500);
+  }
+
   // Chibi calf matching the mascot: cream body, coral patch + ears, pink
   // blush. `expr` swaps the eyes/mouth so the calf reads sleepy → beaming.
+  // Used as the automatic fallback when a rendered frame is absent.
   function calfSvg(expr) {
     var eyes, mouth = '<path d="M 92 118 Q 100 126 108 118" stroke="#3C2E28" stroke-width="3.2" fill="none" stroke-linecap="round"/>';
     if (expr === 'sleepy') {
@@ -231,7 +271,7 @@
   // Scene 2 — open the blanket / reveal the calf
   function sceneReveal() {
     render(
-      '<div class="calf-stage-art pop-in" id="calf-reveal" style="position:relative">' + calfSvg('sleepy') +
+      '<div class="calf-stage-art pop-in" id="calf-reveal" style="position:relative">' + calfArt('sleepy') +
         '<span class="calf-sparkle s1">✨</span><span class="calf-sparkle s2">🌿</span>' +
         '<span class="calf-sparkle s3">💛</span><span class="calf-sparkle s4">✨</span>' +
       '</div>' +
@@ -254,7 +294,7 @@
   // Scene 3 — name the calf
   function sceneNameCalf() {
     render(
-      '<div class="calf-stage-art gentle-float">' + calfSvg('content') + '</div>' +
+      '<div class="calf-stage-art gentle-float">' + calfArt('content') + '</div>' +
       '<h2>What shall we call them?</h2>' +
       '<p>Pick a name that makes you smile.</p>' +
       '<input class="calf-input" id="calf-name-input" type="text" maxlength="24" autocomplete="off" ' +
@@ -275,7 +315,7 @@
   // Scene 4 — your name
   function sceneYourName() {
     render(
-      '<div class="calf-stage-art gentle-float">' + calfSvg('happy') + '</div>' +
+      '<div class="calf-stage-art gentle-float">' + calfArt('happy') + '</div>' +
       '<h2>And what should ' + esc(draft.calfName) + ' call you?</h2>' +
       '<p>Just a first name or nickname is perfect.</p>' +
       '<input class="calf-input" id="calf-you-input" type="text" maxlength="24" autocomplete="given-name" ' +
@@ -333,7 +373,7 @@
         '<span class="ico">' + d.emoji + '</span><span>' + esc(d.label) + '</span></button>';
     }).join('');
     render(
-      '<div class="calf-stage-art gentle-float" style="width:120px;height:120px">' + calfSvg('happy') + '</div>' +
+      '<div class="calf-stage-art gentle-float" style="width:120px;height:120px">' + calfArt('happy') + '</div>' +
       '<h2>What would you like to grow together?</h2>' +
       '<p>Pick a few. We\'ll bring these to the top of your daily IMAGINE.</p>' +
       '<div class="calf-focus-grid">' + items + '</div>' +
@@ -389,7 +429,7 @@
     var name = draft.calfName || 'Your calf';
     var you = draft.userName ? (', ' + esc(draft.userName)) : '';
     render(
-      '<div class="calf-stage-art pop-in">' + calfSvg('beam') + '</div>' +
+      '<div class="calf-stage-art pop-in">' + calfArt('beam') + '</div>' +
       '<h2>' + esc(name) + ' is so glad to meet you' + you + '.</h2>' +
       '<p>You\'ll find ' + esc(name) + ' grazing in your Progress Pasture, over in Your Space. Spend a moment together whenever you like — there\'s no streak to keep up.</p>' +
       '<div class="calf-actions">' +
@@ -441,7 +481,7 @@
       slot.innerHTML =
         '<div class="calf-card calf-invite" id="calf-invite" role="button" tabindex="0" aria-label="Meet your calf">' +
           '<div class="calf-invite-row">' +
-            '<div class="calf-stage" aria-hidden="true">' + calfSvg('sleepy') + '</div>' +
+            '<div class="calf-stage" aria-hidden="true">' + calfArt('sleepy') + '</div>' +
             '<div class="calf-invite-text">' +
               '<strong>Meet your calf</strong>' +
               '<span>A little one is on the way — welcome them, and raise them alongside you.</span>' +
@@ -556,6 +596,10 @@
     isBorn: isBorn,
     renderHome: renderHome,
     care: recordCare,
+    // Live mood swap for a mounted calf (e.g. CowchCalf.setExpr(el, 'beam')).
+    setExpr: setCalfExpr,
+    // Inline-SVG fallback used by calfArt when a rendered frame is missing.
+    _svg: calfSvg,
     reset: function () { try { localStorage.removeItem(KEY); localStorage.removeItem(SKIP_KEY); } catch (_) {} renderHome(); }
   };
 })();
