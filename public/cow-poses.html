@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Cowch — full-body poses 🐮</title>
+<style>
+  :root{ --ink:#3C2E28; --muted:#7a6b60; --coral:#F0916F; --green:#2D5C38; }
+  *{box-sizing:border-box}
+  body{margin:0; font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:#FAF6EE; padding:26px 16px 70px}
+  .wrap{max-width:920px; margin:0 auto}
+  h1{font-size:1.4rem; margin:0 0 4px}
+  .lede{color:var(--muted); margin:0 0 6px}
+  .hi{background:#FFF3E0; border:1px solid #F3D9B0; border-radius:14px; padding:12px 16px;
+    margin:14px 0 22px; font-size:.92rem}
+
+  .bgbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 18px}
+  .bgbar span{font-size:.85rem; color:var(--muted); margin-right:4px}
+  .bgbar button{font:inherit; font-size:.85rem; border:1px solid #e3dccb; background:#fff;
+    padding:6px 13px; border-radius:999px; cursor:pointer}
+  .bgbar button.on{background:var(--green); color:#fff; border-color:var(--green)}
+
+  .grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .cell{background:#fff; border-radius:18px; padding:12px; box-shadow:0 6px 22px rgba(60,46,40,.09)}
+  .frame{position:relative; width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center}
+  .frame img{width:100%; height:100%; object-fit:contain; display:block}
+  .bg-pale{background:#efe3cf} .bg-white{background:#fff}
+  .bg-meadow{background:linear-gradient(#bfe3f2 0,#d7eef0 46%,#cfeac0 47%,#a9d97f 100%)}
+  .bg-checker{background:linear-gradient(45deg,#e4e4e4 25%,transparent 25%),
+    linear-gradient(-45deg,#e4e4e4 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#e4e4e4 75%),
+    linear-gradient(-45deg,transparent 75%,#e4e4e4 75%);
+    background-size:18px 18px; background-position:0 0,0 9px,9px -9px,-9px 0; background-color:#fff}
+  .miss{color:#9a8c80; font-size:.82rem; text-align:center; padding:0 12px}
+  .miss code{background:#f0e8da; padding:2px 6px; border-radius:6px; font-size:.76rem}
+  .cap{text-align:center; margin:9px 0 1px; font-weight:700; font-size:.95rem}
+  .cap small{display:block; font-weight:400; color:var(--muted); font-size:.78rem}
+  .foot{color:var(--muted); font-size:.84rem; margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐮 Full-body cow — pose review</h1>
+  <p class="lede">As poses are generated, they appear here. Empty slots show the filename to drop in.</p>
+  <div class="hi">Naming: save each as <code>/assets/calf/poses/&lt;name&gt;.webp</code> (or .png) —
+    backgrounds can be cut transparent afterwards. Use the background switcher to see how each
+    pose sits on a card, the meadow, or transparent.</div>
+
+  <div class="bgbar" id="bgbar">
+    <span>Background:</span>
+    <button data-bg="bg-pale" class="on">Pale</button>
+    <button data-bg="bg-white">White</button>
+    <button data-bg="bg-meadow">Meadow</button>
+    <button data-bg="bg-checker">Transparent</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <p class="foot">This page is just for choosing. Once favourites are picked, they get cut out,
+    compressed, and wired into the app.</p>
+</div>
+
+<script>
+  var POSES = [
+    {key:'base',        title:'Base',        sub:'sitting, neutral'},
+    {key:'crosslegged', title:'Cross-legged',sub:'calm / self'},
+    {key:'meditate',    title:'Meditating',  sub:'mindfulness'},
+    {key:'namaste',     title:'Namaste',     sub:'acceptance / gratitude'},
+    {key:'wave',        title:'Waving',      sub:'connection'},
+    {key:'play',        title:'Playful',     sub:'nurturing / play'},
+    {key:'explore',     title:'Exploring',   sub:'looking out'},
+    {key:'rest',        title:'Resting',     sub:'lying down, sleepy'}
+  ];
+  var bg = 'bg-pale';
+
+  function srcFor(key, cb){
+    // prefer cut webp, then webp, then png
+    var tries = ['/assets/calf/poses/'+key+'-cut.webp',
+                 '/assets/calf/poses/'+key+'.webp',
+                 '/assets/calf/poses/'+key+'.png'];
+    var i=0;
+    (function next(){
+      if(i>=tries.length){ cb(null); return; }
+      var u=tries[i++];
+      fetch(u,{method:'HEAD',cache:'no-store'}).then(function(r){ r.ok?cb(u):next(); }).catch(next);
+    })();
+  }
+  function render(){
+    var grid=document.getElementById('grid'); grid.innerHTML='';
+    POSES.forEach(function(p){
+      var cell=document.createElement('div'); cell.className='cell';
+      cell.innerHTML='<div class="frame '+bg+'"><div class="miss">…</div></div>'+
+        '<div class="cap">'+p.title+'<small>'+p.sub+'</small></div>';
+      grid.appendChild(cell);
+      var frame=cell.querySelector('.frame');
+      srcFor(p.key, function(u){
+        if(u){ frame.innerHTML='<img src="'+u+'" alt="'+p.title+'">'; }
+        else { frame.innerHTML='<div class="miss">drop<br><code>'+p.key+'.webp</code></div>'; }
+      });
+    });
+  }
+  document.querySelectorAll('#bgbar button').forEach(function(b){
+    b.onclick=function(){
+      document.querySelectorAll('#bgbar button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on'); bg=b.dataset.bg; render();
+    };
+  });
+  render();
+</script>
+</body>
+</html>
