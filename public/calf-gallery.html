@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Cowch — new calf, for Mandy 🐮</title>
+<style>
+  :root{ --ink:#3C2E28; --muted:#7a6b60; --coral:#F0916F; --green:#2D5C38; }
+  *{box-sizing:border-box}
+  body{margin:0; font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:#FAF6EE; padding:28px 18px 80px}
+  .wrap{max-width:920px; margin:0 auto}
+  h1{font-size:1.6rem; margin:0 0 6px}
+  .lede{color:var(--muted); margin:0 0 8px; font-size:1.02rem}
+  .hi{background:#FFF3E0; border:1px solid #F3D9B0; border-radius:14px; padding:12px 16px;
+    margin:14px 0 26px; font-size:.95rem}
+  h2{font-size:1.15rem; margin:30px 0 10px}
+
+  /* background switcher */
+  .bgbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:6px 0 18px}
+  .bgbar span{font-size:.85rem; color:var(--muted); margin-right:4px}
+  .bgbar button{font:inherit; font-size:.85rem; border:1px solid #e3dccb; background:#fff;
+    padding:6px 13px; border-radius:999px; cursor:pointer}
+  .bgbar button.on{background:var(--green); color:#fff; border-color:var(--green)}
+  .modebar{display:flex; gap:8px; margin:0 0 16px}
+  .modebar button{font:inherit; font-size:.85rem; border:1px solid #e3dccb; background:#fff;
+    padding:6px 13px; border-radius:999px; cursor:pointer}
+  .modebar button.on{background:var(--coral); color:#fff; border-color:var(--coral)}
+
+  .grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .cell{background:#fff; border-radius:20px; padding:14px; box-shadow:0 6px 22px rgba(60,46,40,.09)}
+  .frame{position:relative; width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center}
+  .frame img{width:100%; height:100%; object-fit:contain; display:block}
+  /* background options applied to .frame */
+  .bg-original{background:#e9dcc4}
+  .bg-white{background:#ffffff}
+  .bg-cream{background:#F7F1E7}
+  .bg-meadow{background:linear-gradient(#bfe3f2 0%,#d7eef0 46%,#cfeac0 47%,#a9d97f 100%)}
+  .bg-checker{background:
+    linear-gradient(45deg,#e4e4e4 25%,transparent 25%),
+    linear-gradient(-45deg,#e4e4e4 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#e4e4e4 75%),
+    linear-gradient(-45deg,transparent 75%,#e4e4e4 75%);
+    background-size:18px 18px; background-position:0 0,0 9px,9px -9px,-9px 0px; background-color:#fff}
+  .cap{text-align:center; margin:10px 0 2px; font-weight:700}
+  .cap small{display:block; font-weight:400; color:var(--muted); font-size:.8rem; margin-top:2px}
+
+  .ask{background:#fff; border-radius:18px; padding:18px 20px; margin-top:34px;
+    box-shadow:0 6px 22px rgba(60,46,40,.09)}
+  .ask h2{margin-top:0}
+  .ask ol{margin:.4rem 0 0; padding-left:1.2rem}
+  .ask li{margin:.5rem 0}
+  .foot{color:var(--muted); font-size:.85rem; margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐮 A new look for your Cowch calf</h1>
+  <p class="lede">Hi Mandy — here are the new calf images, and a couple of choices for you.</p>
+  <div class="hi">Same character throughout, in four moods that the app can use as the calf
+    settles in and grows: <b>resting → calm → happy → beaming</b>. Have a flick through the
+    background options below, then there are a few quick questions at the bottom.</div>
+
+  <h2>The four moods</h2>
+  <div class="modebar" id="modebar">
+    <button data-mode="bg" class="on">With background</button>
+    <button data-mode="cut">Background removed</button>
+  </div>
+  <div class="bgbar" id="bgbar" hidden>
+    <span>Try it on:</span>
+    <button data-bg="bg-white" class="on">White</button>
+    <button data-bg="bg-cream">App cream</button>
+    <button data-bg="bg-meadow">Meadow</button>
+    <button data-bg="bg-checker">Transparent</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="ask">
+    <h2>What I'd love your call on</h2>
+    <ol>
+      <li><b>Do these feel right for Cowch?</b> The warmth, the face, the vibe.</li>
+      <li><b>Background on or off?</b> "With background" is ready to use as-is; "background removed"
+        lets the calf sit on any scene (the meadow, a card, the chat).</li>
+      <li><b>Where should the calf appear?</b> e.g. the chat avatar, the welcome when you first
+        meet your calf, your Progress Pasture, the app icon / share image.</li>
+      <li><b>Should the calf move?</b> We can give it a gentle breathing/blinking idle so it
+        feels alive — or keep it as a still picture.</li>
+    </ol>
+  </div>
+
+  <p class="foot">Nothing here is final — it's for you to steer. Whatever you pick, Tom &amp; Claude
+    will wire it in.</p>
+</div>
+
+<script>
+  var FRAMES = [
+    {key:'sleepy',  title:'Resting',  sub:'just arrived / winding down'},
+    {key:'content', title:'Calm',     sub:'settled, at ease'},
+    {key:'happy',   title:'Happy',    sub:'bright & engaged'},
+    {key:'beam',    title:'Beaming',  sub:'thriving, full of joy'}
+  ];
+  var state = {mode:'bg', bg:'bg-white'};
+
+  function render(){
+    var grid = document.getElementById('grid'); grid.innerHTML='';
+    FRAMES.forEach(function(f){
+      var src = state.mode==='cut' ? '/assets/calf/'+f.key+'-cut.webp' : '/assets/calf/'+f.key+'.webp';
+      var frameBg = state.mode==='cut' ? state.bg : 'bg-original';
+      var cell = document.createElement('div'); cell.className='cell';
+      cell.innerHTML =
+        '<div class="frame '+frameBg+'"><img src="'+src+'" alt="'+f.title+' calf"></div>'+
+        '<div class="cap">'+f.title+'<small>'+f.sub+'</small></div>';
+      grid.appendChild(cell);
+    });
+  }
+  document.querySelectorAll('#modebar button').forEach(function(b){
+    b.onclick=function(){
+      document.querySelectorAll('#modebar button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on'); state.mode=b.dataset.mode;
+      document.getElementById('bgbar').hidden = state.mode!=='cut';
+      render();
+    };
+  });
+  document.querySelectorAll('#bgbar button').forEach(function(b){
+    b.onclick=function(){
+      document.querySelectorAll('#bgbar button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on'); state.bg=b.dataset.bg; render();
+    };
+  });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Pasture — photoreal cow mockup</title>
+<style>
+  :root{
+    --ink:#3C2E28; --muted:#7a6b60; --green:#2D5C38;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:#EEF1E6; padding:22px 16px 64px; display:flex;
+    flex-direction:column; align-items:center;
+  }
+  h1{font-size:1.15rem; margin:0 0 2px}
+  .sub{color:var(--muted); margin:0 0 18px; font-size:.9rem; text-align:center}
+
+  .panel{width:100%; max-width:520px}
+  .panel h2{font-size:1.4rem; font-weight:800; margin:0 0 2px}
+  .panel .pasture-sub{color:var(--muted); margin:0 0 14px; font-size:.95rem}
+  .blurb{font-size:1rem; margin:0 0 12px}
+
+  /* ---- meadow scene ---- */
+  .scene{
+    position:relative; width:100%; aspect-ratio:1/0.82; border-radius:26px; overflow:hidden;
+    background:linear-gradient(#bfe3f2 0%, #d7eef0 46%, #cfeac0 47%, #bfe39f 100%);
+    box-shadow:0 8px 28px rgba(60,46,40,.12);
+  }
+  .sun{position:absolute; top:8%; left:9%; width:14%; aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle,#ffe48a 0%,#ffd34d 70%,rgba(255,211,77,0) 72%); opacity:.95}
+  .cloud{position:absolute; height:8%; aspect-ratio:2.2/1; background:#fff; border-radius:999px;
+    opacity:.92; filter:blur(.3px)}
+  .c1{top:11%; right:14%; transform:scale(1)}
+  .c2{top:16%; right:8%; transform:scale(.7)}
+  .c3{top:7%; right:22%; transform:scale(.55)}
+  .hill{position:absolute; bottom:0; left:0; width:100%; height:44%;
+    background:radial-gradient(120% 150% at 50% 100%, #a9d97f 0%, #93cf63 60%, #86c557 100%)}
+  /* glow halo + sparkles, colour driven by domain */
+  .halo{position:absolute; left:50%; top:54%; transform:translate(-50%,-50%);
+    width:62%; aspect-ratio:1; border-radius:50%; filter:blur(14px); opacity:.55;
+    background:var(--glow,#ffd34d); transition:background .4s ease}
+  .spark{position:absolute; font-size:1.1rem; opacity:.85; animation:tw 3s ease-in-out infinite}
+  .sp1{left:30%; top:32%} .sp2{right:28%; top:30%; animation-delay:.6s}
+  .sp3{right:24%; top:52%; animation-delay:1.1s} .sp4{left:26%; top:54%; animation-delay:1.6s}
+  @keyframes tw{0%,100%{opacity:.25; transform:scale(.8)}50%{opacity:.95; transform:scale(1.1)}}
+
+  .cow{
+    position:absolute; left:50%; bottom:6%; transform:translateX(-50%);
+    width:64%; aspect-ratio:1; z-index:2;
+    animation:breathe 4.4s ease-in-out infinite; transform-origin:50% 100%;
+  }
+  .cow img{width:100%; height:100%; object-fit:contain; display:block;
+    filter:drop-shadow(0 10px 10px rgba(60,46,40,.18))}
+  @keyframes breathe{0%,100%{transform:translateX(-50%) translateY(0) scale(1)}
+    50%{transform:translateX(-50%) translateY(-1.4%) scale(1.02)}}
+
+  /* ---- domain icon row ---- */
+  .icons{display:flex; justify-content:center; gap:8px; margin:14px 0 12px; flex-wrap:wrap}
+  .icons button{
+    width:46px; height:46px; border-radius:50%; border:2px solid #e3dccb; background:#fff;
+    font-size:1.25rem; cursor:pointer; display:grid; place-items:center; transition:.2s;
+    filter:grayscale(.5) opacity(.7);
+  }
+  .icons button.on{border-color:var(--glow,#ffd34d); box-shadow:0 0 0 4px color-mix(in srgb,var(--glow,#ffd34d) 30%,transparent);
+    filter:none; transform:translateY(-2px)}
+
+  .tally{font-size:.95rem; color:var(--ink); margin:6px 0 4px}
+  .tally b{color:var(--green)}
+  .explain{font-size:.86rem; color:var(--muted); margin:0}
+
+  /* growth + expression controls (mockup only) */
+  .controls{width:100%; max-width:520px; margin:18px 0 0; background:#fff; border-radius:16px;
+    padding:14px 16px; box-shadow:0 4px 16px rgba(60,46,40,.07)}
+  .controls label{font-size:.8rem; color:var(--muted); display:block; margin:8px 0 4px}
+  .controls input[type=range]{width:100%}
+  .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px}
+  .row button{font:inherit; font-size:.85rem; border:1px solid #e3dccb; background:#fff;
+    padding:6px 12px; border-radius:999px; cursor:pointer}
+  .row button.on{background:var(--green); color:#fff; border-color:var(--green)}
+  .tag{display:inline-block; font-size:.7rem; color:var(--muted); margin-top:6px}
+</style>
+</head>
+<body>
+  <h1>🐮 Progress Pasture — photoreal mockup</h1>
+  <p class="sub">Same meadow + reactivity, photoreal calf instead of the SVG. Tap a domain; drag growth.</p>
+
+  <div class="panel">
+    <h2>Your Progress Pasture</h2>
+    <p class="pasture-sub">Your cow reflects what you’re tending</p>
+    <p class="blurb" id="blurb">Your cow is glowing and grinning — a moment of looking after yourself.</p>
+
+    <div class="scene" id="scene">
+      <div class="sun"></div>
+      <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+      <div class="halo" id="halo"></div>
+      <span class="spark sp1">✨</span><span class="spark sp2">✨</span>
+      <span class="spark sp3">🌿</span><span class="spark sp4">💛</span>
+      <div class="hill"></div>
+      <div class="cow" id="cow"><img id="cow-img" alt=""></div>
+    </div>
+
+    <div class="icons" id="icons"></div>
+
+    <p class="tally">You have shown up <b id="visits">5</b> times so far. Investing in yourself is good for you 🤗</p>
+    <p class="explain">Your cow sits with you and reflects what you’re tending — the glow and the
+      chosen focus shift with each domain you tap.</p>
+  </div>
+
+  <div class="controls">
+    <label>Growth / joy (showing-up count) — drives expression & size</label>
+    <input type="range" id="growth" min="0" max="30" value="14">
+    <div class="row" id="expr-row"></div>
+    <span class="tag" id="expr-tag"></span>
+  </div>
+
+<script>
+  // domains: glow colour + blurb (pose is conveyed by glow + icon, not body shape)
+  var DOMAINS = [
+    {key:'I',  icon:'✨', glow:'#ff7fb0', blurb:'Your cow is glowing and grinning — a moment of looking after yourself.'},
+    {key:'M',  icon:'🧘', glow:'#7ec8ff', blurb:'Your cow settles into a calm, mindful breath with you.'},
+    {key:'A',  icon:'☮️', glow:'#b79cff', blurb:'Your cow rests easy — accepting what is, just for now.'},
+    {key:'G',  icon:'🙏', glow:'#ffd34d', blurb:'Your cow beams — soft with gratitude for the good things.'},
+    {key:'I2', icon:'👋', glow:'#ff9e6b', blurb:'Your cow looks up warmly — connection is nourishing.'},
+    {key:'N',  icon:'🎈', glow:'#8bd98b', blurb:'Your cow is playful and light — a little joy goes a long way.'},
+    {key:'E',  icon:'🔭', glow:'#6fe0d0', blurb:'Your cow is curious and bright — ready to explore.'}
+  ];
+  // expression frames (the four you made)
+  var FRAMES = {sleepy:'/assets/calf/sleepy.webp', content:'/assets/calf/content.webp',
+                happy:'/assets/calf/happy.webp', beam:'/assets/calf/beam.webp'};
+
+  var state = {domain:'I', expr:'beam'};
+
+  function exprForGrowth(g){
+    if (g < 4) return 'sleepy';
+    if (g < 12) return 'content';
+    if (g < 22) return 'happy';
+    return 'beam';
+  }
+
+  function renderIcons(){
+    var box = document.getElementById('icons'); box.innerHTML='';
+    DOMAINS.forEach(function(d){
+      var b=document.createElement('button');
+      b.textContent=d.icon; b.title=d.key;
+      if(d.key===state.domain){ b.className='on'; b.style.setProperty('--glow',d.glow); }
+      b.onclick=function(){ state.domain=d.key; apply(); };
+      box.appendChild(b);
+    });
+  }
+  function renderExprRow(){
+    var row=document.getElementById('expr-row'); row.innerHTML='';
+    ['sleepy','content','happy','beam'].forEach(function(e){
+      var b=document.createElement('button'); b.textContent=e;
+      if(e===state.expr) b.className='on';
+      b.onclick=function(){ state.expr=e; document.getElementById('growth').disabled=true;
+        document.getElementById('expr-tag').textContent='(manual expression — release growth slider to re-link)';
+        apply(); };
+      row.appendChild(b);
+    });
+  }
+  function apply(){
+    var d = DOMAINS.find(function(x){return x.key===state.domain;}) || DOMAINS[0];
+    document.documentElement.style.setProperty('--glow', d.glow);
+    document.getElementById('halo').style.setProperty('--glow', d.glow);
+    document.getElementById('blurb').textContent = d.blurb;
+    document.getElementById('cow-img').src = FRAMES[state.expr] || FRAMES.beam;
+    // size grows subtly with growth
+    var g = +document.getElementById('growth').value;
+    var scale = 1 + Math.min(0.12, g*0.006);
+    document.getElementById('cow').style.setProperty('--s', scale);
+    document.getElementById('cow').style.width = (60 + Math.min(10,g*0.5)) + '%';
+    renderIcons(); renderExprRow();
+  }
+  document.getElementById('growth').addEventListener('input', function(){
+    this.disabled=false;
+    var g=+this.value; document.getElementById('visits').textContent=Math.max(1,Math.round(g/2));
+    state.expr = exprForGrowth(g);
+    document.getElementById('expr-tag').textContent='(expression auto-linked to growth)';
+    apply();
+  });
+
+  state.expr = exprForGrowth(14);
+  document.getElementById('expr-tag').textContent='(expression auto-linked to growth)';
+  apply();
+</script>
+</body>
+</html>
