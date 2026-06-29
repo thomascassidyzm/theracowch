@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cowch — characters</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root { --ink: #4a3a35; --bg: #fbf3ee; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: Gabarito, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      padding: 28px 18px 64px;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; }
+    header h1 { font-size: 28px; margin: 0 0 6px; }
+    header p { margin: 0 0 4px; color: #6c5a52; max-width: 64ch; }
+    .note { font-size: 13px; color: #8a766c; margin-top: 10px; }
+    h2 { font-size: 18px; margin: 34px 0 4px; }
+    h2 + p { margin: 0 0 16px; color: #6c5a52; font-size: 14px; }
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    /* Card style as requested */
+    .cowch-card {
+      background: #fff7f2; border-radius: 24px; padding: 20px;
+      text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .cowch-card img { width: 180px; max-width: 100%; height: auto; object-fit: contain; }
+    .cowch-card h3 { font-size: 18px; margin-top: 12px; color: #4a3a35; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Cowch — character set 🐄</h1>
+      <p>The Cowch mascot: a soft, friendly cow companion with big sparkly eyes,
+         a pink nose and a gentle smile. Two styles below.</p>
+      <p class="note">Cowch is a non-clinical wellbeing companion — warm and
+         emotionally safe, never a therapist or a replacement for therapy.</p>
+    </header>
+
+    <h2>Rendered portraits</h2>
+    <p>Transparent cutouts from the source artwork — ready for hero images and app icons.</p>
+    <div class="grid" id="grid-render"></div>
+
+    <h2>Editable vector variants</h2>
+    <p>Clean SVG mascots — pastel, transparent, scale to any size, and easy to tweak
+       in code. Each variant is just a few feature toggles (grin, pink streak, earring, lashes).</p>
+    <div class="grid" id="grid-vector"></div>
+  </div>
+
+  <script src="/assets/cowch/cowch-characters.js"></script>
+</body>
+</html>

@@ -534,6 +534,21 @@ function cowHead(opts) {
              '<path d="M -1.5 -3 H 1.5" fill="none"/><path d="M -20.5 -5 l -7 -3" fill="none"/><path d="M 20.5 -5 l 7 -3" fill="none"/>' +
              '</g>';
     }
+    // Optional character touches (used by the Cowch character variants).
+    if (opts.lashes) {
+        // Slightly thicker outer lashes — a gentle "girly" look, never heavy.
+        s += '<g stroke="#2B2B2B" stroke-width="2" stroke-linecap="round" fill="none">' +
+             '<path d="M -19 -9 l -5 -4 M -17 -11 l -4 -5 M -14 -12 l -2 -5"/>' +
+             '<path d="M 19 -9 l 5 -4 M 17 -11 l 4 -5 M 14 -12 l 2 -5"/></g>';
+    }
+    if (opts.streak) {
+        // A soft pink streak swept through the fringe.
+        s += '<path d="M -12 -42 Q -2 -30 5 -15" stroke="#F77BA0" stroke-width="4.6" fill="none" stroke-linecap="round" opacity="0.92"/>';
+    }
+    if (opts.earring) {
+        // A small gold hoop with a heart charm on one ear.
+        s += '<circle cx="46" cy="18" r="3.4" fill="none" stroke="#E3B341" stroke-width="1.7"/>' + pastureHeart(46, 27, 0.42);
+    }
     return s;
 }
 
