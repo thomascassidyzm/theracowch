@@ -439,22 +439,20 @@ function poseForKey(key) {
     return PASTURE_POSES.find(p => p.key === key) || PASTURE_POSES[0];
 }
 
-// Which area the cow is currently showing. Defaults to whatever the user last
-// viewed; falls back to the area they have tended most, then to self-care.
+// Which area the cow is focused on (its base posture). Defaults to the area the
+// user tended most recently — so the pasture reflects what they're tending now —
+// then the most-tended area. Tapping an IMAGINE icon previews another area for
+// the session only (not persisted), so the cow returns to your latest focus on
+// the next visit.
 let pastureActivePose = null;
 function getPastureActivePose() {
     if (pastureActivePose) return pastureActivePose;
-    try {
-        const saved = localStorage.getItem(PASTURE_POSE_KEY);
-        if (saved && PASTURE_POSES.some(p => p.key === saved)) { pastureActivePose = saved; return saved; }
-    } catch (_) {}
-    const top = (typeof cowEngagement === 'function') ? cowEngagement().top[0] : null;
-    pastureActivePose = top || 'I';
-    return pastureActivePose;
+    const eng = (typeof cowEngagement === 'function') ? cowEngagement() : null;
+    if (eng) return eng.recent || eng.top[0] || 'I';
+    return 'I';
 }
 function setPastureActivePose(key) {
     pastureActivePose = key;
-    try { localStorage.setItem(PASTURE_POSE_KEY, key); } catch (_) {}
 }
 
 // The few thank-yous the user has written, shown floating around the cow in the
@@ -569,6 +567,15 @@ function pastureLotus(x, y) {
         '<ellipse cx="8" cy="2" rx="4.5" ry="8" fill="#7FC0E4" transform="rotate(34 8 2)"/>' +
         '<circle cx="0" cy="1" r="2.6" fill="#FFE08A"/></g>';
 }
+// A soft pink heart — the self-care token the cow cradles (or that floats in
+// when self-care is one of several things being tended).
+function pastureHeart(x, y, s) {
+    s = s || 1;
+    return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')">' +
+        '<path d="M 0 12 C -15 0 -13 -15 -4.5 -15 Q 0 -15 0 -9 Q 0 -15 4.5 -15 C 13 -15 15 0 0 12 Z" fill="#F77BA0" stroke="#E15B82" stroke-width="1.5"/>' +
+        '<ellipse cx="-5" cy="-6" rx="2.6" ry="4" fill="#FFFFFF" opacity="0.6" transform="rotate(-22 -5 -6)"/>' +
+        '</g>';
+}
 // A round token of something we cannot control, crossed out with a red ✗.
 function pastureCantControl(x, y, kind) {
     const glyph = kind === 'cloud' ? '🌧️' : (kind === 'people' ? '👥' : '⏰');
@@ -632,16 +639,19 @@ function pastureTelescope(x, yGround) {
             '<circle cx="33" cy="-1" r="4" fill="#9ED2EE"/></g></g>';
 }
 
-// Build the cow's full artwork for a pose, at a given joy (0..1), drawn at the
-// group origin = seat on the ground.
-function buildCowArt(poseKey, joy, gratitudeWords) {
+// The parts that make up one IMAGINE pose, in the cow's local space (origin =
+// seat on the ground, up = -y). Split out from the assembly so several poses can
+// be layered together (see buildCowArtCombined).
+function poseParts(poseKey, gratitudeWords) {
     let preBody = '', arms = '', headOpts = { eyes: 'open', mouth: 'smile' }, front = '', extras = '';
 
     switch (poseKey) {
         case 'selfcare':
-            arms = cowArm(-1, -22, -34) + cowArm(1, 22, -34);
+            // Cradling a heart at the chest — a moment of looking after yourself.
+            arms = cowArm(-1, -12, -50) + cowArm(1, 12, -50);
+            front = pastureHeart(0, -52, 1);
             headOpts = { eyes: 'open', mouth: 'big', blush: true, glow: true };
-            extras = pastureSparkles([[-60, -150], [60, -160], [-72, -92], [72, -102], [0, -198]]);
+            extras = pastureSparkles([[-60, -150], [60, -160], [-72, -92], [72, -102]]);
             break;
         case 'mindfulness':
             arms = '<path d="M -34 -2 Q 0 -24 34 -2" stroke="#FFFFFF" stroke-width="13" fill="none" stroke-linecap="round"/>' +
@@ -691,9 +701,57 @@ function buildCowArt(poseKey, joy, gratitudeWords) {
             headOpts = { eyes: 'open', mouth: 'smile' };
     }
 
-    return '<ellipse cx="0" cy="2" rx="66" ry="12" fill="#3C2E28" opacity="0.12"/>' + preBody + cowBody() + arms +
-        '<g transform="translate(0, -150)">' + cowHead(headOpts) + '</g>' +
-        front + extras;
+    return { preBody, arms, headOpts, front, extras };
+}
+
+// Assemble a parts object into the cow's full SVG: ground shadow, seated body,
+// arms, head, then any front/extra props.
+function assembleCow(parts) {
+    parts = parts || {};
+    return '<ellipse cx="0" cy="2" rx="66" ry="12" fill="#3C2E28" opacity="0.12"/>' +
+        (parts.preBody || '') + cowBody() + (parts.arms || '') +
+        '<g transform="translate(0, -150)">' + cowHead(parts.headOpts || {}) + '</g>' +
+        (parts.front || '') + (parts.extras || '');
+}
+
+// A single pose — kept for the character gallery and any single-pose use.
+function buildCowArt(poseKey, joy, gratitudeWords) {
+    return assembleCow(poseParts(poseKey, gratitudeWords));
+}
+
+// A compact, collision-safe prop for an area when it's a *secondary* thing the
+// user is tending — dropped into a free `slot` around the base pose so several
+// engagements can read at once without fighting the base cow's arms.
+function poseAccessory(letterKey, slot, gratitudeWords) {
+    switch (letterKey) {
+        case 'I':  return { front: pastureHeart(0, -46, 0.8), extras: pastureSparkles([[slot.x, slot.y]]) };
+        case 'M':  return { extras: pastureLotus(slot.x, slot.y) };
+        case 'A':  return { extras: pastureCantControl(slot.x, slot.y, 'cloud') };
+        case 'G':  return { extras: pastureThankCard(slot.x, slot.y) + pastureGratitudeFloat(gratitudeWords) };
+        case 'I2': return { preBody: pastureFriendCow(slot.side * 104, 8, 0.5, slot.side < 0 ? '#F7B2C5' : '#9ED2EE') };
+        case 'N':  return { extras: pastureBalloon(slot.x - 16, slot.y + 70) };
+        case 'E':  return { extras: pastureTelescope(slot.side * 96, -16) };
+        default:   return {};
+    }
+}
+
+// The cow showing several tended areas at once: a base posture from the primary
+// area, with compact props layered in for up to two others. `keys` are IMAGINE
+// letters, most-important first; an empty list gives the neutral resting cow.
+function buildCowArtCombined(keys, joy, gratitudeWords) {
+    keys = (keys || []).slice();
+    const primaryLetter = keys[0];
+    const primaryPose = primaryLetter ? poseForKey(primaryLetter).pose : 'default';
+    const parts = poseParts(primaryPose, gratitudeWords);
+    let pre = parts.preBody, front = parts.front, extras = parts.extras;
+    const slots = [{ x: 98, y: -86, side: 1 }, { x: -98, y: -86, side: -1 }];
+    keys.slice(1, 3).forEach(function (lk, i) {
+        const acc = poseAccessory(lk, slots[i % slots.length], gratitudeWords);
+        if (acc.preBody) pre += acc.preBody;
+        if (acc.front) front += acc.front;
+        if (acc.extras) extras += acc.extras;
+    });
+    return assembleCow({ preBody: pre, arms: parts.arms, headOpts: parts.headOpts, front: front, extras: extras });
 }
 
 function clientToPastureSvg(svg, clientX, clientY) {
@@ -827,17 +885,24 @@ function buildPastureScenery(svg, vit) {
 function cowEngagement() {
     const data = (typeof loadImagineEngagement === 'function') ? loadImagineEngagement() : {};
     const letters = ['I', 'M', 'A', 'G', 'I2', 'N', 'E'];
-    const counts = {};
+    const counts = {}, lastAt = {};
     let total = 0;
     letters.forEach(l => {
-        const n = Array.isArray(data[l]) ? data[l].length : 0;
-        counts[l] = n; total += n;
+        const arr = Array.isArray(data[l]) ? data[l] : [];
+        counts[l] = arr.length; total += arr.length;
+        // Entries are timestamps; the latest one marks how recently this area was tended.
+        lastAt[l] = arr.length ? Math.max.apply(null, arr.map(Number).filter(n => !isNaN(n)).concat(0)) : 0;
     });
-    // Show the two most-tended areas, so the cow stays readable, not cluttered.
-    const top = letters.filter(l => counts[l] > 0)
-        .sort((a, b) => counts[b] - counts[a])
-        .slice(0, 2);
-    return { counts, total, top };
+    // Areas the user is tending, most-tended first (recency breaks ties) so the
+    // cow can layer several at once while staying readable.
+    const tended = letters.filter(l => counts[l] > 0)
+        .sort((a, b) => (counts[b] - counts[a]) || (lastAt[b] - lastAt[a]));
+    const top = tended.slice(0, 2);
+    // The most recently tended area — the cow's default focus, so finishing a
+    // mindfulness moment settles the cow cross-legged.
+    let recent = null, best = 0;
+    letters.forEach(l => { if (lastAt[l] > best) { best = lastAt[l]; recent = l; } });
+    return { counts, total, top, tended, recent, lastAt };
 }
 
 function cowName() {
@@ -860,7 +925,9 @@ function buildCowNode(ctx) {
     const eng = cowEngagement();
     const name = cowName();
     const named = name && name !== 'Your cow';
-    const meta = poseForKey(getPastureActivePose());
+    const hasEngagement = eng.tended.length > 0;
+    const primaryKey = hasEngagement ? getPastureActivePose() : null;
+    const meta = hasEngagement ? poseForKey(primaryKey) : null;
 
     // Growth comes from showing up: IMAGINE engagement + days spent caring.
     const growth = eng.total + cowCareDays() * 2;
@@ -872,21 +939,18 @@ function buildCowNode(ctx) {
     g.setAttribute('transform', 'translate(' + PASTURE_COW_CX + ', ' + PASTURE_COW_GROUND + ')');
     g.classList.add('pasture-item', 'pasture-cow');
     g.setAttribute('role', 'img');
-    g.setAttribute('aria-label', (named ? name : 'Your cow') + ' — ' + meta.label);
+    g.setAttribute('aria-label', (named ? name : 'Your cow') + (meta ? ' — ' + meta.label : ' — resting in the pasture'));
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
-    // The pasture companion is a rendered portrait (cream cow with a pink fringe
-    // and a heart earring). Drawn from origin (the grass line) upward, with the
-    // lower chest tucked into the grass so the portrait reads as standing in the
-    // field. A soft shadow grounds them.
-    const COW_W = 172, COW_H = COW_W * 704 / 720;
-    art.innerHTML =
-        '<ellipse cx="0" cy="2" rx="' + (COW_W * 0.34).toFixed(1) + '" ry="7" fill="rgba(60,46,40,0.14)"/>' +
-        '<image href="/assets/calf/pasture-cow.webp" ' +
-            'x="' + (-COW_W / 2).toFixed(1) + '" y="' + (-COW_H + 6).toFixed(1) + '" ' +
-            'width="' + COW_W + '" height="' + COW_H.toFixed(1) + '" ' +
-            'preserveAspectRatio="xMidYMax meet" />';
+    // The cow reflects what you're tending: a base posture from the area you're
+    // focused on, with compact props layered in for the *other* areas you've
+    // tended — so several engagements read at once (e.g. a cross-legged, mindful
+    // cow that's also cradling a self-care heart). Built from composable SVG
+    // parts, which is what lets the poses genuinely combine.
+    const others = hasEngagement ? eng.tended.filter(k => k !== primaryKey).slice(0, 2) : [];
+    const keys = hasEngagement ? [primaryKey].concat(others) : [];
+    art.innerHTML = buildCowArtCombined(keys, joy, loadGratitudeWords());
     g.appendChild(art);
 
     // No name tag in the pasture — the cow stays unnamed here.
