@@ -876,7 +876,17 @@ function buildCowNode(ctx) {
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
-    art.innerHTML = buildCowArt(meta.pose, joy, loadGratitudeWords());
+    // The pasture companion is a rendered portrait (cream cow with a pink fringe
+    // and a heart earring). Drawn from origin (the grass line) upward, with the
+    // lower chest tucked into the grass so the portrait reads as standing in the
+    // field. A soft shadow grounds them.
+    const COW_W = 172, COW_H = COW_W * 704 / 720;
+    art.innerHTML =
+        '<ellipse cx="0" cy="2" rx="' + (COW_W * 0.34).toFixed(1) + '" ry="7" fill="rgba(60,46,40,0.14)"/>' +
+        '<image href="/assets/calf/pasture-cow.webp" ' +
+            'x="' + (-COW_W / 2).toFixed(1) + '" y="' + (-COW_H + 6).toFixed(1) + '" ' +
+            'width="' + COW_W + '" height="' + COW_H.toFixed(1) + '" ' +
+            'preserveAspectRatio="xMidYMax meet" />';
     g.appendChild(art);
 
     // No name tag in the pasture — the cow stays unnamed here.
