@@ -1134,7 +1134,7 @@ function updatePasturePoseUI() {
     const blurb = document.getElementById('pasture-blurb');
     if (blurb) {
         blurb.textContent = meta ? meta.blurb
-            : 'Your cow is settling in — keep showing up and tending the IMAGINE areas, and they’ll start striking poses that reflect what you tend.';
+            : 'Your cow is a reflection of your world. It’s settling in — keep showing up and tending the IMAGINE areas, and it’ll come to life with poses that mirror what you tend.';
     }
     const grat = document.getElementById('pasture-gratitude');
     if (grat) grat.hidden = (!meta || meta.key !== 'G');
@@ -1166,8 +1166,8 @@ function updatePastureUI() {
     const blockSub = document.getElementById('pasture-block-sub');
     if (blockSub) {
         blockSub.textContent = cowEngagement().total === 0
-            ? 'Meet your cow — see how you’re tending each part of you'
-            : 'See how your cow reflects what you’re tending';
+            ? 'Your cow is a reflection of your world — meet them and start tending each part of you'
+            : 'Your cow is a reflection of your world — see what you’re tending';
     }
 
     renderPastureIcons();
