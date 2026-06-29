@@ -786,7 +786,9 @@ const COW3D = {
     gratitude:    { src: '/assets/cowch/cowch-gratitude.webp',    aspect: 720 / 1114, h: 170 },
     interactions: { src: '/assets/cowch/cowch-interactions.webp', aspect: 820 / 608,  h: 150 },
     nurturing:    { src: '/assets/cowch/cowch-nurture.webp',      aspect: 720 / 888,  h: 158 },
-    exploring:    { src: '/assets/cowch/cowch-explore.webp',      aspect: 720 / 638,  h: 122 }
+    exploring:    { src: '/assets/cowch/cowch-explore.webp',      aspect: 720 / 638,  h: 122 },
+    // A mood pose, not an IMAGINE area: shown when the chat reads the user as low.
+    sad:          { src: '/assets/cowch/cowch-sad.webp',          aspect: 720 / 876,  h: 156 }
 };
 
 // A smaller rendered cow friend beside the main one (the Interactions area).
@@ -815,13 +817,20 @@ function cow3dToken(letterKey, baseName, h, w, slot, gratitudeWords) {
 // Build the rendered cow for the tended areas (letters, most important first):
 // the primary area picks the base pose (its own dedicated render), and the
 // other tended areas add a small token on top. An empty list = the standing cow.
-function buildCow3D(keys, gratitudeWords) {
+function buildCow3D(keys, gratitudeWords, baseOverride) {
     keys = (keys || []).slice(0, 3);
     const primary = keys[0];
     const poseName = primary ? poseForKey(primary).pose : null;
-    const baseName = (poseName && COW3D[poseName]) ? poseName : 'classic';
+    // A mood override (e.g. 'sad') shows that pose on its own — no props, no
+    // friend — so the cow simply sits with the feeling.
+    const baseName = (baseOverride && COW3D[baseOverride]) ? baseOverride
+        : ((poseName && COW3D[poseName]) ? poseName : 'classic');
     const b = COW3D[baseName], h = b.h, w = h * b.aspect;
     let s = '<ellipse cx="0" cy="3" rx="' + (w * 0.5).toFixed(1) + '" ry="8" fill="rgba(60,46,40,0.16)"/>';
+    if (baseOverride) {
+        return s + '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
+            '" width="' + w.toFixed(1) + '" height="' + h + '" preserveAspectRatio="xMidYMax meet"/>';
+    }
     // A friend cow renders behind the main one — unless the two-cow Interactions
     // render is already the base pose.
     if (keys.indexOf('I2') >= 0 && baseName !== 'interactions') s += cow3dFriend(-0.52 * w, 4);
@@ -1004,6 +1013,30 @@ function cowCareDays() {
 const PASTURE_COW_CX = 180;
 const PASTURE_COW_GROUND = 246;
 
+// The cow reflects the user's world, including the hard days. The chat reads the
+// user's mood (see api/chat.js) and stores it here; when it's 'low' the pasture
+// cow sits sad with them for a while, then gently eases back to its poses.
+const COWCH_MOOD_KEY = 'cowch_mood';
+const COWCH_MOOD_WINDOW_MS = 8 * 60 * 60 * 1000; // a low mood softens the cow for ~8h
+function pastureMood() {
+    try {
+        const m = JSON.parse(localStorage.getItem(COWCH_MOOD_KEY) || 'null');
+        if (m && m.mood === 'low' && (Date.now() - (m.at || 0)) < COWCH_MOOD_WINDOW_MS) return 'low';
+    } catch (_) {}
+    return null;
+}
+// Called from the chat when a reply comes back with the AI's mood read.
+window.recordCowchMood = function (mood) {
+    try { localStorage.setItem(COWCH_MOOD_KEY, JSON.stringify({ mood: String(mood || 'okay'), at: Date.now() })); } catch (_) {}
+    // If the pasture is on screen, let the cow update right away.
+    try {
+        if (document.getElementById('pasture-svg') && typeof renderPasture === 'function') {
+            renderPasture();
+            updatePasturePoseUI();
+        }
+    } catch (_) {}
+};
+
 // How "active" the user has been — this gates how expressive the cow is. Poses
 // are earned: a brand-new cow simply rests (level 0), starts striking a single
 // pose as the user shows up (level 1), and unlocks layered, combined poses once
@@ -1027,13 +1060,16 @@ function buildCowNode(ctx) {
     // IMAGINE icon previews a single pose at any level (an explicit peek).
     const level = pastureActivityLevel();
     const tapped = pastureActivePose != null;
+    // A low mood (read from the chat) takes priority over poses — unless the user
+    // is actively tapping an icon to look at a specific area.
+    const sad = !tapped && pastureMood() === 'low';
     const primaryKey = tapped ? pastureActivePose : (eng.tended.length ? getPastureActivePose() : null);
     let keys = [];
     if (primaryKey) {
         if (level >= 2) keys = [primaryKey].concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
         else if (level >= 1 || tapped) keys = [primaryKey];
     }
-    const meta = keys.length ? poseForKey(keys[0]) : null;
+    const meta = sad ? null : (keys.length ? poseForKey(keys[0]) : null);
 
     // Growth comes from showing up: IMAGINE engagement + days spent caring.
     const growth = eng.total + cowCareDays() * 2;
@@ -1045,13 +1081,14 @@ function buildCowNode(ctx) {
     g.setAttribute('transform', 'translate(' + PASTURE_COW_CX + ', ' + PASTURE_COW_GROUND + ')');
     g.classList.add('pasture-item', 'pasture-cow');
     g.setAttribute('role', 'img');
-    g.setAttribute('aria-label', (named ? name : 'Your cow') + (meta ? ' — ' + meta.label : ' — resting in the pasture'));
+    g.setAttribute('aria-label', (named ? name : 'Your cow') + (sad ? ' — feeling low, here with you' : (meta ? ' — ' + meta.label : ' — resting in the pasture')));
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
     // `keys` (chosen above by activity level) decides the pose: empty = resting,
     // one = a single pose, several = a combined pose with props layered on top.
-    art.innerHTML = buildCow3D(keys, loadGratitudeWords());
+    // A low mood overrides all of that with the cow simply sitting sad with you.
+    art.innerHTML = buildCow3D(keys, loadGratitudeWords(), sad ? 'sad' : null);
     g.appendChild(art);
 
     // No name tag in the pasture — the cow stays unnamed here.
@@ -1128,6 +1165,15 @@ function renderPastureIcons() {
 // cow is still resting (low activity, or nothing tended yet), show a gentle
 // "keep showing up" note instead of a pose blurb.
 function updatePasturePoseUI() {
+    // A low mood read from the chat: the cow sits sad with the user, and the
+    // blurb gently holds that, rather than describing a pose.
+    if (pastureActivePose == null && pastureMood() === 'low') {
+        const blurb = document.getElementById('pasture-blurb');
+        if (blurb) blurb.textContent = 'It’s okay to not be okay. Your cow is here, sitting with you. 💛';
+        const grat = document.getElementById('pasture-gratitude');
+        if (grat) grat.hidden = true;
+        return;
+    }
     const resting = pastureActivePose == null &&
         (pastureActivityLevel() < 1 || cowEngagement().tended.length === 0);
     const meta = resting ? null : poseForKey(getPastureActivePose());

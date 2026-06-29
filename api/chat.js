@@ -523,6 +523,22 @@ FORMATTING: Use markdown to structure your responses for better readability:
 
 Keep formatting subtle and purposeful - it should enhance clarity, not distract from the connection.`;
 
+    // Hidden mood read — lets the user's cow companion reflect how they're doing.
+    // The model appends one tag at the very end; the server strips it before the
+    // reply ever reaches the user, so it stays invisible.
+    systemPrompt += `
+
+==========================================================
+HIDDEN MOOD TAG (for the app only — never shown to the user)
+==========================================================
+At the very end of EVERY reply, on its own final line, output exactly one tag in this form:
+[[MOOD: x]]
+where x is your honest read of the USER'S current emotional state, chosen from:
+- low  — the user sounds sad, down, tearful, hopeless, grieving, or very anxious/distressed
+- okay — neutral, mixed, or settling
+- good — positive, lighter, hopeful, or content
+Rules: always include the tag; write nothing after it; never mention or explain it. The app strips it before the user sees your message, so it does NOT change your wording — write your reply normally, then add the tag on the final line.`;
+
     // Prepare conversation messages
     const messages = [
       { role: 'system', content: systemPrompt }
@@ -591,7 +607,14 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
     }
 
     const data = await response.json();
-    const aiResponse = data.content[0].text;
+    let aiResponse = data.content[0].text;
+
+    // Pull the hidden mood tag the model appended, then strip it so the user
+    // never sees it. Defaults to 'okay' if the tag is missing or malformed.
+    let mood = 'okay';
+    const moodMatch = aiResponse.match(/\[\[\s*MOOD\s*:\s*(low|okay|good)\s*\]\]/i);
+    if (moodMatch) mood = moodMatch[1].toLowerCase();
+    aiResponse = aiResponse.replace(/\[\[\s*MOOD\s*:[^\]]*\]\]/ig, '').trim();
 
     // Enhanced pattern recognition based on Mandy's wellness specialties
     let detectedPattern = 'general';
@@ -627,6 +650,7 @@ Keep formatting subtle and purposeful - it should enhance clarity, not distract 
     return res.status(200).json({
       response: aiResponse,
       pattern: detectedPattern,
+      mood: mood,
       timestamp: new Date().toISOString(),
       sessionPhase: sessionPhase || 'exploring'
     });

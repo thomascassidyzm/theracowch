@@ -693,6 +693,11 @@ async function handleSendMessage() {
 
         const data = await response.json();
 
+        // Let the cow reflect the user's world: record the AI's read of their mood.
+        if (data.mood && typeof window.recordCowchMood === 'function') {
+            window.recordCowchMood(data.mood);
+        }
+
         // Remove typing indicator
         removeTypingIndicator();
 
