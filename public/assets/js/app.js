@@ -769,6 +769,64 @@ function buildCowArtCombined(keys, joy, gratitudeWords) {
     return assembleCow({ preBody: pre, arms: parts.arms, headOpts: parts.headOpts, front: front, extras: extras });
 }
 
+// ── the cow as a rendered (3D) portrait, posed by engagement ────────────────
+// The pasture shows the rendered cow users expect, choosing a base posture from
+// the area they're focused on — cross-legged for mindfulness, otherwise the
+// standing portrait — and layering the same prop set on top for the *other*
+// areas they're tending. So a mindful, cross-legged cow can still cradle a
+// self-care heart: the base is a photo, the props are drawn over it.
+const COW3D = {
+    classic: { src: '/assets/cowch/cowch-classic.webp', aspect: 720 / 927, h: 172 },
+    lotus:   { src: '/assets/cowch/cowch-lotus.webp',   aspect: 720 / 907, h: 150 }
+};
+
+// A smaller rendered cow friend beside the main one (the Interactions area).
+function cow3dFriend(x, yGround) {
+    const c = COW3D.classic, fh = 92, fw = fh * c.aspect;
+    return '<image href="' + c.src + '" x="' + (x - fw / 2).toFixed(1) + '" y="' + (yGround - fh).toFixed(1) +
+        '" width="' + fw.toFixed(1) + '" height="' + fh + '" preserveAspectRatio="xMidYMax meet"/>';
+}
+
+// A prop for a tended area, positioned in the cow's local space (origin = the
+// grass line under the cow, up = -y), sized to the base image box (h tall, w wide).
+function cow3dProp(letterKey, base, h, w, gratitudeWords) {
+    const heartY = base === 'lotus' ? -0.27 * h : -0.42 * h;
+    switch (letterKey) {
+        case 'I':  return pastureHeart(0, heartY, 1.05) +
+                          pastureSparkles([[-0.46 * w, -0.62 * h], [0.46 * w, -0.72 * h]]);
+        case 'M':  return pastureLotus(0, -h - 6);
+        case 'A':  return pastureCantControl(0, -h - 8, 'cloud');
+        case 'G':  return pastureThankCard(0.22 * w, -0.34 * h);
+        case 'I2': return cow3dFriend(-0.52 * w, 4);
+        case 'N':  return pastureBalloon(0.30 * w, -0.5 * h);
+        case 'E':  return pastureTelescope(-0.5 * w - 2, 4) + pastureMagnifier(0.36 * w, -0.42 * h);
+        default:   return '';
+    }
+}
+
+// Build the rendered cow + layered props for the tended areas (letters, most
+// important first). An empty list gives the plain standing cow.
+function buildCow3D(keys, gratitudeWords) {
+    keys = (keys || []).slice(0, 3);
+    const primary = keys[0];
+    const baseName = (primary === 'M') ? 'lotus' : 'classic';
+    const b = COW3D[baseName];
+    const h = b.h, w = h * b.aspect;
+    let s = '<ellipse cx="0" cy="3" rx="' + (w * 0.5).toFixed(1) + '" ry="8" fill="rgba(60,46,40,0.16)"/>';
+    // Friends render behind the main cow.
+    keys.forEach(function (k) { if (k === 'I2') s += cow3dProp(k, baseName, h, w, gratitudeWords); });
+    s += '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
+        '" width="' + w.toFixed(1) + '" height="' + h + '" preserveAspectRatio="xMidYMax meet"/>';
+    // Props on top — skip the friend (already behind) and mindfulness when the
+    // cross-legged base already says it.
+    keys.forEach(function (k) {
+        if (k === 'I2') return;
+        if (k === 'M' && baseName === 'lotus') return;
+        s += cow3dProp(k, baseName, h, w, gratitudeWords);
+    });
+    return s;
+}
+
 function clientToPastureSvg(svg, clientX, clientY) {
     const pt = svg.createSVGPoint();
     pt.x = clientX; pt.y = clientY;
@@ -958,14 +1016,13 @@ function buildCowNode(ctx) {
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
-    // The cow reflects what you're tending: a base posture from the area you're
-    // focused on, with compact props layered in for the *other* areas you've
-    // tended — so several engagements read at once (e.g. a cross-legged, mindful
-    // cow that's also cradling a self-care heart). Built from composable SVG
-    // parts, which is what lets the poses genuinely combine.
+    // The rendered cow reflects what you're tending: a base posture from the area
+    // you're focused on (cross-legged for mindfulness, otherwise standing), with
+    // props layered on top for the *other* areas you've tended — so a mindful,
+    // cross-legged cow can still cradle a self-care heart.
     const others = hasEngagement ? eng.tended.filter(k => k !== primaryKey).slice(0, 2) : [];
     const keys = hasEngagement ? [primaryKey].concat(others) : [];
-    art.innerHTML = buildCowArtCombined(keys, joy, loadGratitudeWords());
+    art.innerHTML = buildCow3D(keys, loadGratitudeWords());
     g.appendChild(art);
 
     // No name tag in the pasture — the cow stays unnamed here.
