@@ -1004,13 +1004,36 @@ function cowCareDays() {
 const PASTURE_COW_CX = 180;
 const PASTURE_COW_GROUND = 246;
 
+// How "active" the user has been — this gates how expressive the cow is. Poses
+// are earned: a brand-new cow simply rests (level 0), starts striking a single
+// pose as the user shows up (level 1), and unlocks layered, combined poses once
+// they're well into it (level 2). Counts IMAGINE engagement + days of care +
+// days shown up, so any kind of showing-up moves the cow along.
+function pastureActivityLevel() {
+    const eng = cowEngagement();
+    const visits = (typeof getPastureVisitDays === 'function') ? getPastureVisitDays() : 0;
+    const score = eng.total + cowCareDays() + visits;
+    if (score >= 8) return 2;
+    if (score >= 3) return 1;
+    return 0;
+}
+
 function buildCowNode(ctx) {
     const eng = cowEngagement();
     const name = cowName();
     const named = name && name !== 'Your cow';
-    const hasEngagement = eng.tended.length > 0;
-    const primaryKey = hasEngagement ? getPastureActivePose() : null;
-    const meta = hasEngagement ? poseForKey(primaryKey) : null;
+    // Poses are gated by activity: a quiet cow rests, an active one strikes a
+    // single pose, and a well-tended one layers several at once. Tapping an
+    // IMAGINE icon previews a single pose at any level (an explicit peek).
+    const level = pastureActivityLevel();
+    const tapped = pastureActivePose != null;
+    const primaryKey = tapped ? pastureActivePose : (eng.tended.length ? getPastureActivePose() : null);
+    let keys = [];
+    if (primaryKey) {
+        if (level >= 2) keys = [primaryKey].concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
+        else if (level >= 1 || tapped) keys = [primaryKey];
+    }
+    const meta = keys.length ? poseForKey(keys[0]) : null;
 
     // Growth comes from showing up: IMAGINE engagement + days spent caring.
     const growth = eng.total + cowCareDays() * 2;
@@ -1026,12 +1049,8 @@ function buildCowNode(ctx) {
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
-    // The rendered cow reflects what you're tending: a base posture from the area
-    // you're focused on (cross-legged for mindfulness, otherwise standing), with
-    // props layered on top for the *other* areas you've tended — so a mindful,
-    // cross-legged cow can still cradle a self-care heart.
-    const others = hasEngagement ? eng.tended.filter(k => k !== primaryKey).slice(0, 2) : [];
-    const keys = hasEngagement ? [primaryKey].concat(others) : [];
+    // `keys` (chosen above by activity level) decides the pose: empty = resting,
+    // one = a single pose, several = a combined pose with props layered on top.
     art.innerHTML = buildCow3D(keys, loadGratitudeWords());
     g.appendChild(art);
 
@@ -1105,13 +1124,20 @@ function renderPastureIcons() {
     });
 }
 
-// Keep the blurb + gratitude controls in step with the active pose.
+// Keep the blurb + gratitude controls in step with the active pose. While the
+// cow is still resting (low activity, or nothing tended yet), show a gentle
+// "keep showing up" note instead of a pose blurb.
 function updatePasturePoseUI() {
-    const meta = poseForKey(getPastureActivePose());
+    const resting = pastureActivePose == null &&
+        (pastureActivityLevel() < 1 || cowEngagement().tended.length === 0);
+    const meta = resting ? null : poseForKey(getPastureActivePose());
     const blurb = document.getElementById('pasture-blurb');
-    if (blurb) blurb.textContent = meta.blurb;
+    if (blurb) {
+        blurb.textContent = meta ? meta.blurb
+            : 'Your cow is settling in — keep showing up and tending the IMAGINE areas, and they’ll start striking poses that reflect what you tend.';
+    }
     const grat = document.getElementById('pasture-gratitude');
-    if (grat) grat.hidden = (meta.key !== 'G');
+    if (grat) grat.hidden = (!meta || meta.key !== 'G');
 }
 
 function updatePastureUI() {
