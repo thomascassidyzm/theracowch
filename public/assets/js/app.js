@@ -1016,14 +1016,14 @@ const PASTURE_COW_CX = 180;
 const PASTURE_COW_GROUND = 246;
 
 // The cow reflects the user's world, including the hard days. The chat reads the
-// user's mood (see api/chat.js) and stores it here; when it's 'low' the pasture
-// cow sits sad with them for a while, then gently eases back to its poses.
+// user's mood (see api/chat.js) and stores it here; the cow holds that mood —
+// sad when low, beaming when good — until the next chat reply reads it
+// differently (an 'okay' read eases the cow back to its activity poses).
 const COWCH_MOOD_KEY = 'cowch_mood';
-const COWCH_MOOD_WINDOW_MS = 8 * 60 * 60 * 1000; // a low mood softens the cow for ~8h
 function pastureMood() {
     try {
         const m = JSON.parse(localStorage.getItem(COWCH_MOOD_KEY) || 'null');
-        if (m && (Date.now() - (m.at || 0)) < COWCH_MOOD_WINDOW_MS) {
+        if (m) {
             if (m.mood === 'low') return 'low';
             if (m.mood === 'good') return 'good';
         }
