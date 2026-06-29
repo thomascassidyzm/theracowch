@@ -775,9 +775,18 @@ function buildCowArtCombined(keys, joy, gratitudeWords) {
 // standing portrait — and layering the same prop set on top for the *other*
 // areas they're tending. So a mindful, cross-legged cow can still cradle a
 // self-care heart: the base is a photo, the props are drawn over it.
+// Each IMAGINE area has its own rendered pose (the cow literally holds the
+// heart, sits cross-legged, holds the thank-you note, leans in with a friend,
+// and so on). 'classic' is the default standing cow when nothing's tended yet.
 const COW3D = {
-    classic: { src: '/assets/cowch/cowch-classic.webp', aspect: 720 / 927, h: 172 },
-    lotus:   { src: '/assets/cowch/cowch-lotus.webp',   aspect: 720 / 907, h: 150 }
+    classic:      { src: '/assets/cowch/cowch-classic.webp',      aspect: 720 / 927,  h: 172 },
+    selfcare:     { src: '/assets/cowch/cowch-selfcare.webp',     aspect: 720 / 867,  h: 152 },
+    mindfulness:  { src: '/assets/cowch/cowch-mindfulness.webp',  aspect: 720 / 853,  h: 150 },
+    acceptance:   { src: '/assets/cowch/cowch-acceptance.webp',   aspect: 720 / 911,  h: 154 },
+    gratitude:    { src: '/assets/cowch/cowch-gratitude.webp',    aspect: 720 / 1114, h: 170 },
+    interactions: { src: '/assets/cowch/cowch-interactions.webp', aspect: 820 / 608,  h: 150 },
+    nurturing:    { src: '/assets/cowch/cowch-nurture.webp',      aspect: 720 / 888,  h: 158 },
+    exploring:    { src: '/assets/cowch/cowch-explore.webp',      aspect: 720 / 638,  h: 122 }
 };
 
 // A smaller rendered cow friend beside the main one (the Interactions area).
@@ -787,42 +796,43 @@ function cow3dFriend(x, yGround) {
         '" width="' + fw.toFixed(1) + '" height="' + fh + '" preserveAspectRatio="xMidYMax meet"/>';
 }
 
-// A prop for a tended area, positioned in the cow's local space (origin = the
-// grass line under the cow, up = -y), sized to the base image box (h tall, w wide).
-function cow3dProp(letterKey, base, h, w, gratitudeWords) {
-    const heartY = base === 'lotus' ? -0.27 * h : -0.42 * h;
+// A compact token for an area when it's a *secondary* thing being tended —
+// layered over the base pose, whose own area is already shown by its render.
+// `slot` is a free position to the side; the self-care heart sits in the lap.
+function cow3dToken(letterKey, baseName, h, w, slot, gratitudeWords) {
     switch (letterKey) {
-        case 'I':  return pastureHeart(0, heartY, 1.05) +
-                          pastureSparkles([[-0.46 * w, -0.62 * h], [0.46 * w, -0.72 * h]]);
-        case 'M':  return pastureLotus(0, -h - 6);
-        case 'A':  return pastureCantControl(0, -h - 8, 'cloud');
-        case 'G':  return pastureThankCard(0.22 * w, -0.34 * h);
-        case 'I2': return cow3dFriend(-0.52 * w, 4);
-        case 'N':  return pastureBalloon(0.30 * w, -0.5 * h);
-        case 'E':  return pastureTelescope(-0.5 * w - 2, 4) + pastureMagnifier(0.36 * w, -0.42 * h);
+        case 'I':  { const y = (baseName === 'classic') ? -0.46 * h : -0.27 * h;
+                     return pastureHeart(0, y, 0.95) + pastureSparkles([[slot.x, slot.y]]); }
+        case 'M':  return pastureLotus(slot.x, slot.y);
+        case 'A':  return pastureCantControl(slot.x, slot.y, 'cloud');
+        case 'G':  return pastureThankCard(slot.x, slot.y);
+        case 'N':  return '<text x="' + slot.x.toFixed(1) + '" y="' + slot.y.toFixed(1) + '" font-size="22" text-anchor="middle">🎶</text>';
+        case 'E':  return pastureMagnifier(slot.x, slot.y);
         default:   return '';
     }
 }
 
-// Build the rendered cow + layered props for the tended areas (letters, most
-// important first). An empty list gives the plain standing cow.
+// Build the rendered cow for the tended areas (letters, most important first):
+// the primary area picks the base pose (its own dedicated render), and the
+// other tended areas add a small token on top. An empty list = the standing cow.
 function buildCow3D(keys, gratitudeWords) {
     keys = (keys || []).slice(0, 3);
     const primary = keys[0];
-    const baseName = (primary === 'M') ? 'lotus' : 'classic';
-    const b = COW3D[baseName];
-    const h = b.h, w = h * b.aspect;
+    const poseName = primary ? poseForKey(primary).pose : null;
+    const baseName = (poseName && COW3D[poseName]) ? poseName : 'classic';
+    const b = COW3D[baseName], h = b.h, w = h * b.aspect;
     let s = '<ellipse cx="0" cy="3" rx="' + (w * 0.5).toFixed(1) + '" ry="8" fill="rgba(60,46,40,0.16)"/>';
-    // Friends render behind the main cow.
-    keys.forEach(function (k) { if (k === 'I2') s += cow3dProp(k, baseName, h, w, gratitudeWords); });
+    // A friend cow renders behind the main one — unless the two-cow Interactions
+    // render is already the base pose.
+    if (keys.indexOf('I2') >= 0 && baseName !== 'interactions') s += cow3dFriend(-0.52 * w, 4);
     s += '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
         '" width="' + w.toFixed(1) + '" height="' + h + '" preserveAspectRatio="xMidYMax meet"/>';
-    // Props on top — skip the friend (already behind) and mindfulness when the
-    // cross-legged base already says it.
+    const slots = [{ x: 0.54 * w, y: -0.62 * h }, { x: -0.54 * w, y: -0.62 * h }];
+    let si = 0;
     keys.forEach(function (k) {
-        if (k === 'I2') return;
-        if (k === 'M' && baseName === 'lotus') return;
-        s += cow3dProp(k, baseName, h, w, gratitudeWords);
+        if (k === 'I2') return;                       // friend already drawn behind
+        if (poseForKey(k).pose === baseName) return;  // base render already shows this area
+        s += cow3dToken(k, baseName, h, w, slots[si++ % slots.length], gratitudeWords);
     });
     return s;
 }
