@@ -27,6 +27,12 @@ function switchTab(tabId) {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
 
+    // Gently guide the user when they land on IMAGINE — Mandy asks which of
+    // the seven areas they'd like to work on (once per session).
+    if (tabId === 'imagine' && typeof window.maybeShowImagineGuide === 'function') {
+        setTimeout(() => window.maybeShowImagineGuide(), 250);
+    }
+
     // Refresh the Your-Space cards whenever the user lands on it — picks up
     // anything completed earlier this session, and grows the pasture if it's
     // a new day.
@@ -2817,6 +2823,63 @@ function setupDomainPanel() {
 }
 
 // ============================================
+// IMAGINE Guide popup — Mandy gently asks which of the seven areas the
+// user wants to work on, then opens a guided chat about their choice.
+// Shown once per app session when landing on the IMAGINE screen.
+// ============================================
+const IMAGINE_GUIDE_TITLES = {
+    self: 'I, Me, Myself',
+    mind: 'Mindfulness',
+    accept: 'Acceptance',
+    thanks: 'Gratitude',
+    connect: 'Interactions',
+    play: 'Nurture',
+    explore: 'Explore'
+};
+
+let imagineGuideShownThisSession = false;
+
+function setupImagineGuide() {
+    const modal = document.getElementById('imagine-guide-modal');
+    if (!modal) return;
+    const closeBtn = document.getElementById('imagine-guide-close');
+    const browseBtn = document.getElementById('imagine-guide-browse');
+
+    function close() {
+        modal.setAttribute('hidden', '');
+    }
+
+    closeBtn.addEventListener('click', close);
+    browseBtn.addEventListener('click', close);
+    // Tapping the dimmed backdrop (outside the card) closes the popup.
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) close();
+    });
+
+    modal.querySelectorAll('.imagine-guide-area').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const domainKey = btn.dataset.domain;
+            const title = IMAGINE_GUIDE_TITLES[domainKey] || 'this area';
+            close();
+            switchTab('chat');
+            const prompt = `I'd like to work on the ${title} area of the IMAGINE framework. Can you guide me through it and help me get started?`;
+            setTimeout(() => {
+                if (typeof window.triggerChatPrompt === 'function') {
+                    window.triggerChatPrompt(prompt);
+                }
+            }, 300);
+        });
+    });
+
+    // Expose so switchTab can open it on demand.
+    window.maybeShowImagineGuide = function() {
+        if (imagineGuideShownThisSession) return;
+        imagineGuideShownThisSession = true;
+        modal.removeAttribute('hidden');
+    };
+}
+
+// ============================================
 // Chat - delegated to chat-script.js via initChat()
 // ============================================
 
@@ -4285,6 +4348,7 @@ function init() {
     setupReminders();
     setupTabNavigation();
     setupDomainPanel();
+    setupImagineGuide();
     setupToolPanels();
     setupQuickCheckin();
     setupClearHistory();
