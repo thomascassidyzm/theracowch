@@ -1,0 +1,202 @@
+/* ============================================================
+   IMAGINE guide — a little cow that leads you through an area's
+   exercises one at a time (Finch-style), instead of dropping the
+   whole grid on you to pick from. Self-contained: it defines its
+   own palette fallbacks so it works whether or not variables.css
+   is loaded on the page. The page's domain colour is passed in at
+   runtime as --ig-accent (set by imagine-guide.js).
+
+   Non-clinical, no pressure: the cow only suggests. There's always
+   a gentle "I'll choose myself" escape hatch that reveals the grid.
+   ============================================================ */
+
+.ig-guide {
+  /* domain accent + readable on-accent text are injected by JS */
+  --ig-accent: #C97B63;
+  --ig-on-accent: #ffffff;
+  --ig-ink: #2D2D2D;
+  --ig-muted: #6E6863;
+  --ig-paper: #ffffff;
+
+  position: relative;
+  /* span every column when dropped inside a CSS-grid card list; ignored in
+     flex/block contexts, so it's safe on every IMAGINE area page. */
+  grid-column: 1 / -1;
+  display: flex;
+  gap: clamp(12px, 3vw, 22px);
+  align-items: flex-start;
+  background: var(--ig-paper);
+  border: 4px solid var(--ig-accent);
+  border-radius: 24px;
+  padding: clamp(18px, 4vw, 26px);
+  margin: 0 0 28px;
+  box-shadow: 8px 8px 0 0 color-mix(in srgb, var(--ig-accent) 28%, transparent);
+  animation: ig-rise 0.5s ease-out both;
+}
+
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .ig-guide { box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.12); }
+}
+
+/* ---- the little cow face ---- */
+.ig-cow {
+  flex: 0 0 auto;
+  width: clamp(72px, 18vw, 96px);
+  height: clamp(72px, 18vw, 96px);
+  align-self: center;
+}
+.ig-cow svg { width: 100%; height: 100%; display: block; }
+
+/* a gentle idle bob + occasional blink, motion-safe */
+@media (prefers-reduced-motion: no-preference) {
+  .ig-cow { animation: ig-bob 4.5s ease-in-out infinite; }
+  .ig-cow .ig-lid { animation: ig-blink 6s steps(1) infinite; }
+}
+
+/* ---- the thought bubble ---- */
+.ig-bubble {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: color-mix(in srgb, var(--ig-accent) 10%, #fff);
+  border: 3px solid var(--ig-accent);
+  border-radius: 22px;
+  padding: 16px 18px;
+}
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .ig-bubble { background: #fff; }
+}
+
+/* the classic "thought" trail — two little puffs aimed at the cow */
+.ig-bubble::before,
+.ig-bubble::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border: 3px solid var(--ig-accent);
+  border-radius: 50%;
+}
+.ig-bubble::before { width: 16px; height: 16px; left: -22px; bottom: 18px; }
+.ig-bubble::after  { width: 9px;  height: 9px;  left: -34px; bottom: 8px; }
+
+@media (max-width: 460px) {
+  .ig-guide { flex-direction: column; align-items: center; text-align: center; }
+  .ig-bubble::before { left: 22px; top: -22px; bottom: auto; }
+  .ig-bubble::after  { left: 8px;  top: -34px; bottom: auto; }
+}
+
+/* ---- bubble contents ---- */
+.ig-lead {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ig-muted);
+  margin: 0 0 6px;
+}
+.ig-pick-title {
+  font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+  font-weight: 900;
+  color: var(--ig-ink);
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+.ig-pick-desc {
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--ig-muted);
+  margin: 0 0 16px;
+}
+
+.ig-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+@media (max-width: 460px) {
+  .ig-actions { justify-content: center; }
+}
+
+.ig-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 12px 18px;
+  border: 3px solid var(--ig-accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.ig-btn-go {
+  background: var(--ig-accent);
+  color: var(--ig-on-accent);
+}
+.ig-btn-go:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 0 color-mix(in srgb, var(--ig-accent) 55%, #000);
+}
+.ig-btn-soft {
+  background: transparent;
+  color: var(--ig-accent);
+}
+.ig-btn-soft:hover { background: color-mix(in srgb, var(--ig-accent) 12%, #fff); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-btn:hover { transform: none; box-shadow: none; }
+}
+
+/* a quiet text link for "I'll choose myself" / "let the cow guide me" */
+.ig-toggle {
+  display: inline-block;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ig-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ig-toggle:hover { color: var(--ig-accent); }
+
+/* steps dots — how far through the area you've worked today */
+.ig-steps {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+@media (max-width: 460px) { .ig-steps { justify-content: center; } }
+.ig-steps span {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid var(--ig-accent);
+  background: transparent;
+}
+.ig-steps span.done { background: var(--ig-accent); }
+
+/* hide the grid cards while the cow is leading; restored on "choose myself" */
+.ig-card-hidden { display: none !important; }
+
+@keyframes ig-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ig-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+@keyframes ig-blink {
+  0%, 92%, 100% { opacity: 0; }
+  94%, 98%      { opacity: 1; }
+}
+
+/* swap-in animation when the cow suggests a different exercise */
+.ig-swap { animation: ig-pop 0.35s ease-out both; }
+@keyframes ig-pop {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-guide, .ig-swap { animation: none; }
+}
