@@ -4181,146 +4181,134 @@
             transform: translateY(-2px);
         }
 
-        /* IMAGINE Guide popup — Mandy asks which area to work on */
-        .imagine-guide-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: var(--z-modal);
+        /* IMAGINE Guide — inline speech bubble from Mandy that walks the user
+           through choosing an area, then an exercise within it. */
+        .imagine-guide {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-lg);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            animation: imagineGuideFade 0.2s ease;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            animation: imagineGuideIn 0.3s ease;
         }
 
-        .imagine-guide-modal[hidden] { display: none; }
-
-        @keyframes imagineGuideFade {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
-        .imagine-guide-content {
-            position: relative;
-            background: var(--bg-card);
-            border: var(--border-thicc) solid var(--border-warm);
-            border-radius: var(--radius-chunky);
-            padding: var(--space-xl) var(--space-lg) var(--space-lg);
-            max-width: 420px;
-            width: 100%;
-            margin: auto;
-            text-align: center;
-            box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.15);
-        }
-
-        .imagine-guide-close {
-            position: absolute;
-            top: var(--space-sm);
-            right: var(--space-sm);
-            width: 36px;
-            height: 36px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.75rem;
-            line-height: 1;
-            cursor: pointer;
+        @keyframes imagineGuideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .imagine-guide-avatar {
-            width: 64px;
-            height: 64px;
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: var(--border-medium) solid var(--border-warm);
             background: var(--bg-canvas);
-            margin-bottom: var(--space-sm);
         }
 
-        .imagine-guide-title {
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-black);
+        .imagine-guide-bubble {
+            position: relative;
+            flex: 1;
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-chunky);
+            border-top-left-radius: var(--radius-small);
+            padding: var(--space-md);
+            box-shadow: 5px 5px 0 0 rgba(0, 0, 0, 0.08);
+        }
+
+        /* Little speech-bubble tail pointing back at Mandy */
+        .imagine-guide-bubble::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 10px solid var(--border-warm);
+        }
+
+        .imagine-guide-text {
             color: var(--text-on-canvas);
-            line-height: 1.3;
-            margin-bottom: var(--space-xs);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-bold);
+            line-height: 1.4;
         }
 
-        .imagine-guide-sub {
-            font-size: var(--font-size-sm);
-            color: var(--text-secondary);
-            margin-bottom: var(--space-lg);
-        }
-
-        .imagine-guide-areas {
+        .imagine-guide-options {
             display: flex;
             flex-direction: column;
             gap: var(--space-xs);
-            margin-bottom: var(--space-md);
-            text-align: left;
+            margin-top: var(--space-md);
         }
 
-        .imagine-guide-area {
+        .imagine-guide-options:empty {
+            margin-top: 0;
+        }
+
+        .imagine-guide-chip {
             display: flex;
             align-items: center;
             gap: var(--space-sm);
+            width: 100%;
+            text-align: left;
             padding: var(--space-sm);
-            background: var(--bg-card);
+            background: var(--bg-canvas);
             border: var(--border-medium) solid var(--border-warm);
-            border-left: 6px solid var(--area-color);
             border-radius: var(--radius-small);
             cursor: pointer;
             transition: all var(--transition-brutal);
         }
 
-        .imagine-guide-area:hover {
+        .imagine-guide-chip:hover {
             transform: translateY(-2px);
-            box-shadow: 4px 4px 0 0 var(--area-color);
+            box-shadow: 3px 3px 0 0 var(--coral);
         }
 
-        .imagine-guide-area-letter {
-            flex-shrink: 0;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--area-color);
-            color: #fff;
-            font-weight: var(--font-weight-black);
-            font-size: var(--font-size-lg);
-            border-radius: var(--radius-small);
-        }
-
-        .imagine-guide-area-text {
+        .imagine-guide-chip-text {
             display: flex;
             flex-direction: column;
-            line-height: 1.25;
+            flex: 1;
+            min-width: 0;
         }
 
-        .imagine-guide-area-text strong {
+        .imagine-guide-chip-title {
             color: var(--text-on-canvas);
             font-size: var(--font-size-base);
             font-weight: var(--font-weight-bold);
+            line-height: 1.25;
         }
 
-        .imagine-guide-area-text span {
+        .imagine-guide-chip-desc {
+            display: block;
             color: var(--text-secondary);
             font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-normal);
+            margin-top: 2px;
         }
 
-        .imagine-guide-browse {
+        .imagine-guide-chip-duration {
+            margin-left: auto;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .imagine-guide-back {
+            align-self: flex-start;
             background: transparent;
             border: none;
             color: var(--text-secondary);
             font-size: var(--font-size-sm);
             font-weight: var(--font-weight-bold);
-            text-decoration: underline;
             cursor: pointer;
-            padding: var(--space-xs);
+            padding: var(--space-xs) 0 0;
+        }
+
+        .imagine-guide-back:hover {
+            color: var(--coral);
         }
 
         /* First-launch consent gate */
@@ -4967,17 +4955,15 @@
                         <p>Seven ways to nurture your wellbeing</p>
                     </div>
 
-                    <!-- Tune IMAGINE to you (sits at the top so the user can
-                         shape the order before browsing the domain cards) -->
-                    <div class="exercises-cta">
-                        <a href="#" class="exercises-cta-btn" id="tune-imagine-btn">
-                            <span class="exercises-cta-icon">🎛️</span>
-                            <div class="exercises-cta-text">
-                                <strong>Tune IMAGINE to you</strong>
-                                <span id="tune-imagine-sub">Pick the area to start your daily exercise</span>
-                            </div>
-                            <span class="exercises-cta-arrow">→</span>
-                        </a>
+                    <!-- Mandy's guide bubble — walks the user through choosing
+                         an area (the cards below), then an exercise within it.
+                         Populated by setupImagineGuide() in assets/js/app.js. -->
+                    <div class="imagine-guide" id="imagine-guide">
+                        <img src="/icons/cowch-icon.svg" alt="Mandy" class="imagine-guide-avatar">
+                        <div class="imagine-guide-bubble">
+                            <p class="imagine-guide-text" id="imagine-guide-text"></p>
+                            <div class="imagine-guide-options" id="imagine-guide-options"></div>
+                        </div>
                     </div>
 
                     <div class="domain-cards">
@@ -5861,48 +5847,6 @@
             <h2>Exercise Library</h2>
         </div>
         <div class="slide-panel-content" id="exercise-content"></div>
-    </div>
-
-    <!-- IMAGINE Guide popup — Mandy gently asks which of the seven areas to
-         work on. Shown once per session on landing on the IMAGINE screen. -->
-    <div class="imagine-guide-modal" id="imagine-guide-modal" role="dialog" aria-modal="true" aria-labelledby="imagine-guide-title" hidden>
-        <div class="imagine-guide-content">
-            <button class="imagine-guide-close" id="imagine-guide-close" aria-label="Close">&times;</button>
-            <img src="/icons/cowch-icon.svg" alt="Mandy" class="imagine-guide-avatar">
-            <h3 class="imagine-guide-title" id="imagine-guide-title">Which of these seven areas would you like to work on?</h3>
-            <p class="imagine-guide-sub">Pick one and I'll guide you through it.</p>
-            <div class="imagine-guide-areas">
-                <button class="imagine-guide-area" data-domain="self" style="--area-color: var(--color-self)">
-                    <span class="imagine-guide-area-letter">I</span>
-                    <span class="imagine-guide-area-text"><strong>I, Me, Myself</strong><span>Know yourself deeply</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="mind" style="--area-color: var(--color-mind)">
-                    <span class="imagine-guide-area-letter">M</span>
-                    <span class="imagine-guide-area-text"><strong>Mindfulness</strong><span>Find your calm</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="accept" style="--area-color: var(--color-accept)">
-                    <span class="imagine-guide-area-letter">A</span>
-                    <span class="imagine-guide-area-text"><strong>Acceptance</strong><span>Embrace what is</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="thanks" style="--area-color: var(--color-thanks)">
-                    <span class="imagine-guide-area-letter">G</span>
-                    <span class="imagine-guide-area-text"><strong>Gratitude</strong><span>Notice the good</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="connect" style="--area-color: var(--color-connect)">
-                    <span class="imagine-guide-area-letter">I</span>
-                    <span class="imagine-guide-area-text"><strong>Interactions</strong><span>Strengthen connections</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="play" style="--area-color: var(--color-play)">
-                    <span class="imagine-guide-area-letter">N</span>
-                    <span class="imagine-guide-area-text"><strong>Nurture</strong><span>Feed your joy</span></span>
-                </button>
-                <button class="imagine-guide-area" data-domain="explore" style="--area-color: var(--color-explore)">
-                    <span class="imagine-guide-area-letter">E</span>
-                    <span class="imagine-guide-area-text"><strong>Explore</strong><span>Try something new</span></span>
-                </button>
-            </div>
-            <button class="imagine-guide-browse" id="imagine-guide-browse">I'll just browse for now</button>
-        </div>
     </div>
 
     <!-- Mandy's Thought for the Day — opened by tapping the home cloud -->

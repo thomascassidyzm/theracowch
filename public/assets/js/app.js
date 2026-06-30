@@ -27,10 +27,10 @@ function switchTab(tabId) {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
     }
 
-    // Gently guide the user when they land on IMAGINE — Mandy asks which of
-    // the seven areas they'd like to work on (once per session).
-    if (tabId === 'imagine' && typeof window.maybeShowImagineGuide === 'function') {
-        setTimeout(() => window.maybeShowImagineGuide(), 250);
+    // Reset Mandy's IMAGINE guide bubble to the area chooser each time the
+    // user lands on the IMAGINE screen.
+    if (tabId === 'imagine' && typeof window.resetImagineGuide === 'function') {
+        window.resetImagineGuide();
     }
 
     // Refresh the Your-Space cards whenever the user lands on it — picks up
@@ -2698,19 +2698,9 @@ function setupDomainPanel() {
     const domainPanelSubtitle = document.getElementById('domain-panel-subtitle');
     const domainPanelContent = document.getElementById('domain-panel-content');
 
-    // Navigate to section page when clicking a domain card
-    document.querySelectorAll('.domain-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const domainKey = card.dataset.domain;
-            const pageUrl = DOMAIN_PAGES[domainKey];
-            if (pageUrl) {
-                window.location.href = pageUrl;
-            } else {
-                // Fallback to panel for unmapped domains
-                openDomainPanel(domainKey);
-            }
-        });
-    });
+    // Domain-card clicks are handled by the IMAGINE guide bubble
+    // (setupImagineGuide), which shows that area's exercises inline rather
+    // than navigating straight to the section page.
 
     // Also handle IMAGINE mini letters on home tab
     document.querySelectorAll('.imagine-mini-letter').forEach(letter => {
@@ -2823,60 +2813,104 @@ function setupDomainPanel() {
 }
 
 // ============================================
-// IMAGINE Guide popup — Mandy gently asks which of the seven areas the
-// user wants to work on, then opens a guided chat about their choice.
-// Shown once per app session when landing on the IMAGINE screen.
+// IMAGINE Guide — Mandy's inline speech bubble on the IMAGINE screen.
+// Step 1: she asks which area to start with (the user taps an area card
+// below). Step 2: the bubble lists that area's exercises so the user can
+// pick one, which then starts it with Mandy. Lives where the old "Tune
+// IMAGINE" box was.
 // ============================================
-const IMAGINE_GUIDE_TITLES = {
-    self: 'I, Me, Myself',
-    mind: 'Mindfulness',
-    accept: 'Acceptance',
-    thanks: 'Gratitude',
-    connect: 'Interactions',
-    play: 'Nurture',
-    explore: 'Explore'
+// Interactive exercises that have a dedicated page (others open in chat).
+const IMAGINE_GUIDE_EXERCISE_URLS = {
+    breathing: '/exercises/box-breathing.html',
+    grounding: '/exercises/grounding.html',
+    weather: '/exercises/weather.html',
+    wave: '/exercises/wave.html'
 };
 
-let imagineGuideShownThisSession = false;
-
 function setupImagineGuide() {
-    const modal = document.getElementById('imagine-guide-modal');
-    if (!modal) return;
-    const closeBtn = document.getElementById('imagine-guide-close');
-    const browseBtn = document.getElementById('imagine-guide-browse');
+    const guide = document.getElementById('imagine-guide');
+    const textEl = document.getElementById('imagine-guide-text');
+    const optionsEl = document.getElementById('imagine-guide-options');
+    if (!guide || !textEl || !optionsEl) return;
 
-    function close() {
-        modal.setAttribute('hidden', '');
+    function startExercise(ex) {
+        if (ex.interactive && IMAGINE_GUIDE_EXERCISE_URLS[ex.interactive]) {
+            window.location.href = IMAGINE_GUIDE_EXERCISE_URLS[ex.interactive];
+            return;
+        }
+        switchTab('chat');
+        const prompt = ex.prompt;
+        setTimeout(() => {
+            if (typeof window.triggerChatPrompt === 'function') {
+                window.triggerChatPrompt(prompt);
+            }
+        }, 300);
     }
 
-    closeBtn.addEventListener('click', close);
-    browseBtn.addEventListener('click', close);
-    // Tapping the dimmed backdrop (outside the card) closes the popup.
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) close();
-    });
+    // Step 1 — invite the user to pick one of the area cards below.
+    function renderAreaPrompt() {
+        textEl.innerHTML = "Hi, I'm Mandy. I'm here to help you understand IMAGINE — which of the seven areas below would you like to start working on?";
+        optionsEl.innerHTML = '';
+    }
 
-    modal.querySelectorAll('.imagine-guide-area').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const domainKey = btn.dataset.domain;
-            const title = IMAGINE_GUIDE_TITLES[domainKey] || 'this area';
-            close();
-            switchTab('chat');
-            const prompt = `I'd like to work on the ${title} area of the IMAGINE framework. Can you guide me through it and help me get started?`;
-            setTimeout(() => {
-                if (typeof window.triggerChatPrompt === 'function') {
-                    window.triggerChatPrompt(prompt);
-                }
-            }, 300);
+    // Step 2 — once an area is chosen, list its exercises to choose from.
+    function renderExercisePrompt(domainKey) {
+        const domain = IMAGINE_DOMAINS[domainKey];
+        if (!domain) return;
+
+        textEl.innerHTML = `Lovely choice. Here are some ways to explore <strong>${domain.title}</strong> — which would you like to try?`;
+        optionsEl.innerHTML = '';
+
+        domain.exercises.forEach(ex => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'imagine-guide-chip';
+            chip.innerHTML =
+                `<span class="imagine-guide-chip-text">` +
+                    `<span class="imagine-guide-chip-title">${ex.title}</span>` +
+                    `<span class="imagine-guide-chip-desc">${ex.description}</span>` +
+                `</span>` +
+                (ex.duration ? `<span class="imagine-guide-chip-duration">${ex.duration}</span>` : '');
+            chip.addEventListener('click', () => startExercise(ex));
+            optionsEl.appendChild(chip);
+        });
+
+        // Open the area's full page for the user who wants more.
+        const pageUrl = DOMAIN_PAGES[domainKey];
+        if (pageUrl) {
+            const pageChip = document.createElement('button');
+            pageChip.type = 'button';
+            pageChip.className = 'imagine-guide-chip';
+            pageChip.innerHTML =
+                `<span class="imagine-guide-chip-text">` +
+                    `<span class="imagine-guide-chip-title">Open the full ${domain.title} page</span>` +
+                    `<span class="imagine-guide-chip-desc">See everything in this area</span>` +
+                `</span>`;
+            pageChip.addEventListener('click', () => { window.location.href = pageUrl; });
+            optionsEl.appendChild(pageChip);
+        }
+
+        // Back to the area chooser.
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'imagine-guide-back';
+        back.textContent = '← Choose a different area';
+        back.addEventListener('click', renderAreaPrompt);
+        optionsEl.appendChild(back);
+    }
+
+    // Tapping any area card drives step 2 in the bubble.
+    document.querySelectorAll('.domain-card').forEach(card => {
+        card.addEventListener('click', () => {
+            renderExercisePrompt(card.dataset.domain);
+            guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 
-    // Expose so switchTab can open it on demand.
-    window.maybeShowImagineGuide = function() {
-        if (imagineGuideShownThisSession) return;
-        imagineGuideShownThisSession = true;
-        modal.removeAttribute('hidden');
-    };
+    renderAreaPrompt();
+
+    // Reset to the area prompt each time the user lands on IMAGINE.
+    window.resetImagineGuide = renderAreaPrompt;
 }
 
 // ============================================
