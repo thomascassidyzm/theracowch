@@ -1192,6 +1192,28 @@
             gap: var(--space-sm);
         }
 
+        .chat-back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xs);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-small);
+            color: var(--text-secondary);
+            cursor: pointer;
+            line-height: 0;
+            transition: all var(--transition-brutal);
+        }
+
+        .chat-back-btn:hover {
+            background: var(--coral);
+            border-color: var(--coral);
+            color: var(--text-on-coral);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 0 var(--bg-card);
+        }
+
         .chat-header-title span {
             font-size: 1.5rem;
         }
@@ -4921,6 +4943,11 @@
                 <div class="chat-tab">
                     <header class="chat-header">
                         <div class="chat-header-title">
+                            <button class="chat-back-btn" data-tab="home" aria-label="Back to Home">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15 18l-6-6 6-6"/>
+                                </svg>
+                            </button>
                             <img src="/icons/cowch-icon.svg" alt="Mandy" class="chat-avatar">
                             <h1>Mandy</h1>
                         </div>
