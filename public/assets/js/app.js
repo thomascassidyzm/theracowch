@@ -402,6 +402,24 @@ function getPastureVisitDays() {
     return 0;
 }
 
+// How many days since the user's most recent *previous* visit (today excluded).
+// Drives the pasture's away pose: when they've been gone a few days, the cow
+// has a sit and a rest rather than standing to attention. 0 = brand-new, or
+// last seen today/yesterday.
+function pastureDaysAway() {
+    try {
+        const todayKey = streakDayKey(new Date());
+        const prev = loadVisitDays().filter(k => typeof k === 'string' && k < todayKey).sort();
+        if (!prev.length) return 0;
+        const last = dayKeyToDate(prev[prev.length - 1]);
+        const today = dayKeyToDate(todayKey);
+        if (isNaN(last.getTime()) || isNaN(today.getTime())) return 0;
+        return Math.max(0, Math.round((today - last) / 86400000));
+    } catch (_) { return 0; }
+}
+// The cow sits down to rest once the user's been away at least this many days.
+const PASTURE_AWAY_DAYS = 3;
+
 // Legacy reader: older builds planted one item per visit day. Nothing plants
 // anything now, but recordVisitToday() still reads these dates to backfill the
 // visit log, so the reader stays.
@@ -796,7 +814,10 @@ const COW3D = {
     // Mood poses, not IMAGINE areas: shown when the chat reads the user as low or
     // bright. They override the activity poses (see buildCowNode).
     sad:          { src: '/assets/cowch/cowch-sad.webp',          aspect: 720 / 876,  h: 156 },
-    happy:        { src: '/assets/cowch/cowch-happy.webp',        aspect: 720 / 669,  h: 140 }
+    happy:        { src: '/assets/cowch/cowch-happy.webp',        aspect: 720 / 669,  h: 140 },
+    // Away pose: a calm, seated cow shown when the user's been gone a few days —
+    // it's had a sit and a rest, waiting for them (see buildCowNode).
+    resting:      { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 }
 };
 
 // A smaller rendered cow friend beside the main one (the Interactions area).
@@ -1075,7 +1096,12 @@ function buildCowNode(ctx) {
     // cow down sad, a bright one has them beaming — unless the user is actively
     // tapping an icon to look at a specific area.
     const mood = tapped ? null : pastureMood();
-    const moodBase = mood === 'low' ? 'sad' : (mood === 'good' ? 'happy' : null);
+    // Been away a few days? The cow sits and rests until they're back — a mood
+    // read still wins, and tapping an icon perks the cow up into that pose.
+    const away = !tapped && !mood && pastureDaysAway() >= PASTURE_AWAY_DAYS;
+    const moodBase = mood === 'low' ? 'sad'
+        : (mood === 'good' ? 'happy'
+        : (away ? 'resting' : null));
     const primaryKey = tapped ? pastureActivePose : (eng.tended.length ? getPastureActivePose() : null);
     let keys = [];
     if (primaryKey) {
@@ -1189,6 +1215,15 @@ function updatePasturePoseUI() {
         if (blurb) blurb.textContent = mood === 'low'
             ? 'It’s okay to not be okay. Your cow is here, sitting with you. 💛'
             : 'Your cow is beaming right along with you today. ✨';
+        const grat = document.getElementById('pasture-gratitude');
+        if (grat) grat.hidden = true;
+        return;
+    }
+    // Been away a few days: the cow's sitting and resting — say welcome back,
+    // and tapping an area (below) perks it up into that pose.
+    if (pastureActivePose == null && pastureDaysAway() >= PASTURE_AWAY_DAYS) {
+        const blurb = document.getElementById('pasture-blurb');
+        if (blurb) blurb.textContent = 'Welcome back. Your cow’s been having a sit and a rest — tap an area in the pasture and it’ll perk up with you. 💛';
         const grat = document.getElementById('pasture-gratitude');
         if (grat) grat.hidden = true;
         return;
@@ -1854,6 +1889,7 @@ function setupPasturePanel() {
     if (!block.dataset.wired) {
         block.dataset.wired = '1';
         block.addEventListener('click', () => {
+            setPastureActivePose(null);     // open on the cow's true state (away / mood / focus), not a stale preview
             updatePastureUI();              // sync + render with the latest data
             panel.classList.add('active');
         });
