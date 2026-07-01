@@ -1083,30 +1083,37 @@ function pastureActivityLevel() {
     return 0;
 }
 
+// Did the user tend an IMAGINE area today? A same-day exercise re-engages the
+// cow — it perks up into that posture rather than showing the been-away rest.
+function pastureEngagedToday() {
+    const eng = cowEngagement();
+    return !!eng.recent && !!eng.lastAt[eng.recent] &&
+        streakDayKey(new Date(eng.lastAt[eng.recent])) === streakDayKey(new Date());
+}
+
 function buildCowNode(ctx) {
     const eng = cowEngagement();
     const name = cowName();
     const named = name && name !== 'Your cow';
-    // Poses are gated by activity: a quiet cow rests, an active one strikes a
-    // single pose, and a well-tended one layers several at once. Tapping an
-    // IMAGINE icon previews a single pose at any level (an explicit peek).
+    // The cow takes on the posture of the IMAGINE area the user most recently
+    // tended — the pose *appears after they do an exercise*, a little reflection
+    // of what they've been working on. Once they're well into it (level 2), the
+    // other areas they're tending layer on top as compact props.
     const level = pastureActivityLevel();
-    const tapped = pastureActivePose != null;
     // A mood read from the chat takes priority over poses — a low mood sits the
-    // cow down sad, a bright one has them beaming — unless the user is actively
-    // tapping an icon to look at a specific area.
-    const mood = tapped ? null : pastureMood();
-    // Been away a few days? The cow sits and rests until they're back — a mood
-    // read still wins, and tapping an icon perks the cow up into that pose.
-    const away = !tapped && !mood && pastureDaysAway() >= PASTURE_AWAY_DAYS;
+    // cow down sad, a bright one has them beaming.
+    const mood = pastureMood();
+    // Been away a few days (and not re-engaged today)? The cow sits and rests
+    // until they're back. A mood read still wins; doing an exercise perks it up.
+    const away = !mood && !pastureEngagedToday() && pastureDaysAway() >= PASTURE_AWAY_DAYS;
     const moodBase = mood === 'low' ? 'sad'
         : (mood === 'good' ? 'happy'
         : (away ? 'resting' : null));
-    const primaryKey = tapped ? pastureActivePose : (eng.tended.length ? getPastureActivePose() : null);
+    const primaryKey = eng.tended.length ? getPastureActivePose() : null;
     let keys = [];
     if (primaryKey) {
-        if (level >= 2) keys = [primaryKey].concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
-        else if (level >= 1 || tapped) keys = [primaryKey];
+        keys = [primaryKey];
+        if (level >= 2) keys = keys.concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
     }
     const meta = moodBase ? null : (keys.length ? poseForKey(keys[0]) : null);
 
@@ -1175,41 +1182,18 @@ function renderPasture() {
     svg.appendChild(buildCowNode({ svg }));
 }
 
-// The IMAGINE icon row beneath the cow — icons (not nature) showing where the
-// user's attention has gone. Tap one to put the cow into that pose.
-function renderPastureIcons() {
-    const row = document.getElementById('pasture-icons');
-    if (!row) return;
-    const eng = cowEngagement();
-    const active = getPastureActivePose();
-    row.innerHTML = '';
-    PASTURE_POSES.forEach(p => {
-        const n = eng.counts[p.key] || 0;
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'pasture-icon' + (p.key === active ? ' active' : '') + (n > 0 ? ' tended' : '');
-        btn.style.setProperty('--area', IMAGINE_PALETTE[p.key]);
-        btn.setAttribute('aria-pressed', p.key === active ? 'true' : 'false');
-        btn.setAttribute('aria-label', p.label + (n ? ' — tended ' + n + ' time' + (n === 1 ? '' : 's') : ' — not yet tended'));
-        btn.innerHTML = '<span class="pasture-icon-glyph">' + p.icon + '</span>' +
-                        (n > 0 ? '<span class="pasture-icon-count">' + n + '</span>' : '');
-        btn.addEventListener('click', () => {
-            setPastureActivePose(p.key);
-            renderPasture();
-            renderPastureIcons();
-            updatePasturePoseUI();
-        });
-        row.appendChild(btn);
-    });
-}
+// (The tap-to-pose IMAGINE icon row was removed: the cow now takes on a
+//  posture on its own after the user completes an exercise in that area — the
+//  pose reflects what they've been tending, read live from the engagement log
+//  via cowEngagement(), rather than from tapping an icon.)
 
-// Keep the blurb + gratitude controls in step with the active pose. While the
-// cow is still resting (low activity, or nothing tended yet), show a gentle
-// "keep showing up" note instead of a pose blurb.
+// Keep the blurb + gratitude controls in step with the cow's posture. The
+// posture reflects the IMAGINE area the user most recently tended; until they've
+// done an exercise (or if they've been away), show a gentle note instead.
 function updatePasturePoseUI() {
     // A mood read from the chat: the cow sits sad with the user, or beams along
     // with them, and the blurb holds that rather than describing a pose.
-    const mood = pastureActivePose == null ? pastureMood() : null;
+    const mood = pastureMood();
     if (mood) {
         const blurb = document.getElementById('pasture-blurb');
         if (blurb) blurb.textContent = mood === 'low'
@@ -1219,22 +1203,21 @@ function updatePasturePoseUI() {
         if (grat) grat.hidden = true;
         return;
     }
-    // Been away a few days: the cow's sitting and resting — say welcome back,
-    // and tapping an area (below) perks it up into that pose.
-    if (pastureActivePose == null && pastureDaysAway() >= PASTURE_AWAY_DAYS) {
+    // Been away a few days and not yet re-engaged: the cow's sitting and resting.
+    // Doing an IMAGINE exercise perks it up into that area's posture.
+    if (!pastureEngagedToday() && pastureDaysAway() >= PASTURE_AWAY_DAYS) {
         const blurb = document.getElementById('pasture-blurb');
-        if (blurb) blurb.textContent = 'Welcome back. Your cow’s been having a sit and a rest — tap an area in the pasture and it’ll perk up with you. 💛';
+        if (blurb) blurb.textContent = 'Welcome back. Your cow’s been having a sit and a rest — do an IMAGINE exercise and it’ll perk up into that posture. 💛';
         const grat = document.getElementById('pasture-gratitude');
         if (grat) grat.hidden = true;
         return;
     }
-    const resting = pastureActivePose == null &&
-        (pastureActivityLevel() < 1 || cowEngagement().tended.length === 0);
-    const meta = resting ? null : poseForKey(getPastureActivePose());
+    // A posture appears once they've tended an area; otherwise a gentle invite.
+    const meta = cowEngagement().tended.length ? poseForKey(getPastureActivePose()) : null;
     const blurb = document.getElementById('pasture-blurb');
     if (blurb) {
         blurb.textContent = meta ? meta.blurb
-            : 'Your cow is a reflection of your world. It’s settling in — keep showing up and tending the IMAGINE areas, and it’ll come to life with poses that mirror what you tend.';
+            : 'Your cow is a reflection of your world. It’s settling in — complete an IMAGINE exercise and it’ll take on a posture that mirrors what you tended.';
     }
     const grat = document.getElementById('pasture-gratitude');
     if (grat) grat.hidden = (!meta || meta.key !== 'G');
@@ -1270,7 +1253,6 @@ function updatePastureUI() {
             : 'Your cow is a reflection of your world — see what you’re tending';
     }
 
-    renderPastureIcons();
     updatePasturePoseUI();
     renderPasture();
 }
