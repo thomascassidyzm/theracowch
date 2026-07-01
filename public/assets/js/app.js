@@ -1207,12 +1207,13 @@ function petPastureCow(g, scale) {
 // edges so the rectangular frame disappears — its night sky blends into the
 // pasture's, and the pillow fades into the grass. The pasture draws its own
 // moon and stars behind, so the image's are masked away by the fade.
-// Displayed footprint on the grass. The height is deliberately shorter than the
-// image's aspect so `slice` + bottom anchor (yMax) crop most of the image's own
-// sky away — the cow, pillow and blanket stay; the pasture's night sky shows
-// behind. A radial fade dissolves the remaining rectangular edges.
-const PASTURE_SLEEP_W = 208;
-const PASTURE_SLEEP_H = 100;
+// Displayed footprint on the grass. The whole render is shown (aspect-matched)
+// so the cow's head stays complete; an elliptical fade keeps the cow opaque
+// while dissolving the thin strip of the image's own sky and the rectangular
+// edges into the pasture's night sky and grass. The pasture draws its own moon
+// and stars behind.
+const PASTURE_SLEEP_W = 210;
+const PASTURE_SLEEP_H = Math.round(210 * 817 / 1320);   // ~130, image aspect
 function buildSleepingCowNode() {
     const w = PASTURE_SLEEP_W, h = PASTURE_SLEEP_H;
     const x = PASTURE_COW_CX - w / 2;
@@ -1224,9 +1225,9 @@ function buildSleepingCowNode() {
     g.setAttribute('aria-label', (nm !== 'Your cow' ? nm : 'Your cow') + ' — fast asleep in the pasture');
     g.innerHTML =
         '<defs>' +
-            '<radialGradient id="pastureSleepFade" cx="47%" cy="56%" r="50%">' +
+            '<radialGradient id="pastureSleepFade" cx="50%" cy="57%" r="50%">' +
                 '<stop offset="0%" stop-color="#fff"/>' +
-                '<stop offset="46%" stop-color="#fff"/>' +
+                '<stop offset="80%" stop-color="#fff"/>' +
                 '<stop offset="100%" stop-color="#000"/>' +
             '</radialGradient>' +
             '<mask id="pastureSleepMask">' +
@@ -1234,7 +1235,7 @@ function buildSleepingCowNode() {
             '</mask>' +
         '</defs>' +
         '<image href="' + SLEEPING_SCENE_SRC + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
-            '" preserveAspectRatio="xMidYMax slice" mask="url(#pastureSleepMask)"/>';
+            '" preserveAspectRatio="xMidYMid slice" mask="url(#pastureSleepMask)"/>';
     return g;
 }
 
