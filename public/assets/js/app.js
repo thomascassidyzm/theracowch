@@ -828,23 +828,14 @@ const COW3D = {
     // Away pose: a calm, seated cow shown when the user's been gone a few days —
     // it's had a sit and a rest, waiting for them (see buildCowNode).
     resting:      { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 },
-    // Sleeping pose: the seated cow, dozing, with a drifting "Zzz" (added in
-    // buildCow3D) — shown during the user's sleep hours (see buildCowNode).
-    sleeping:     { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 }
+    // Sleeping is not a cutout pose — it's a full cozy "goodnight" scene that
+    // takes over the whole pasture (see renderSleepingScene / renderPasture).
+    // This entry is only a defensive fallback if ever drawn as a cutout.
+    sleeping:     { src: '/assets/cowch/cowch-sleeping.jpg',      aspect: 1320 / 817, h: 150 }
 };
 
-// A gentle drifting "z z Z" above the cow's head while it sleeps.
-function pastureSleepZzz() {
-    function z(x, y, size, delay, label) {
-        return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" text-anchor="middle"' +
-            ' fill="#FCF5E8" stroke="#4A3F4A" stroke-width="0.6" opacity="0"' +
-            ' font-family="Gabarito, sans-serif" font-weight="900">' + label +
-            '<animate attributeName="opacity" values="0;0.75;0" dur="3s" begin="' + delay + 's" repeatCount="indefinite"/>' +
-            '<animateTransform attributeName="transform" type="translate" values="0 6; 0 -12" dur="3s" begin="' + delay + 's" repeatCount="indefinite"/>' +
-            '</text>';
-    }
-    return '<g>' + z(36, -150, 13, 0, 'z') + z(48, -164, 17, 1, 'z') + z(62, -180, 22, 2, 'Z') + '</g>';
-}
+// The full-bleed cozy sleeping scene (its own night sky, pillow and blanket).
+const SLEEPING_SCENE_SRC = '/assets/cowch/cowch-sleeping.jpg';
 
 // A smaller rendered cow friend beside the main one (the Interactions area).
 function cow3dFriend(x, yGround) {
@@ -883,10 +874,8 @@ function buildCow3D(keys, gratitudeWords, baseOverride) {
     const b = COW3D[baseName], h = b.h, w = h * b.aspect;
     let s = '<ellipse cx="0" cy="3" rx="' + (w * 0.5).toFixed(1) + '" ry="8" fill="rgba(60,46,40,0.16)"/>';
     if (baseOverride) {
-        s += '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
+        return s + '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
             '" width="' + w.toFixed(1) + '" height="' + h + '" preserveAspectRatio="xMidYMax meet"/>';
-        if (baseName === 'sleeping') s += pastureSleepZzz();
-        return s;
     }
     // A friend cow renders behind the main one — unless the two-cow Interactions
     // render is already the base pose.
@@ -1119,6 +1108,22 @@ function pastureEngagedToday() {
         streakDayKey(new Date(eng.lastAt[eng.recent])) === streakDayKey(new Date());
 }
 
+// The cow's current base state, shared by the renderer and the blurb. A chat
+// mood read wins (the cow sits sad, or beams). Otherwise, when the user hasn't
+// tended an area today, it sleeps through their sleep hours or sits to rest if
+// they've been away a few days. null = show the pose from what they've tended.
+// (Doing an exercise sets pastureEngagedToday(), so the cow perks up into a pose.)
+function pastureCowBase() {
+    const mood = pastureMood();
+    if (mood === 'low') return 'sad';
+    if (mood === 'good') return 'happy';
+    if (!pastureEngagedToday()) {
+        if (isPastureSleepTime()) return 'sleeping';
+        if (pastureDaysAway() >= PASTURE_AWAY_DAYS) return 'resting';
+    }
+    return null;
+}
+
 function buildCowNode(ctx) {
     const eng = cowEngagement();
     const name = cowName();
@@ -1128,19 +1133,11 @@ function buildCowNode(ctx) {
     // of what they've been working on. Once they're well into it (level 2), the
     // other areas they're tending layer on top as compact props.
     const level = pastureActivityLevel();
-    // A mood read from the chat takes priority over poses — a low mood sits the
-    // cow down sad, a bright one has them beaming.
-    const mood = pastureMood();
-    // Ambient states when the user hasn't tended an area today: the cow sleeps
-    // through their sleep hours, or sits to rest if they've been away a few days.
-    // A mood read still wins, and doing an exercise perks the cow up into a pose.
-    const idle = !mood && !pastureEngagedToday();
-    const asleep = idle && isPastureSleepTime();
-    const away = idle && !asleep && pastureDaysAway() >= PASTURE_AWAY_DAYS;
-    const moodBase = mood === 'low' ? 'sad'
-        : (mood === 'good' ? 'happy'
-        : (asleep ? 'sleeping'
-        : (away ? 'resting' : null)));
+    // A mood read, sleep, or been-away rest — otherwise null and the cow shows
+    // the pose from whatever the user's been tending. (Sleeping is handled as a
+    // full-scene takeover in renderPasture, so buildCowNode won't normally see
+    // it; the COW3D fallback covers it defensively.)
+    const moodBase = pastureCowBase();
     const primaryKey = eng.tended.length ? getPastureActivePose() : null;
     let keys = [];
     if (primaryKey) {
@@ -1205,11 +1202,40 @@ function petPastureCow(g, scale) {
 //  when the pasture moved to telling progress through the cow and the IMAGINE
 //  icon row instead of nature.)
 
+// While the cow sleeps, a cozy full-bleed "goodnight" scene (its own night sky,
+// pillow and blanket) takes over the whole pasture instead of the vector
+// scenery + cow. It fills the view (slice-cropped); the cow sits centred so it
+// stays fully in frame.
+function renderSleepingScene(svg) {
+    svg.setAttribute('data-phase', 'night');
+    const img = document.createElementNS(NS_SVG, 'image');
+    img.setAttribute('href', SLEEPING_SCENE_SRC);
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', SLEEPING_SCENE_SRC);
+    img.setAttribute('x', '0');
+    img.setAttribute('y', '0');
+    img.setAttribute('width', '360');
+    img.setAttribute('height', '280');
+    img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    const nm = cowName();
+    img.setAttribute('role', 'img');
+    img.setAttribute('aria-label', (nm !== 'Your cow' ? nm : 'Your cow') + ' — fast asleep');
+    svg.appendChild(img);
+}
+
 function renderPasture() {
     const svg = document.getElementById('pasture-svg');
     if (!svg) return;
     const eng = cowEngagement();
     svg.innerHTML = '';
+    // At the user's sleep hours the whole pasture becomes a sleeping scene. The
+    // scene fills the box (slice) so there are no letterbox bands; the vector
+    // pasture stays 'meet' (its CSS sky gradient fills any band).
+    if (pastureCowBase() === 'sleeping') {
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        renderSleepingScene(svg);
+        return;
+    }
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     // Backdrop only — no planted scenery. Brightness lifts with engagement.
     buildPastureScenery(svg, Math.min(1, eng.total / 16));
     // the cow, large and forward, in the active pose.
@@ -1225,44 +1251,28 @@ function renderPasture() {
 // posture reflects the IMAGINE area the user most recently tended; until they've
 // done an exercise (or if they've been away), show a gentle note instead.
 function updatePasturePoseUI() {
-    // A mood read from the chat: the cow sits sad with the user, or beams along
-    // with them, and the blurb holds that rather than describing a pose.
-    const mood = pastureMood();
-    if (mood) {
-        const blurb = document.getElementById('pasture-blurb');
-        if (blurb) blurb.textContent = mood === 'low'
-            ? 'It’s okay to not be okay. Your cow is here, sitting with you. 💛'
-            : 'Your cow is beaming right along with you today. ✨';
-        const grat = document.getElementById('pasture-gratitude');
-        if (grat) grat.hidden = true;
-        return;
-    }
-    // Sleep hours (and not tended anything today): the cow's dozing along with
-    // the user. It'll be up and about — and ready to pose — come morning.
-    if (!pastureEngagedToday() && isPastureSleepTime()) {
-        const blurb = document.getElementById('pasture-blurb');
-        if (blurb) blurb.textContent = 'Shhh… your cow is curled up asleep, just like you should be. Rest well. 💤';
-        const grat = document.getElementById('pasture-gratitude');
-        if (grat) grat.hidden = true;
-        return;
-    }
-    // Been away a few days and not yet re-engaged: the cow's sitting and resting.
-    // Doing an IMAGINE exercise perks it up into that area's posture.
-    if (!pastureEngagedToday() && pastureDaysAway() >= PASTURE_AWAY_DAYS) {
-        const blurb = document.getElementById('pasture-blurb');
-        if (blurb) blurb.textContent = 'Welcome back. Your cow’s been having a sit and a rest — do an IMAGINE exercise and it’ll perk up into that posture. 💛';
-        const grat = document.getElementById('pasture-gratitude');
+    const blurb = document.getElementById('pasture-blurb');
+    const grat = document.getElementById('pasture-gratitude');
+    // Base states (mood read / asleep / been-away) get their own note instead of
+    // a pose blurb — kept in step with what the cow is actually showing.
+    const base = pastureCowBase();
+    if (base) {
+        const notes = {
+            sad:      'It’s okay to not be okay. Your cow is here, sitting with you. 💛',
+            happy:    'Your cow is beaming right along with you today. ✨',
+            sleeping: 'Shhh… your cow is curled up asleep, just like you should be. Rest well. 💤',
+            resting:  'Welcome back. Your cow’s been having a sit and a rest — do an IMAGINE exercise and it’ll perk up into that posture. 💛'
+        };
+        if (blurb) blurb.textContent = notes[base];
         if (grat) grat.hidden = true;
         return;
     }
     // A posture appears once they've tended an area; otherwise a gentle invite.
     const meta = cowEngagement().tended.length ? poseForKey(getPastureActivePose()) : null;
-    const blurb = document.getElementById('pasture-blurb');
     if (blurb) {
         blurb.textContent = meta ? meta.blurb
             : 'Your cow is a reflection of your world. It’s settling in — complete an IMAGINE exercise and it’ll take on a posture that mirrors what you tended.';
     }
-    const grat = document.getElementById('pasture-gratitude');
     if (grat) grat.hidden = (!meta || meta.key !== 'G');
 }
 
