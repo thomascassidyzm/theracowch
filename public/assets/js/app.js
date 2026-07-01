@@ -420,6 +420,16 @@ function pastureDaysAway() {
 // The cow sits down to rest once the user's been away at least this many days.
 const PASTURE_AWAY_DAYS = 3;
 
+// The cow sleeps when the user (probably) does. The app has no way to detect
+// actual sleep — it only knows the device's local wall-clock — so this is a
+// simple nightly window in local time (wraps past midnight). Tunable here.
+const PASTURE_SLEEP_START = 21;  // 9pm
+const PASTURE_SLEEP_END   = 6;   // 6am
+function isPastureSleepTime(date) {
+    const h = (date || new Date()).getHours();
+    return h >= PASTURE_SLEEP_START || h < PASTURE_SLEEP_END;
+}
+
 // Legacy reader: older builds planted one item per visit day. Nothing plants
 // anything now, but recordVisitToday() still reads these dates to backfill the
 // visit log, so the reader stays.
@@ -817,8 +827,24 @@ const COW3D = {
     happy:        { src: '/assets/cowch/cowch-happy.webp',        aspect: 720 / 669,  h: 140 },
     // Away pose: a calm, seated cow shown when the user's been gone a few days —
     // it's had a sit and a rest, waiting for them (see buildCowNode).
-    resting:      { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 }
+    resting:      { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 },
+    // Sleeping pose: the seated cow, dozing, with a drifting "Zzz" (added in
+    // buildCow3D) — shown during the user's sleep hours (see buildCowNode).
+    sleeping:     { src: '/assets/cowch/cowch-lotus.webp',        aspect: 720 / 907,  h: 150 }
 };
+
+// A gentle drifting "z z Z" above the cow's head while it sleeps.
+function pastureSleepZzz() {
+    function z(x, y, size, delay, label) {
+        return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" text-anchor="middle"' +
+            ' fill="#FCF5E8" stroke="#4A3F4A" stroke-width="0.6" opacity="0"' +
+            ' font-family="Gabarito, sans-serif" font-weight="900">' + label +
+            '<animate attributeName="opacity" values="0;0.75;0" dur="3s" begin="' + delay + 's" repeatCount="indefinite"/>' +
+            '<animateTransform attributeName="transform" type="translate" values="0 6; 0 -12" dur="3s" begin="' + delay + 's" repeatCount="indefinite"/>' +
+            '</text>';
+    }
+    return '<g>' + z(36, -150, 13, 0, 'z') + z(48, -164, 17, 1, 'z') + z(62, -180, 22, 2, 'Z') + '</g>';
+}
 
 // A smaller rendered cow friend beside the main one (the Interactions area).
 function cow3dFriend(x, yGround) {
@@ -857,8 +883,10 @@ function buildCow3D(keys, gratitudeWords, baseOverride) {
     const b = COW3D[baseName], h = b.h, w = h * b.aspect;
     let s = '<ellipse cx="0" cy="3" rx="' + (w * 0.5).toFixed(1) + '" ry="8" fill="rgba(60,46,40,0.16)"/>';
     if (baseOverride) {
-        return s + '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
+        s += '<image href="' + b.src + '" x="' + (-w / 2).toFixed(1) + '" y="' + (-h + 5).toFixed(1) +
             '" width="' + w.toFixed(1) + '" height="' + h + '" preserveAspectRatio="xMidYMax meet"/>';
+        if (baseName === 'sleeping') s += pastureSleepZzz();
+        return s;
     }
     // A friend cow renders behind the main one — unless the two-cow Interactions
     // render is already the base pose.
@@ -1103,12 +1131,16 @@ function buildCowNode(ctx) {
     // A mood read from the chat takes priority over poses — a low mood sits the
     // cow down sad, a bright one has them beaming.
     const mood = pastureMood();
-    // Been away a few days (and not re-engaged today)? The cow sits and rests
-    // until they're back. A mood read still wins; doing an exercise perks it up.
-    const away = !mood && !pastureEngagedToday() && pastureDaysAway() >= PASTURE_AWAY_DAYS;
+    // Ambient states when the user hasn't tended an area today: the cow sleeps
+    // through their sleep hours, or sits to rest if they've been away a few days.
+    // A mood read still wins, and doing an exercise perks the cow up into a pose.
+    const idle = !mood && !pastureEngagedToday();
+    const asleep = idle && isPastureSleepTime();
+    const away = idle && !asleep && pastureDaysAway() >= PASTURE_AWAY_DAYS;
     const moodBase = mood === 'low' ? 'sad'
         : (mood === 'good' ? 'happy'
-        : (away ? 'resting' : null));
+        : (asleep ? 'sleeping'
+        : (away ? 'resting' : null)));
     const primaryKey = eng.tended.length ? getPastureActivePose() : null;
     let keys = [];
     if (primaryKey) {
@@ -1130,7 +1162,9 @@ function buildCowNode(ctx) {
     g.setAttribute('aria-label', (named ? name : 'Your cow') +
         (moodBase === 'sad' ? ' — feeling low, here with you'
             : moodBase === 'happy' ? ' — beaming with you today'
-                : (meta ? ' — ' + meta.label : ' — resting in the pasture')));
+                : moodBase === 'sleeping' ? ' — fast asleep'
+                    : moodBase === 'resting' ? ' — having a sit and a rest'
+                        : (meta ? ' — ' + meta.label : ' — resting in the pasture')));
 
     const art = document.createElementNS(NS_SVG, 'g');
     art.setAttribute('transform', 'scale(' + scale.toFixed(3) + ')');
@@ -1199,6 +1233,15 @@ function updatePasturePoseUI() {
         if (blurb) blurb.textContent = mood === 'low'
             ? 'It’s okay to not be okay. Your cow is here, sitting with you. 💛'
             : 'Your cow is beaming right along with you today. ✨';
+        const grat = document.getElementById('pasture-gratitude');
+        if (grat) grat.hidden = true;
+        return;
+    }
+    // Sleep hours (and not tended anything today): the cow's dozing along with
+    // the user. It'll be up and about — and ready to pose — come morning.
+    if (!pastureEngagedToday() && isPastureSleepTime()) {
+        const blurb = document.getElementById('pasture-blurb');
+        if (blurb) blurb.textContent = 'Shhh… your cow is curled up asleep, just like you should be. Rest well. 💤';
         const grat = document.getElementById('pasture-gratitude');
         if (grat) grat.hidden = true;
         return;
