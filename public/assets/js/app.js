@@ -1202,24 +1202,40 @@ function petPastureCow(g, scale) {
 //  when the pasture moved to telling progress through the cow and the IMAGINE
 //  icon row instead of nature.)
 
-// While the cow sleeps, a cozy full-bleed "goodnight" scene (its own night sky,
-// pillow and blanket) takes over the whole pasture instead of the vector
-// scenery + cow. It fills the view (slice-cropped); the cow sits centred so it
-// stays fully in frame.
-function renderSleepingScene(svg) {
-    svg.setAttribute('data-phase', 'night');
-    const img = document.createElementNS(NS_SVG, 'image');
-    img.setAttribute('href', SLEEPING_SCENE_SRC);
-    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', SLEEPING_SCENE_SRC);
-    img.setAttribute('x', '0');
-    img.setAttribute('y', '0');
-    img.setAttribute('width', '360');
-    img.setAttribute('height', '280');
-    img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+// The sleeping cow, placed *in* the pasture: the cozy render (its own pillow,
+// blanket and bit of night sky) sits on the grass, softly feathered at the
+// edges so the rectangular frame disappears — its night sky blends into the
+// pasture's, and the pillow fades into the grass. The pasture draws its own
+// moon and stars behind, so the image's are masked away by the fade.
+// Displayed footprint on the grass. The height is deliberately shorter than the
+// image's aspect so `slice` + bottom anchor (yMax) crop most of the image's own
+// sky away — the cow, pillow and blanket stay; the pasture's night sky shows
+// behind. A radial fade dissolves the remaining rectangular edges.
+const PASTURE_SLEEP_W = 208;
+const PASTURE_SLEEP_H = 100;
+function buildSleepingCowNode() {
+    const w = PASTURE_SLEEP_W, h = PASTURE_SLEEP_H;
+    const x = PASTURE_COW_CX - w / 2;
+    const y = (PASTURE_COW_GROUND + 14) - h;   // rest the pillow on the grass
     const nm = cowName();
-    img.setAttribute('role', 'img');
-    img.setAttribute('aria-label', (nm !== 'Your cow' ? nm : 'Your cow') + ' — fast asleep');
-    svg.appendChild(img);
+    const g = document.createElementNS(NS_SVG, 'g');
+    g.classList.add('pasture-item', 'pasture-cow');
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', (nm !== 'Your cow' ? nm : 'Your cow') + ' — fast asleep in the pasture');
+    g.innerHTML =
+        '<defs>' +
+            '<radialGradient id="pastureSleepFade" cx="47%" cy="56%" r="50%">' +
+                '<stop offset="0%" stop-color="#fff"/>' +
+                '<stop offset="46%" stop-color="#fff"/>' +
+                '<stop offset="100%" stop-color="#000"/>' +
+            '</radialGradient>' +
+            '<mask id="pastureSleepMask">' +
+                '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="url(#pastureSleepFade)"/>' +
+            '</mask>' +
+        '</defs>' +
+        '<image href="' + SLEEPING_SCENE_SRC + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
+            '" preserveAspectRatio="xMidYMax slice" mask="url(#pastureSleepMask)"/>';
+    return g;
 }
 
 function renderPasture() {
@@ -1227,19 +1243,12 @@ function renderPasture() {
     if (!svg) return;
     const eng = cowEngagement();
     svg.innerHTML = '';
-    // At the user's sleep hours the whole pasture becomes a sleeping scene. The
-    // scene fills the box (slice) so there are no letterbox bands; the vector
-    // pasture stays 'meet' (its CSS sky gradient fills any band).
-    if (pastureCowBase() === 'sleeping') {
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-        renderSleepingScene(svg);
-        return;
-    }
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-    // Backdrop only — no planted scenery. Brightness lifts with engagement.
+    // Night backdrop (its own moon + stars); brightness lifts with engagement.
     buildPastureScenery(svg, Math.min(1, eng.total / 16));
-    // the cow, large and forward, in the active pose.
-    svg.appendChild(buildCowNode({ svg }));
+    // At the user's sleep hours the cow is curled up asleep on the grass;
+    // otherwise the standing/posed cow, large and forward.
+    svg.appendChild(pastureCowBase() === 'sleeping' ? buildSleepingCowNode() : buildCowNode({ svg }));
 }
 
 // (The tap-to-pose IMAGINE icon row was removed: the cow now takes on a
