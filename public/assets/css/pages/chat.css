@@ -1455,6 +1455,88 @@
 }
 
 /* ============================================
+   Positive Data Log (self-doubt intervention)
+   ============================================ */
+
+.pdl-entry {
+    margin: var(--space-md) 0;
+}
+
+.pdl-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid var(--border-warm);
+    border-radius: var(--radius-medium);
+    padding: var(--space-sm) var(--space-md);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    resize: vertical;
+    margin-bottom: var(--space-sm);
+}
+
+.pdl-input:focus {
+    outline: none;
+    border-color: var(--coral);
+}
+
+.pdl-add {
+    width: 100%;
+}
+
+.pdl-list-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: var(--space-md) 0 var(--space-xs);
+}
+
+.pdl-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pdl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    background: var(--bg-card);
+    border: 2px solid var(--border-warm);
+    border-left: 4px solid var(--coral);
+    border-radius: var(--radius-medium);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.pdl-item-text {
+    flex: 1;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.pdl-item-remove {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0 0 var(--space-xs);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+}
+
+.pdl-item-remove:active {
+    color: var(--coral);
+}
+
+/* ============================================
    Not-Okay Intervention Modal
    ============================================ */
 

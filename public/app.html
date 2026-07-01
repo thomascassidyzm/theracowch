@@ -7187,6 +7187,67 @@
         </div>
     </div>
 
+    <!-- Self-Doubt Intervention Modal -->
+    <div class="exercise-modal" id="selfdoubt-intervention-modal">
+        <div class="exercise-modal-content micro-intervention-content">
+            <div class="exercise-modal-header">
+                <h3>For self-doubt</h3>
+                <button class="close-modal" id="close-selfdoubt-intervention">&times;</button>
+            </div>
+
+            <div class="dep-swipe-track" id="selfdoubt-swipe-track">
+                <!-- Screen 1: Positive Data Log -->
+                <div class="dep-slide active" data-selfdoubt-slide="1">
+                    <p class="micro-section-label">Positive Data Log</p>
+                    <p class="dep-instruction">Self-doubt only ever collects the evidence <em>against</em> you. This is where you collect the evidence <strong>for</strong> you &mdash; and keep it.</p>
+                    <p class="dep-instruction">Write down things you like about yourself, things you&rsquo;re proud of, or small wins. They don&rsquo;t have to be achievements &mdash; a characteristic counts too. <strong>Kindness.</strong> Patience. Showing up today.</p>
+                    <div class="pdl-entry">
+                        <textarea id="pdl-input" class="pdl-input" rows="2" maxlength="280" placeholder="e.g. I&rsquo;m kind to people who are having a hard time"></textarea>
+                        <button type="button" class="dep-nav-btn is-primary pdl-add" id="pdl-add">Add to my log</button>
+                    </div>
+                    <p class="pdl-list-label" id="pdl-list-label" hidden>Your log</p>
+                    <div class="pdl-list" id="pdl-list"></div>
+                    <div class="dep-why">
+                        <strong>Why it works:</strong>
+                        <p>Doubt feels like fact because your mind hides the counter-evidence. Writing it down &mdash; and re-reading it &mdash; slowly rebalances the picture. It stays on this device, just for you.</p>
+                    </div>
+                </div>
+
+                <!-- Screen 2: Stop comparing & despairing -->
+                <div class="dep-slide" data-selfdoubt-slide="2">
+                    <p class="micro-section-label">Stop comparing &amp; despairing</p>
+                    <div class="dep-compassion">
+                        <p class="dep-quote">It&rsquo;s an unfair comparison.</p>
+                    </div>
+                    <p class="dep-instruction">You never really know what you&rsquo;re comparing yourself to. People show you their <strong>highlight reel</strong> &mdash; the polished, edited, sometimes embellished version.</p>
+                    <p class="dep-instruction">Meanwhile you know your own <strong>behind-the-scenes footage</strong> &mdash; every outtake, and everything that didn&rsquo;t make the grade.</p>
+                    <div class="dep-steps">
+                        <div class="dep-step-item">Their best moment vs. your whole messy reality</div>
+                        <div class="dep-step-item">A curated snapshot vs. your entire unedited day</div>
+                        <div class="dep-step-item">What they chose to show vs. everything you actually feel</div>
+                    </div>
+                    <div class="dep-why">
+                        <strong>Remember:</strong>
+                        <p>It was never a fair contest. When the comparison creeps in, come back to your Positive Data Log &mdash; that&rsquo;s <em>your</em> real evidence.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress dots -->
+            <div class="micro-progress">
+                <span class="dep-dot active" data-selfdoubt-dot="1"></span>
+                <span class="dep-dot" data-selfdoubt-dot="2"></span>
+            </div>
+
+            <div class="dep-nav" id="selfdoubt-nav">
+                <button type="button" class="dep-nav-btn is-hidden" data-selfdoubt-nav="back">← Back</button>
+                <button type="button" class="dep-nav-btn is-primary" data-selfdoubt-nav="next">Next →</button>
+            </div>
+
+            <div class="dep-swipe-hint" id="selfdoubt-swipe-hint">Swipe or tap Next to continue</div>
+        </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="confirm-modal" id="confirm-modal">
         <div class="confirm-modal-content">
@@ -7957,6 +8018,135 @@
             var tracking = false;
 
             content.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                tracking = true;
+            }, { passive: true });
+
+            content.addEventListener('touchend', function(e) {
+                if (!tracking) return;
+                tracking = false;
+                var dx = e.changedTouches[0].clientX - startX;
+                var dy = e.changedTouches[0].clientY - startY;
+                if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx)) return;
+                if (dx < 0 && current < total) goToSlide(current + 1);
+                if (dx > 0 && current > 1) goToSlide(current - 1);
+            }, { passive: true });
+        })();
+
+        // ============================================
+        // Self-Doubt Intervention (Positive Data Log + comparison reframe)
+        // ============================================
+        (function() {
+            var modal = document.getElementById('selfdoubt-intervention-modal');
+            if (!modal) return;
+            var content = modal.querySelector('.exercise-modal-content');
+            var closeBtn = document.getElementById('close-selfdoubt-intervention');
+            var openBtn = document.querySelector('.micro-ai-option[data-mood="self-doubt"]');
+            var hint = document.getElementById('selfdoubt-swipe-hint');
+            var slides = modal.querySelectorAll('.dep-slide');
+            var dots = modal.querySelectorAll('.dep-dot');
+            var backBtn = modal.querySelector('[data-selfdoubt-nav="back"]');
+            var nextBtn = modal.querySelector('[data-selfdoubt-nav="next"]');
+            var current = 1;
+            var total = slides.length;
+
+            // --- Positive Data Log (kept on-device, just for the user) ---
+            var STORE_KEY = 'cowch_positive_data_log';
+            var input = document.getElementById('pdl-input');
+            var addBtn = document.getElementById('pdl-add');
+            var list = document.getElementById('pdl-list');
+            var listLabel = document.getElementById('pdl-list-label');
+
+            function loadLog() {
+                try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+                catch (e) { return []; }
+            }
+            function saveLog(items) {
+                try { localStorage.setItem(STORE_KEY, JSON.stringify(items)); } catch (e) {}
+            }
+            function renderLog() {
+                var items = loadLog();
+                list.innerHTML = '';
+                listLabel.hidden = items.length === 0;
+                items.forEach(function(entry, i) {
+                    var row = document.createElement('div');
+                    row.className = 'pdl-item';
+                    var text = document.createElement('span');
+                    text.className = 'pdl-item-text';
+                    text.textContent = entry.text;
+                    var del = document.createElement('button');
+                    del.type = 'button';
+                    del.className = 'pdl-item-remove';
+                    del.setAttribute('aria-label', 'Remove this entry');
+                    del.innerHTML = '&times;';
+                    del.addEventListener('click', function() {
+                        var cur = loadLog();
+                        cur.splice(i, 1);
+                        saveLog(cur);
+                        renderLog();
+                    });
+                    row.appendChild(text);
+                    row.appendChild(del);
+                    list.appendChild(row);
+                });
+            }
+            function addEntry() {
+                var val = (input.value || '').trim();
+                if (!val) { input.focus(); return; }
+                var items = loadLog();
+                items.unshift({ text: val, ts: new Date().toISOString() });
+                saveLog(items);
+                input.value = '';
+                renderLog();
+                input.focus();
+            }
+            if (addBtn) addBtn.addEventListener('click', addEntry);
+            if (input) {
+                // Cmd/Ctrl+Enter adds without losing the on-screen keyboard flow
+                input.addEventListener('keydown', function(e) {
+                    if ((e.key === 'Enter' || e.keyCode === 13) && (e.metaKey || e.ctrlKey)) {
+                        e.preventDefault();
+                        addEntry();
+                    }
+                });
+            }
+
+            function goToSlide(n) {
+                current = n;
+                slides.forEach(function(s) { s.classList.remove('active'); });
+                modal.querySelector('[data-selfdoubt-slide="' + n + '"]').classList.add('active');
+                dots.forEach(function(d) { d.classList.remove('active'); });
+                modal.querySelector('[data-selfdoubt-dot="' + n + '"]').classList.add('active');
+                hint.innerHTML = n < total ? 'Swipe or tap Next to continue' : 'Whenever you need it, it&rsquo;s here &mdash; tap Done';
+                backBtn.classList.toggle('is-hidden', n === 1);
+                nextBtn.innerHTML = n === total ? 'Done' : 'Next &rarr;';
+            }
+
+            if (openBtn) openBtn.addEventListener('click', function() {
+                renderLog();
+                goToSlide(1);
+                modal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            backBtn.addEventListener('click', function() {
+                if (current > 1) goToSlide(current - 1);
+            });
+            nextBtn.addEventListener('click', function() {
+                if (current < total) goToSlide(current + 1);
+                else modal.classList.remove('active');
+            });
+
+            // Swipe detection — don't hijack a horizontal drag inside the text box
+            var startX = 0;
+            var startY = 0;
+            var tracking = false;
+
+            content.addEventListener('touchstart', function(e) {
+                if (e.target.closest('.pdl-input')) { tracking = false; return; }
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 tracking = true;
