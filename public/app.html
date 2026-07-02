@@ -921,6 +921,19 @@
             margin-top: var(--space-md);
         }
 
+        /* Brief intro above the area cards — why these seven areas, and a
+           gentle nudge to pick a couple of small daily habits from below. */
+        .imagine-intro {
+            font-size: var(--font-size-base);
+            line-height: 1.55;
+            color: var(--text-on-canvas-muted);
+            background: var(--surface, rgba(255, 255, 255, 0.6));
+            border-left: 3px solid var(--coral);
+            border-radius: var(--radius-md, 12px);
+            padding: var(--space-md);
+            margin: 0 0 var(--space-xl);
+        }
+
         .domain-cards {
             display: flex;
             flex-direction: column;
@@ -4917,6 +4930,8 @@
                         <h1>IMAGINE</h1>
                         <p>Seven ways to nurture your wellbeing</p>
                     </div>
+
+                    <p class="imagine-intro">These seven areas have each been shown to support your mental and physical wellbeing. Add one or two small daily habits from the areas below &mdash; or more, if you&rsquo;re able.</p>
 
                     <!-- Mandy's guide bubble — walks the user through choosing
                          an area (the cards below), then an exercise within it.
