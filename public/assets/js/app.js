@@ -2678,10 +2678,11 @@ const IMAGINE_DOMAINS = {
         color: '#E87EA8',
         description: 'This domain is about nurturing your relationship with yourself. It includes self-care practices, setting healthy boundaries, and developing self-compassion.',
         exercises: [
-            { title: '5-Minute Body Reset', description: 'Boost energy through small intentional movement', duration: '5 min', prompt: 'Can you guide me through a 5-minute body reset? I want to do some intentional movement to boost my energy.' },
-            { title: 'The 1% Boundary', description: 'Build confidence in saying "no" or setting limits', prompt: 'Can you guide me through the 1% Boundary exercise? I want to practice setting small, healthy boundaries.' },
-            { title: 'Talk to Yourself Like a Friend', description: 'Reduce harsh self-talk and build resilience', prompt: 'Can you help me practice self-compassion? I noticed some harsh self-talk and want to respond to myself like I would a friend.' },
-            { title: 'Something Just for Me', description: 'Strengthen self-care through intentional enjoyment', prompt: "Can you help me create a 'yes list' of things I enjoy but haven't done recently?" }
+            { title: '1 Minute Reset', description: 'A quick superhero pose to shift your energy and posture.', duration: '1 min', url: '/exercises/minute-reset.html' },
+            { title: 'Inner Weather', description: 'Check in with your inner weather — just noticing, no judgement.', duration: '3 min', url: '/exercises/inner-weather.html' },
+            { title: 'Self-Compassion', description: 'Respond to yourself the way you would to a good friend.', url: '/exercises/self-compassion.html' },
+            { title: 'Wellness Check-in', description: 'A gentle look across the different parts of your life.', url: '/exercises/wellness-checkin.html' },
+            { title: 'Energy Audit', description: 'Notice what fills your cup and what drains it.', url: '/exercises/energy-audit.html' }
         ]
     },
     mind: {
@@ -2691,10 +2692,9 @@ const IMAGINE_DOMAINS = {
         color: '#5BB4E0',
         description: 'Mindfulness helps you step out of autopilot and into the present moment. These exercises help calm your nervous system and anchor you in the here and now.',
         exercises: [
-            { title: 'Box Breathing', description: '4-4-4-4 breathing to calm your nervous system', duration: '4 min', interactive: 'breathing', prompt: 'Can you guide me through box breathing?' },
-            { title: '5-4-3-2-1 Grounding', description: 'Use your senses to anchor in the present', duration: '3 min', interactive: 'grounding', prompt: 'Can you guide me through the 5-4-3-2-1 grounding technique?' },
-            { title: 'Progressive Muscle Relaxation', description: 'Release tension through guided body awareness', duration: '10 min', interactive: 'pmr', prompt: 'Can you guide me through progressive muscle relaxation?' },
-            { title: 'Give Your Brain a Breather', description: 'A 2-minute mindfulness reset', duration: '2 min', prompt: 'Can you guide me through a 2-minute mind unclutter exercise? I need to step out of constant thinking and just notice.' }
+            { title: 'Box Breathing', description: '4-count breathing to settle your nervous system.', duration: '4 min', url: '/exercises/box-breathing.html' },
+            { title: 'Body Scan / PMR', description: 'Tense and release each muscle group to let tension go.', duration: '10 min', url: '/exercises/body-scan.html' },
+            { title: '5-4-3-2-1 Grounding', description: 'Use your five senses to anchor in the present.', duration: '3 min', url: '/exercises/grounding-54321.html' }
         ]
     },
     accept: {
@@ -2704,9 +2704,9 @@ const IMAGINE_DOMAINS = {
         color: '#9C7CD4',
         description: 'Acceptance isn\'t about giving up - it\'s about acknowledging reality so you can respond wisely rather than react. These exercises help you make peace with what you cannot change.',
         exercises: [
-            { title: 'The Wave', description: 'Watch emotions rise and fall like ocean waves', duration: '3 min', interactive: 'wave', prompt: 'Can you guide me through the wave exercise? I have a strong feeling and want to practice letting it rise and fall naturally.' },
-            { title: 'What Am I Pushing Away?', description: 'Notice thoughts or feelings you might be avoiding', prompt: 'Can you guide me through a resistance scan? I want to gently notice what I might be avoiding or pushing away.' },
-            { title: 'Sort It Out', description: 'Distinguish between what you can and cannot control', prompt: 'Can you help me do the circle of control exercise? I want to sort out what I can control versus what I need to accept.' }
+            { title: 'The Wave', description: 'Watch a feeling rise and fall like a wave.', duration: '3 min', url: '/exercises/wave.html' },
+            { title: 'Radical Acceptance', description: 'Acknowledge what is, so you can respond wisely.', url: '/exercises/radical-acceptance.html' },
+            { title: 'HEAL Framework', description: 'A gentle way to sit with a difficult feeling.', url: '/exercises/heal-framework.html' }
         ]
     },
     thanks: {
@@ -2716,8 +2716,9 @@ const IMAGINE_DOMAINS = {
         color: '#34B7AE',
         description: 'Gratitude isn\'t about toxic positivity - it\'s about training your brain to notice good things alongside the difficult ones. These exercises build your appreciation muscle.',
         exercises: [
-            { title: 'Notice the Small Stuff', description: 'Tune into subtle positives you might have missed', duration: '2 min', prompt: 'Can you help me with the tiny wins gratitude check? I want to notice three small things that made today even slightly better.' },
-            { title: 'A Different Angle', description: 'Reframe a challenge through appreciation', prompt: "Can you guide me through the gratitude lens exercise? I have a challenge I'd like to look at from a different angle." }
+            { title: 'Gratitude Stars', description: 'Name a few good things and watch them light up.', url: '/exercises/gratitude.html' },
+            { title: 'Small Wins', description: 'Notice the small stuff you might have missed.', duration: '2 min', url: '/exercises/small-wins.html' },
+            { title: 'Gratitude Journal', description: 'A short note on what you appreciated today.', url: '/exercises/gratitude-journal.html' }
         ]
     },
     connect: {
@@ -2727,9 +2728,10 @@ const IMAGINE_DOMAINS = {
         color: '#FFD21E',
         description: 'We\'re social creatures, and connection matters for wellbeing. These exercises help you notice your interaction patterns and take small steps toward meaningful connection.',
         exercises: [
-            { title: 'How Connected Was Today?', description: 'Build awareness of your daily interaction levels', duration: '2 min', interactive: 'social', prompt: 'Can you help me do a social pulse check? I want to reflect on my connections today.' },
-            { title: 'Who Did I See This Week?', description: 'Spot patterns in how often you connect', prompt: "Can you help me with the connection tracker? I want to reflect on who I've connected with this week." },
-            { title: 'A Small Step Away From Isolation', description: 'Break isolation with one tiny, achievable action', prompt: 'Can you guide me through the one-step outward challenge? I want to take a small step toward connection today.' }
+            { title: 'Connection Web', description: 'Map who supports you across your inner, middle and outer circles.', url: '/exercises/connection-web.html' },
+            { title: 'Good Communication', description: 'Express a need clearly, without aggression or avoidance.', url: '/exercises/good-communication.html' },
+            { title: 'Boundary Setting', description: 'Practise saying no and holding a healthy limit.', url: '/exercises/boundary-setting.html' },
+            { title: 'A Small Step Outward', description: 'Take one small, achievable step toward connection.', url: '/exercises/comfort-ladder.html' }
         ]
     },
     play: {
@@ -2739,9 +2741,12 @@ const IMAGINE_DOMAINS = {
         color: '#F2802E',
         description: 'Play isn\'t just for kids - it\'s essential for mental health. These exercises help you reconnect with joy, lightness, and your playful side.',
         exercises: [
-            { title: 'Scheduled Silly Time', description: 'Interrupt seriousness with 10 minutes of play', duration: '10 min', prompt: 'Can you help me take a 10-minute play break? I need to reconnect with my playful side.' },
-            { title: 'Replaying Joy', description: 'Unlock playfulness through nostalgia', prompt: 'Can you guide me through the childhood micro-joy exercise? I want to rediscover something I loved as a child.' },
-            { title: 'The Mini Laugh Experiment', description: 'Trigger laughter on purpose to shift your state', duration: '3 min', prompt: "Can you guide me through the 3-minute laugh starter? I want to try triggering laughter even if I don't feel like it." }
+            { title: 'Joy Bubbles', description: 'Pop bubbles — no goals, just a two-minute reset.', duration: '2 min', url: '/exercises/joy.html' },
+            { title: 'Fun Prompts', description: 'Random playful nudges to add a little spontaneity.', url: '/exercises/fun-prompts.html' },
+            { title: 'Playfulness Diary', description: 'Log the moments that made you smile.', url: '/exercises/playfulness-diary.html' },
+            { title: 'Creative Expression', description: 'Make time for something creative and see how it feels.', url: '/exercises/creative-expression.html' },
+            { title: 'Silly Dice', description: 'Roll for jokes, silly challenges and fun facts.', url: '/exercises/silly-dice.html' },
+            { title: 'Oracle Cards', description: 'Draw a card for a moment of playful guidance.', url: '/exercises/oracle-cards.html' }
         ]
     },
     explore: {
@@ -2751,12 +2756,10 @@ const IMAGINE_DOMAINS = {
         color: '#F25C6A',
         description: 'Growth happens at the edge of your comfort zone. These exercises help you gently stretch your boundaries and build tolerance for uncertainty.',
         exercises: [
-            { title: 'What\'s Protecting You... and Limiting You?', description: 'Identify behaviours that block growth', prompt: 'Can you help me spot my safety behaviours? I want to notice what I do to avoid discomfort and what it might be costing me.' },
-            { title: 'Grow Without Overwhelm', description: 'Try something 10% more challenging', prompt: 'Can you guide me through the 10% stretch exercise? I want to gently push my comfort zone without overwhelming myself.' },
-            { title: 'Investigate Instead of Assuming', description: 'Replace anxious predictions with curiosity', prompt: "Can you help me be a curious detective? I have a situation where I'm assuming the worst and want to gather real evidence instead." },
-            { title: 'Uncertainty Ladder', description: 'Build tolerance for uncertainty in gradual steps', interactive: 'ladder', prompt: 'Can you help me with the uncertainty ladder? I want to practice tolerating uncertainty in small, manageable steps.' },
-            { title: 'Inner Weather Report', description: 'Check in with your internal state without judgment', duration: '3 min', interactive: 'weather', prompt: "Can you guide me through an inner weather report? I want to explore what's happening inside me right now." },
-            { title: 'Trigger Mapping', description: 'Map what triggered you so it feels clearer and more manageable', duration: '5 min', interactive: 'trigger', prompt: 'I feel triggered or overwhelmed. Can you help me map what just happened step by step?' }
+            { title: 'Values Compass', description: 'Get clear on what matters most to you.', url: '/exercises/values-compass.html' },
+            { title: 'Wonder Cards', description: 'Swap anxious predictions for a little curiosity.', url: '/exercises/wonder.html' },
+            { title: 'Comfort-Zone Ladder', description: 'Stretch your comfort zone in small, manageable steps.', url: '/exercises/comfort-ladder.html' },
+            { title: 'Trigger Mapping', description: 'Map what set you off, step by step, so it feels clearer.', duration: '5 min', url: '/exercises/trigger-mapping.html' }
         ]
     }
 };
@@ -2819,7 +2822,8 @@ function setupDomainPanel() {
             <div class="exercise-list">
                 ${domain.exercises.map((ex, i) => `
                     <div class="exercise-card ${ex.interactive ? 'interactive' : ''}"
-                         data-prompt="${ex.prompt.replace(/"/g, '&quot;')}"
+                         data-prompt="${(ex.prompt || '').replace(/"/g, '&quot;')}"
+                         data-url="${ex.url || ''}"
                          data-interactive="${ex.interactive || ''}">
                         <div class="exercise-card-header">
                             <h4>${ex.interactive ? '&#9658; ' : ''}${ex.title}</h4>
@@ -2845,6 +2849,12 @@ function setupDomainPanel() {
         // Add click handlers for exercise cards
         domainPanelContent.querySelectorAll('.exercise-card').forEach(card => {
             card.addEventListener('click', () => {
+                // Prefer the exercise's own dedicated page.
+                if (card.dataset.url) {
+                    closeDomainPanel();
+                    window.location.href = card.dataset.url;
+                    return;
+                }
                 const interactive = card.dataset.interactive;
                 if (interactive && EXERCISE_URLS[interactive]) {
                     // Open dedicated exercise page
@@ -2915,6 +2925,13 @@ function setupImagineGuide() {
     if (!guide || !textEl || !optionsEl) return;
 
     function startExercise(ex) {
+        // Every IMAGINE exercise now opens its own dedicated exercise page
+        // rather than dropping the user into chat.
+        if (ex.url) {
+            window.location.href = ex.url;
+            return;
+        }
+        // Legacy fallbacks (kept defensively): an interactive page, then chat.
         if (ex.interactive && IMAGINE_GUIDE_EXERCISE_URLS[ex.interactive]) {
             window.location.href = IMAGINE_GUIDE_EXERCISE_URLS[ex.interactive];
             return;
