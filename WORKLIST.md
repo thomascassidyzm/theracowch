@@ -38,19 +38,11 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 
 ## 🔨 To build   (claimable — one line, link the plan)
 
-- [x] @claude-local 06-14 **University-facing pitch surface — SHIPPED** (`public/for-universities.html`): brand-styled, print-friendly, noindex, not in app nav — the gap / what-it-is / why-yes / the ask (~50-student evaluated pilot). From `docs/marketing-strategy.md` App. A.
-- [x] @claude-local 06-14 **One-page institutional privacy / data-flow statement — SHIPPED** (`public/privacy-for-institutions.html`): on-device, no central student DB, no DTAC/DCB0129 trigger, at-a-glance Q&A — the DPIA-killer.
-- [x] @claude-local 06-14 **Campus on-ramp — SHIPPED** (`public/qr/`): printable `talk-card.html` (error-level-H QR → `cowch.app/?utm_source=surrey-talk`, attributes in Vercel + telemetry `source`) + standalone SVG/PNG for slides + README for per-talk variants.
-- [~] @cloud-space 06-19 **MuMu grows & reflects in the Pasture** — the pasture cow scales up with engagement and wears small tokens of the user's top-tended IMAGINE areas (mirror=self, lotus=mindfulness, leaf=acceptance, journal=gratitude, friend=interactions, balloon+smile=nurturing/play, binoculars=exploring). `public/assets/js/app.js`.
 - [ ] **Warm welcome for shared/invited arrivals** — a `?ref=*` first-visit nudge ("someone thought this might help you", once, then in); reuse `window.CowchInstall`.
 - [ ] **Gentle, once-only share nudge** after a genuinely good moment (calls `window.CowchShare.share()`; a `localStorage` flag so it never nags).
 - [ ] **Install & preview polish** — real screenshots (`manifest.json` references `/screenshots/*` that 404); confirm the social card renders everywhere.
 - [ ] **Light, consent-aware feedback / testimonial capture** from early users + the pilot.
 - [ ] **Exercise/IMAGINE page analytics** — those pages have *no* analytics (only 6/32 even load `activity-log.js`); we see app-side opens, not their page-views/completions. Light them up only if the open-rate signal proves worth deepening.
-- [x] @claude-local 06-13 **Share→install loop + social preview cards — SHIPPED.** `CowchShare` (native sheet / copy+toast), two entry points (YOU-tab pill + Settings); OG/Twitter cards on `index.html`+`app.html` with a brand 1200×630 `og-image.png`. → `docs/sharing-and-marketing.md`
-- [x] @claude-local 06-13 **Validation telemetry (first pass) — SHIPPED.** Privacy-safe Vercel events: `chat_started`, `exercise_open`/`domain_open`, `returned`, install funnel, `share` — each with a first-touch `source`. Vercel Web Analytics enabled (Pro). → `docs/sharing-and-marketing.md`
-- [x] @web-calf 06-14 **Interactive calf companion (Finch-inspired) — SHIPPED v1.** Stork-delivery welcome flow → name your calf + yourself → a few gentle on-device intake questions → pick focus areas (reorders daily IMAGINE + seeds profile). Persistent, growing calf card on Home; "spend a moment" care actions deep-link to IMAGINE exercises (caring for the calf = caring for you). Non-clinical, no breakable streaks, on-device only. `public/assets/js/calf.js` + `calf.css`. Open design left: how warm/central the calf becomes vs. Mandy.
-- [x] @claude-local 06-14 **Claims-safety pass — SHIPPED.** Audited all copy + the chat system prompt (AI no longer calls itself a therapist; proactively reaffirms "general wellbeing support, not therapy"); removed `vision.html`; aligned "coach"→"companion"; moved the prompt into a bundled `lib/prompt-base.js`. → `docs/claims-audit.md`
 
 ## 🤔 Areas to think through   (open design — link the think-piece)
 
@@ -73,11 +65,15 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 - [!] @tom 06-14 **Surrey: confirm the contact + a talk date** — Centre for Wellbeing owner; whether the pilot runs via a talk / society / wellbeing service (loop in the School of Psychology for a measure).
 - [!] @tom 06-14 **Mandy reviews the live chat voice** — she may want it warmer or more arm's-length now the reaffirmation is live.
 - [!] @tom 06-14 **Prime the social-preview caches** after any OG change — run `cowch.app` through the FB / Twitter / LinkedIn debuggers once (links in `docs/sharing-and-marketing.md`).
+- [!] @mandy 07-03 **Calf render / pose direction** — new full-body calf renders + pose options staged for review (`public/calf-gallery.html`, `public/cow-poses.html`) — **awaiting Mandy's pick** before any of it gets wired into the live app.
 
 ## ✅ Done (archive — groomer-managed, don't hand-edit)
 
-- 2026-06-14 — Claims-safety audit + proactive not-therapy reaffirmation; chat prompt bundled to `lib/prompt-base.js`; `vision.html` removed; "coach"→"companion".
 - 2026-06-13 — Share→install loop, social preview cards, Vercel Web Analytics (enabled, Pro) + validation telemetry; marketing strategy (`docs/marketing-strategy.md`) + this worklist.
+- 2026-06-14 — Claims-safety audit + proactive not-therapy reaffirmation; chat prompt bundled to `lib/prompt-base.js`; `vision.html` removed; "coach"→"companion".
+- 2026-06-14 — University-facing pitch surface, institutional privacy statement, campus on-ramp (QR talk cards) — Surrey pilot-readiness pack.
+- 2026-06-14 — Interactive calf companion (Finch-inspired) v1 — welcome flow, care actions, persistent growing Home card.
+- 2026-07-03 — MuMu grows & reflects in the Pasture — pasture cow scales with engagement and wears tokens of the user's top-tended IMAGINE areas.
 
 ---
 

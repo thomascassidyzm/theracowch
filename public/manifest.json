@@ -30,27 +30,13 @@
       "purpose": "any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/mobile-1.png",
-      "sizes": "375x812",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/screenshots/desktop-1.png", 
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Chat with Mandy",
       "short_name": "Chat",
       "description": "Start a conversation with your AI wellbeing companion",
       "url": "/app.html",
-      "icons": [{ "src": "/icons/chat-icon.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
