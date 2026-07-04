@@ -2713,6 +2713,7 @@ const IMAGINE_DOMAINS = {
         title: 'I, Me, Myself',
         subtitle: 'Self-care, boundaries & compassion',
         color: '#E87EA8',
+        blurb: 'valuing yourself and treating yourself well — looking after your own needs, setting healthy boundaries, and being as kind to yourself as you would be to a friend.',
         description: 'This domain is about nurturing your relationship with yourself. It includes self-care practices, setting healthy boundaries, and developing self-compassion.',
         exercises: [
             { title: '1 Minute Reset', description: 'A quick superhero pose to shift your energy and posture.', duration: '1 min', url: '/exercises/minute-reset.html' },
@@ -2727,6 +2728,7 @@ const IMAGINE_DOMAINS = {
         title: 'Mindfulness',
         subtitle: 'Present moment awareness',
         color: '#5BB4E0',
+        blurb: 'easing anxiety and stepping out of a busy, overthinking mind — gently coming back to the present moment and settling your nervous system.',
         description: 'Mindfulness helps you step out of autopilot and into the present moment. These exercises help calm your nervous system and anchor you in the here and now.',
         exercises: [
             { title: 'Box Breathing', description: '4-count breathing to settle your nervous system.', duration: '4 min', url: '/exercises/box-breathing.html' },
@@ -2739,6 +2741,7 @@ const IMAGINE_DOMAINS = {
         title: 'Acceptance',
         subtitle: 'Making peace with what is',
         color: '#9C7CD4',
+        blurb: 'knowing the difference between what you can and can\'t change. Letting go of what you can\'t control eases anxiety, and self-acceptance means loving yourself as you are.',
         description: 'Acceptance isn\'t about giving up - it\'s about acknowledging reality so you can respond wisely rather than react. These exercises help you make peace with what you cannot change.',
         exercises: [
             { title: 'The Wave', description: 'Watch a feeling rise and fall like a wave.', duration: '3 min', url: '/exercises/wave.html' },
@@ -2751,6 +2754,7 @@ const IMAGINE_DOMAINS = {
         title: 'Gratitude',
         subtitle: 'Noticing the good',
         color: '#34B7AE',
+        blurb: 'training your mind to notice the good alongside the hard — the small, real things you appreciate, which lifts how the day feels.',
         description: 'Gratitude isn\'t about toxic positivity - it\'s about training your brain to notice good things alongside the difficult ones. These exercises build your appreciation muscle.',
         exercises: [
             { title: 'Gratitude Stars', description: 'Name a few good things and watch them light up.', url: '/exercises/gratitude.html' },
@@ -2763,6 +2767,7 @@ const IMAGINE_DOMAINS = {
         title: 'Interactions',
         subtitle: 'Connection with others',
         color: '#FFD21E',
+        blurb: 'connecting with others — connection matters for wellbeing, so you notice your patterns, communicate your needs, and take small steps toward the people around you.',
         description: 'We\'re social creatures, and connection matters for wellbeing. These exercises help you notice your interaction patterns and take small steps toward meaningful connection.',
         exercises: [
             { title: 'Connection Web', description: 'Map who supports you across your inner, middle and outer circles.', url: '/exercises/connection-web.html' },
@@ -2776,6 +2781,7 @@ const IMAGINE_DOMAINS = {
         title: 'Nurture Fun & Play',
         subtitle: 'Joy and lightness',
         color: '#F2802E',
+        blurb: 'making room for joy, fun and lightness — play isn\'t just for kids, it\'s good for your mind and a real antidote to stress.',
         description: 'Play isn\'t just for kids - it\'s essential for mental health. These exercises help you reconnect with joy, lightness, and your playful side.',
         exercises: [
             { title: 'Joy Bubbles', description: 'Pop bubbles — no goals, just a two-minute reset.', duration: '2 min', url: '/exercises/joy.html' },
@@ -2791,6 +2797,7 @@ const IMAGINE_DOMAINS = {
         title: 'Explore',
         subtitle: 'Growth and discovery',
         color: '#F25C6A',
+        blurb: 'gently stretching beyond your comfort zone — trading anxious predictions for curiosity, and growing through small, manageable steps.',
         description: 'Growth happens at the edge of your comfort zone. These exercises help you gently stretch your boundaries and build tolerance for uncertainty.',
         exercises: [
             { title: 'Values Compass', description: 'Get clear on what matters most to you.', url: '/exercises/values-compass.html' },
@@ -2993,7 +3000,8 @@ function setupImagineGuide() {
         const domain = IMAGINE_DOMAINS[domainKey];
         if (!domain) return;
 
-        textEl.innerHTML = `Lovely choice. Here are some ways to explore <strong>${domain.title}</strong> — which would you like to try?`;
+        const blurb = domain.blurb ? `<strong>${domain.title}</strong> is about ${domain.blurb}<br><br>` : '';
+        textEl.innerHTML = `Lovely choice. ${blurb}Here are some ways to explore it — which would you like to try?`;
         optionsEl.innerHTML = '';
 
         domain.exercises.forEach(ex => {
