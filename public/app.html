@@ -2551,6 +2551,124 @@
         }
         .summary-saved.show { opacity: 1; }
 
+        /* Review-the-Week footer: close out / browse past reflections */
+        .summary-footer {
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 2px dashed var(--border-warm);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .summary-fresh-btn {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: border-color 0.15s ease, transform 0.1s ease;
+        }
+        .summary-fresh-btn:hover { border-color: var(--coral); }
+        .summary-fresh-btn:active { transform: translateY(1px); }
+        .summary-archive-link {
+            align-self: center;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+        .summary-archive-link:hover { color: var(--coral); }
+        .archive-open-count { color: var(--text-muted); font-weight: 700; }
+
+        /* Fresh-week choice modal — stacked buttons on the confirm-modal base */
+        .fresh-week-buttons { flex-direction: column; }
+        .fresh-week-buttons .btn-confirm { width: 100%; text-transform: none; font-size: var(--font-size-sm); }
+        .btn-confirm-clear {
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            color: var(--coral);
+        }
+        .btn-confirm-clear:hover { transform: translateY(-2px); }
+
+        /* Past reflections list */
+        .archive-list { display: flex; flex-direction: column; gap: var(--space-md); }
+        .archive-item {
+            background: var(--bg-card);
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            padding: 14px 16px;
+        }
+        .archive-item-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .archive-item-range { font-size: 0.98rem; font-weight: 900; color: var(--text-primary); }
+        .archive-item-remove {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+        .archive-item-remove:hover { color: var(--coral); }
+        .archive-item-saved { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
+        .archive-item-highlights {
+            background: #FDF5E8;
+            border-left: 4px solid #C9A857;
+            padding: 8px 12px;
+            border-radius: var(--radius-small);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm);
+        }
+        .archive-item-field { margin-top: 10px; }
+        .archive-item-label {
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--coral);
+            margin-bottom: 3px;
+        }
+        .archive-item-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .archive-item-plans { display: flex; flex-direction: column; gap: 4px; }
+        .archive-plan-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+        .archive-plan-mark { flex-shrink: 0; color: var(--text-muted); font-weight: 900; }
+        .archive-plan-row.is-done { color: var(--text-muted); text-decoration: line-through; }
+        .archive-plan-row.is-done .archive-plan-mark { color: #7BA888; text-decoration: none; }
+        .archive-empty { text-align: center; padding: var(--space-2xl) var(--space-lg); }
+        .archive-empty-emoji { font-size: 2.4rem; margin-bottom: var(--space-sm); }
+        .archive-empty-title { font-size: 1rem; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; }
+        .archive-empty-sub { font-size: 0.88rem; line-height: 1.5; color: var(--text-muted); margin: 0; }
+
         .weekly-card {
             background: var(--bg-card);
             border: var(--border-thicc) solid var(--border-warm);
@@ -5391,7 +5509,26 @@
                     </div>
 
                     <div class="summary-saved" id="summary-saved" aria-live="polite"></div>
+
+                    <div class="summary-footer">
+                        <button type="button" class="summary-fresh-btn" id="summary-fresh-week">🌱 Start a fresh week</button>
+                        <button type="button" class="summary-archive-link" id="summary-archive-open">🗂️ Past reflections <span class="archive-open-count" id="summary-archive-count"></span></button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Past reflections — archived weeks the user chose to keep -->
+        <div class="summary-panel archive-panel" id="archive-panel">
+            <header class="domain-panel-header">
+                <button class="domain-panel-back" id="archive-panel-back">← Back</button>
+                <div class="domain-panel-title">
+                    <h2>Past reflections</h2>
+                    <span>Weeks you saved to look back on</span>
+                </div>
+            </header>
+            <div class="summary-panel-content">
+                <div class="archive-list" id="archive-list"></div>
             </div>
         </div>
 
@@ -7246,6 +7383,18 @@
         </div>
     </div>
 
+    <!-- "Start a fresh week" — save this week's reflection to Past reflections, or clear it -->
+    <div class="confirm-modal" id="fresh-week-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-message">Ready to start a fresh week? You can keep this week&rsquo;s reflection in your Past reflections to look back on, or clear it and begin again. Either way, unfinished plans roll into the new week.</div>
+            <div class="confirm-modal-buttons fresh-week-buttons">
+                <button class="btn-confirm btn-confirm-ok" id="fresh-week-save">Save &amp; start fresh</button>
+                <button class="btn-confirm btn-confirm-clear" id="fresh-week-clear">Clear without saving</button>
+                <button class="btn-confirm btn-confirm-cancel" id="fresh-week-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- "Errors in Thinking" reference — opened from the weekly summary's
          thinking-errors question. A reflective, non-clinical reference. -->
     <div class="errors-modal" id="errors-thinking-modal" role="dialog" aria-modal="true" aria-labelledby="errors-thinking-title">
@@ -7299,7 +7448,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=56"></script>
-    <script src="/assets/js/app.js?v=86"></script>
+    <script src="/assets/js/app.js?v=87"></script>
     <script src="/assets/js/calf.js?v=2"></script>
 
     <!-- "New version available" update banner (shown only when a new build is

@@ -1856,6 +1856,8 @@ function updateWeeklySummaryUI() {
 
     renderWeeklyTodos();
 
+    if (typeof updateArchiveCount === 'function') updateArchiveCount();
+
     // Keep the Your-Space entry block's subtitle in step with the summary.
     const blockSub = document.getElementById('summary-block-sub');
     if (blockSub) {
@@ -2103,6 +2105,240 @@ function setupWeeklySummary() {
     }
 }
 window.setupWeeklySummary = setupWeeklySummary;
+
+// ============================================
+// Past reflections — close out a week. The weekly reflection is a single
+// rolling blob; this lets the user snapshot the current reflection (and a copy
+// of the week's plans) into an archive they can look back on, then clear the
+// working fields for a fresh start — or clear without saving. Private and
+// on-device: a personal keepsake of past thoughts, never a clinical record.
+// ============================================
+const WEEKLY_ARCHIVE_KEY = 'cowch_weekly_archive';
+const ARCHIVE_FIELD_LABELS = {
+    autoThoughts:   'Negative automatic thoughts',
+    thinkingErrors: 'Errors in thinking to let go of',
+    problemSolve:   'Problem solving — possible actions'
+};
+
+function loadWeekArchive() {
+    try {
+        const a = JSON.parse(localStorage.getItem(WEEKLY_ARCHIVE_KEY) || '[]');
+        return Array.isArray(a) ? a : [];
+    } catch (_) { return []; }
+}
+function saveWeekArchive(list) {
+    try { localStorage.setItem(WEEKLY_ARCHIVE_KEY, JSON.stringify(list)); } catch (_) {}
+}
+
+// True when there's something worth saving or clearing this week.
+function weekHasEntries() {
+    const data = loadWeeklyReflection();
+    const anyText = Object.keys(REFLECTION_FIELDS).some(k => (data[k] || '').trim());
+    return anyText || loadWeeklyTodos().length > 0;
+}
+
+// The "Jun 28 – Jul 4" label for the rolling week, computed now.
+function currentWeekRangeLabel() {
+    const today = new Date();
+    const start = new Date(today); start.setDate(start.getDate() - 6);
+    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return fmt(start) + ' – ' + fmt(today);
+}
+
+// Snapshot the current reflection + plans into the archive (newest first).
+// Returns false when there was nothing to save.
+function archiveCurrentWeek() {
+    if (!weekHasEntries()) return false;
+    const data = loadWeeklyReflection();
+    const reflection = {};
+    Object.keys(REFLECTION_FIELDS).forEach(k => { reflection[k] = (data[k] || '').trim(); });
+    const todos = loadWeeklyTodos().map(t => ({ text: t.text, done: !!t.done }));
+    const highlights = (typeof buildSummaryHighlights === 'function') ? buildSummaryHighlights() : '';
+
+    const list = loadWeekArchive();
+    list.unshift({
+        id: 'wk' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        savedAt: Date.now(),
+        rangeLabel: currentWeekRangeLabel(),
+        reflection,
+        todos,
+        highlights
+    });
+    saveWeekArchive(list);
+    return true;
+}
+
+// Clear the working reflection fields for a fresh week. Completed plans are
+// dropped; unfinished plans roll into the new week (matching the card's own
+// "whatever's left rolls into next week" promise).
+function clearCurrentWeek() {
+    saveWeeklyReflection({});
+    Object.keys(REFLECTION_FIELDS).forEach(key => {
+        const el = document.getElementById(REFLECTION_FIELDS[key]);
+        if (el) el.value = '';
+    });
+    saveWeeklyTodos(loadWeeklyTodos().filter(t => !t.done));
+    if (typeof renderWeeklyTodos === 'function') renderWeeklyTodos();
+    updateWeeklySummaryUI();
+}
+
+// Small inline note on the summary "saved" line (reused for the archive flow).
+function flashSummaryNote(text) {
+    const el = document.getElementById('summary-saved');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(flashSummaryNote._t);
+    flashSummaryNote._t = setTimeout(() => { el.classList.remove('show'); }, 1800);
+}
+
+const escArchive = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Refresh the "Past reflections (N)" count on the summary footer link.
+function updateArchiveCount() {
+    const el = document.getElementById('summary-archive-count');
+    if (!el) return;
+    const n = loadWeekArchive().length;
+    el.textContent = n ? '(' + n + ')' : '';
+}
+
+function renderWeekArchive() {
+    const list = document.getElementById('archive-list');
+    if (!list) return;
+    const entries = loadWeekArchive();
+    list.innerHTML = '';
+
+    if (!entries.length) {
+        const empty = document.createElement('div');
+        empty.className = 'archive-empty';
+        empty.innerHTML =
+            '<div class="archive-empty-emoji">🗂️</div>' +
+            '<p class="archive-empty-title">No past reflections yet</p>' +
+            '<p class="archive-empty-sub">When you start a fresh week, you can save your reflection here to look back on your past thoughts.</p>';
+        list.appendChild(empty);
+        return;
+    }
+
+    const fmtDate = ms => {
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    entries.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'archive-item';
+
+        let html =
+            '<div class="archive-item-head">' +
+                '<div class="archive-item-range">' + escArchive(entry.rangeLabel || 'A week') + '</div>' +
+                '<button type="button" class="archive-item-remove" data-id="' + entry.id + '" aria-label="Delete this reflection">✕</button>' +
+            '</div>' +
+            '<div class="archive-item-saved">Saved ' + fmtDate(entry.savedAt) + '</div>';
+
+        // highlights is our own generated HTML (counts + <strong>), not user input.
+        if (entry.highlights) {
+            html += '<p class="archive-item-highlights">' + entry.highlights + '</p>';
+        }
+
+        const refl = entry.reflection || {};
+        Object.keys(ARCHIVE_FIELD_LABELS).forEach(k => {
+            const val = (refl[k] || '').trim();
+            if (!val) return;
+            html +=
+                '<div class="archive-item-field">' +
+                    '<div class="archive-item-label">' + ARCHIVE_FIELD_LABELS[k] + '</div>' +
+                    '<div class="archive-item-text">' + escArchive(val) + '</div>' +
+                '</div>';
+        });
+
+        const todos = Array.isArray(entry.todos) ? entry.todos : [];
+        if (todos.length) {
+            html += '<div class="archive-item-field"><div class="archive-item-label">Plans that week</div><div class="archive-item-plans">';
+            todos.forEach(t => {
+                html +=
+                    '<div class="archive-plan-row' + (t.done ? ' is-done' : '') + '">' +
+                        '<span class="archive-plan-mark">' + (t.done ? '✓' : '○') + '</span>' +
+                        '<span>' + escArchive(t.text) + '</span>' +
+                    '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        card.innerHTML = html;
+        list.appendChild(card);
+    });
+}
+window.renderWeekArchive = renderWeekArchive;
+
+// Wire the archive: open/close the panel, delete entries, and the
+// "start a fresh week" save/clear choice.
+function setupWeekArchive() {
+    const openBtn = document.getElementById('summary-archive-open');
+    const panel = document.getElementById('archive-panel');
+    const back = document.getElementById('archive-panel-back');
+
+    if (openBtn && panel && !openBtn.dataset.wired) {
+        openBtn.dataset.wired = '1';
+        openBtn.addEventListener('click', () => {
+            renderWeekArchive();
+            panel.classList.add('active');
+        });
+    }
+    if (back && panel && !back.dataset.wired) {
+        back.dataset.wired = '1';
+        back.addEventListener('click', () => panel.classList.remove('active'));
+    }
+
+    // Delete an archived entry (delegated).
+    const list = document.getElementById('archive-list');
+    if (list && !list.dataset.wired) {
+        list.dataset.wired = '1';
+        list.addEventListener('click', (e) => {
+            const rm = e.target.closest('.archive-item-remove');
+            if (!rm) return;
+            saveWeekArchive(loadWeekArchive().filter(x => x.id !== rm.dataset.id));
+            renderWeekArchive();
+            updateArchiveCount();
+        });
+    }
+
+    // "Start a fresh week" → save-or-clear choice.
+    const freshBtn = document.getElementById('summary-fresh-week');
+    const modal = document.getElementById('fresh-week-modal');
+    if (freshBtn && modal && !freshBtn.dataset.wired) {
+        freshBtn.dataset.wired = '1';
+        const close = () => modal.classList.remove('active');
+
+        freshBtn.addEventListener('click', () => {
+            if (!weekHasEntries()) {
+                flashSummaryNote('Nothing to review yet — check in first');
+                return;
+            }
+            modal.classList.add('active');
+        });
+
+        const saveBtn = document.getElementById('fresh-week-save');
+        const clearBtn = document.getElementById('fresh-week-clear');
+        const cancelBtn = document.getElementById('fresh-week-cancel');
+
+        if (saveBtn) saveBtn.addEventListener('click', () => {
+            const saved = archiveCurrentWeek();
+            clearCurrentWeek();
+            close();
+            updateArchiveCount();
+            flashSummaryNote(saved ? 'Saved to your past reflections ✓' : 'Fresh week started ✓');
+        });
+        if (clearBtn) clearBtn.addEventListener('click', () => {
+            clearCurrentWeek();
+            close();
+            flashSummaryNote('Cleared — fresh week started ✓');
+        });
+        if (cancelBtn) cancelBtn.addEventListener('click', close);
+        modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    }
+}
+window.setupWeekArchive = setupWeekArchive;
 
 // ============================================
 // Patterns I'm noticing — gentle, non-judgmental reflections from the week
@@ -4519,6 +4755,7 @@ function init() {
     setupPasturePanel();
     setupWeeklySummary();
     setupSummaryPanel();
+    setupWeekArchive();
     updateWeeklySummaryUI();
     setupWellnessPanel();
     updatePatternsUI();
