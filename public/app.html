@@ -2227,6 +2227,20 @@
         .pasture-legend-letter { font-weight: 900; color: var(--text-primary); }
         .pasture-legend-label { font-size: 0.86rem; color: var(--text-secondary); }
 
+        /* Live key naming the symbols currently on the cow. */
+        .pasture-key {
+            background: var(--surface, rgba(255, 255, 255, 0.6));
+            border-radius: var(--radius-md, 12px);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        .pasture-key-title { font-size: 0.82rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-sm); }
+        .pasture-key-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+        .pasture-key-item { display: flex; align-items: flex-start; gap: 10px; }
+        .pasture-key-icon { font-size: 1.1rem; line-height: 1.35; flex-shrink: 0; }
+        .pasture-key-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4; }
+        .pasture-key-text strong { color: var(--text-primary); }
+
         /* Gratitude pose: add a few thank-yous to float around the cow */
         .pasture-gratitude { margin-bottom: var(--space-md); }
         .pasture-gratitude-form { display: flex; gap: 8px; }
@@ -5305,6 +5319,14 @@
             <div class="pasture-panel-content">
                 <p class="pasture-blurb" id="pasture-blurb">Your cow is a reflection of your world — it takes on a new posture each time you complete an IMAGINE exercise.</p>
                 <svg class="pasture-svg" id="pasture-svg" viewBox="0 0 360 280" preserveAspectRatio="xMidYMid meet" aria-label="Your cow in your pasture"></svg>
+
+                <!-- A live key naming the symbols currently on the cow, so the
+                     user can read what the pose + tokens mean. Populated by
+                     renderPastureKey(); hidden when there's nothing to label. -->
+                <div class="pasture-key" id="pasture-key" hidden>
+                    <div class="pasture-key-title">What’s in your pasture right now</div>
+                    <ul class="pasture-key-list" id="pasture-key-list"></ul>
+                </div>
 
                 <!-- Gratitude pose: add a few thank-yous to float around the cow -->
                 <div class="pasture-gratitude" id="pasture-gratitude" hidden>

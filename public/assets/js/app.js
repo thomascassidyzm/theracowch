@@ -460,13 +460,13 @@ function maybeTickVisitDay() {
 // the chip icon that represents progress (icons, not nature). Keys match
 // IMAGINE_PALETTE (Interactions = I2).
 const PASTURE_POSES = [
-    { key: 'I',  pose: 'selfcare',     icon: '✨', label: 'I, Me, Myself', blurb: 'Your cow is glowing and grinning — a moment of looking after yourself.' },
-    { key: 'M',  pose: 'mindfulness',  icon: '🧘', label: 'Mindfulness',   blurb: 'Your cow settles into a calm yoga pose. Breathe along with them.' },
-    { key: 'A',  pose: 'acceptance',   icon: '☮️', label: 'Acceptance',    blurb: 'Hooves together, centred — letting go of what can’t be changed.' },
-    { key: 'G',  pose: 'gratitude',    icon: '🙏', label: 'Gratitude',     blurb: 'A thank-you from your cow. Add a few of your own below.' },
-    { key: 'I2', pose: 'interactions', icon: '👋', label: 'Interactions',  blurb: 'Your cow and a friend or two — connection matters.' },
-    { key: 'N',  pose: 'nurturing',    icon: '🎈', label: 'Nurturing',     blurb: 'Play and rest — a balloon and a big happy smile.' },
-    { key: 'E',  pose: 'exploring',    icon: '🔭', label: 'Exploring',     blurb: 'Glasses on, telescope up — curious about the world.' }
+    { key: 'I',  pose: 'selfcare',     icon: '✨', label: 'I, Me, Myself', blurb: 'Your cow is glowing and grinning — a moment of looking after yourself.', note: 'the heart your cow is holding — a moment of self-care' },
+    { key: 'M',  pose: 'mindfulness',  icon: '🧘', label: 'Mindfulness',   blurb: 'Your cow settles into a calm yoga pose. Breathe along with them.', note: 'your cow’s calm cross-legged yoga pose' },
+    { key: 'A',  pose: 'acceptance',   icon: '☮️', label: 'Acceptance',    blurb: 'Hooves together, centred — letting go of what can’t be changed.', note: 'hooves together and a crossed-out cloud — letting go of what you can’t control' },
+    { key: 'G',  pose: 'gratitude',    icon: '🙏', label: 'Gratitude',     blurb: 'A thank-you from your cow. Add a few of your own below.', note: 'the thank-you note your cow is holding' },
+    { key: 'I2', pose: 'interactions', icon: '👋', label: 'Interactions',  blurb: 'Your cow and a friend or two — connection matters.', note: 'the friend beside your cow — connection' },
+    { key: 'N',  pose: 'nurturing',    icon: '🎈', label: 'Nurturing',     blurb: 'Play and rest — a balloon and a big happy smile.', note: 'the balloon and big happy smile — play and rest' },
+    { key: 'E',  pose: 'exploring',    icon: '🔭', label: 'Exploring',     blurb: 'Glasses on, telescope up — curious about the world.', note: 'the glasses and telescope — curiosity' }
 ];
 
 function poseForKey(key) {
@@ -1124,26 +1124,35 @@ function pastureCowBase() {
     return null;
 }
 
+// The IMAGINE areas the cow is currently showing: the base pose (its most
+// recently tended area) plus, once the user is well into it (level 2), up to
+// two more tended areas layered on as small tokens. Empty while the cow is in
+// a mood / away / asleep state (those show no area symbols). Shared by the
+// renderer and the on-screen key so the two never drift.
+function pastureShownKeys() {
+    if (pastureCowBase()) return [];
+    const eng = cowEngagement();
+    const primaryKey = eng.tended.length ? getPastureActivePose() : null;
+    if (!primaryKey) return [];
+    let keys = [primaryKey];
+    if (pastureActivityLevel() >= 2) {
+        keys = keys.concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
+    }
+    return keys;
+}
+
 function buildCowNode(ctx) {
     const eng = cowEngagement();
     const name = cowName();
     const named = name && name !== 'Your cow';
-    // The cow takes on the posture of the IMAGINE area the user most recently
-    // tended — the pose *appears after they do an exercise*, a little reflection
-    // of what they've been working on. Once they're well into it (level 2), the
-    // other areas they're tending layer on top as compact props.
-    const level = pastureActivityLevel();
     // A mood read, sleep, or been-away rest — otherwise null and the cow shows
     // the pose from whatever the user's been tending. (Sleeping is handled as a
     // full-scene takeover in renderPasture, so buildCowNode won't normally see
     // it; the COW3D fallback covers it defensively.)
     const moodBase = pastureCowBase();
-    const primaryKey = eng.tended.length ? getPastureActivePose() : null;
-    let keys = [];
-    if (primaryKey) {
-        keys = [primaryKey];
-        if (level >= 2) keys = keys.concat(eng.tended.filter(k => k !== primaryKey).slice(0, 2));
-    }
+    // The base pose (most recently tended area) plus any layered tokens — the
+    // pose *appears after an exercise*, a little reflection of what's tended.
+    const keys = pastureShownKeys();
     const meta = moodBase ? null : (keys.length ? poseForKey(keys[0]) : null);
 
     // Growth comes from showing up: IMAGINE engagement + days spent caring.
@@ -1250,6 +1259,31 @@ function renderPasture() {
     // At the user's sleep hours the cow is curled up asleep on the grass;
     // otherwise the standing/posed cow, large and forward.
     svg.appendChild(pastureCowBase() === 'sleeping' ? buildSleepingCowNode() : buildCowNode({ svg }));
+    renderPastureKey();
+}
+
+// Label what's actually in the pasture right now, so the symbols read clearly:
+// the cow's pose plus any small tokens it's wearing/holding, each named. Lists
+// only what's currently shown (hidden when the cow is resting / away / asleep).
+function renderPastureKey() {
+    const box = document.getElementById('pasture-key');
+    const list = document.getElementById('pasture-key-list');
+    if (!box || !list) return;
+    const keys = pastureShownKeys();
+    if (!keys.length) {
+        box.hidden = true;
+        list.innerHTML = '';
+        return;
+    }
+    list.innerHTML = keys.map(function (k) {
+        const p = poseForKey(k);
+        return '<li class="pasture-key-item">' +
+            '<span class="pasture-key-icon" aria-hidden="true">' + p.icon + '</span>' +
+            '<span class="pasture-key-text"><strong>' + p.label + '</strong>' +
+            (p.note ? ' — ' + p.note : '') + '</span>' +
+            '</li>';
+    }).join('');
+    box.hidden = false;
 }
 
 // (The tap-to-pose IMAGINE icon row was removed: the cow now takes on a
