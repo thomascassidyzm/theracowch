@@ -364,13 +364,17 @@ function migrateStorageKey() {
     }
 }
 
-// Expose for app.js
+// Expose for app.js. Alias each real function directly — do NOT wrap it as
+// `function(){ foo(); }`. These run at the script's global scope, where the
+// `function foo(){}` declaration already IS `window.foo`, so a wrapper would
+// reassign the global name to itself and every call would recurse forever
+// (Maximum call stack size exceeded).
 window.initChat = initChat;
-window.stopGrounding = function() { if (typeof stopGrounding === 'function') return stopGrounding(); };
-window.handleClearChat = function() { handleClearChat(); };
-window.handlePrivacyInfo = function() { handlePrivacyInfo(); };
-window.openInteractiveExercise = function(type) { openInteractiveExercise(type); };
-window.triggerChatPrompt = function(prompt) { triggerChatPrompt(prompt); };
+window.stopGrounding = stopGrounding;
+window.handleClearChat = handleClearChat;
+window.handlePrivacyInfo = handlePrivacyInfo;
+window.openInteractiveExercise = openInteractiveExercise;
+window.triggerChatPrompt = triggerChatPrompt;
 
 // Open a specific interactive exercise by type
 function openInteractiveExercise(type) {
