@@ -2984,7 +2984,7 @@ function setupImagineGuide() {
 
     // Step 1 — invite the user to pick one of the area cards below.
     function renderAreaPrompt() {
-        textEl.innerHTML = "Hi, I'm Mandy. I'm here to help you understand IMAGINE — which of the seven areas below would you like to start working on?";
+        textEl.innerHTML = "I'm here to help you understand IMAGINE — which of the seven areas below would you like to start working on?";
         optionsEl.innerHTML = '';
     }
 
