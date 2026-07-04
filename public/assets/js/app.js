@@ -460,13 +460,13 @@ function maybeTickVisitDay() {
 // the chip icon that represents progress (icons, not nature). Keys match
 // IMAGINE_PALETTE (Interactions = I2).
 const PASTURE_POSES = [
-    { key: 'I',  pose: 'selfcare',     icon: '✨', label: 'I, Me, Myself', blurb: 'Your cow is glowing and grinning — a moment of looking after yourself.', note: 'the heart your cow is holding — a moment of self-care' },
-    { key: 'M',  pose: 'mindfulness',  icon: '🧘', label: 'Mindfulness',   blurb: 'Your cow settles into a calm yoga pose. Breathe along with them.', note: 'your cow’s calm cross-legged yoga pose' },
-    { key: 'A',  pose: 'acceptance',   icon: '☮️', label: 'Acceptance',    blurb: 'Hooves together, centred — letting go of what can’t be changed.', note: 'hooves together and a crossed-out cloud — letting go of what you can’t control' },
-    { key: 'G',  pose: 'gratitude',    icon: '🙏', label: 'Gratitude',     blurb: 'A thank-you from your cow. Add a few of your own below.', note: 'the thank-you note your cow is holding' },
-    { key: 'I2', pose: 'interactions', icon: '👋', label: 'Interactions',  blurb: 'Your cow and a friend or two — connection matters.', note: 'the friend beside your cow — connection' },
-    { key: 'N',  pose: 'nurturing',    icon: '🎈', label: 'Nurturing',     blurb: 'Play and rest — a balloon and a big happy smile.', note: 'the balloon and big happy smile — play and rest' },
-    { key: 'E',  pose: 'exploring',    icon: '🔭', label: 'Exploring',     blurb: 'Glasses on, telescope up — curious about the world.', note: 'the glasses and telescope — curiosity' }
+    { key: 'I',  pose: 'selfcare',     icon: '✨', label: 'I, Me, Myself', blurb: 'Your cow is glowing and grinning — a moment of looking after yourself.', note: 'the heart your cow is holding — a moment of self-care', tokenNote: 'a little heart floating by — a moment of self-care' },
+    { key: 'M',  pose: 'mindfulness',  icon: '🧘', label: 'Mindfulness',   blurb: 'Your cow settles into a calm yoga pose. Breathe along with them.', note: 'your cow’s calm cross-legged yoga pose', tokenNote: 'a calm blue lotus — a mindfulness moment' },
+    { key: 'A',  pose: 'acceptance',   icon: '☮️', label: 'Acceptance',    blurb: 'Hooves together, centred — letting go of what can’t be changed.', note: 'your cow’s hooves wrapped in a settled self-hug — letting go of what you can’t control', tokenNote: 'a crossed-out cloud — letting go of what you can’t control' },
+    { key: 'G',  pose: 'gratitude',    icon: '🙏', label: 'Gratitude',     blurb: 'A thank-you from your cow. Add a few of your own below.', note: 'the thank-you note your cow is holding', tokenNote: 'a thank-you note — gratitude' },
+    { key: 'I2', pose: 'interactions', icon: '👋', label: 'Interactions',  blurb: 'Your cow and a friend or two — connection matters.', note: 'the friend beside your cow — connection', tokenNote: 'a friend beside your cow — connection' },
+    { key: 'N',  pose: 'nurturing',    icon: '😄', label: 'Nurturing',     blurb: 'Play and rest — a big happy smile.', note: 'your cow’s big happy smile — play and rest', tokenNote: 'a musical note — play and rest' },
+    { key: 'E',  pose: 'exploring',    icon: '🔍', label: 'Exploring',     blurb: 'Magnifying glass out — curious about the world.', note: 'the magnifying glass your cow is peering through — curiosity', tokenNote: 'a magnifying glass — curiosity' }
 ];
 
 function poseForKey(key) {
@@ -1275,12 +1275,15 @@ function renderPastureKey() {
         list.innerHTML = '';
         return;
     }
-    list.innerHTML = keys.map(function (k) {
+    // keys[0] is the base pose (the whole cow takes it on); any later keys show
+    // only as a small token beside the cow, so describe those with tokenNote.
+    list.innerHTML = keys.map(function (k, i) {
         const p = poseForKey(k);
+        const desc = (i > 0 && p.tokenNote) ? p.tokenNote : p.note;
         return '<li class="pasture-key-item">' +
             '<span class="pasture-key-icon" aria-hidden="true">' + p.icon + '</span>' +
             '<span class="pasture-key-text"><strong>' + p.label + '</strong>' +
-            (p.note ? ' — ' + p.note : '') + '</span>' +
+            (desc ? ' — ' + desc : '') + '</span>' +
             '</li>';
     }).join('');
     box.hidden = false;

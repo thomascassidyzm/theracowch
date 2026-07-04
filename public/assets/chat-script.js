@@ -2175,6 +2175,11 @@ function triggerChatPrompt(promptText, exerciseName = null) {
         }
     }
 
+    // Make sure the chat page is actually showing — "Talk to Mandy" can be
+    // tapped from the home screen (e.g. Need help now → Stay with me mode), so
+    // switch to the chat tab before sending or the reply lands on a hidden panel.
+    if (typeof switchTab === 'function') switchTab('chat');
+
     // Fill chat input with the prompt
     chatInput.value = promptText;
 
