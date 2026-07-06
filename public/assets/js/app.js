@@ -931,6 +931,89 @@ const PASTURE_PHASES = {
     }
 };
 
+// A single soft, coloured cloud — a cluster of lumps in an IMAGINE area's
+// colour, with a white halo + highlight so it still reads as a fluffy cloud
+// rather than a flat blob. `s` is the radius unit; `title` gives it a hover /
+// screen-reader label naming the area.
+function pastureActivityCloud(svg, cx, cy, s, color, opacity, title) {
+    const g = document.createElementNS(NS_SVG, 'g');
+    g.setAttribute('class', 'pasture-activity-cloud');
+    if (title) {
+        const t = document.createElementNS(NS_SVG, 'title');
+        t.textContent = title;
+        g.appendChild(t);
+    }
+    // Soft white halo for a fluffy edge.
+    const halo = document.createElementNS(NS_SVG, 'circle');
+    halo.setAttribute('cx', cx); halo.setAttribute('cy', cy - s * 0.1);
+    halo.setAttribute('r', s * 1.08);
+    halo.setAttribute('fill', '#FFFFFF');
+    halo.setAttribute('opacity', (opacity * 0.35).toFixed(2));
+    g.appendChild(halo);
+    // Coloured lumps.
+    [{ dx: -s * 0.85, dy: s * 0.12, r: s * 0.72 },
+     { dx: 0,         dy: -s * 0.12, r: s * 0.95 },
+     { dx: s * 0.9,   dy: s * 0.12, r: s * 0.70 }].forEach(l => {
+        const c = document.createElementNS(NS_SVG, 'circle');
+        c.setAttribute('cx', cx + l.dx); c.setAttribute('cy', cy + l.dy);
+        c.setAttribute('r', l.r);
+        c.setAttribute('fill', color);
+        c.setAttribute('opacity', opacity.toFixed(2));
+        g.appendChild(c);
+    });
+    // A gentle top highlight for a bit of form.
+    const hi = document.createElementNS(NS_SVG, 'circle');
+    hi.setAttribute('cx', cx - s * 0.2); hi.setAttribute('cy', cy - s * 0.38);
+    hi.setAttribute('r', s * 0.3);
+    hi.setAttribute('fill', '#FFFFFF');
+    hi.setAttribute('opacity', (opacity * 0.4).toFixed(2));
+    g.appendChild(hi);
+    svg.appendChild(g);
+}
+
+// Draw one coloured cloud per IMAGINE area the user has been tending, so the
+// sky reads — alongside the cow's posture — what they've been active with. The
+// biggest cloud is the area they've tended most. Returns true if any were
+// drawn (so the caller can fall back to plain decorative clouds when there's
+// no activity yet). Colours match the pasture legend + the cow.
+function buildActivityClouds(svg, phase, p) {
+    const eng = (typeof cowEngagement === 'function') ? cowEngagement() : null;
+    if (!eng || !eng.tended.length) return false;
+    const palette = (typeof IMAGINE_PALETTE !== 'undefined') ? IMAGINE_PALETTE : null;
+    if (!palette) return false;
+
+    const areas = eng.tended.slice(0, 5);                 // most-tended first
+    const maxCount = Math.max.apply(null, areas.map(k => eng.counts[k] || 1));
+
+    // Candidate slots spread across the upper sky; drop any sitting on top of
+    // the sun/moon for this phase so the luminary stays clear.
+    const slots = [
+        { x: 78,  y: 46 }, { x: 130, y: 30 }, { x: 182, y: 52 },
+        { x: 232, y: 30 }, { x: 286, y: 50 }
+    ];
+    const lum = (phase === 'night') ? p.moon : p.sun;
+    const clear = slots.filter(s => {
+        if (!lum) return true;
+        const dx = s.x - lum.cx, dy = s.y - lum.cy;
+        return Math.sqrt(dx * dx + dy * dy) > 42;
+    });
+    const use = (clear.length >= areas.length) ? clear : slots;
+
+    const baseOpacity = phase === 'night' ? 0.72 : (phase === 'sunset' ? 0.80 : 0.86);
+
+    areas.forEach((k, i) => {
+        const slot = use[i % use.length];
+        const rel = (eng.counts[k] || 1) / maxCount;      // 0..1 relative activity
+        const s = 8.5 + rel * 5;                           // most-tended reads biggest
+        const color = palette[k] || '#FFFFFF';
+        const meta = (typeof poseForKey === 'function') ? poseForKey(k) : { label: k };
+        const n = eng.counts[k] || 0;
+        const title = meta.label + ' — ' + n + ' moment' + (n === 1 ? '' : 's');
+        pastureActivityCloud(svg, slot.x, slot.y, s, color, baseOpacity, title);
+    });
+    return true;
+}
+
 function buildPastureScenery(svg, vit) {
     const phase = getPastureTimeOfDay();
     svg.setAttribute('data-phase', phase);
@@ -987,8 +1070,12 @@ function buildPastureScenery(svg, vit) {
         svg.appendChild(sun);
     }
 
-    // Clouds — skip at night
-    if (p.cloud) {
+    // Clouds. Prefer coloured "activity" clouds — one per IMAGINE area the user
+    // has been tending — so the sky mirrors what they've engaged with, next to
+    // the cow's posture. When there's no activity yet, fall back to the plain
+    // decorative daytime clouds so the sky isn't empty (skipped at night).
+    const hasActivityClouds = buildActivityClouds(svg, phase, p);
+    if (!hasActivityClouds && p.cloud) {
         [{ x: 220, y: 28, r: 12 }, { x: 250, y: 24, r: 14 }, { x: 280, y: 30, r: 11 }].forEach(c => {
             const e = document.createElementNS(NS_SVG, 'circle');
             e.setAttribute('cx', c.x); e.setAttribute('cy', c.y);
