@@ -2069,8 +2069,47 @@ function setupPasturePanel() {
         back.dataset.wired = '1';
         back.addEventListener('click', () => panel.classList.remove('active'));
     }
+
+    // Reset — for when the user wants to start their pasture from scratch.
+    const reset = document.getElementById('pasture-reset');
+    if (reset && !reset.dataset.wired) {
+        reset.dataset.wired = '1';
+        reset.addEventListener('click', () => {
+            const msg = 'Reset your pasture? This clears your cow’s growth, the ' +
+                'coloured activity clouds, your gratitude notes and your shown-up ' +
+                'count, so everything starts fresh. Your cow keeps its name. This ' +
+                'can’t be undone.';
+            if (typeof showConfirm === 'function') {
+                showConfirm(msg, resetPasture);
+            } else if (window.confirm(msg)) {
+                resetPasture();
+            }
+        });
+    }
 }
 window.setupPasturePanel = setupPasturePanel;
+
+// Wipe everything the pasture grows from — IMAGINE engagement (clouds, pose,
+// tokens), the shown-up counter, gratitude notes and legacy planted items — so
+// the cow starts fresh. Keeps the cow's name/companion; leaves check-ins and
+// other tools untouched. On-device only.
+function resetPasture() {
+    try {
+        [IMAGINE_ENGAGEMENT_KEY, PASTURE_VISITDAYS_KEY, PASTURE_LASTGROW_KEY,
+         PASTURE_ITEMS_KEY, PASTURE_POSE_KEY, PASTURE_GRATITUDE_KEY]
+            .forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+        // Keep the calf's name + identity, but clear the care-day tally that
+        // also feeds the cow's growth so the reset is truly fresh.
+        try {
+            const c = JSON.parse(localStorage.getItem('cowch_calf'));
+            if (c && typeof c === 'object') { c.careDays = []; localStorage.setItem('cowch_calf', JSON.stringify(c)); }
+        } catch (_) {}
+    } catch (_) {}
+    setPastureActivePose(null);   // drop any session-only preview pose
+    updatePastureUI();            // re-render the now-empty pasture + home teaser
+    if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
+}
+window.resetPasture = resetPasture;
 
 // Wire up the summary card once. Autosaves reflection text and manages the
 // rolling to-do list.

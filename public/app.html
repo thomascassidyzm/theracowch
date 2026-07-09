@@ -2222,6 +2222,20 @@
         }
         .pasture-legend-title { font-size: 0.82rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-sm); }
         .pasture-legend-hint { font-size: 0.82rem; line-height: 1.45; color: var(--text-muted); margin: 0 0 var(--space-md); }
+        .pasture-reset {
+            display: block;
+            margin: var(--space-lg) auto 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .pasture-reset:hover { color: var(--coral); }
         .pasture-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
         .pasture-legend-item { display: flex; align-items: center; gap: 8px; }
         .pasture-legend-swatch { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.7) inset; }
@@ -5466,6 +5480,9 @@
                     <p class="pasture-legend-hint">Each coloured cloud in the sky is an area you’ve been active with — the more you tend it, the bigger its cloud. Your cow takes on the posture of your latest focus.</p>
                     <div class="pasture-legend-grid" id="pasture-legend-grid"></div>
                 </div>
+
+                <!-- Reset — wipe the pasture's growth to start from scratch -->
+                <button type="button" class="pasture-reset" id="pasture-reset">Reset pasture — start from scratch</button>
             </div>
         </div>
 
@@ -7450,7 +7467,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=56"></script>
-    <script src="/assets/js/app.js?v=88"></script>
+    <script src="/assets/js/app.js?v=89"></script>
     <script src="/assets/js/calf.js?v=2"></script>
 
     <!-- "New version available" update banner (shown only when a new build is
