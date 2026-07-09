@@ -479,6 +479,10 @@ function poseForKey(key) {
 // the session only (not persisted), so the cow returns to your latest focus on
 // the next visit.
 let pastureActivePose = null;
+// After a reset we want the cow shown in its plain standing default — not a
+// stored mood / asleep / been-away rest. This session flag forces that base;
+// it's cleared as soon as a fresh mood read comes in (see recordCowchMood).
+let pastureForceStanding = false;
 function getPastureActivePose() {
     if (pastureActivePose) return pastureActivePose;
     const eng = (typeof cowEngagement === 'function') ? cowEngagement() : null;
@@ -1163,6 +1167,7 @@ function pastureMood() {
 }
 // Called from the chat when a reply comes back with the AI's mood read.
 window.recordCowchMood = function (mood) {
+    pastureForceStanding = false;   // a fresh mood read should show, ending the post-reset standing hold
     try { localStorage.setItem(COWCH_MOOD_KEY, JSON.stringify({ mood: String(mood || 'okay'), at: Date.now() })); } catch (_) {}
     // If the pasture is on screen, let the cow update right away.
     try {
@@ -1201,6 +1206,7 @@ function pastureEngagedToday() {
 // they've been away a few days. null = show the pose from what they've tended.
 // (Doing an exercise sets pastureEngagedToday(), so the cow perks up into a pose.)
 function pastureCowBase() {
+    if (pastureForceStanding) return null;   // just reset — show the standing default
     const mood = pastureMood();
     if (mood === 'low') return 'sad';
     if (mood === 'good') return 'happy';
@@ -2096,7 +2102,7 @@ window.setupPasturePanel = setupPasturePanel;
 function resetPasture() {
     try {
         [IMAGINE_ENGAGEMENT_KEY, PASTURE_VISITDAYS_KEY, PASTURE_LASTGROW_KEY,
-         PASTURE_ITEMS_KEY, PASTURE_POSE_KEY, PASTURE_GRATITUDE_KEY]
+         PASTURE_ITEMS_KEY, PASTURE_POSE_KEY, PASTURE_GRATITUDE_KEY, COWCH_MOOD_KEY]
             .forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
         // Keep the calf's name + identity, but clear the care-day tally that
         // also feeds the cow's growth so the reset is truly fresh.
@@ -2106,6 +2112,7 @@ function resetPasture() {
         } catch (_) {}
     } catch (_) {}
     setPastureActivePose(null);   // drop any session-only preview pose
+    pastureForceStanding = true;  // show the plain standing default, not a mood / asleep / rest pose
     updatePastureUI();            // re-render the now-empty pasture + home teaser
     if (typeof updateYourSpaceGreeting === 'function') updateYourSpaceGreeting();
 }
