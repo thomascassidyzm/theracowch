@@ -138,6 +138,23 @@
         .confirm h2 { font-size: 1.6rem; font-weight: 900; margin-bottom: 12px; }
         .confirm p { margin-bottom: 8px; }
         .confirm .ref { color: #7A6556; font-size: 0.85rem; margin-top: 16px; }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 14px 24px;
+            background: #2D2D2D;
+            color: #FFFFFF;
+            font-weight: 900;
+            font-size: 1rem;
+            border: 4px solid #2D2D2D;
+            box-shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .download-btn:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+        .download-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -184,10 +201,12 @@
             <p>Your signed copy has been recorded. Mandy / the Cowch team has been notified.</p>
             <p>A confirmation has been recorded against reference: <strong id="confirmRef">—</strong></p>
             <p class="ref">Signed <span id="confirmTime"></span></p>
+            <button type="button" class="download-btn" id="downloadPdfBtn">Download your signed copy (PDF)</button>
         </div>
     </div>
 
     <script src="/assets/js/nda-text.js"></script>
+    <script src="/assets/lib/jspdf.umd.min.js"></script>
     <script>
         (function () {
             document.getElementById('pageTitle').textContent = window.NDA_TITLE || 'Non-Disclosure Agreement';
@@ -198,6 +217,7 @@
 
             var params = new URLSearchParams(window.location.search);
             var ref = params.get('ref') || '';
+            var signedRecord = null;
 
             // --- signature pad ---
             var canvas = document.getElementById('sigPad');
@@ -296,13 +316,25 @@
                     .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
                     .then(function (result) {
                         if (!result.ok) throw new Error(result.data && result.data.error || 'Submission failed');
+                        var data = result.data;
                         form.style.display = 'none';
                         document.getElementById('ndaDoc').style.display = 'none';
                         document.getElementById('draftBanner').style.display = 'none';
-                        document.getElementById('confirmRef').textContent = ref || result.data.id;
-                        document.getElementById('confirmTime').textContent = new Date().toLocaleString('en-GB');
+                        document.getElementById('confirmRef').textContent = data.ref || ref || data.id;
+                        document.getElementById('confirmTime').textContent = new Date(data.signedAt || Date.now()).toLocaleString('en-GB');
                         document.getElementById('confirmView').style.display = 'block';
                         window.scrollTo(0, 0);
+
+                        signedRecord = {
+                            id: data.id,
+                            ref: data.ref || ref || '',
+                            ndaVersion: data.ndaVersion || payload.ndaVersion,
+                            signedAt: data.signedAt || new Date().toISOString(),
+                            fullName: payload.fullName,
+                            organisation: payload.organisation,
+                            email: payload.email,
+                            signatureDataUrl: payload.signatureDataUrl
+                        };
                     })
                     .catch(function (err) {
                         errorMsg.textContent = err.message || 'Something went wrong — please try again.';
@@ -310,6 +342,111 @@
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Sign & submit';
                     });
+            });
+
+            // --- signed-copy PDF ---
+            function extractParagraphs() {
+                var out = [];
+                document.querySelectorAll('#ndaDoc p').forEach(function (p) {
+                    var strong = p.querySelector('strong');
+                    var full = p.textContent.trim();
+                    var heading = strong ? strong.textContent.trim() : '';
+                    var body = heading && full.indexOf(heading) === 0 ? full.slice(heading.length).trim() : full;
+                    out.push({ heading: heading, body: body });
+                });
+                return out;
+            }
+
+            function generatePdf(record) {
+                var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+                var pageWidth = doc.internal.pageSize.getWidth();
+                var pageHeight = doc.internal.pageSize.getHeight();
+                var margin = 50;
+                var maxWidth = pageWidth - margin * 2;
+                var y = margin;
+
+                function ensureSpace(lineHeight) {
+                    if (y + lineHeight > pageHeight - margin) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                }
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(18);
+                doc.text(window.NDA_TITLE || 'Non-Disclosure Agreement', margin, y);
+                y += 22;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(110);
+                doc.text('Cowch (cowch.app) — signed copy', margin, y);
+                y += 22;
+                doc.setTextColor(0);
+
+                var metaLines = [
+                    'Signed by: ' + record.fullName + (record.organisation ? ' (' + record.organisation + ')' : ''),
+                    'Email: ' + record.email,
+                    'Signed at: ' + new Date(record.signedAt).toLocaleString('en-GB'),
+                    'NDA version: ' + record.ndaVersion,
+                    'Record ID: ' + record.id,
+                    'Reference: ' + (record.ref || '—')
+                ];
+                doc.setFontSize(10);
+                var boxTop = y;
+                var boxHeight = metaLines.length * 14 + 16;
+                doc.setDrawColor(45, 45, 45);
+                doc.setLineWidth(1);
+                doc.rect(margin, boxTop, maxWidth, boxHeight);
+                var my = boxTop + 18;
+                metaLines.forEach(function (line) {
+                    doc.text(line, margin + 10, my);
+                    my += 14;
+                });
+                y = boxTop + boxHeight + 24;
+
+                doc.setFontSize(9);
+                extractParagraphs().forEach(function (para) {
+                    if (para.heading) {
+                        doc.setFont('helvetica', 'bold');
+                        doc.splitTextToSize(para.heading, maxWidth).forEach(function (l) {
+                            ensureSpace(13);
+                            doc.text(l, margin, y);
+                            y += 13;
+                        });
+                    }
+                    if (para.body) {
+                        doc.setFont('helvetica', 'normal');
+                        doc.splitTextToSize(para.body, maxWidth).forEach(function (l) {
+                            ensureSpace(12);
+                            doc.text(l, margin, y);
+                            y += 12;
+                        });
+                    }
+                    y += 8;
+                });
+
+                ensureSpace(140);
+                y += 8;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('Signature', margin, y);
+                y += 10;
+                try {
+                    doc.addImage(record.signatureDataUrl, 'PNG', margin, y, 220, 90);
+                } catch (e) { /* bad image data — skip, rest of PDF still valid */ }
+                y += 100;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.text(record.fullName + '   —   ' + new Date(record.signedAt).toLocaleString('en-GB'), margin, y);
+
+                var filenameRef = String(record.ref || record.id).replace(/[^a-zA-Z0-9-_]/g, '_');
+                doc.save('Cowch-NDA-signed-' + filenameRef + '.pdf');
+            }
+
+            document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+                if (!signedRecord) return;
+                generatePdf(signedRecord);
             });
         })();
     </script>

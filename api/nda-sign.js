@@ -71,7 +71,13 @@ export default async function handler(req, res) {
         await redis.set('cowch:nda:' + id, record);
         await redis.sadd('cowch:nda:all', id);
 
-        res.json({ ok: true, id });
+        res.json({
+            ok: true,
+            id,
+            ref: record.ref,
+            ndaVersion: record.ndaVersion,
+            signedAt: record.signedAt
+        });
     } catch (err) {
         console.error('nda-sign error:', err);
         res.status(500).json({ error: 'nda-sign failed', detail: String(err && err.message || err) });
