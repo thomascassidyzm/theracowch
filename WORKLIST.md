@@ -77,11 +77,15 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 - [!] @tom 06-14 **Surrey: confirm the contact + a talk date** — Centre for Wellbeing owner; whether the pilot runs via a talk / society / wellbeing service (loop in the School of Psychology for a measure).
 - [!] @tom 06-14 **Mandy reviews the live chat voice** — she may want it warmer or more arm's-length now the reaffirmation is live.
 - [!] @tom 06-14 **Prime the social-preview caches** after any OG change — run `cowch.app` through the FB / Twitter / LinkedIn debuggers once (links in `docs/sharing-and-marketing.md`).
+- [!] @mandy 07-03 **Calf render / pose direction** — new full-body calf renders + pose options staged for review (`public/calf-gallery.html`, `public/cow-poses.html`) — **awaiting Mandy's pick** before any of it gets wired into the live app.
 
 ## ✅ Done (archive — groomer-managed, don't hand-edit)
 
-- 2026-06-14 — Claims-safety audit + proactive not-therapy reaffirmation; chat prompt bundled to `lib/prompt-base.js`; `vision.html` removed; "coach"→"companion".
 - 2026-06-13 — Share→install loop, social preview cards, Vercel Web Analytics (enabled, Pro) + validation telemetry; marketing strategy (`docs/marketing-strategy.md`) + this worklist.
+- 2026-06-14 — Claims-safety audit + proactive not-therapy reaffirmation; chat prompt bundled to `lib/prompt-base.js`; `vision.html` removed; "coach"→"companion".
+- 2026-06-14 — University-facing pitch surface, institutional privacy statement, campus on-ramp (QR talk cards) — Surrey pilot-readiness pack.
+- 2026-06-14 — Interactive calf companion (Finch-inspired) v1 — welcome flow, care actions, persistent growing Home card.
+- 2026-07-03 — MuMu grows & reflects in the Pasture — pasture cow scales with engagement and wears tokens of the user's top-tended IMAGINE areas.
 
 ---
 
