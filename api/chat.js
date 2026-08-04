@@ -387,29 +387,37 @@ SAFETY & BOUNDARIES:
 - If the user is in crisis or at risk, gently encourage seeking real-world support (Samaritans: 116 123, SHOUT: text SHOUT to 85258)
 - Do not provide medical diagnoses`;
 
+    // Per-user context is built into its OWN string, deliberately NOT appended to
+    // systemPrompt. Prompt caching is a byte-exact prefix match, so anything
+    // user-specific inside the cached block gives every returning user a fresh
+    // cache key — the whole ~6k-token base prompt would be re-prefilled and
+    // re-billed on every single message. This string ships as a second, uncached
+    // system block after the frozen base (see the `system` array below).
+    let userContext = '';
+
     // Add compressed therapy profile context (if available)
     if (profile && Object.keys(profile).length > 0) {
-      systemPrompt += `\n\n--- CLIENT CONTEXT (from previous sessions) ---`;
+      userContext += `\n\n--- CLIENT CONTEXT (from previous sessions) ---`;
       if (profile.sessionCount) {
-        systemPrompt += `\nSessions: ${profile.sessionCount}`;
+        userContext += `\nSessions: ${profile.sessionCount}`;
       }
       if (profile.patterns) {
-        systemPrompt += `\nPatterns noticed: ${profile.patterns}`;
+        userContext += `\nPatterns noticed: ${profile.patterns}`;
       }
       if (profile.activeThemes) {
-        systemPrompt += `\nCurrently working on: ${profile.activeThemes}`;
+        userContext += `\nCurrently working on: ${profile.activeThemes}`;
       }
       if (profile.insights) {
-        systemPrompt += `\nKey insights: ${profile.insights}`;
+        userContext += `\nKey insights: ${profile.insights}`;
       }
       if (profile.strengths) {
-        systemPrompt += `\nStrengths: ${profile.strengths}`;
+        userContext += `\nStrengths: ${profile.strengths}`;
       }
       if (profile.respondsTo) {
-        systemPrompt += `\nResponds well to: ${profile.respondsTo}`;
+        userContext += `\nResponds well to: ${profile.respondsTo}`;
       }
       if (profile.lastSession) {
-        systemPrompt += `\nLast session: ${profile.lastSession}`;
+        userContext += `\nLast session: ${profile.lastSession}`;
       }
       if (profile.imagine) {
         const activeImagine = Object.entries(profile.imagine)
@@ -417,20 +425,20 @@ SAFETY & BOUNDARIES:
           .map(([k, v]) => `${k}:${v}`)
           .join(', ');
         if (activeImagine) {
-          systemPrompt += `\nIMAGINE engagement: ${activeImagine}`;
+          userContext += `\nIMAGINE engagement: ${activeImagine}`;
         }
       }
-      systemPrompt += `\n--- END CLIENT CONTEXT ---`;
+      userContext += `\n--- END CLIENT CONTEXT ---`;
     }
 
     // Add current session context
     if (currentPattern) {
-      systemPrompt += `\n\nCurrent wellness focus: ${currentPattern}`;
+      userContext += `\n\nCurrent wellness focus: ${currentPattern}`;
     }
     if (sessionPhase) {
-      systemPrompt += `\nSession phase: ${sessionPhase}`;
+      userContext += `\nSession phase: ${sessionPhase}`;
     }
-    
+
     systemPrompt += `\n\nRespond authentically as Mandy Kloppers would - combining professional expertise with genuine compassion and practical guidance. Keep responses to 2-3 sentences maximum (unless guiding an intervention). Calibrate any pattern-spotting to your confidence: LOW = ask a question to gather more, don't name anything; MEDIUM = suggest gently as a hypothesis ("I might be mistaken, but I'm wondering if…") and invite confirmation; HIGH = only with clear repetition (two or more explicit self-reported examples), reflect the pattern back with their own words and check it lands. Do NOT generate psychological interpretations or patterns that could feel diagnostic (traits, labels, or clinical-sounding summaries) unless the user has explicitly described consistent experiences over time. If data is thin, say so — "I don't have enough information yet to identify a pattern." Never introduce patterns the user hasn't directly or indirectly expressed.
 
 IMAGINE FRAMEWORK EXPLANATIONS:
@@ -541,7 +549,7 @@ Rules: always include the tag; write nothing after it; never mention or explain 
 
     // Prepare conversation messages
     const messages = [
-      { role: 'system', content: systemPrompt }
+      { role: 'system', content: systemPrompt + userContext }
     ];
 
     // Add recent messages for immediate context
@@ -570,6 +578,23 @@ Rules: always include the tag; write nothing after it; never mention or explain 
       });
     }
 
+    // The system array is two blocks, and the order matters: caching matches a
+    // PREFIX, so the frozen base has to come first. Block 1 is identical for
+    // every user and every turn and carries cache_control; block 2 carries the
+    // per-user context and is deliberately uncached. An empty text block is
+    // rejected by the API, so the second block is only added when there is
+    // something in it.
+    const systemBlocks = [
+      {
+        type: 'text',
+        text: systemPrompt,
+        cache_control: { type: 'ephemeral' }  // Cache this for 5 minutes
+      }
+    ];
+    if (userContext) {
+      systemBlocks.push({ type: 'text', text: userContext });
+    }
+
     // Call Claude API. Prompt caching is GA, so `cache_control` works without
     // a beta header. Model is Sonnet 4.6 (the supported successor to Sonnet 4);
     // effort:low + thinking disabled keeps replies fast and conversational.
@@ -585,13 +610,7 @@ Rules: always include the tag; write nothing after it; never mention or explain 
         max_tokens: 500,  // Increased for guided interventions
         thinking: { type: 'disabled' },
         output_config: { effort: 'low' },
-        system: [
-          {
-            type: 'text',
-            text: systemPrompt,
-            cache_control: { type: 'ephemeral' }  // Cache this for 5 minutes
-          }
-        ],
+        system: systemBlocks,
         messages: messages.slice(1) // Remove system message since we're using system array format
       })
     });
@@ -607,6 +626,20 @@ Rules: always include the tag; write nothing after it; never mention or explain 
     }
 
     const data = await response.json();
+
+    // Cache observability. Anthropic reports what it actually did with the
+    // prefix; without surfacing it, "is the base prompt caching?" is invisible
+    // from outside. cache_read_input_tokens > 0 on a second turn within the
+    // 5-minute window means the frozen base block is being reused.
+    const usage = data.usage || {};
+    console.log('Chat API usage:', JSON.stringify({
+      hasProfile: Boolean(userContext),
+      input_tokens: usage.input_tokens,
+      cache_creation_input_tokens: usage.cache_creation_input_tokens,
+      cache_read_input_tokens: usage.cache_read_input_tokens,
+      output_tokens: usage.output_tokens
+    }));
+
     let aiResponse = data.content[0].text;
 
     // Pull the hidden mood tag the model appended, then strip it so the user
@@ -652,7 +685,11 @@ Rules: always include the tag; write nothing after it; never mention or explain 
       pattern: detectedPattern,
       mood: mood,
       timestamp: new Date().toISOString(),
-      sessionPhase: sessionPhase || 'exploring'
+      sessionPhase: sessionPhase || 'exploring',
+      // Non-sensitive cache diagnostics — token counts only, no prompt content.
+      // Makes "is the cached base actually being reused?" checkable from outside.
+      cacheReadTokens: usage.cache_read_input_tokens ?? 0,
+      cacheCreationTokens: usage.cache_creation_input_tokens ?? 0
     });
 
   } catch (error) {

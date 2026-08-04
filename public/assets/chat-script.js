@@ -692,6 +692,24 @@ async function handleSendMessage() {
         });
 
         if (!response.ok) {
+            // Read the body before throwing so the next real failure names
+            // itself. The server sends back the Anthropic status as
+            // `upstreamStatus` (429 = rate limited, 529 = overloaded, 401 = key),
+            // and that's the one number that says what actually went wrong. Wrap
+            // it — a Vercel platform error page isn't JSON.
+            let upstream = null;
+            try {
+                const body = await response.json();
+                upstream = body;
+            } catch (parseError) {
+                // Body wasn't JSON — nothing more to learn from it.
+            }
+            console.error(
+                `API error: ${response.status}`,
+                upstream
+                    ? `upstreamStatus: ${upstream.upstreamStatus ?? 'none'} | ${upstream.error ?? 'no error field'}`
+                    : 'no JSON body (likely a platform error page)'
+            );
             throw new Error(`API error: ${response.status}`);
         }
 
