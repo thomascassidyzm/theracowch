@@ -288,9 +288,10 @@
   }
 
   function answer(i) {
+    var wasNew = !responses[qIndex];
     responses[qIndex] = { opt: i };
     recompute();
-    advance();
+    advance(wasNew);
   }
 
   /* The honest exit: no weights touched — this scenario simply won't count.
@@ -314,9 +315,10 @@
 
   function abstainContinue() {
     var el = $('exitNote');
+    var wasNew = !responses[qIndex];
     responses[qIndex] = { exit: true, note: ((el && el.value) || '').trim() };
     recompute();
-    advance();
+    advance(wasNew);
   }
 
   /* Move to a moment in the current ten, with the same fade the quiz has
@@ -335,12 +337,19 @@
   }
 
   /* After answering: on to the next moment in the ten; at the end of the ten,
-     back to anything skipped; only when the ten is whole does the curtain lift. */
-  function advance() {
+     back to anything skipped; only when the ten is whole does the curtain lift.
+     `wasNew` is what tells a fresh answer from a change of mind — filling the
+     last gap finishes the ten wherever you're standing, while re-answering an
+     old moment just carries on, so an edit never hijacks you to the reveal. */
+  function advance(wasNew) {
     /* measurement-blind: nothing visible changes except the journey dots */
+    if (wasNew && firstUnansweredInBlock() === -1) return reveal();
     if (qIndex < blockEnd()) return goTo(qIndex + 1);
-    var skipped = firstUnansweredInBlock();
-    if (skipped !== -1) return goTo(skipped);
+    return navNext();
+  }
+
+  /* The curtain: a checkpoint at ten and twenty, the full picture at thirty. */
+  function reveal() {
     busy = true;
     renderJourney();
     setTimeout(blockEnd() === TOTAL - 1 ? finishQuiz : showCheckpoint, 350);
@@ -354,8 +363,7 @@
     if (qIndex < blockEnd()) return goTo(qIndex + 1);
     var skipped = firstUnansweredInBlock();
     if (skipped !== -1) return goTo(skipped);
-    busy = true;
-    setTimeout(blockEnd() === TOTAL - 1 ? finishQuiz : showCheckpoint, 100);
+    reveal();
   }
 
   function sortedByResolution() {
