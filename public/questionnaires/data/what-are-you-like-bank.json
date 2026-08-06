@@ -1,0 +1,1089 @@
+{
+  "meta": {
+    "instrument": "What are you like, anyway?",
+    "set": "universal-30 core",
+    "note": "Pure data. The engine reads this; questions are never hand-coded into a page. Five scenarios per axis across three acts of ten; every scenario carries four options plus an honest exit (rendered by the engine, overridden here via 'x').",
+    "axes": {
+      "O": {
+        "name": "Openness",
+        "sub": "novelty of ideas · the unfamiliar · curiosity"
+      },
+      "C": {
+        "name": "Conscientiousness",
+        "sub": "finishing · order · follow-through"
+      },
+      "E": {
+        "name": "Extraversion",
+        "sub": "where the energy comes from"
+      },
+      "A": {
+        "name": "Agreeableness",
+        "sub": "accommodation · harmony · its price"
+      },
+      "N": {
+        "name": "Sensitivity",
+        "sub": "how loudly the alarm system runs"
+      },
+      "R": {
+        "name": "Risk appetite",
+        "sub": "tolerance of downside with real stakes"
+      }
+    },
+    "source_repo": "thrive-website",
+    "source_files": [
+      "prototypes/data/scenario-bank.json",
+      "prototypes/data/build-proto-a.py"
+    ],
+    "source_commit": "30198ce20bdddfc6fbcaa325b7cdd93e139c98dd",
+    "bank_version": "2.0",
+    "count": 30
+  },
+  "questions": [
+    {
+      "id": "e-party-host-kitchen",
+      "s": "You arrive at a party where the only person you know is the host — and they're busy in the kitchen.",
+      "opts": [
+        {
+          "t": "Pick up a tea towel and help — it gives you a job, and people drift to the kitchen anyway",
+          "w": {
+            "E": 0.3,
+            "A": 0.6,
+            "C": 0.3
+          }
+        },
+        {
+          "t": "Walk up to the nearest group and introduce yourself cold",
+          "w": {
+            "E": 1,
+            "R": 0.3
+          }
+        },
+        {
+          "t": "Find one other person standing alone and talk to them",
+          "w": {
+            "E": 0.2,
+            "A": 0.5,
+            "O": 0.2
+          }
+        },
+        {
+          "t": "Post up somewhere quiet with your phone and plan an early exit",
+          "w": {
+            "E": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "r-yoghurt-date",
+      "s": "Fridge, evening. The yoghurt is four days past its date. It looks fine. It smells… fine?",
+      "opts": [
+        {
+          "t": "Eat it without ceremony — dates are a suggestion, the nose is the law",
+          "w": {
+            "R": 0.8,
+            "C": -0.2
+          }
+        },
+        {
+          "t": "Full tribunal — look, smell, tiny exploratory taste — then trust the verdict",
+          "w": {
+            "R": 0.3,
+            "C": 0.5
+          }
+        },
+        {
+          "t": "Bin it. No yoghurt is worth a bad Tuesday night.",
+          "w": {
+            "R": -0.7,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Eat it — then spend the evening quietly monitoring yourself for symptoms",
+          "w": {
+            "R": 0.4,
+            "N": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-admin-three-days",
+      "s": "You get home and remember an admin task that's due in three days — twenty dull minutes, nothing more.",
+      "opts": [
+        {
+          "t": "Do it now, before coat comes off. Open loops cost more than the task does.",
+          "w": {
+            "C": 1,
+            "N": 0.2
+          }
+        },
+        {
+          "t": "Calendar slot tomorrow lunchtime — scheduled is as good as done",
+          "w": {
+            "C": 0.6,
+            "N": -0.2
+          }
+        },
+        {
+          "t": "It'll get done on day three, like always, with ten minutes to spare",
+          "w": {
+            "C": -0.5,
+            "R": 0.3,
+            "N": -0.4
+          }
+        },
+        {
+          "t": "It joins the pile of things you know about and don't look at",
+          "w": {
+            "C": -1,
+            "N": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-restaurant-veto",
+      "s": "Six of you are picking a restaurant. The majority lands on the one place you actively dislike.",
+      "opts": [
+        {
+          "t": "Go along and say nothing — the evening's peace is worth one bad meal",
+          "w": {
+            "A": 0.9,
+            "E": -0.3
+          }
+        },
+        {
+          "t": "Say you're not keen and pitch an alternative, cheerfully",
+          "w": {
+            "A": -0.5,
+            "E": 0.7
+          }
+        },
+        {
+          "t": "Suggest the group splits — two venues, meet after for drinks",
+          "w": {
+            "A": -0.3,
+            "O": 0.6,
+            "R": 0.3
+          }
+        },
+        {
+          "t": "Go along cheerfully — but on the record: 'noted, and the next pick is mine'",
+          "w": {
+            "A": 0.5,
+            "E": 0.3,
+            "C": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-pop-in",
+      "s": "A text from a good friend: 'Just passing your end — pop in for a cuppa? Be there in 20.' The flat is at its honest weekday level: lived-in, dishes visible, life everywhere.",
+      "opts": [
+        {
+          "t": "'Door's open!' — kettle on, dishes exactly where they are. They asked for you, not a showroom.",
+          "w": {
+            "N": -0.8,
+            "E": 0.5
+          }
+        },
+        {
+          "t": "'Yes!!' — followed by eighteen minutes of the fastest cleaning of your life",
+          "w": {
+            "N": 0.6,
+            "E": 0.3
+          }
+        },
+        {
+          "t": "'Perfect timing — was just heading out! Café on the corner in 10?' The friend received; the flat unseen.",
+          "w": {
+            "N": 0.7,
+            "A": 0.3,
+            "C": -0.2
+          }
+        },
+        {
+          "t": "'This week's rammed — next week, properly?' Postpone until the flat and the self are presentable.",
+          "w": {
+            "N": 0.5,
+            "E": -0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "o-free-evening",
+      "s": "A free evening, energy for exactly one thing.",
+      "opts": [
+        {
+          "t": "The series you already know and love — guaranteed pleasure, zero gamble",
+          "w": {
+            "O": -0.8
+          }
+        },
+        {
+          "t": "The strange documentary a friend swore would change how you see things",
+          "w": {
+            "O": 0.9
+          }
+        },
+        {
+          "t": "Start learning something with no obvious payoff, just because it pulls at you",
+          "w": {
+            "O": 1,
+            "C": 0.3
+          }
+        },
+        {
+          "t": "Finally clear that nagging life-admin task — the relief IS the treat",
+          "w": {
+            "C": 0.9,
+            "O": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "e-recharge",
+      "s": "A brutal week finally ends. Recharging, for you, looks like—",
+      "opts": [
+        {
+          "t": "Cancelling everything. Cave weekend. Speak to no one.",
+          "w": {
+            "E": -1
+          }
+        },
+        {
+          "t": "Getting people round — other humans are where the energy comes back from",
+          "w": {
+            "E": 1
+          }
+        },
+        {
+          "t": "One close friend, one long walk",
+          "w": {
+            "E": 0.1,
+            "A": 0.5
+          }
+        },
+        {
+          "t": "Out somewhere loud where nobody knows you and nothing is expected of you",
+          "w": {
+            "E": 0.6,
+            "O": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-morning-alarm",
+      "s": "The 6:30 alarm exists because evening-you keeps designing a better morning — the run, the reading, the unhurried start. It is now 6:30. Mid-November. Dark.",
+      "opts": [
+        {
+          "t": "Up on the first note. The decision was made last night — 6:30-you is just the courier.",
+          "w": {
+            "C": 1,
+            "N": -0.2
+          }
+        },
+        {
+          "t": "The designed snooze — one, nine minutes, built into the plan like a landing strip",
+          "w": {
+            "C": 0.5
+          }
+        },
+        {
+          "t": "Renegotiate from inside the duvet — and evening-you loses the case about half the time",
+          "w": {
+            "C": -0.5,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "The alarm has quietly migrated to 7:15 since the clocks changed. The better morning is a spring project now.",
+          "w": {
+            "C": -0.7,
+            "N": -0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-bill-split",
+      "s": "Dinner with five friends. The bill arrives; you had far less than everyone else. Someone says the easy words: 'Split it six ways?'",
+      "opts": [
+        {
+          "t": "Split it. The £15 difference is cheaper than being the person who counts.",
+          "w": {
+            "A": 0.8
+          }
+        },
+        {
+          "t": "Say, lightly, 'I'll put in for what I had' — and let the table adjust",
+          "w": {
+            "A": -0.6,
+            "C": 0.4
+          }
+        },
+        {
+          "t": "Split it tonight, but suggest itemising next time as a general policy",
+          "w": {
+            "A": 0.4,
+            "C": 0.5,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Split it — and privately eat less generously at the next three dinners to even the ledger",
+          "w": {
+            "A": 0.5,
+            "N": 0.6,
+            "C": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "o-rabbit-hole-11pm",
+      "s": "11pm, work tomorrow. A stray link has opened into a subject you didn't know existed an hour ago — and it is genuinely fascinating. Three tabs deep, night quietly disappearing.",
+      "opts": [
+        {
+          "t": "Follow it down. Feeling this awake to something is rarer than sleep.",
+          "w": {
+            "O": 1,
+            "C": -0.4
+          }
+        },
+        {
+          "t": "Bookmark the trailhead, bed now — and genuinely return at the weekend, tabs restored, tea made",
+          "w": {
+            "O": 0.6,
+            "C": 0.7
+          }
+        },
+        {
+          "t": "Bookmark it, bed — knowing the folder where curiosity gets saved is where curiosity goes to end",
+          "w": {
+            "O": 0.2,
+            "C": 0.3,
+            "N": 0.2
+          }
+        },
+        {
+          "t": "Close the tabs. It was a link-hole, not a calling — most 11pm fascination is the hour talking, not the subject.",
+          "w": {
+            "O": -0.6,
+            "C": 0.3,
+            "N": -0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-silence-24h",
+      "s": "You sent a slightly risky message yesterday — a pitch, an overture, a hard truth. Twenty-four hours: silence.",
+      "opts": [
+        {
+          "t": "Reread what you sent, twice, hunting for the sentence that sank it",
+          "w": {
+            "N": 1
+          }
+        },
+        {
+          "t": "Genuinely forget about it until they reply — their silence is their business",
+          "w": {
+            "N": -1
+          }
+        },
+        {
+          "t": "Send a light follow-up nudge and move on",
+          "w": {
+            "N": 0.1,
+            "E": 0.5,
+            "R": 0.3
+          }
+        },
+        {
+          "t": "Decide it's a no before they can say it — quietly brace now, so the real answer can only match or improve",
+          "w": {
+            "N": 0.6,
+            "R": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "o-unplanned-detour",
+      "s": "Road trip, on schedule. A brown sign flashes past: something unexplained — 'The Singing Caves, 9 miles'. You've never heard of them.",
+      "opts": [
+        {
+          "t": "Turn off. The itinerary exists to be betrayed by better ideas.",
+          "w": {
+            "O": 1,
+            "R": 0.3,
+            "C": -0.3
+          }
+        },
+        {
+          "t": "Look them up at the next stop; detour on the way back if they're worth it",
+          "w": {
+            "O": 0.3,
+            "C": 0.7
+          }
+        },
+        {
+          "t": "Note the name, feel the pull, keep driving — the schedule is the schedule",
+          "w": {
+            "O": -0.2,
+            "C": 0.6,
+            "N": 0.2
+          }
+        },
+        {
+          "t": "Nine unexplained miles each way? That's how afternoons die. Drive on, unbothered.",
+          "w": {
+            "O": -0.8,
+            "N": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "r-wobbly-chair",
+      "s": "The hall bulb has gone. The proper stepladder is buried behind everything else you own. The kitchen chair — the slightly wobbly one — is right there.",
+      "opts": [
+        {
+          "t": "Chair, now, on tiptoes. It's held you before; it can hold you again.",
+          "w": {
+            "R": 0.9
+          }
+        },
+        {
+          "t": "Excavate the ladder — two minutes of faff against six weeks in a cast is no contest",
+          "w": {
+            "R": -0.7,
+            "C": 0.5
+          }
+        },
+        {
+          "t": "Chair, but managed: shoes off, hand on the wall, weight tested before it's trusted",
+          "w": {
+            "R": 0.3,
+            "C": 0.6
+          }
+        },
+        {
+          "t": "Leave it dark for now. It's a hall, not an operating theatre — it can wait for a day with more ladder in it.",
+          "w": {
+            "R": -0.2,
+            "C": -0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-undercharged",
+      "s": "Checking the restaurant bill at home, you find they forgot the second bottle — you're £40 up, the place is a ten-minute walk away, and no one will ever know.",
+      "opts": [
+        {
+          "t": "Walk back tomorrow and pay it — the ten minutes IS the point",
+          "w": {
+            "A": 0.8,
+            "C": 0.6
+          }
+        },
+        {
+          "t": "Pay it next time you're passing — if you remember, and you might not",
+          "w": {
+            "A": 0.3,
+            "C": -0.4
+          }
+        },
+        {
+          "t": "Keep it. Their systems, their margin for error — it evens out across a lifetime of being overcharged.",
+          "w": {
+            "A": -0.6,
+            "R": 0.2
+          }
+        },
+        {
+          "t": "Keep it, but tip roughly that much extra there over the next few visits",
+          "w": {
+            "A": 0.4,
+            "N": 0.4,
+            "C": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-broken-drawer",
+      "s": "The kitchen drawer that needs a shove and a prayer has needed them for four months. Tonight it sticks completely — then gives.",
+      "opts": [
+        {
+          "t": "Toolbox out now. Four months of shoving ends tonight.",
+          "w": {
+            "C": 0.8,
+            "E": 0.2
+          }
+        },
+        {
+          "t": "Add it to the list — the real one you actually work through on weekends",
+          "w": {
+            "C": 0.7,
+            "N": -0.2
+          }
+        },
+        {
+          "t": "Another shove, another prayer. It works. This is the system now.",
+          "w": {
+            "C": -0.8,
+            "N": -0.3
+          }
+        },
+        {
+          "t": "Watch a fix-it video, buy nothing, feel briefly like someone who fixes drawers",
+          "w": {
+            "C": -0.4,
+            "O": 0.4,
+            "N": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "e-train-chat",
+      "s": "Four-hour train ride. You've been saving a book for this. The person next to you is friendly, chatty — and clearly settling in for a long conversation.",
+      "opts": [
+        {
+          "t": "Put the book away — a real conversation with a stranger is rarer than a good book",
+          "w": {
+            "E": 0.9,
+            "O": 0.4,
+            "A": 0.3
+          }
+        },
+        {
+          "t": "Chat warmly for ten minutes, then say, with a smile, that you've been promising yourself this book all week",
+          "w": {
+            "E": 0.2,
+            "A": -0.2,
+            "C": 0.4
+          }
+        },
+        {
+          "t": "Answer politely but ever more briefly until they take the hint",
+          "w": {
+            "E": -0.6,
+            "A": 0.3,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Headphones in at the first pause — kindly, but immediately",
+          "w": {
+            "E": -0.9,
+            "A": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-results-wait",
+      "s": "Results arrive Friday — a test, a scan, a decision on something that matters. It's Monday.",
+      "opts": [
+        {
+          "t": "Fill the week deliberately so full that Friday has no room to echo",
+          "w": {
+            "N": 0.6,
+            "C": 0.6,
+            "E": 0.3
+          }
+        },
+        {
+          "t": "It surfaces a few times a day; you notice it, breathe, and it passes",
+          "w": {
+            "N": -0.6
+          }
+        },
+        {
+          "t": "Low-grade static all week — sleep thinner, fuse shorter, everything slightly harder",
+          "w": {
+            "N": 1
+          }
+        },
+        {
+          "t": "Decide the likely outcome now and pre-live it, so Friday can only confirm or pleasantly surprise",
+          "w": {
+            "N": 0.7,
+            "C": 0.4,
+            "R": -0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "o-always-wondered",
+      "s": "Mid-conversation, someone mentions — just in passing — a thing you've always vaguely wondered about. They clearly actually know. The conversation is about to move on.",
+      "opts": [
+        {
+          "t": "Stop the table: 'wait — go back. How does that actually work?'",
+          "w": {
+            "O": 1,
+            "E": 0.5
+          }
+        },
+        {
+          "t": "Catch them later, one to one: 'you mentioned a thing earlier — tell me properly'",
+          "w": {
+            "O": 0.7,
+            "E": -0.3
+          }
+        },
+        {
+          "t": "Note it on your phone to look up tonight — and actually look it up",
+          "w": {
+            "O": 0.5,
+            "C": 0.5
+          }
+        },
+        {
+          "t": "Let it drift past. Wondering about it now and then was the comfortable bit.",
+          "w": {
+            "O": -0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "r-cutting-it-fine",
+      "s": "Tonight's thing genuinely matters — fixed start, no slipping in late. Door to door, it's forty minutes when everything behaves.",
+      "opts": [
+        {
+          "t": "Leave over an hour before. Early and bored beats late and sweating, every single time.",
+          "w": {
+            "R": -0.8,
+            "C": 0.4,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Fifty minutes: one honest cushion, no evening wasted standing in a foyer",
+          "w": {
+            "R": -0.2,
+            "C": 0.5
+          }
+        },
+        {
+          "t": "Forty. Things mostly behave — and landing exactly on time is a small art.",
+          "w": {
+            "R": 0.6
+          }
+        },
+        {
+          "t": "Thirty-five, and make it up en route. The edge is half the point.",
+          "w": {
+            "R": 1,
+            "C": -0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-train-tears",
+      "s": "Evening train, half-full. The person across the aisle is crying — quietly, steadily, past the point of hiding it. Every other passenger has become very interested in their phone.",
+      "opts": [
+        {
+          "t": "Lean over quietly: 'Sorry — is there anything I can do?' — and accept whatever comes back, including nothing",
+          "w": {
+            "A": 0.8,
+            "E": 0.4,
+            "R": 0.4
+          }
+        },
+        {
+          "t": "The wordless offer — a packet of tissues held out, a kind nod, no conversation attached",
+          "w": {
+            "A": 0.6,
+            "E": -0.2
+          }
+        },
+        {
+          "t": "Leave them their privacy — public crying usually wants witnesses gone, and attention can be the heavier thing. Today might have been the exception.",
+          "w": {
+            "A": -0.1,
+            "N": -0.2
+          }
+        },
+        {
+          "t": "Feel it hard, do nothing, and carry them home in your head all evening",
+          "w": {
+            "A": 0.3,
+            "N": 0.8,
+            "E": -0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-money-reconcile",
+      "s": "End of the month. Your account is about £180 lighter than your rough mental maths says it should be.",
+      "opts": [
+        {
+          "t": "Statement open, line by line, until the £180 confesses",
+          "w": {
+            "C": 0.9,
+            "N": 0.4
+          }
+        },
+        {
+          "t": "Two-minute scan for anything obviously wrong, then let it go",
+          "w": {
+            "C": 0.3,
+            "N": -0.3
+          }
+        },
+        {
+          "t": "Shrug — months vary, the mental maths was rough anyway",
+          "w": {
+            "C": -0.7,
+            "N": -0.5,
+            "R": 0.2
+          }
+        },
+        {
+          "t": "Feel a pulse of worry, resolve to check properly... and not check",
+          "w": {
+            "C": -0.5,
+            "N": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "e-weekend-second-invite",
+      "s": "Saturday's plans are already set. Now a second invitation lands for Sunday — good people, but it's your only empty day this week.",
+      "opts": [
+        {
+          "t": "Go. Empty days are what invitations are for.",
+          "w": {
+            "E": 1
+          }
+        },
+        {
+          "t": "Decline, and say honestly that you need a day of nothing",
+          "w": {
+            "E": -0.7,
+            "A": -0.2
+          }
+        },
+        {
+          "t": "Invent a softer excuse — 'family stuff' — and keep the day",
+          "w": {
+            "E": -0.6,
+            "A": 0.4,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Say maybe, then decide on the day by how you feel",
+          "w": {
+            "E": -0.1,
+            "C": -0.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-odd-symptom",
+      "s": "A small, odd symptom — nothing dramatic — has now hung around for a week.",
+      "opts": [
+        {
+          "t": "Book the GP today. Not from panic — because booked beats wondering.",
+          "w": {
+            "N": 0.2,
+            "C": 0.8
+          }
+        },
+        {
+          "t": "Give it another week. Bodies are noisy; most noise passes.",
+          "w": {
+            "N": -0.7
+          }
+        },
+        {
+          "t": "Search it tonight — and surface forty minutes later, three conditions deep, worse off",
+          "w": {
+            "N": 1
+          }
+        },
+        {
+          "t": "Mention it to no one and think about it more than you'd ever admit",
+          "w": {
+            "N": 0.8,
+            "E": -0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "o-conviction-challenged",
+      "s": "A friend you respect calmly dismantles an opinion you've held for years — and their argument is annoyingly good.",
+      "opts": [
+        {
+          "t": "Chase it — 'go on, break the rest of it' — and enjoy the demolition",
+          "w": {
+            "O": 1,
+            "N": -0.4
+          }
+        },
+        {
+          "t": "Defend it hard tonight, then quietly re-examine everything tomorrow",
+          "w": {
+            "O": 0.5,
+            "N": 0.4,
+            "E": 0.3
+          }
+        },
+        {
+          "t": "Concede the good points, keep the conclusion — roots deeper than arguments",
+          "w": {
+            "O": -0.4
+          }
+        },
+        {
+          "t": "Steer somewhere lighter. Dinner isn't a tribunal.",
+          "w": {
+            "O": -0.6,
+            "A": 0.5,
+            "E": -0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r-wall-next-door",
+      "s": "Through the party wall, later than usual and sharper: a couple's row next door, escalating — then something breaking, then a silence that's somehow louder. You know them to nod to.",
+      "opts": [
+        {
+          "t": "Knock now with a pretext — 'sorry, heard a crash, everything okay?' — eyes open, tone light, mortification accepted",
+          "w": {
+            "R": 0.7,
+            "A": 0.6,
+            "E": 0.4
+          }
+        },
+        {
+          "t": "Listen hard for a few minutes — voices resuming would mean one thing, continued silence another — then decide",
+          "w": {
+            "C": 0.7,
+            "N": 0.4,
+            "R": -0.2
+          }
+        },
+        {
+          "t": "Not your wall's business — couples break things, the morning will look ordinary, and knocking makes you the odd one. The doubt can keep you up instead.",
+          "w": {
+            "R": -0.5,
+            "N": 0.3,
+            "A": -0.2
+          }
+        },
+        {
+          "t": "Log it properly — the date, the pattern if it becomes one — and decide now what threshold would make you act",
+          "w": {
+            "C": 0.8,
+            "R": -0.3,
+            "N": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-friend-bad-plan",
+      "s": "A close friend, glowing, announces the plan: quitting their stable job to day-trade full time. They've done four months of YouTube research. They ask what you think.",
+      "opts": [
+        {
+          "t": "Say plainly that you think it's a mistake, and exactly why — friendship over comfort",
+          "w": {
+            "A": -0.8,
+            "C": 0.4
+          }
+        },
+        {
+          "t": "Ask the hard questions — runway, loss limits, plan B — and let the answers do the talking",
+          "w": {
+            "O": 0.5,
+            "C": 0.7,
+            "A": -0.2
+          }
+        },
+        {
+          "t": "Cheer them on. Belief is fuel, doubts are free, and they didn't ask for a risk assessment.",
+          "w": {
+            "A": 0.8,
+            "R": 0.3
+          }
+        },
+        {
+          "t": "Voice mild, hedged concern — enough to be on record, not enough to dent the glow",
+          "w": {
+            "A": 0.5,
+            "N": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-resolution-feb",
+      "s": "February 9th. The resolution — real, chosen, yours — has been flat on the canvas for eleven days now. Nobody else ever knew it existed.",
+      "opts": [
+        {
+          "t": "Restart tonight. Day one is any day you say it is — the eleven days are data, not a verdict.",
+          "w": {
+            "C": 0.8,
+            "N": -0.2
+          }
+        },
+        {
+          "t": "Retire it out loud, on purpose: it was the wrong resolution, aimed at someone you don't actually want to be",
+          "w": {
+            "O": 0.5,
+            "C": 0.2,
+            "N": -0.3
+          }
+        },
+        {
+          "t": "Let it fade without a decision — by March it will simply never have happened",
+          "w": {
+            "C": -0.7,
+            "N": 0.2
+          }
+        },
+        {
+          "t": "Rebuild it at a third of the size and start that tonight — the ambition was the bug, never the wanting",
+          "w": {
+            "C": 0.6,
+            "O": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "e-impromptu-toast",
+      "s": "Mid-birthday-dinner, someone taps a glass: 'You've known them longest — say a few words!' Eight faces turn to you.",
+      "opts": [
+        {
+          "t": "Stand up and enjoy it — you have three stories ready before you're upright",
+          "w": {
+            "E": 1,
+            "N": -0.4
+          }
+        },
+        {
+          "t": "Say something short and warm, then sit down fast",
+          "w": {
+            "E": 0.1,
+            "A": 0.4,
+            "N": 0.3
+          }
+        },
+        {
+          "t": "Deflect with a joke and raise a toast instead — five words, glasses up, done",
+          "w": {
+            "E": -0.3,
+            "N": 0.4
+          }
+        },
+        {
+          "t": "Point at someone else: 'They tell it better' — and mean it as escape, not generosity",
+          "w": {
+            "E": -0.8,
+            "N": 0.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-friend-success-ache",
+      "s": "Your closest friend just got the exact thing you've been quietly chasing for two years — the house, the role, the news. Their joy is total. The celebration is Saturday, and you have until then to sort your face out.",
+      "opts": [
+        {
+          "t": "Go and celebrate hard, ache and all — both things are true, and their day only needs one of them",
+          "w": {
+            "N": 0.2,
+            "A": 0.6,
+            "C": 0.4
+          }
+        },
+        {
+          "t": "Go, perform it well enough, leave early — and be rough company for whoever's at home",
+          "w": {
+            "N": 0.7,
+            "A": 0.4,
+            "E": -0.3
+          }
+        },
+        {
+          "t": "Tell them the whole truth some quiet evening soon: 'overjoyed for you, and it's lit up everything I haven't got — both at once'",
+          "w": {
+            "N": 0.4,
+            "R": 0.5,
+            "E": 0.3,
+            "A": 0.3
+          }
+        },
+        {
+          "t": "Ration the friendship until your own news arrives — protect it from your worst self by seeing less of them, exactly when presence counted",
+          "w": {
+            "N": 0.5,
+            "E": -0.4,
+            "A": -0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "r-saw-their-partner",
+      "s": "Across the street, unmistakable: your close friend's partner, hand in hand with someone else. They didn't see you. By the time you're home you've rewritten it charitably four times — colleague, cousin, nothing — and believed none of them.",
+      "opts": [
+        {
+          "t": "Tell your friend today — just what you saw, no interpretation — and stay while it detonates, knowing you might be wrong and you're now in it either way",
+          "w": {
+            "R": 0.8,
+            "C": 0.4,
+            "E": 0.3
+          }
+        },
+        {
+          "t": "Go to the partner first: 'I saw. You tell them, or I will.'",
+          "w": {
+            "R": 0.6,
+            "E": 0.5,
+            "C": 0.4,
+            "A": -0.3
+          }
+        },
+        {
+          "t": "Verify before igniting anything — you have one fact and four guesses, and someone's whole life is on the table",
+          "w": {
+            "C": 0.8,
+            "R": -0.3,
+            "N": 0.4
+          }
+        },
+        {
+          "t": "Hold it — if it's real it will surface without you; if it's innocent you'll have torched nothing. And they may one day learn you knew.",
+          "w": {
+            "R": -0.7,
+            "N": 0.6,
+            "A": 0.4
+          }
+        }
+      ]
+    }
+  ]
+}
