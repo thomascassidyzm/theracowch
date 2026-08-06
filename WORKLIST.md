@@ -55,6 +55,7 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 - [x] @cloud-web 07-09 **Review the Week → Past reflections — SHIPPED.** "Start a fresh week" archives the current reflection + a snapshot of the week's plans + highlights to an on-device archive (or clears without saving); unfinished plans still roll over. New "Past reflections" panel browses/deletes saved weeks. `cowch_weekly_archive`, `public/assets/js/app.js` + `app.html`.
 - [x] @cloud-web 07-09 **Pasture activity clouds — SHIPPED.** One coloured cloud per IMAGINE area tended, tinted to match the legend + cow and sized by how much it's been tended, alongside the cow's posture; dodges sun/moon, all time-of-day phases, falls back to plain clouds when there's no activity. `buildActivityClouds()` in `public/assets/js/app.js`.
 - [x] @cloud-web 07-09 **Pasture reset — SHIPPED.** Subtle "Reset pasture — start from scratch" button (confirm-gated) wipes IMAGINE engagement, shown-up count, gratitude notes, legacy items + the calf care-day tally; keeps the cow's name and leaves check-ins/other tools untouched. `resetPasture()` in `public/assets/js/app.js`.
+- [~] @claude-local 08-06 **"What are you like, anyway?" inside the questionnaires set** — the universal-30 core (six axes incl. risk appetite), measurement-blind answering, room-of-100 confidence bands, honest exit. On-device, non-clinical, no front door: a fourth card in `/questionnaires/`. Bank + engine ported from `thrive-website` @30198ce.
 
 ## 🤔 Areas to think through   (open design — link the think-piece)
 
