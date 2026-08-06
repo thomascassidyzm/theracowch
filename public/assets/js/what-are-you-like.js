@@ -21,7 +21,17 @@
   /* ================= AXES =================
      Names, subtitles and room-of-100 sentences carried across verbatim.
      N is surfaced as "Sensitivity — how loudly the alarm system runs", never
-     as neuroticism. R (risk appetite) is the sixth axis. */
+     as neuroticism. R (risk appetite) is the sixth axis.
+
+     TWO KINDS OF AXIS, and the difference is honesty, not decoration.
+     O/C/E/A come from an established instrument with a real comparison
+     population behind them, so "put 100 people in a room, you'd be standing
+     around here" is a claim we can actually make. N and R are ours — there is
+     no population of other people's answers behind them yet, so a percentile
+     would be a made-up number. Those two carry `abs: true`: same maths, same
+     honest width, but reported as a position on the axis's OWN scale
+     (`loEnd` ↔ `hiEnd`) with no comparison to anybody. Don't quietly fold them
+     back into the room of 100. */
   var AXES = [
     { k: 'O', name: 'Openness', sub: 'novelty · ideas · the unfamiliar', color: 'var(--band-O)',
       hi: "you'd likely be among the people reaching for the unfamiliar option first",
@@ -40,13 +50,15 @@
       lo: "you'd likely be among the people who say the plain thing — clarity over comfort",
       mid: "you'd likely be mid-room — generous, but not for free" },
     { k: 'N', name: 'Sensitivity', sub: 'how loudly the alarm system runs', color: 'var(--band-N)',
-      hi: "you'd likely be among the people whose radar runs hot — it catches real signals and false ones alike",
-      lo: "you'd likely be among the people who put things down and leave them down",
-      mid: "you'd likely be mid-room — alert under real pressure, quiet otherwise" },
+      abs: true, loEnd: 'quiet alarm', hiEnd: 'loud alarm',
+      hi: "your alarm system runs hot — it catches real signals and false ones alike",
+      lo: "your alarm system runs quiet — you put things down and leave them down",
+      mid: "your alarm system runs middling — alert under real pressure, quiet otherwise" },
     { k: 'R', name: 'Risk appetite', sub: 'the sixth axis nobody measures', color: 'var(--band-R)',
-      hi: "you'd likely be among the people already halfway out the door toward the uncertain thing",
-      lo: "you'd likely be among the people who protect the downside first — and sleep well",
-      mid: "you'd likely be mid-room — you take risks, but you price them first" }
+      abs: true, loEnd: 'protect the downside', hiEnd: 'chase the uncertain',
+      hi: "you move toward the uncertain thing — often already halfway out the door",
+      lo: "you protect the downside first — and sleep well",
+      mid: "you take risks, but you price them first" }
   ];
 
   var CHECKPOINTS = [10, 20];
@@ -143,6 +155,17 @@
   function estimate(k) { return estimateOf(state, k); }
   function uncertainty(k) { return uncertaintyOf(state, k); }
   function resolutionPct(k) { return resolutionOf(state, k); }
+  /* The absolute read, for the two axes that have no comparison population.
+     Same tanh estimate and same uncertainty as everywhere else — only the
+     reporting changes: the 0–100 internal position becomes a reading on the
+     axis's own 0–10 dial, and the honest width becomes "give or take". */
+  function dial(k) { return Math.round(estimate(k) / 10 * 10) / 10; }
+  function dialSpread(k) { return Math.max(0.1, Math.round(uncertainty(k) / 10 * 10) / 10); }
+  function positionLabel(k) {
+    var est = estimate(k);
+    return est >= 62 ? 'toward the high end' : est <= 38 ? 'toward the low end' : 'around the middle';
+  }
+
   function overallFocus() {
     return Math.round(AXES.reduce(function (acc, a) { return acc + resolutionPct(a.k); }, 0) / AXES.length);
   }
@@ -157,6 +180,10 @@
   /* ================= RENDER ================= */
   function buildBars(container, prefix) {
     container.innerHTML = AXES.map(function (a) {
+      /* the caption is where the two kinds of axis visibly part company */
+      var caption = a.abs
+        ? '<span>' + a.loEnd + '</span><span>its own scale</span><span>' + a.hiEnd + '</span>'
+        : '<span>fewer of 100</span><span>room of 100</span><span>more of 100</span>';
       return '<div class="trait" id="trait-' + prefix + a.k + '">' +
         '<div class="trait-head">' +
           '<span class="trait-name">' + a.name + ' <small>' + a.sub + '</small></span>' +
@@ -167,7 +194,7 @@
           '<div class="band" id="band-' + prefix + a.k + '" style="background:' + a.color + ';"></div>' +
           '<div class="band-dot" id="dot-' + prefix + a.k + '"></div>' +
         '</div>' +
-        '<div class="bar-caption"><span>fewer of 100</span><span>room of 100</span><span>more of 100</span></div>' +
+        '<div class="bar-caption">' + caption + '</div>' +
       '</div>';
     }).join('');
   }
@@ -373,6 +400,12 @@
     var est = estimate(a.k);
     return est >= 62 ? a.hi : est <= 38 ? a.lo : a.mid;
   }
+  /* One sentence, framed the way that axis is honestly allowed to be framed. */
+  function traitLine(a) {
+    return a.abs
+      ? 'on its own scale you sit ' + positionLabel(a.k) + ': ' + traitSentence(a)
+      : 'in a room of 100 people, ' + traitSentence(a);
+  }
 
   function showCheckpoint() {
     busy = false;
@@ -401,7 +434,7 @@
         insights.innerHTML = top2.map(function (a) {
           return '<div class="insight"><b>' + a.name + '</b> is ' +
             (first ? 'sharpening fastest' : 'the clearest thing on the board') +
-            ' — in a room of 100 people, ' + traitSentence(a) + '. ' +
+            ' — ' + traitLine(a) + '. ' +
             '<span class="insight-note">(' + resolutionPct(a.k) +
             '% in focus — the band is still honest about its width.)</span></div>';
         }).join('');
@@ -445,11 +478,20 @@
     $('resultText').innerHTML = AXES.map(function (a) {
       var est = Math.round(estimate(a.k));
       var u = Math.round(uncertainty(a.k));
+      var head = a.abs
+        ? '· ' + dial(a.k).toFixed(1) + ' on its own 0–10 dial, give or take ' + dialSpread(a.k).toFixed(1)
+        : '· roughly ' + Math.max(1, est - u) + '–' + Math.min(99, est + u) + ' of 100';
+      var body = a.abs
+        ? 'On this axis&rsquo;s own scale, running from ' + a.loEnd + ' to ' + a.hiEnd +
+          ', you sit ' + positionLabel(a.k) + ': ' + traitSentence(a) +
+          '. That&rsquo;s where your answers put you on the axis, not where it puts you among ' +
+          'other people. At ' + resolutionPct(a.k) +
+          '% focus this is an indication, not a measurement — more scenarios would tighten it.'
+        : 'In a room of 100 people, ' + traitSentence(a) + '. At ' + resolutionPct(a.k) +
+          '% focus this is an indication, not a measurement — more scenarios would tighten it.';
       return '<div class="result-trait">' +
-        '<h3>' + a.name + ' <span class="pct">· roughly ' + Math.max(1, est - u) + '–' +
-          Math.min(99, est + u) + ' of 100</span></h3>' +
-        '<p>In a room of 100 people, ' + traitSentence(a) + '. At ' + resolutionPct(a.k) +
-        '% focus this is an indication, not a measurement — more scenarios would tighten it.</p>' +
+        '<h3>' + a.name + ' <span class="pct">' + head + '</span></h3>' +
+        '<p>' + body + '</p>' +
         '</div>';
     }).join('');
 
@@ -484,13 +526,23 @@
         meta: meta,
         scenariosSeen: answered,
         bands: AXES.map(function (a) {
-          return {
+          /* the stored record keeps the two kinds apart too — an absolute axis
+             never gets written down as a percentile */
+          var b = {
             k: a.k, name: a.name,
-            low: Math.max(1, Math.round(estimate(a.k) - uncertainty(a.k))),
-            high: Math.min(99, Math.round(estimate(a.k) + uncertainty(a.k))),
+            scale: a.abs ? 'absolute' : 'population',
             focus: resolutionPct(a.k),
             sentence: traitSentence(a)
           };
+          if (a.abs) {
+            b.dial = dial(a.k);
+            b.spread = dialSpread(a.k);
+            b.position = positionLabel(a.k);
+          } else {
+            b.low = Math.max(1, Math.round(estimate(a.k) - uncertainty(a.k)));
+            b.high = Math.min(99, Math.round(estimate(a.k) + uncertainty(a.k)));
+          }
+          return b;
         }),
         answers: answers,
         abstentions: abstentions.map(function (a) { return { id: a.id, s: a.s, note: a.note }; })
@@ -500,14 +552,28 @@
 
   /* A plain-text copy of the results, so someone can paste them into their
      chat with Mandy — or anywhere else — entirely at their own choice. */
+  function firstPerson(s) {
+    return s.replace(/\byou['’]d\b/g, 'I’d').replace(/\byour\b/g, 'my').replace(/\byou\b/g, 'I');
+  }
+
   function resultsAsText() {
     var lines = ['What are you like, anyway? — my starting points', $('resultsMeta').textContent, ''];
-    lines.push('Put 100 people in a room — here’s roughly where I’d be standing.', '');
-    AXES.forEach(function (a) {
+    lines.push('FOUR OF THE FAMILIAR FIVE — where I’d stand in a room of 100 people.', '');
+    AXES.filter(function (a) { return !a.abs; }).forEach(function (a) {
       var est = Math.round(estimate(a.k)), u = Math.round(uncertainty(a.k));
       lines.push(a.name + ' — roughly ' + Math.max(1, est - u) + '–' + Math.min(99, est + u) +
         ' of 100 (' + resolutionPct(a.k) + '% in focus)');
-      lines.push('  ' + traitSentence(a).replace(/^you'd/, 'I’d').replace(/^you’d/, 'I’d'));
+      lines.push('  ' + firstPerson(traitSentence(a)));
+    });
+    lines.push('', 'RISK AND SENSITIVITY — no room of 100 behind these two.',
+      'They’re Cowch’s own axes, so there’s no comparison population yet. These are',
+      'absolute readings on each axis’s own scale — where my answers put me, not where',
+      'that puts me among other people.', '');
+    AXES.filter(function (a) { return a.abs; }).forEach(function (a) {
+      lines.push(a.name + ' — ' + dial(a.k).toFixed(1) + ' on its own 0–10 dial (' + a.loEnd +
+        ' → ' + a.hiEnd + '), give or take ' + dialSpread(a.k).toFixed(1) +
+        ' (' + resolutionPct(a.k) + '% in focus)');
+      lines.push('  ' + positionLabel(a.k) + ': ' + firstPerson(traitSentence(a)));
     });
     if (abstentions.length) {
       lines.push('', 'Where I said "it depends":');
@@ -515,6 +581,13 @@
         lines.push('  · ' + a.s + (a.note ? ' — "' + a.note + '"' : ''));
       });
     }
+    lines.push('',
+      'READ TOGETHER',
+      'My familiar-five position, how I handle risk, and how loudly my alarm system',
+      'runs — taken together that’s a starting point, not a verdict. Where it tends to',
+      'earn its keep is anywhere two people have to fit together: a relationship, or a',
+      'business with someone. Not a prediction of how either will go. Just a better set',
+      'of questions to ask early — and earlier than you’d otherwise think to ask them.');
     lines.push('', 'A starting point, not a verdict.');
     return lines.join('\n');
   }
