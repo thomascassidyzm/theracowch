@@ -96,6 +96,8 @@
         .journey .dot.done { background: var(--gold); }
         .journey .dot.reveal { width: 9px; height: 9px; border: 2px solid var(--coral); background: transparent; }
         .journey .dot.reveal.done { background: var(--coral); }
+        /* where you're standing right now — matters once you can walk back */
+        .journey .dot.here { outline: 2px solid var(--ink); outline-offset: 2px; }
         .journey-label { white-space: nowrap; margin-left: 8px; }
 
         /* ---------- question card ---------- */
@@ -142,6 +144,32 @@
             margin-top: 4px;
         }
         .opt-exit:hover { box-shadow: none; transform: translate(-1px, -1px); border-color: var(--ink); color: var(--ink); }
+
+        /* Your own answer, shown back to you so you can change it. This is the
+           one thing it's safe to reflect while answering — it says what you
+           picked, never what it counted for. */
+        .opt.chosen { border-color: var(--coral); background: #FBE7DF; }
+        .chosen-tag {
+            display: block; margin-top: 4px;
+            font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--coral); font-weight: 900; font-style: normal;
+        }
+        .abs-recall { font-size: 0.9rem; color: var(--muted); font-weight: 600; font-style: italic; margin: -4px 0 8px; }
+        .change-hint { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-top: 8px; }
+
+        /* ---------- moving about within the ten ---------- */
+        .nav-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            margin-top: 16px; padding-top: 14px;
+            border-top: 2px dashed var(--line);
+        }
+        .nav-btn {
+            font-family: inherit; font-size: 0.88rem; font-weight: 700;
+            color: var(--muted); background: transparent;
+            border: none; padding: 8px 2px; cursor: pointer;
+        }
+        .nav-btn:hover:not(:disabled) { color: var(--ink); }
+        .nav-btn:disabled { opacity: 0.3; cursor: default; }
 
         .exit-note {
             width: 100%;
@@ -300,6 +328,7 @@
             <p>While you answer, nothing moves. No bars creeping, no score ticking &mdash; <b>what you can&rsquo;t watch, you can&rsquo;t steer</b>, and that&rsquo;s what keeps the answers honest.</p>
             <p>Then, at 10, 20 and 30 answers, the curtain lifts: six things about you come into focus &mdash; the familiar five, plus <b>risk appetite</b>, the one everybody argues about later. Sharper at every look.</p>
             <p>Every result is relative: <i>put 100 people in a room &mdash; you&rsquo;d be standing around here.</i> No types, no verdicts, no right answers.</p>
+            <p>Nothing is locked in as you go: step back and forward through the ten you&rsquo;re on, change an answer, pick up one you skipped. Once the curtain lifts on a ten, though, that ten is settled &mdash; you can&rsquo;t go back and tune it to the picture.</p>
             <p>And if none of the options is you &mdash; or the honest answer is &ldquo;it depends&rdquo; &mdash; every moment has a way to say exactly that. It&rsquo;s a real answer, not a cop-out.</p>
 
             <div class="callout">
@@ -379,6 +408,6 @@
 
 </div>
 
-<script src="/assets/js/what-are-you-like.js?v=1"></script>
+<script src="/assets/js/what-are-you-like.js?v=2"></script>
 </body>
 </html>

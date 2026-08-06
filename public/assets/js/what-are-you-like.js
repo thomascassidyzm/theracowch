@@ -50,6 +50,10 @@
   ];
 
   var CHECKPOINTS = [10, 20];
+  /* Moments come in blocks of ten, each closed by a reveal. You can move
+     freely backwards and forwards inside the block you're in — and change
+     anything in it — but not back across a reveal you've already seen. */
+  var BLOCK = 10;
 
   /* The honest exit — one consistent phrasing bank-wide; a scenario may
      override it via its optional `exit` field (q.x). Choosing it is an
@@ -62,23 +66,57 @@
   var state = {};
   var answers = [];      /* substantive picks: {id, opt} */
   var abstentions = [];  /* honest exits: {id, s, note} — out of the bars, into the narrative */
+  /* One slot per moment: null (not answered yet), {opt:i}, or {exit:true, note}.
+     This — not a running total — is the record. Scores are recomputed from it
+     after every change, so changing an old answer simply cannot leave a stale
+     contribution behind in the bands. */
+  var responses = [];
   var qIndex = 0;
   var answered = 0;
   var lastSnapshot = null;  /* per-axis {sum,n} as of the previous reveal */
   /* The outgoing card stays in the DOM for the 280ms fade, so its buttons are
      still tappable — on a phone a double-tap would otherwise answer two moments
-     with one card on screen. Answering is closed until the next card is up. */
+     with one card on screen. Answering and navigating are both closed until the
+     next card is up. */
   var busy = false;
 
   function resetState() {
+    responses = [];
+    for (var i = 0; i < TOTAL; i++) responses.push(null);
+    qIndex = 0;
+    lastSnapshot = null;
+    busy = false;
+    recompute();
+  }
+
+  /* The single source of truth: rebuild every derived number from `responses`. */
+  function recompute() {
     state = {};
     AXES.forEach(function (a) { state[a.k] = { sum: 0, n: 0 }; });
     answers = [];
     abstentions = [];
-    qIndex = 0;
     answered = 0;
-    lastSnapshot = null;
-    busy = false;
+    responses.forEach(function (r, i) {
+      if (!r) return;
+      answered++;
+      var q = QUESTIONS[i];
+      if (r.exit) { abstentions.push({ id: q.id, s: q.s, note: r.note }); return; }
+      var w = q.opts[r.opt].w;
+      for (var k in w) {
+        if (!state[k]) continue;  /* proposed axes are never scored */
+        state[k].sum += w[k];
+        state[k].n += Math.abs(w[k]);
+      }
+      answers.push({ id: q.id, opt: r.opt });
+    });
+  }
+
+  /* ---- where we are in the block of ten ---- */
+  function blockStart() { return Math.floor(qIndex / BLOCK) * BLOCK; }
+  function blockEnd() { return Math.min(blockStart() + BLOCK, TOTAL) - 1; }
+  function firstUnansweredInBlock() {
+    for (var i = blockStart(); i <= blockEnd(); i++) if (!responses[i]) return i;
+    return -1;
   }
 
   function snapshot() {
@@ -185,15 +223,35 @@
     var dots = '';
     for (var i = 1; i <= TOTAL; i++) {
       var isReveal = CHECKPOINTS.indexOf(i) !== -1 || i === TOTAL;
-      dots += '<span class="dot' + (isReveal ? ' reveal' : '') + (i <= answered ? ' done' : '') + '"></span>';
+      /* per-moment now, not "first N" — a moment you skipped past stays visibly
+         open until you go back and answer it */
+      dots += '<span class="dot' + (isReveal ? ' reveal' : '') +
+        (responses[i - 1] ? ' done' : '') + (i - 1 === qIndex ? ' here' : '') + '"></span>';
     }
-    var next = CHECKPOINTS.filter(function (c) { return c > answered; })[0] || TOTAL;
+    var next = blockEnd() + 1;
     j.innerHTML = dots + '<span class="journey-label">' +
       (next === TOTAL ? 'full picture' : 'next reveal') + ' at ' + next + '</span>';
   }
 
+  /* Back / forward inside the current ten. Deliberately unfussy: you can walk
+     forward past a moment you haven't answered, and walk back to it later. */
+  function navRow() {
+    var atStart = qIndex === blockStart();
+    var atEnd = qIndex === blockEnd();
+    var skipped = firstUnansweredInBlock();
+    var nextLabel;
+    if (!atEnd) nextLabel = 'Next →';
+    else if (skipped !== -1) nextLabel = 'The one you skipped →';
+    else nextLabel = blockEnd() === TOTAL - 1 ? 'The full picture →' : 'See what these ten say →';
+    return '<div class="nav-row">' +
+      '<button class="nav-btn" type="button" data-nav="back"' + (atStart ? ' disabled' : '') + '>← Back</button>' +
+      '<button class="nav-btn" type="button" data-nav="next">' + nextLabel + '</button>' +
+      '</div>';
+  }
+
   function renderQuestion() {
     var q = QUESTIONS[qIndex];
+    var r = responses[qIndex];
     var card = $('qcard');
     card.classList.add('entering');
     card.innerHTML =
@@ -201,9 +259,16 @@
       '<p class="scenario">' + escapeHtml(q.s) + '</p>' +
       '<p class="prompt">Which would you do first?</p>' +
       q.opts.map(function (o, i) {
-        return '<button class="opt" type="button" data-opt="' + i + '">' + escapeHtml(o.t) + '</button>';
+        var chosen = r && !r.exit && r.opt === i;
+        return '<button class="opt' + (chosen ? ' chosen' : '') + '" type="button" data-opt="' + i + '">' +
+          escapeHtml(o.t) + (chosen ? '<span class="chosen-tag">your answer</span>' : '') + '</button>';
       }).join('') +
-      '<button class="opt opt-exit" type="button" data-exit="1">' + escapeHtml(q.x || EXIT_DEFAULT) + '</button>';
+      '<button class="opt opt-exit' + (r && r.exit ? ' chosen' : '') + '" type="button" data-exit="1">' +
+        escapeHtml(q.x || EXIT_DEFAULT) +
+        (r && r.exit ? '<span class="chosen-tag">your answer</span>' : '') + '</button>' +
+      (r && r.exit && r.note ? '<p class="abs-recall">&ldquo;' + escapeHtml(r.note) + '&rdquo;</p>' : '') +
+      (r ? '<p class="change-hint">Answered — tap another option if that’s not it.</p>' : '') +
+      navRow();
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         card.classList.remove('entering');
@@ -223,14 +288,8 @@
   }
 
   function answer(i) {
-    var q = QUESTIONS[qIndex];
-    var w = q.opts[i].w;
-    for (var k in w) {
-      if (!state[k]) continue;  /* proposed axes are never scored */
-      state[k].sum += w[k];
-      state[k].n += Math.abs(w[k]);
-    }
-    answers.push({ id: q.id, opt: i });
+    responses[qIndex] = { opt: i };
+    recompute();
     advance();
   }
 
@@ -238,44 +297,65 @@
      One optional line in their own words; continuing without typing is one tap. */
   function abstain() {
     var q = QUESTIONS[qIndex];
+    var r = responses[qIndex];
     var card = $('qcard');
     card.innerHTML =
       '<div class="qnum">Moment ' + (qIndex + 1) + ' of ' + TOTAL + '</div>' +
       '<p class="scenario scenario-quiet">' + escapeHtml(q.s) + '</p>' +
       '<p class="prompt">Fair enough. What would it depend on — or what would you do?</p>' +
-      '<textarea class="exit-note" id="exitNote" rows="2" placeholder="Optional — a line in your own words"></textarea>' +
+      '<textarea class="exit-note" id="exitNote" rows="2" placeholder="Optional — a line in your own words">' +
+        escapeHtml((r && r.exit && r.note) || '') + '</textarea>' +
       '<div class="btn-row"><button class="btn btn-primary" type="button" data-exit-continue="1">Continue</button></div>' +
-      '<p class="exit-hint">Entirely optional — carry straight on if you like.</p>';
+      '<p class="exit-hint">Entirely optional — carry straight on if you like.</p>' +
+      '<div class="nav-row"><button class="nav-btn" type="button" data-exit-cancel="1">← Back to the options</button></div>';
     var note = $('exitNote');
     if (note) note.focus({ preventScroll: true });
   }
 
   function abstainContinue() {
-    var q = QUESTIONS[qIndex];
     var el = $('exitNote');
-    var note = ((el && el.value) || '').trim();
-    abstentions.push({ id: q.id, s: q.s, note: note });
+    responses[qIndex] = { exit: true, note: ((el && el.value) || '').trim() };
+    recompute();
     advance();
   }
 
-  function advance() {
+  /* Move to a moment in the current ten, with the same fade the quiz has
+     always used. `busy` stays true for the whole transition — that's what
+     stops a double-tap answering two moments with one card on screen. */
+  function goTo(i) {
     busy = true;
-    answered++;
-    qIndex++;
-    /* measurement-blind: nothing visible changes except the journey dots */
     renderJourney();
-
-    if (CHECKPOINTS.indexOf(answered) !== -1) {
-      setTimeout(showCheckpoint, 350);
-      return;
-    }
-    if (qIndex >= TOTAL) {
-      setTimeout(finishQuiz, 350);
-      return;
-    }
     var card = $('qcard');
     card.classList.add('fading');
-    setTimeout(function () { card.classList.remove('fading'); renderQuestion(); }, 280);
+    setTimeout(function () {
+      qIndex = i;
+      card.classList.remove('fading');
+      renderQuestion();
+    }, 280);
+  }
+
+  /* After answering: on to the next moment in the ten; at the end of the ten,
+     back to anything skipped; only when the ten is whole does the curtain lift. */
+  function advance() {
+    /* measurement-blind: nothing visible changes except the journey dots */
+    if (qIndex < blockEnd()) return goTo(qIndex + 1);
+    var skipped = firstUnansweredInBlock();
+    if (skipped !== -1) return goTo(skipped);
+    busy = true;
+    renderJourney();
+    setTimeout(blockEnd() === TOTAL - 1 ? finishQuiz : showCheckpoint, 350);
+  }
+
+  function navBack() {
+    if (qIndex > blockStart()) goTo(qIndex - 1);
+  }
+
+  function navNext() {
+    if (qIndex < blockEnd()) return goTo(qIndex + 1);
+    var skipped = firstUnansweredInBlock();
+    if (skipped !== -1) return goTo(skipped);
+    busy = true;
+    setTimeout(blockEnd() === TOTAL - 1 ? finishQuiz : showCheckpoint, 100);
   }
 
   function sortedByResolution() {
@@ -289,7 +369,7 @@
   function showCheckpoint() {
     busy = false;
     $('live').classList.add('hidden');
-    var first = answered === CHECKPOINTS[0];
+    var first = blockEnd() === CHECKPOINTS[0] - 1;
 
     $('cpTitle').textContent = first ? 'First look — ten moments in' : 'Second look — twenty moments in';
     $('cpSub').textContent = first
@@ -327,7 +407,10 @@
     }, 1400);
   }
 
+  /* Onward into the next ten. The reveal is the one door that only opens one
+     way: what's behind it has been seen, so it stays behind it. */
   function continueQuiz() {
+    qIndex = Math.min(blockEnd() + 1, TOTAL - 1);
     $('checkpoint').classList.add('hidden');
     $('live').classList.remove('hidden');
     $('qcard').classList.remove('fading');
@@ -462,6 +545,8 @@
       if (t.dataset.opt !== undefined) return busy ? undefined : answer(parseInt(t.dataset.opt, 10));
       if (t.dataset.exit) return busy ? undefined : abstain();
       if (t.dataset.exitContinue) return busy ? undefined : abstainContinue();
+      if (t.dataset.exitCancel) return busy ? undefined : renderQuestion();
+      if (t.dataset.nav) return busy ? undefined : (t.dataset.nav === 'back' ? navBack() : navNext());
       if (t.dataset.continue) return continueQuiz();
       if (t.dataset.finish) return finishQuiz();
       if (t.dataset.start) return startQuiz();
