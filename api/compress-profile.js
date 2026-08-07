@@ -2,29 +2,12 @@
 // Uses Claude to extract therapeutic insights from conversation
 // Called periodically to update the local therapy profile
 
-export default async function handler(req, res) {
-  // Origin lock + CORS — same rationale as api/chat.js: a public, account-less
-  // endpoint fronting a billed Anthropic key, locked to theracowch.com.
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com', 'https://cowch.app', 'https://www.cowch.app'];
-  let originOk = !origin || allowedOrigins.includes(origin);
-  if (origin && !originOk) {
-    try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }
-  }
-  res.setHeader('Access-Control-Allow-Origin', originOk && origin ? origin : allowedOrigins[0]);
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+import { gate, LIMITS } from '../lib/request-gate.js';
 
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  if (origin && !originOk) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
+export default async function handler(req, res) {
+  // Same gate as api/chat.js, same rationale: a public, account-less endpoint
+  // fronting a billed Anthropic key. One shared helper so the two can't drift.
+  if (!(await gate(req, res, LIMITS.compress))) return;
 
   try {
     const { prompt } = req.body;

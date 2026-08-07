@@ -1,4 +1,5 @@
 import IMAGINE_FRAMEWORK_PROMPTS from '../lib/prompt-base.js';
+import { gate, LIMITS } from '../lib/request-gate.js';
 
 // The chat system-prompt base is BUNDLED via the import above (lib/prompt-base.js)
 // so it deploys reliably and is not served publicly. To change the prompt, edit
@@ -10,30 +11,12 @@ async function getImagineFrameworkPrompts() {
 }
 
 export default async function handler(req, res) {
-  // Origin lock + CORS. This endpoint is public and account-less and fronts a
-  // billed Anthropic key, so restrict it to theracowch.com (+ Vercel previews)
-  // to stop it being used as a free Claude proxy / running up the bill.
-  // Same-origin and installed-PWA requests send no Origin header → allowed.
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://theracowch.com', 'https://www.theracowch.com', 'https://cowch.app', 'https://www.cowch.app'];
-  let originOk = !origin || allowedOrigins.includes(origin);
-  if (origin && !originOk) {
-    try { originOk = new URL(origin).hostname.endsWith('.vercel.app'); } catch (_e) { originOk = false; }
-  }
-  res.setHeader('Access-Control-Allow-Origin', originOk && origin ? origin : allowedOrigins[0]);
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  if (origin && !originOk) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
+  // Origin lock + CORS + per-IP rate limit, all in one place and shared with
+  // api/compress-profile.js (lib/request-gate.js). This endpoint is public and
+  // account-less and fronts a billed Anthropic key, so nothing reaches Anthropic
+  // until the gate says so. Everything it rejects is answered before any
+  // upstream call — a rejected request costs nothing.
+  if (!(await gate(req, res, LIMITS.chat))) return;
 
   try {
     const { message, profile, recentMessages, history, currentPattern, sessionPhase } = req.body;
