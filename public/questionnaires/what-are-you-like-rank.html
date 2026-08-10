@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>What are you like, anyway? — the ranked one | Cowch</title>
+    <meta name="description" content="Thirty everyday moments, four options each: drag them into order, most like you at the top. No right answers, nothing to get wrong — a playful, private way to notice what you're actually like.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Cowch "Dark Brutalism / Cozy Bold" — the /questionnaires/ idiom:
+           warm cream canvas, white cards, 4px ink borders with hard offset
+           shadows, Gabarito. Mirrored here rather than imported, exactly as the
+           sibling questionnaires do (these pages are self-contained).
+
+           This is the RANKED variant of "What are you like, anyway?". The
+           single-choice original lives at what-are-you-like.html and is
+           untouched — the two run side by side. */
+        :root {
+            --canvas: #FFF6F0;
+            --card: #FFFFFF;
+            --ink: #2D2D2D;
+            --muted: #7A6556;
+            --body: #5C4432;
+            --coral: #E35B32;
+            --cream: #FDF5E8;
+            --gold: #C9A857;
+            --line: #E4D8CE;
+            --shadow: 6px 6px 0 rgba(60, 46, 40, 0.18);
+            /* The six axis colours, carried across from the canonical prototype. */
+            --band-O: #7c6fb0;
+            --band-C: #3d7a74;
+            --band-E: #d9a441;
+            --band-A: #c96f4a;
+            --band-N: #8a7f6a;
+            --band-R: #b0486e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Gabarito', system-ui, sans-serif;
+            background: var(--canvas);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 680px; margin: 0 auto; padding-bottom: 60px; }
+
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--cream);
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 700;
+            border: 4px solid var(--ink);
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+        }
+        .back-link:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+
+        h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); font-weight: 900; margin-bottom: 8px; line-height: 1.1; }
+        .lede { color: var(--muted); margin-bottom: 24px; font-weight: 600; font-size: 1.05rem; }
+
+        .panel {
+            background: var(--card);
+            border: 4px solid var(--ink);
+            box-shadow: var(--shadow);
+            padding: 24px 22px;
+            margin-bottom: 20px;
+        }
+        .panel h2 { font-size: 1.35rem; font-weight: 900; margin-bottom: 8px; }
+        .panel .sub { color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+        .panel p { font-size: 0.98rem; color: var(--body); margin-bottom: 10px; }
+        .panel p b { color: var(--ink); }
+
+        .callout {
+            background: var(--cream);
+            border-left: 5px solid var(--gold);
+            padding: 16px 20px;
+            margin: 18px 0;
+            font-size: 0.95rem;
+            color: var(--body);
+        }
+        .callout b { color: var(--ink); }
+
+        /* ---------- answering progress (deliberately quiet — no measurement leaks) ---------- */
+        .journey {
+            display: flex; align-items: center; justify-content: center;
+            gap: 5px; flex-wrap: wrap;
+            margin: 0 0 16px;
+            font-size: 0.8rem; color: var(--muted); font-weight: 600;
+        }
+        .journey .dot { width: 7px; height: 7px; background: var(--line); }
+        .journey .dot.done { background: var(--gold); }
+        .journey .dot.reveal { width: 9px; height: 9px; border: 2px solid var(--coral); background: transparent; }
+        .journey .dot.reveal.done { background: var(--coral); }
+        .journey .dot.here { outline: 2px solid var(--ink); outline-offset: 2px; }
+        .journey-label { white-space: nowrap; margin-left: 8px; }
+
+        /* ---------- question card ---------- */
+        .qcard {
+            background: var(--card);
+            border: 4px solid var(--ink);
+            box-shadow: var(--shadow);
+            padding: 22px 20px;
+        }
+        .qcard.fading { opacity: 0; transform: translateY(6px); transition: opacity 0.25s, transform 0.25s; }
+        .qcard.entering { opacity: 0; transform: translateY(-6px); }
+
+        .qnum {
+            font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase;
+            color: var(--coral); font-weight: 900; margin-bottom: 8px;
+        }
+        .scenario { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .prompt { font-weight: 900; color: var(--ink); margin-bottom: 14px; }
+
+        /* ---------- the ranking list ----------
+           Four rows you put in order. The grip is the drag target and carries
+           touch-action:none so a finger on it drags instead of scrolling the
+           page; everything else on the row pans normally, so the page never
+           gets stuck under a thumb. The arrows do the same job with a tap or
+           a keyboard, and are the safety net if a drag misbehaves. */
+        .rank-list { list-style: none; margin: 0 0 4px; padding: 0; }
+        .rank-row {
+            display: flex; align-items: stretch; gap: 10px;
+            background: var(--cream);
+            border: 3px solid var(--ink);
+            box-shadow: 4px 4px 0 rgba(60, 46, 40, 0.14);
+            padding: 10px 10px 10px 0;
+            margin-bottom: 10px;
+            position: relative;
+            touch-action: pan-y;
+            transition: box-shadow 0.12s;
+        }
+        .rank-row.dragging {
+            z-index: 5;
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.26);
+            border-color: var(--coral);
+            opacity: 0.97;
+        }
+        .rank-grip {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 2px;
+            flex: 0 0 44px; align-self: stretch;
+            margin: -10px 0 -10px 0;
+            padding: 6px 0;
+            background: rgba(60, 46, 40, 0.06);
+            border-right: 3px solid var(--ink);
+            cursor: grab;
+            touch-action: none;
+            user-select: none; -webkit-user-select: none;
+        }
+        .rank-row.dragging .rank-grip { cursor: grabbing; background: rgba(227, 91, 50, 0.16); }
+        .rank-n { font-size: 1.05rem; font-weight: 900; color: var(--ink); line-height: 1; }
+        .rank-dots { font-size: 0.95rem; color: var(--muted); line-height: 1; }
+        .rank-text {
+            flex: 1 1 auto;
+            font-size: 0.95rem; line-height: 1.4; font-weight: 600; color: var(--ink);
+        }
+        .rank-edge {
+            display: block; margin-top: 3px;
+            font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--coral); font-weight: 900;
+        }
+        .rank-moves { display: flex; flex-direction: column; justify-content: center; gap: 4px; flex: 0 0 auto; }
+        .rank-move {
+            font-family: inherit; font-size: 0.8rem; font-weight: 900;
+            width: 34px; height: 30px;
+            color: var(--ink); background: var(--card);
+            border: 2px solid var(--ink);
+            cursor: pointer;
+        }
+        .rank-move:disabled { opacity: 0.28; cursor: default; }
+        .rank-move:hover:not(:disabled) { background: var(--coral); color: #fff; }
+
+        .rank-hint { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-top: 10px; }
+        .change-hint { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-top: 6px; }
+
+        /* screen-reader-only live region for the move buttons */
+        .sr-live {
+            position: absolute; width: 1px; height: 1px;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+        }
+
+        /* ---------- moving about within the ten ---------- */
+        .nav-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            margin-top: 8px; padding-top: 14px;
+            border-top: 2px dashed var(--line);
+        }
+        .nav-btn {
+            font-family: inherit; font-size: 0.88rem; font-weight: 700;
+            color: var(--muted); background: transparent;
+            border: none; padding: 8px 2px; cursor: pointer;
+        }
+        .nav-btn:hover:not(:disabled) { color: var(--ink); }
+        .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+        /* ---------- trait bands (checkpoint & results only) ---------- */
+        .traits { margin-bottom: 6px; }
+        .trait { margin-bottom: 16px; }
+        .trait-head {
+            display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+            font-size: 0.85rem; margin-bottom: 5px;
+        }
+        .trait-name { font-weight: 900; }
+        .trait-name small { font-weight: 600; color: var(--muted); font-size: 0.82em; }
+        .trait-res {
+            font-size: 0.72rem; color: var(--muted); font-weight: 700;
+            font-variant-numeric: tabular-nums; white-space: nowrap;
+            transition: color 0.3s;
+        }
+        .trait-res.bump { color: var(--coral); }
+        .bar {
+            position: relative; height: 24px;
+            background: var(--cream);
+            border: 3px solid var(--ink);
+            overflow: hidden;
+        }
+        .bar .ticks {
+            position: absolute; inset: 0;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent calc(25% - 1px), rgba(60,46,40,0.16) calc(25% - 1px), rgba(60,46,40,0.16) 25%);
+        }
+        .band {
+            position: absolute; top: 0; bottom: 0;
+            opacity: 0.9;
+            transition: left 1.1s cubic-bezier(.22,1,.36,1), width 1.1s cubic-bezier(.22,1,.36,1), filter 1.1s ease, opacity 1.1s ease;
+        }
+        .band-dot {
+            position: absolute; top: 50%; width: 8px; height: 8px;
+            background: var(--ink);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: left 1.1s cubic-bezier(.22,1,.36,1), opacity 0.8s ease;
+        }
+        .bar-caption {
+            display: flex; justify-content: space-between;
+            font-size: 0.66rem; color: #A4917F; margin-top: 3px; font-weight: 600;
+        }
+        @keyframes sharpen-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(227, 91, 50, 0.45); }
+            100% { box-shadow: 0 0 0 10px rgba(227, 91, 50, 0); }
+        }
+        .bar.pulse { animation: sharpen-pulse 0.9s ease-out 1; }
+
+        .curtain {
+            text-align: center; font-style: italic; font-weight: 600;
+            color: var(--muted); padding: 26px 10px;
+        }
+        .curtain.gone { display: none; }
+
+        .insight {
+            border-left: 5px solid var(--gold);
+            background: var(--cream);
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            font-size: 0.96rem;
+            color: var(--body);
+        }
+        .insight b { color: var(--ink); }
+        .insight-note { color: var(--muted); font-size: 0.85em; }
+
+        /* ---------- buttons ---------- */
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+        .btn {
+            font-family: inherit; font-size: 0.98rem; font-weight: 700;
+            padding: 14px 20px;
+            border: 4px solid var(--ink);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            flex: 1; min-width: 170px;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+        .btn:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.18); }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18); }
+        .btn:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: var(--shadow); }
+        .btn-primary { background: var(--coral); color: #FFFFFF; }
+        .btn-ghost { background: var(--cream); color: var(--ink); }
+
+        /* ---------- results ---------- */
+        .result-trait { margin-bottom: 18px; }
+        .result-trait h3 { font-size: 1.05rem; font-weight: 900; margin-bottom: 2px; }
+        .result-trait .pct { color: var(--coral); font-size: 0.85em; font-weight: 700; }
+        .result-trait p { font-size: 0.95rem; color: var(--body); margin-top: 3px; }
+
+        .honesty {
+            text-align: center; font-style: italic; font-weight: 600;
+            color: var(--muted); font-size: 0.94rem;
+            margin: 20px auto 0; max-width: 460px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ---------- accessibility ---------- */
+        button:focus-visible, a:focus-visible {
+            outline: 3px solid var(--coral); outline-offset: 3px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; }
+            .band, .band-dot { filter: none !important; transition: none !important; }
+            .btn, .back-link, .qcard, .rank-row { transition: none !important; }
+            .btn:hover, .back-link:hover { transform: none; }
+        }
+
+        /* ---------- print / save-as-PDF ---------- */
+        .print-only { display: none; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .no-print { display: none !important; }
+            .print-only { display: block; }
+            .container { max-width: 100%; padding: 0; }
+            .panel { box-shadow: none; border-width: 2px; break-inside: avoid; }
+            .band { filter: none !important; transition: none; }
+            .result-trait, .trait { break-inside: avoid; }
+            .print-header { text-align: center; margin-bottom: 18px; }
+            .print-header h1 { font-size: 1.5rem; }
+            .print-header p { color: #666; font-size: 0.85rem; font-weight: 600; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a href="/questionnaires/" class="back-link no-print">← Back to questionnaires</a>
+
+    <!-- intro -->
+    <section id="intro" class="no-print">
+        <h1>What are you like, anyway?</h1>
+        <p class="lede">The ranked one. Thirty little moments everyone knows, four ways to handle each &mdash; put them in order, most like you at the top.</p>
+
+        <div class="panel">
+            <p>The party where you only know the host. The yoghurt past its date. The bulb that&rsquo;s gone and the ladder that&rsquo;s buried. You already know what you&rsquo;d do &mdash; you do it every day. This just pays attention.</p>
+            <p><b>Nothing here is right or wrong.</b> You&rsquo;re not picking a winner and you&rsquo;re not committing to anything &mdash; just putting four ordinary reactions in order, going on what you&rsquo;ve actually done before. Most likely at the top, least likely at the bottom. If two feel close, put them next to each other and move on; that&rsquo;s exactly what a middling ranking is for.</p>
+            <p>Drag by the grip on the left, or nudge a row up and down with the arrows. Either way works, on a phone or anywhere else.</p>
+            <p>While you answer, nothing moves. No bars creeping, no score ticking &mdash; <b>what you can&rsquo;t watch, you can&rsquo;t steer</b>, and that&rsquo;s what keeps the answers honest.</p>
+            <p>Then, at 10, 20 and 30 moments, the curtain lifts: six things about you come into focus &mdash; the familiar five, plus <b>risk appetite</b>, the one everybody argues about later. Sharper at every look.</p>
+            <p>Four of them are relative: <i>put 100 people in a room &mdash; you&rsquo;d be standing around here.</i> Risk appetite and sensitivity are ours rather than borrowed, so there&rsquo;s no crowd to stand in yet &mdash; those two come back as a reading on their own scale instead. No types, no verdicts, no right answers.</p>
+            <p>Nothing is locked in as you go: step back and forward through the ten you&rsquo;re on, re-order anything, pick up one you skipped. Once the curtain lifts on a ten, though, that ten is settled &mdash; you can&rsquo;t go back and tune it to the picture.</p>
+
+            <div class="callout">
+                This isn&rsquo;t a test and it isn&rsquo;t a diagnosis &mdash; it&rsquo;s a mirror, and a playful one. Everything you order stays on your device. Bring anything that catches you to your chat with Mandy.
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" type="button" id="startBtn" data-start="1" disabled>Loading the moments&hellip;</button>
+            </div>
+            <p class="honesty">This is a starting point, not a verdict.</p>
+        </div>
+    </section>
+
+    <!-- live answering area: question card only, nothing that moves per answer -->
+    <section id="live" class="hidden no-print">
+        <div class="journey" id="journey"></div>
+        <div class="qcard" id="qcard"></div>
+        <p class="honesty">Nothing on this page will hint at your profile until the reveal. Order them from the gut.</p>
+    </section>
+
+    <!-- checkpoint reveal -->
+    <section id="checkpoint" class="hidden no-print">
+        <div class="panel">
+            <h2 id="cpTitle"></h2>
+            <p class="sub" id="cpSub"></p>
+            <div class="curtain" id="cpCurtain">&hellip;developing&hellip;</div>
+            <div class="traits hidden" id="cpBars"></div>
+            <div id="cpInsights"></div>
+            <div class="btn-row" id="cpButtons"></div>
+            <p class="honesty">This is a starting point, not a verdict.</p>
+        </div>
+    </section>
+
+    <!-- results -->
+    <section id="results" class="hidden">
+        <div class="print-only print-header">
+            <h1>What you&rsquo;re like &mdash; at today&rsquo;s resolution</h1>
+            <p id="printMeta"></p>
+        </div>
+
+        <div class="panel">
+            <h2 class="no-print">So &mdash; what are you like?</h2>
+            <p class="sub no-print" id="resultsMeta"></p>
+
+            <div class="callout">
+                How to read this: for the familiar four &mdash; openness, conscientiousness, extraversion, agreeableness &mdash; <b>put 100 people in a room.</b> Those bands show where you&rsquo;d most likely be standing, and how sure we can honestly be. A wide band means we&rsquo;d need more answers before narrowing it; that&rsquo;s the truth, not a flaw.
+            </div>
+
+            <div class="callout">
+                <b>Risk appetite and sensitivity work differently.</b> Those two are ours, not borrowed from an established instrument &mdash; so there is no room of 100 behind them. We&rsquo;d be inventing the crowd. What you get instead is an absolute reading: where your own answers put you on each axis&rsquo;s own scale, with the same honest width. Where you sit on it, not where it puts you among other people.
+            </div>
+
+            <div class="traits" id="resultBars"></div>
+
+            <div id="resultText"></div>
+
+            <div class="callout" id="combinedRead">
+                <b>Read together:</b> your familiar-five position, how you handle risk, and how loudly your alarm system runs &mdash; taken together that&rsquo;s a starting point, not a verdict. Where it tends to earn its keep is anywhere two people have to fit together: a relationship, or a business with someone. Not a prediction of how either will go. Just a better set of questions to ask early &mdash; and earlier than you&rsquo;d otherwise think to ask them.
+            </div>
+
+            <div class="callout">
+                <b>A note on honesty:</b> personality measures &mdash; all of them, including this one &mdash; explain only a modest slice of what a person actually does. Treat everything above as an indication worth exploring, never a label. Where a band sits somewhere that surprises you, that gap between how you see yourself and the order you actually put things in is the single most interesting thing on this page.
+            </div>
+
+            <div class="btn-row no-print">
+                <button class="btn btn-primary" type="button" data-print="1">Save or print my profile</button>
+                <button class="btn btn-ghost" type="button" data-copy="1">Copy as text</button>
+            </div>
+            <div class="btn-row no-print">
+                <button class="btn btn-ghost" type="button" data-restart="1">Start over</button>
+            </div>
+            <p class="honesty">This is a starting point, not a verdict.</p>
+        </div>
+
+        <div class="panel no-print">
+            <h2>Talking it through</h2>
+            <p>These are directions to move in, not labels to wear. If something here landed &mdash; or landed wrong &mdash; that&rsquo;s worth a conversation. Copy your results and take them to your chat with Mandy, or keep them entirely to yourself. They&rsquo;re yours: they never left this device.</p>
+            <div class="btn-row">
+                <a class="btn btn-primary" href="/app.html" style="text-align:center; text-decoration:none; display:block;">Back to Mandy</a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script src="/assets/js/what-are-you-like-rank.js?v=1"></script>
+</body>
+</html>
