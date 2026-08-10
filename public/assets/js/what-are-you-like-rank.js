@@ -129,7 +129,7 @@
      once per moment so the bank's authored order can't nudge the ranking.
      Kept per moment so walking back and forth doesn't reshuffle under you. */
   var shuffles = [];
-  var working = null;    /* the order currently on screen, mid-drag */
+  var working = null;    /* the order currently on screen, before it's confirmed */
   var qIndex = 0;
   var answered = 0;
   var lastSnapshot = null;  /* per-axis {sum,n} as of the previous reveal */
@@ -313,10 +313,7 @@
       var o = q.opts[optIndex];
       var edge = POS_LABEL[pos] || '';
       return '<li class="rank-row" data-pos="' + pos + '" role="listitem">' +
-        '<span class="rank-grip" data-grip="1" aria-hidden="true">' +
-          '<span class="rank-n">' + (pos + 1) + '</span>' +
-          '<span class="rank-dots">⠿</span>' +
-        '</span>' +
+        '<span class="rank-n" aria-hidden="true">' + (pos + 1) + '</span>' +
         '<span class="rank-text">' + escapeHtml(o.t) +
           (edge ? '<span class="rank-edge">' + edge + '</span>' : '') +
         '</span>' +
@@ -331,7 +328,8 @@
   }
 
   /* Repaint the numbers, edge labels and move buttons after a reorder, without
-     rebuilding the list — rebuilding mid-drag would drop the dragged node. */
+     rebuilding the list — moving the node rather than re-rendering is what
+     keeps focus on the button that was just pressed. */
   function refreshRowChrome() {
     var list = $('rankList');
     if (!list) return;
@@ -367,6 +365,15 @@
     });
   }
 
+  /* Flag "there's more list below this edge" so the fade in the stylesheet
+     can appear. Cheap enough to run on every reorder and every scroll. */
+  function markListOverflow() {
+    var list = $('rankList');
+    if (!list) return;
+    var more = list.scrollHeight - list.clientHeight - list.scrollTop > 2;
+    list.classList.toggle('has-more', more);
+  }
+
   function announce(msg) {
     var live = $('rankLive');
     if (live) live.textContent = msg;
@@ -383,7 +390,7 @@
       '<p class="scenario">' + escapeHtml(q.s) + '</p>' +
       '<p class="prompt">Put these in order — most like you at the top.</p>' +
       '<ol class="rank-list" id="rankList" role="list">' + rowsHtml(q) + '</ol>' +
-      '<p class="rank-hint">Drag by the grip, or use the arrows. Nothing here is right or wrong — go on what you&rsquo;ve actually done before.</p>' +
+      '<p class="rank-hint">Use the arrows to put these in order. Nothing here is right or wrong — go on what you&rsquo;ve actually done before.</p>' +
       (r ? '<p class="change-hint">Ranked — shuffle it about if that&rsquo;s not it.</p>' : '') +
       '<div class="btn-row"><button class="btn btn-primary" type="button" data-confirm="1">' +
         (r ? 'Keep this order →' : 'That&rsquo;s my order →') + '</button></div>' +
@@ -394,11 +401,12 @@
     list.querySelectorAll('.rank-row').forEach(function (row, pos) {
       row.dataset.opt = working[pos];
     });
-    wireDrag(list);
+    list.addEventListener('scroll', markListOverflow, { passive: true });
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         card.classList.remove('entering');
         card.style.transition = 'opacity 0.3s, transform 0.3s';
+        markListOverflow();
       });
     });
     busy = false;
@@ -432,86 +440,42 @@
     else list.insertBefore(rows[target], row);
     syncWorkingFromDom();
     refreshRowChrome();
+    markListOverflow();
     var text = row.querySelector('.rank-text').firstChild.textContent;
     announce('Now ' + (target + 1) + ' of ' + rows.length + ': ' + text);
     /* keep the keyboard/screen-reader user on the button they just pressed */
+    /* Keep the keyboard/screen-reader user on the button they just pressed. If
+       that press took the row to the top or the bottom the button is now
+       disabled, so hand focus to its sibling on the same row rather than
+       dropping it to the document. */
     var moved = list.querySelectorAll('.rank-row')[target];
-    var btn = moved && moved.querySelector('[data-move="' + (dir < 0 ? 'up' : 'down') + '"]');
+    if (!moved) return;
+    /* On a long moment the list scrolls; keep the row you just moved in sight.
+       'nearest' only ever scrolls the list — the page itself is pinned. */
+    if (moved.scrollIntoView) moved.scrollIntoView({ block: 'nearest' });
+    var btn = moved.querySelector('[data-move="' + (dir < 0 ? 'up' : 'down') + '"]');
+    if (!btn || btn.disabled) btn = moved.querySelector('[data-move="' + (dir < 0 ? 'down' : 'up') + '"]');
     if (btn && !btn.disabled) btn.focus({ preventScroll: true });
   }
 
-  /* ---- pointer-event drag ----
-     HTML5 drag-and-drop does not exist on iOS Safari touch, so this is hand
-     rolled on pointer events. The grip carries `touch-action: none` so a drag
-     from it never turns into a page scroll; the rest of the row keeps normal
-     panning, so the page still scrolls under a finger. */
-  function wireDrag(list) {
-    var dragging = null, startY = 0, offset = 0;
-
-    function rowsArray() {
-      return Array.prototype.slice.call(list.querySelectorAll('.rank-row'));
-    }
-
-    list.addEventListener('pointerdown', function (e) {
-      if (busy) return;
-      var grip = e.target.closest('.rank-grip');
-      if (!grip) return;
-      dragging = grip.closest('.rank-row');
-      if (!dragging) return;
-      startY = e.clientY;
-      offset = 0;
-      dragging.classList.add('dragging');
-      dragging.style.transform = 'translateY(0px)';
-      try { grip.setPointerCapture(e.pointerId); } catch (err) { /* fine without */ }
-      e.preventDefault();
-    });
-
-    list.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      e.preventDefault();
-      offset = e.clientY - startY;
-      var rows = rowsArray();
-      var i = rows.indexOf(dragging);
-      /* Swap with a neighbour once the drag has travelled past half of it,
-         then rebase startY so the finger stays glued to the row. */
-      var prev = rows[i - 1], next = rows[i + 1];
-      if (next && offset > next.offsetHeight / 2) {
-        list.insertBefore(next, dragging);
-        startY += next.offsetHeight;
-        offset = e.clientY - startY;
-        afterSwap();
-      } else if (prev && -offset > prev.offsetHeight / 2) {
-        list.insertBefore(dragging, prev);
-        startY -= prev.offsetHeight;
-        offset = e.clientY - startY;
-        afterSwap();
-      }
-      dragging.style.transform = 'translateY(' + offset + 'px)';
-    });
-
-    function afterSwap() {
-      syncWorkingFromDom();
-      refreshRowChrome();
-    }
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging.classList.remove('dragging');
-      dragging.style.transform = '';
-      dragging = null;
-      syncWorkingFromDom();
-      refreshRowChrome();
-    }
-
-    list.addEventListener('pointerup', endDrag);
-    list.addEventListener('pointercancel', endDrag);
-    list.addEventListener('lostpointercapture', endDrag);
+  /* ---- the answering view holds still ----
+     Ranking is the one place where nothing should move except the rows. The
+     page is pinned while a moment is on screen and released for the intro,
+     the reveals and the results, which are long and want scrolling. */
+  function lockPage(on) {
+    /* Pin from the top: the answering view is a full screen of its own, and
+       every exit from it scrolls its destination to the top anyway, so there
+       is no scroll position worth restoring. */
+    if (on) window.scrollTo(0, 0);
+    document.documentElement.classList.toggle('answering', !!on);
+    document.body.classList.toggle('answering', !!on);
   }
 
   /* ================= FLOW ================= */
   function startQuiz() {
     $('intro').classList.add('hidden');
     $('live').classList.remove('hidden');
+    lockPage(true);
     lastSnapshot = snapshot();
     renderQuestion();
   }
@@ -581,6 +545,7 @@
 
   function showCheckpoint() {
     busy = false;
+    lockPage(false);
     $('live').classList.add('hidden');
     var first = blockEnd() === CHECKPOINTS[0] - 1;
 
@@ -623,12 +588,14 @@
     qIndex = Math.min(blockEnd() + 1, TOTAL - 1);
     $('checkpoint').classList.add('hidden');
     $('live').classList.remove('hidden');
+    lockPage(true);
     $('qcard').classList.remove('fading');
     renderQuestion();
   }
 
   function finishQuiz() {
     busy = false;
+    lockPage(false);
     $('live').classList.add('hidden');
     $('checkpoint').classList.add('hidden');
     $('results').classList.remove('hidden');
@@ -773,6 +740,10 @@
       if (t.dataset.copy) return copyResults(t);
       if (t.dataset.restart) return location.reload();
     });
+    /* Rotating the phone or the browser bars sliding away changes how much
+       room the list has — re-check whether there's still more below. */
+    window.addEventListener('resize', markListOverflow, { passive: true });
+    window.addEventListener('orientationchange', markListOverflow, { passive: true });
   }
 
   function boot() {
