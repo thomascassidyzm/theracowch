@@ -368,10 +368,10 @@
   /* Flag "there's more list below this edge" so the fade in the stylesheet
      can appear. Cheap enough to run on every reorder and every scroll. */
   function markListOverflow() {
-    var list = $('rankList');
-    if (!list) return;
-    var more = list.scrollHeight - list.clientHeight - list.scrollTop > 2;
-    list.classList.toggle('has-more', more);
+    var body = $('qbody');
+    if (!body) return;
+    var more = body.scrollHeight - body.clientHeight - body.scrollTop > 2;
+    body.classList.toggle('has-more', more);
   }
 
   function announce(msg) {
@@ -385,13 +385,19 @@
     working = (r ? r.order : shuffles[qIndex]).slice();
     var card = $('qcard');
     card.classList.add('entering');
+    /* .qbody holds everything you READ — the moment, the four rows, the hint.
+       It is the one thing in the card that scrolls, so the confirm button and
+       the back/forward row below it are pinned at the bottom of the card and
+       stay reachable at any content height. */
     card.innerHTML =
-      '<div class="qnum">Moment ' + (qIndex + 1) + ' of ' + TOTAL + '</div>' +
-      '<p class="scenario">' + escapeHtml(q.s) + '</p>' +
-      '<p class="prompt">Put these in order — most like you at the top.</p>' +
-      '<ol class="rank-list" id="rankList" role="list">' + rowsHtml(q) + '</ol>' +
-      '<p class="rank-hint">Use the arrows to put these in order. Nothing here is right or wrong — go on what you&rsquo;ve actually done before.</p>' +
-      (r ? '<p class="change-hint">Ranked — shuffle it about if that&rsquo;s not it.</p>' : '') +
+      '<div class="qbody" id="qbody">' +
+        '<div class="qnum">Moment ' + (qIndex + 1) + ' of ' + TOTAL + '</div>' +
+        '<p class="scenario">' + escapeHtml(q.s) + '</p>' +
+        '<p class="prompt">Put these in order — most like you at the top.</p>' +
+        '<ol class="rank-list" id="rankList" role="list">' + rowsHtml(q) + '</ol>' +
+        '<p class="rank-hint">Use the arrows to put these in order. Nothing here is right or wrong — go on what you&rsquo;ve actually done before.</p>' +
+        (r ? '<p class="change-hint">Ranked — shuffle it about if that&rsquo;s not it.</p>' : '') +
+      '</div>' +
       '<div class="btn-row"><button class="btn btn-primary" type="button" data-confirm="1">' +
         (r ? 'Keep this order →' : 'That&rsquo;s my order →') + '</button></div>' +
       navRow() +
@@ -401,7 +407,7 @@
     list.querySelectorAll('.rank-row').forEach(function (row, pos) {
       row.dataset.opt = working[pos];
     });
-    list.addEventListener('scroll', markListOverflow, { passive: true });
+    $('qbody').addEventListener('scroll', markListOverflow, { passive: true });
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         card.classList.remove('entering');
@@ -469,6 +475,21 @@
     if (on) window.scrollTo(0, 0);
     document.documentElement.classList.toggle('answering', !!on);
     document.body.classList.toggle('answering', !!on);
+    if (on) fitToVisibleViewport();
+    else document.body.style.height = '';
+  }
+
+  /* `100dvh` is the right unit and modern iOS honours it — but the bug that
+     trapped Max was a pinned box laid out TALLER than the screen, so measure
+     the screen rather than trust a unit. visualViewport is what the person can
+     actually see, and an inline height can't be out-cascaded by anything.
+     Skipped while pinch-zoomed: then the small visual viewport is the user's
+     own doing and re-laying the page out to it would fight them. */
+  function fitToVisibleViewport() {
+    var vv = window.visualViewport;
+    if (!vv || !document.body.classList.contains('answering')) return;
+    if (vv.scale && vv.scale > 1.01) return;
+    document.body.style.height = Math.round(vv.height) + 'px';
   }
 
   /* ================= FLOW ================= */
@@ -742,8 +763,15 @@
     });
     /* Rotating the phone or the browser bars sliding away changes how much
        room the list has — re-check whether there's still more below. */
-    window.addEventListener('resize', markListOverflow, { passive: true });
-    window.addEventListener('orientationchange', markListOverflow, { passive: true });
+    var refit = function () { fitToVisibleViewport(); markListOverflow(); };
+    window.addEventListener('resize', refit, { passive: true });
+    window.addEventListener('orientationchange', refit, { passive: true });
+    /* The URL bar sliding away changes the visible height without always
+       firing a window resize on iOS. */
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', refit, { passive: true });
+      window.visualViewport.addEventListener('scroll', refit, { passive: true });
+    }
   }
 
   function boot() {

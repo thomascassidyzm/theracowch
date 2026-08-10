@@ -181,10 +181,11 @@
         /* ---------- the answering view: fits the screen, and the screen holds still ----------
            While you're ranking, the page is pinned: no scroll, no rubber band,
            nothing that can shift under a thumb. The card becomes a flex column
-           so the list takes whatever height is left over, and the list — never
+           so the moment takes whatever height is left over, and .qbody — never
            the page — is the only thing that can scroll, and only when a
            genuinely long moment won't fit. Option text is never clipped: you
-           have to read all four to rank them honestly.
+           have to read all four to rank them honestly. The controls sit below
+           .qbody and are never in the scroll, so they cannot go off-screen.
 
            Released again for the reveals and the results, which are long and
            legitimately want scrolling. */
@@ -192,6 +193,15 @@
         body.answering {
             position: fixed; inset: 0;
             height: 100vh; height: 100dvh;
+            /* Load-bearing. The base `body` rule carries `min-height: 100vh`,
+               and without this reset it wins: on iOS with the URL bar showing,
+               `vh` is the LARGE viewport, so the pinned box laid out ~125px
+               taller than the screen and the bottom of the column — the
+               confirm button and the back/forward row — sat below the fold
+               with scrolling locked. Max got stuck on moment 20 for exactly
+               this reason. `dvh` asks for the visible viewport; this lets it
+               have it. */
+            min-height: 0;
             overflow: hidden;
             padding: 10px;
         }
@@ -214,7 +224,20 @@
             display: flex; flex-direction: column;
             padding: 16px 14px;
         }
-        body.answering .rank-list {
+        /* Everything you READ scrolls; everything you PRESS is pinned.
+           The moment's words, the four rows and the hint live in .qbody, which
+           is the only shrinkable thing in the card and the only thing that can
+           scroll. The confirm button and the back/forward row sit outside it,
+           so they are at the bottom of the card at every content height —
+           there is no moment, and no phone, that can push them off the screen.
+
+           Why not shrink-to-fit alone: the scenario, the prompt and the hint
+           can't shrink, so on a long moment at a narrow width the unshrinkable
+           parts alone can exceed the screen. Then the list squeezes to nothing
+           and the overflow lands on the controls — which is precisely the trap.
+           At 320x568 the old layout had 20px of slack at its worst; that is a
+           fit by luck, not by construction. */
+        body.answering .qbody {
             flex: 0 1 auto; min-height: 0;
             overflow-y: auto; overflow-x: hidden;
             /* room for the rows' 4px offset shadow, which the scroll container
@@ -223,25 +246,28 @@
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
         }
-        /* On the longest moments four options genuinely won't fit a small
-           phone at a readable size, so the list — and only the list — scrolls.
+        /* On the longest moments a whole moment genuinely won't fit a small
+           phone at a readable size, so .qbody — and only .qbody — scrolls.
            When there's more below, its bottom edge fades: a cut row then reads
            as "keep going", not as broken. The class comes off the moment
            you've reached the end, so nothing is ever dimmed needlessly. */
-        body.answering .rank-list.has-more {
+        body.answering .qbody.has-more {
             -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
             mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
         }
-        body.answering .rank-hint,
-        body.answering .change-hint,
         body.answering .btn-row,
         body.answering .nav-row { flex: 0 0 auto; }
 
-        /* Short screens — a phone in portrait with browser chrome. Trim the
-           furniture, never the words: padding and the two lines that are
-           orientation rather than content give way first, and the arrows keep
-           their full 44px target throughout. */
-        @media (max-height: 800px) {
+        /* Phone-shaped screens. Trim the furniture, never the words: padding
+           and the two lines that are orientation rather than content give way
+           first, and the arrows keep their full 44px target throughout.
+
+           900px, not 800px: at 800 the threshold sat just UNDER the commonest
+           modern phone, so a 390x844 handset got the roomy desktop treatment
+           and then had to scroll all 30 moments, while a shorter 393x727 phone
+           scrolled only 8. Raising it to 900 puts every phone on the compact
+           treatment: 390x844 now scrolls 1 moment in 30. */
+        @media (max-height: 900px) {
             body.answering { padding: 8px; }
             body.answering .back-link { display: none; }
             body.answering #live > .honesty { display: none; }
