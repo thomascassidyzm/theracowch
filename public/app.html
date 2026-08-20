@@ -4522,6 +4522,108 @@
             text-align: center;
         }
 
+        /* First-run welcome guide — Mandy points new users to the two ways in. */
+        .welcome-guide {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(45, 45, 45, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-md);
+            overflow-y: auto;
+        }
+        .welcome-guide[hidden] { display: none; }
+        .welcome-guide-card {
+            background: #FDF5E8;
+            color: #2D2D2D;
+            border: 4px solid #2D2D2D;
+            border-radius: var(--radius-medium);
+            padding: var(--space-xl);
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 8px 8px 0 rgba(60, 46, 40, 0.2);
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+        .welcome-guide-head {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        .welcome-guide-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 3px solid #F37A53;
+            background: #fff;
+        }
+        .welcome-guide-title {
+            font-size: clamp(1.25rem, 4vw, 1.55rem);
+            font-weight: var(--font-weight-black);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        .welcome-guide-lede {
+            color: #5C4432;
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+        .welcome-guide-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            width: 100%;
+            text-align: left;
+            background: #fff;
+            border: 3px solid #2D2D2D;
+            border-radius: var(--radius-small);
+            padding: 14px 16px;
+            margin-bottom: var(--space-md);
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 3px 3px 0 rgba(60, 46, 40, 0.18);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .welcome-guide-option:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 rgba(60, 46, 40, 0.22);
+        }
+        .welcome-guide-option-icon { font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
+        .welcome-guide-option-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .welcome-guide-option-text strong { font-size: 1rem; font-weight: var(--font-weight-black); color: #2D2D2D; }
+        .welcome-guide-option-text span { font-size: 0.85rem; color: #5C4432; line-height: 1.35; }
+        .welcome-guide-option-arrow { font-size: 1.2rem; font-weight: 900; color: #F37A53; flex-shrink: 0; }
+        .welcome-guide-tip {
+            background: #FFF3E0;
+            border-left: 4px solid #C9A857;
+            border-radius: var(--radius-small);
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #5C4432;
+            margin: var(--space-sm) 0 var(--space-md);
+        }
+        .welcome-guide-skip {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            color: #7A6556;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        .welcome-guide-skip:hover { color: #E35B32; }
+
         /* IMAGINE onboarding gate — runs once, after consent, asks the user
            which area they'd like to start with so the daily exercise rotation
            can be re-ordered. */
@@ -4785,6 +4887,41 @@
             <p class="imagine-onboard-lede">Which of these feels weakest right now? Pick one and we&rsquo;ll start your daily exercise there, then cycle through the rest.</p>
             <div class="imagine-onboard-grid" id="imagine-onboard-grid"></div>
             <button type="button" class="imagine-onboard-skip" id="imagine-onboard-skip">No preference &mdash; use the standard IMAGINE order</button>
+        </div>
+    </div>
+
+    <!-- First-run welcome guide — Mandy shows the two ways to begin. Appears once,
+         after consent and once the calf welcome (if any) is dismissed. -->
+    <div id="welcome-guide" class="welcome-guide" role="dialog" aria-modal="true" aria-labelledby="welcome-guide-title" hidden>
+        <div class="welcome-guide-card">
+            <div class="welcome-guide-head">
+                <img src="/icons/cowch-icon.svg" alt="Mandy" class="welcome-guide-avatar">
+                <div>
+                    <h2 id="welcome-guide-title" class="welcome-guide-title">Welcome &mdash; I&rsquo;m so glad you&rsquo;re here 🐮</h2>
+                    <p class="welcome-guide-lede">I&rsquo;m Mandy. There are two easy ways to begin &mdash; whichever feels right today.</p>
+                </div>
+            </div>
+
+            <button type="button" class="welcome-guide-option" data-welcome-go="chat">
+                <span class="welcome-guide-option-icon">💬</span>
+                <span class="welcome-guide-option-text">
+                    <strong>Chat with me</strong>
+                    <span>Talk something through, whenever you need</span>
+                </span>
+                <span class="welcome-guide-option-arrow" aria-hidden="true">&rarr;</span>
+            </button>
+
+            <button type="button" class="welcome-guide-option" data-welcome-go="imagine">
+                <span class="welcome-guide-option-icon">🧭</span>
+                <span class="welcome-guide-option-text">
+                    <strong>Try an IMAGINE exercise</strong>
+                    <span>Small, useful habits for your mind and body</span>
+                </span>
+                <span class="welcome-guide-option-arrow" aria-hidden="true">&rarr;</span>
+            </button>
+
+            <p class="welcome-guide-tip">💛 Just one or two a day is plenty. Small habits, done often, build sturdy long-term wellbeing.</p>
+            <button type="button" class="welcome-guide-skip" id="welcome-guide-skip">I&rsquo;ll explore on my own</button>
         </div>
     </div>
 
@@ -7468,7 +7605,7 @@
     <script src="/assets/js/therapy-profile.js"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=56"></script>
-    <script src="/assets/js/app.js?v=90"></script>
+    <script src="/assets/js/app.js?v=91"></script>
     <script src="/assets/js/calf.js?v=2"></script>
 
     <!-- "New version available" update banner (shown only when a new build is

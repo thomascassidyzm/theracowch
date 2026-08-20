@@ -2474,6 +2474,75 @@ function setupWeekArchive() {
 window.setupWeekArchive = setupWeekArchive;
 
 // ============================================
+// First-run welcome guide — Mandy points new users to the two ways in (chat or
+// an IMAGINE exercise) and nudges one or two small habits a day. Shows once,
+// after consent, and only once the calf welcome (if any) is done, so the
+// first-run modals don't stack on top of each other.
+// ============================================
+const WELCOME_GUIDE_KEY = 'cowch-welcome-guide-v1';
+
+function welcomeGuideDone() {
+    try { return !!localStorage.getItem(WELCOME_GUIDE_KEY); } catch (_) { return false; }
+}
+function consentIsAccepted() {
+    try { return localStorage.getItem('cowch-consent-v1') === 'accepted'; } catch (_) { return false; }
+}
+// True while any other first-run modal (consent / calf welcome / IMAGINE tuner)
+// is on screen — we hold the welcome guide back until they're clear.
+function firstRunModalOpen() {
+    const consent = document.getElementById('consent-gate');
+    if (consent && !consent.hidden) return true;
+    const calf = document.getElementById('calf-welcome');
+    if (calf && !calf.hidden && calf.getAttribute('aria-hidden') !== 'true') return true;
+    const onboard = document.getElementById('imagine-onboard');
+    if (onboard && !onboard.hidden) return true;
+    return false;
+}
+function hideWelcomeGuide() {
+    const el = document.getElementById('welcome-guide');
+    if (el) el.hidden = true;
+}
+function showWelcomeGuide() {
+    const el = document.getElementById('welcome-guide');
+    if (!el) return;
+    try { localStorage.setItem(WELCOME_GUIDE_KEY, 'seen'); } catch (_) {}  // mark up front so it never double-shows
+    el.hidden = false;
+}
+
+function setupWelcomeGuide() {
+    const el = document.getElementById('welcome-guide');
+    if (!el || el.dataset.wired) return;
+    el.dataset.wired = '1';
+
+    // Option buttons → jump to chat / IMAGINE and close.
+    el.querySelectorAll('[data-welcome-go]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dest = btn.getAttribute('data-welcome-go');
+            hideWelcomeGuide();
+            if (typeof switchTab === 'function') switchTab(dest);
+        });
+    });
+    const skip = document.getElementById('welcome-guide-skip');
+    if (skip) skip.addEventListener('click', hideWelcomeGuide);
+    el.addEventListener('click', (e) => { if (e.target === el) hideWelcomeGuide(); });
+
+    if (welcomeGuideDone()) return;
+
+    // Wait until consent is done and no other first-run modal is open, then show.
+    // The initial delay lets the calf welcome (opens ~700ms after load) appear
+    // first, so this guide follows it rather than racing in front of it.
+    let tries = 0;
+    const tick = () => {
+        if (welcomeGuideDone()) return;
+        if (consentIsAccepted() && !firstRunModalOpen()) { showWelcomeGuide(); return; }
+        if (++tries > 150) return;   // ~150 * 700ms safety cap; retries next load if never shown
+        setTimeout(tick, 700);
+    };
+    setTimeout(tick, 1500);
+}
+window.setupWelcomeGuide = setupWelcomeGuide;
+
+// ============================================
 // Patterns I'm noticing — gentle, non-judgmental reflections from the week
 // ============================================
 function buildWeeklyPatterns() {
@@ -4900,6 +4969,7 @@ function init() {
     setupQuickCheckin();
     setupClearHistory();
     setupSettingsButtons();
+    setupWelcomeGuide();
     updateImagineTracker();
 
     // Initialize chat via chat-script.js
