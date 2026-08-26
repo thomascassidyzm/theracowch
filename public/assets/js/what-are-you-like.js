@@ -387,6 +387,11 @@
     /* measurement-blind: nothing visible changes except the journey dots */
     if (wasNew && firstUnansweredInBlock() === -1) return reveal();
     if (qIndex < blockEnd()) return goTo(qIndex + 1);
+    /* Standing on the last of a finished ten and changing your mind is an
+       edit, not progress: it must not fire the curtain. navNext() would,
+       because from here that is all navNext() can do. Stay put and let the
+       Next button - which says what it is about to do - be the deliberate act. */
+    if (!wasNew && firstUnansweredInBlock() === -1) return renderQuestion();
     return navNext();
   }
 
