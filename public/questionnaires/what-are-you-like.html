@@ -284,6 +284,17 @@
             margin: 20px auto 0; max-width: 460px;
         }
 
+        /* the quiet way out of a saved run — present, never shouting */
+        .resume-note {
+            text-align: center; color: var(--muted); font-size: 0.9rem;
+            margin: 12px auto 0; max-width: 460px;
+        }
+        .linkish {
+            background: none; border: 0; padding: 0; font: inherit;
+            color: var(--muted); text-decoration: underline; cursor: pointer;
+        }
+        .linkish:hover { color: var(--body); }
+
         .hidden { display: none !important; }
 
         /* ---------- accessibility ---------- */
@@ -338,6 +349,7 @@
             <div class="btn-row">
                 <button class="btn btn-primary" type="button" id="startBtn" data-start="1" disabled>Loading the moments&hellip;</button>
             </div>
+            <p class="resume-note hidden" id="resumeNote">Your answers so far are still here, on this device. Or <button class="linkish" type="button" data-startover="1">start again from the beginning</button>.</p>
             <p class="honesty">This is a starting point, not a verdict.</p>
         </div>
     </section>

@@ -17,6 +17,11 @@
 
   var BANK_URL = '/questionnaires/data/what-are-you-like-bank.json?v=1';
   var STORE_KEY = 'cowch-q-wayl';
+  /* Deliberately NOT the same key as the finished record above. A run you are
+     still inside and a run you have completed are different things, and one
+     must never be able to masquerade as the other. */
+  var PROGRESS_KEY = 'cowch-q-wayl-progress';
+  var PROGRESS_V = 1;
 
   /* ================= AXES =================
      Names, subtitles and room-of-100 sentences carried across verbatim.
@@ -314,10 +319,18 @@
     renderQuestion();
   }
 
+  /* Whatever was saved, they have asked to walk away from it. */
+  function startOver() {
+    clearProgress();
+    resetState();
+    startQuiz();
+  }
+
   function answer(i) {
     var wasNew = !responses[qIndex];
     responses[qIndex] = { opt: i };
     recompute();
+    saveProgress();
     advance(wasNew);
   }
 
@@ -345,6 +358,7 @@
     var wasNew = !responses[qIndex];
     responses[qIndex] = { exit: true, note: ((el && el.value) || '').trim() };
     recompute();
+    saveProgress();
     advance(wasNew);
   }
 
@@ -358,6 +372,7 @@
     card.classList.add('fading');
     setTimeout(function () {
       qIndex = i;
+      saveProgress();
       card.classList.remove('fading');
       renderQuestion();
     }, 280);
@@ -444,6 +459,7 @@
           : '<button class="btn btn-primary" type="button" data-continue="1">The final ten — full picture at 30</button>' +
             '<button class="btn btn-ghost" type="button" data-finish="1">Finish with what I have</button>';
         lastSnapshot = snapshot();
+        saveProgress();
       });
     }, 1400);
   }
@@ -452,6 +468,7 @@
      way: what's behind it has been seen, so it stays behind it. */
   function continueQuiz() {
     qIndex = Math.min(blockEnd() + 1, TOTAL - 1);
+    saveProgress();
     $('checkpoint').classList.add('hidden');
     $('live').classList.remove('hidden');
     $('qcard').classList.remove('fading');
@@ -513,6 +530,9 @@
       : '';
 
     save(meta);
+    /* the run is over: the finished record above is now the thing worth
+       keeping, and a half-finished run must not linger behind it */
+    clearProgress();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -548,6 +568,64 @@
         abstentions: abstentions.map(function (a) { return { id: a.id, s: a.s, note: a.note }; })
       }));
     } catch (e) { /* private mode / full quota — the page still works */ }
+  }
+
+  /* ---- the run in progress ----
+     Thirty moments is a long way to walk on a phone, and until now every step
+     of it lived only in memory: one reload, one backgrounded tab, one service
+     worker update, and the whole run was gone and you started again at moment
+     one. That is the "it asks me things I already answered" people reported.
+
+     So: written after every change, and read back on load. Same rule as the
+     results — this device, this browser, no endpoint, no upload, no account.
+     What gets stored is `responses`, the per-moment record that is already the
+     single source of truth here; scores are still recomputed from it, never
+     restored from a total, so a resumed run cannot carry a stale contribution. */
+  function saveProgress() {
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify({
+        v: PROGRESS_V,
+        saved: new Date().toISOString(),
+        total: TOTAL,
+        qIndex: qIndex,
+        responses: responses,
+        lastSnapshot: lastSnapshot
+      }));
+    } catch (e) { /* private mode / full quota — the run still works, just not across reloads */ }
+  }
+
+  /* A saved run is only meaningful against the bank it was answered from: the
+     indices ARE the questions. If the bank has changed size, or anything about
+     the shape is off, throw it away rather than resume someone into nonsense. */
+  function loadProgress() {
+    var raw, d;
+    try { raw = localStorage.getItem(PROGRESS_KEY); } catch (e) { return null; }
+    if (!raw) return null;
+    try { d = JSON.parse(raw); } catch (e) { return null; }
+    if (!d || d.v !== PROGRESS_V || d.total !== TOTAL) return null;
+    if (!Array.isArray(d.responses) || d.responses.length !== TOTAL) return null;
+    if (typeof d.qIndex !== 'number' || d.qIndex < 0 || d.qIndex >= TOTAL) return null;
+    /* nothing answered yet is not a run worth resuming */
+    if (!d.responses.some(function (r) { return !!r; })) return null;
+    return d;
+  }
+
+  function clearProgress() {
+    try { localStorage.removeItem(PROGRESS_KEY); } catch (e) { /* nothing sensible left to do */ }
+  }
+
+  function resumeQuiz(d) {
+    responses = d.responses;
+    qIndex = d.qIndex;
+    lastSnapshot = d.lastSnapshot || null;
+    busy = false;
+    recompute();
+    $('intro').classList.add('hidden');
+    $('live').classList.remove('hidden');
+    /* the reveal needs a "before" to sharpen away from; if the saved run
+       predates its first checkpoint, where we are now IS the before */
+    if (!lastSnapshot) lastSnapshot = snapshot();
+    renderQuestion();
   }
 
   /* A plain-text copy of the results, so someone can paste them into their
@@ -630,10 +708,16 @@
       if (t.dataset.nav) return busy ? undefined : (t.dataset.nav === 'back' ? navBack() : navNext());
       if (t.dataset.continue) return continueQuiz();
       if (t.dataset.finish) return finishQuiz();
-      if (t.dataset.start) return startQuiz();
+      if (t.dataset.start) {
+        var saved = loadProgress();
+        return saved ? resumeQuiz(saved) : startQuiz();
+      }
+      if (t.dataset.startover) return startOver();
       if (t.dataset.print) return window.print();
       if (t.dataset.copy) return copyResults(t);
-      if (t.dataset.restart) return location.reload();
+      /* "Start over" from the results: a completed run is behind them, so the
+         reload must not find a stale run in progress and offer to resume it. */
+      if (t.dataset.restart) { clearProgress(); return location.reload(); }
     });
   }
 
@@ -649,10 +733,17 @@
         resetState();
         wire();
         var start = $('startBtn');
+        var saved = loadProgress();
         if (start) {
           start.disabled = false;
-          start.textContent = 'Go on then — first look at 10';
+          /* Naming the moment is the whole point: it says "your answers are
+             still here" before they have to trust that they are. */
+          start.textContent = saved
+            ? 'Pick up where you left off — moment ' + (saved.qIndex + 1) + ' of ' + TOTAL
+            : 'Go on then — first look at 10';
         }
+        var note = $('resumeNote');
+        if (note && saved) note.classList.remove('hidden');
       })
       .catch(function () {
         var start = $('startBtn');
