@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "set": "wellness-13 (draft)",
+    "version": "0.1-prototype",
+    "note": "Thirteen universal wellness spokes for the free wheel-builder prototype. UNIVERSAL SPOKES, PERSONAL ORDERING — the thirteen are the same for everybody, and what the assessment personalises is WHERE a person enters the ring, never what the ring is made of. A bespoke thirteen per person fails the brother-in-law test: nobody can check a bespoke thirteen is reasonable.",
+    "ordering": "By redemption latency, shortest first — how soon the next chance to choose well comes round. Eating went early on the original wheel because its choice density makes it the most forgiving domain in a life; these sort the same way. `latency` is the rank; `nextChance` is the plain-English version of it.",
+    "thirteenth": "The 13th is the review spoke, per RA-19 in REASON-ABILITY-CANON.md — true of three of eight shipped programmes, so a strong default rather than a law. Followed here, and said out loud.",
+    "axes": "`axes` names which of the six questionnaire axes (O, C, E, A, N, R) inform this spoke's candidate statements and its confidence register. Nothing else about the assessment touches a spoke.",
+    "status": "DRAFT — Tom's to rule on. Minted for this prototype against the canon's shape, not lifted from a wellness listicle.",
+    "claims": "Non-clinical wellbeing. Nothing here is therapy, treatment or diagnosis; no spoke names a condition."
+  },
+  "spokes": [
+    {
+      "id": "settling",
+      "latency": 1,
+      "name": "Settling yourself",
+      "what": "What you do with the ninety seconds after something winds you up.",
+      "nextChance": "the next breath",
+      "axes": ["N", "C"]
+    },
+    {
+      "id": "eating",
+      "latency": 2,
+      "name": "Eating",
+      "what": "How you feed yourself across an ordinary day, not on your best day.",
+      "nextChance": "the next meal",
+      "axes": ["C", "N", "O"]
+    },
+    {
+      "id": "intake",
+      "latency": 3,
+      "name": "What you take in",
+      "what": "The feeds, the news and the screens — what you let into your head, and when.",
+      "nextChance": "the next thing you open",
+      "axes": ["O", "N", "C"]
+    },
+    {
+      "id": "moving",
+      "latency": 4,
+      "name": "Moving",
+      "what": "Motion woven through the day, rather than the occasional heroic effort.",
+      "nextChance": "the next time you stand up",
+      "axes": ["C", "E", "R"]
+    },
+    {
+      "id": "self-talk",
+      "latency": 5,
+      "name": "How you talk to yourself",
+      "what": "The running commentary — and catching the script when it has you.",
+      "nextChance": "the next sentence you say to yourself",
+      "axes": ["N", "A"]
+    },
+    {
+      "id": "your-patch",
+      "latency": 6,
+      "name": "Your patch",
+      "what": "The room you're actually in, and how much of your attention it's quietly taking.",
+      "nextChance": "five minutes, today",
+      "axes": ["C", "O"]
+    },
+    {
+      "id": "stopping",
+      "latency": 7,
+      "name": "Stopping",
+      "what": "Where the working day ends, and whether anything marks the edge.",
+      "nextChance": "tomorrow evening",
+      "axes": ["C", "A", "N"]
+    },
+    {
+      "id": "reaching-out",
+      "latency": 8,
+      "name": "Reaching out",
+      "what": "The message you meant to send, the yes you nearly said, the person you thought of.",
+      "nextChance": "the next time someone crosses your mind",
+      "axes": ["E", "A"]
+    },
+    {
+      "id": "edge-off",
+      "latency": 9,
+      "name": "What takes the edge off",
+      "what": "The drink, the scroll, the snack, the box set — what you reach for at the end of a hard one.",
+      "nextChance": "the next hard evening",
+      "axes": ["N", "R", "C"]
+    },
+    {
+      "id": "money-small",
+      "latency": 10,
+      "name": "Money, in the small",
+      "what": "The everyday spends and the low hum of worry behind them.",
+      "nextChance": "the next few weeks",
+      "axes": ["C", "R", "N"]
+    },
+    {
+      "id": "sleep",
+      "latency": 11,
+      "name": "Sleep",
+      "what": "The hours, the room, and what happens in the half-hour before them.",
+      "nextChance": "a few nights running",
+      "axes": ["C", "N"]
+    },
+    {
+      "id": "closest",
+      "latency": 12,
+      "name": "The people closest",
+      "what": "The handful of relationships that hold most of the weight.",
+      "nextChance": "months, honestly",
+      "axes": ["A", "E", "N"]
+    },
+    {
+      "id": "looking-back",
+      "latency": 13,
+      "name": "Looking back",
+      "what": "The lap itself — what you noticed, what stuck, what you'd point at again.",
+      "nextChance": "when you come round again",
+      "axes": ["O", "C"],
+      "review": true
+    }
+  ]
+}

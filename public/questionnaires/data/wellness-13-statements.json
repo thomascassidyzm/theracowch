@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "set": "wellness-13 candidate statements (draft)",
+    "version": "0.1-prototype",
+    "note": "Three genuinely DISTINCT ways a person could honestly hold each spoke — three different stances, never three rewordings of one sentence. The engine supplies distinction; the person supplies selection. They choose one, then edit it into their own words.",
+    "registers": "Each stance is authored twice. `bold` is licensed by tight rankings — the person's answers pointed the same way often enough to earn a declarative sentence. `honest` is licensed by spread rankings — a warrant harvested from a contested selection and played back with false confidence is the tool putting words in their mouth, which is the exact sin it exists to avoid.",
+    "voice": "First person, in the respondent's mouth. These are warrants — why this matters to me and what I'd choose — never instructions from an app, never an external coach. No negative labels, ever. No verdicts. No numbers. No parentheses.",
+    "status": "DRAFT — Tom's to rule on."
+  },
+  "spokes": {
+    "settling": [
+      {
+        "hold": "The pause is the whole thing",
+        "bold": "When something winds me up, I take the ninety seconds before I answer. That gap is where I get to choose instead of react.",
+        "honest": "I think I do better when I leave a gap before answering. I don't always manage it, but the times I have, I liked what I did next."
+      },
+      {
+        "hold": "The body first, the thinking after",
+        "bold": "I settle my body before I try to settle my head — breath, feet on the floor, a walk to the end of the road. The thinking gets easier once the alarm quietens.",
+        "honest": "Talking myself round rarely works when I'm wound up. Moving or breathing seems to help more, so that's probably where I'd start."
+      },
+      {
+        "hold": "Let it run, then let it go",
+        "bold": "I let the feeling arrive rather than fighting it. It passes faster when I'm not arguing with it, and I'm not carrying it into the evening.",
+        "honest": "Pushing a feeling down seems to make it stay longer. I'd like to get better at letting it run through and then putting it down."
+      }
+    ],
+    "eating": [
+      {
+        "hold": "Rhythm over rules",
+        "bold": "I eat at roughly the same times most days. The rhythm does more for me than any rule about what's on the plate.",
+        "honest": "Days when meals happen at sensible times seem to go better. I'd rather aim at that than at a set of rules."
+      },
+      {
+        "hold": "Food is one of the plain pleasures",
+        "bold": "Eating is one of the good parts of being alive, and I'd like to keep it that way. I'd rather eat something properly and enjoy it than eat something virtuous with one eye on my phone.",
+        "honest": "I don't want food to become another thing I'm marking myself on. Enjoying it more, and noticing it more, is closer to what I want."
+      },
+      {
+        "hold": "I eat the way the afternoon goes",
+        "bold": "I can read what I ate in how the afternoon goes. That's the feedback I trust, and it's the one I go on.",
+        "honest": "There's probably a link between what I eat and how the rest of the day feels. I'd like to pay enough attention to actually find out."
+      }
+    ],
+    "intake": [
+      {
+        "hold": "Curiosity, on purpose",
+        "bold": "I want what comes into my head to be things I went and found, not things that were pushed at me. What I read is a choice I make.",
+        "honest": "Most of what I take in arrived without me choosing it. I'd like a bit more of it to be things I actually went looking for."
+      },
+      {
+        "hold": "The first hour and the last",
+        "bold": "The first hour of the day and the last are mine. What's happening in the world can wait until I'm in it properly.",
+        "honest": "Reaching for the phone first thing sets a tone I don't much like. Guarding the two ends of the day feels worth trying."
+      },
+      {
+        "hold": "Notice the aftertaste",
+        "bold": "I judge what I take in by how I feel afterwards, not by how interesting it looked. Some things leave me sharper and some leave me flat, and I know which are which.",
+        "honest": "I don't always notice what a scroll leaves behind. Paying attention to the aftertaste seems like the useful part."
+      }
+    ],
+    "moving": [
+      {
+        "hold": "Woven through, not scheduled",
+        "bold": "I move by putting it in the day rather than in the diary — stairs, walking the long way, carrying the shopping. That's what actually happens.",
+        "honest": "Planned exercise falls over for me more often than not. Movement that's just part of getting around seems to stick better."
+      },
+      {
+        "hold": "For the head, not the shape",
+        "bold": "I move because of what it does to my head. Whatever it does to my body is a bonus I'm not counting.",
+        "honest": "I think the mood lift is the real reason I move, when I do. Aiming at that rather than at a target might suit me better."
+      },
+      {
+        "hold": "Company makes it happen",
+        "bold": "I move when someone's expecting me. On my own it stays a good intention; with someone else it's just what we're doing on Thursday.",
+        "honest": "It's easier when it's arranged with someone. Left to myself I mean to and then don't."
+      }
+    ],
+    "self-talk": [
+      {
+        "hold": "Spot the script",
+        "bold": "I can hear the script when it starts — the same few lines it always uses. Naming it takes most of its power away.",
+        "honest": "There's a familiar run of thoughts that shows up when things go wrong. I'd like to get quicker at spotting it for what it is."
+      },
+      {
+        "hold": "The voice I'd use for a friend",
+        "bold": "I talk to myself the way I'd talk to someone I like. Anything I wouldn't say out loud to a friend, I don't need to say to me.",
+        "honest": "I'm harder on myself than I'd be on anyone else. Borrowing the voice I'd use for a friend is what I'd try."
+      },
+      {
+        "hold": "Be my own best advocate",
+        "bold": "I'm the one who notices when I've done something well, because nobody else is watching that closely. Being pleased with myself is a job I've stopped delegating.",
+        "honest": "I don't often stop and give myself any credit. I suspect being on my own side more would change quite a lot."
+      }
+    ],
+    "your-patch": [
+      {
+        "hold": "Five minutes buys the room back",
+        "bold": "Five minutes of putting things away changes how the room feels for the rest of the day. It's the cheapest thing on this list.",
+        "honest": "A tidy-ish room does seem to quieten my head. Five minutes is about all I'd reliably give it, so that's what I'd try."
+      },
+      {
+        "hold": "One corner that's right",
+        "bold": "I don't need the whole place in order. I need one corner that is exactly how I want it, and I keep that one.",
+        "honest": "Sorting everything is beyond me most weeks. One corner that's genuinely mine might be enough."
+      },
+      {
+        "hold": "The room is the plan",
+        "bold": "I set the room up so the good choice is the easy one — out where I can see it, or away where I can't reach it. Then I don't have to rely on willpower.",
+        "honest": "I'd rather not fight myself over things. Putting them within reach or out of reach seems less effortful than deciding twice a day."
+      }
+    ],
+    "stopping": [
+      {
+        "hold": "There is an edge, and I mark it",
+        "bold": "The day ends somewhere and I mark it — closing the laptop, a walk, changing what I'm wearing. Without the marker it never quite ends.",
+        "honest": "My working day trails off rather than ending. Something small to mark the edge might be what's missing."
+      },
+      {
+        "hold": "Finished is a decision, not a state",
+        "bold": "It's finished when I say it's finished. There is always more that could be done, and calling it is the skill.",
+        "honest": "I struggle to call anything done. Deciding it's finished rather than waiting to feel finished is what I'd work on."
+      },
+      {
+        "hold": "Stopping is what makes the work good",
+        "bold": "I stop because it makes tomorrow's work better, not because I've earned it. Rest is part of the job, not a reward for it.",
+        "honest": "I tend to treat stopping as something to earn. Thinking of it as part of the work would probably serve me better."
+      }
+    ],
+    "reaching-out": [
+      {
+        "hold": "Send it while you're thinking it",
+        "bold": "When someone crosses my mind, I tell them then. The message I save for a better moment never gets sent.",
+        "honest": "I think of people often and rarely say so. Sending it in the moment is the version most likely to actually happen."
+      },
+      {
+        "hold": "A few people, properly",
+        "bold": "I'd rather be properly in touch with a handful of people than lightly in touch with everyone. That's where the good stuff is.",
+        "honest": "Spreading myself thin socially leaves me with nothing much. A few people, more properly, sounds closer to what I want."
+      },
+      {
+        "hold": "Say yes to the thing you'd enjoy once you were there",
+        "bold": "I say yes to the things I know I'd be glad of once I'd arrived, even when leaving the house is the last thing I want.",
+        "honest": "I turn things down and then wish I'd gone. Asking whether I'd be glad once I was there might be a better test than how I feel beforehand."
+      }
+    ],
+    "edge-off": [
+      {
+        "hold": "Know what it's for",
+        "bold": "Whatever I reach for at the end of a hard day, I know what I'm asking it to do. Knowing the job it's doing is what keeps me in charge of it.",
+        "honest": "I reach for things at the end of a day without much thought about why. Knowing what I'm asking them to do feels like the useful first step."
+      },
+      {
+        "hold": "Something else in the drawer",
+        "bold": "I keep more than one way to take the edge off, so no single one has to carry it all. Variety is what stops a habit becoming the only door.",
+        "honest": "I tend to have one go-to. Having a couple of alternatives ready seems sensible, even if I don't always use them."
+      },
+      {
+        "hold": "No shame in the wind-down",
+        "bold": "Wanting the day to soften at the end is completely reasonable. I'm not going to make a character issue out of it — I just want the version that leaves me better off tomorrow.",
+        "honest": "I'd rather not beat myself up about how I wind down. Choosing the version I'm glad of the next morning is the bit I care about."
+      }
+    ],
+    "money-small": [
+      {
+        "hold": "Look at it, so it stops looming",
+        "bold": "I'd rather know the number than dread the number. Looking at it takes ten minutes and takes the hum away for a week.",
+        "honest": "Not looking makes it feel bigger than it is. I'd like to get to where checking is ordinary rather than an event."
+      },
+      {
+        "hold": "Spend it on things I actually want",
+        "bold": "The point isn't spending less, it's spending on things I'm glad of afterwards. Most of what leaks out isn't anything I chose.",
+        "honest": "A fair bit goes on things I don't especially enjoy. Redirecting rather than restricting is the version I'd stick to."
+      },
+      {
+        "hold": "One decision, not thirty",
+        "bold": "I set it up once so it runs without me — what moves where, and when. Deciding it thirty times a month is what wears me out.",
+        "honest": "Making the same small money decisions over and over is tiring. Setting some of them once might take the weight off."
+      }
+    ],
+    "sleep": [
+      {
+        "hold": "Guard the hours",
+        "bold": "I protect the hours themselves — same sort of bedtime, same sort of morning. Nearly everything else gets easier when this is right.",
+        "honest": "My hours are all over the place. Steadying them is probably the change with the most behind it, even if it's the hardest."
+      },
+      {
+        "hold": "The half-hour before",
+        "bold": "Sleep is decided in the half-hour before it. Dim, slow, phone elsewhere — that's the part I actually control.",
+        "honest": "I go from full speed straight to lights out. Slowing down the last half-hour is what I'd try first."
+      },
+      {
+        "hold": "A bad night is just a bad night",
+        "bold": "One rough night doesn't mean anything is wrong. Refusing to worry about it is half of what keeps the next one from going the same way.",
+        "honest": "I do get anxious about sleeping badly, which can't help. Taking a bad night less seriously is something I'd like to manage."
+      }
+    ],
+    "closest": [
+      {
+        "hold": "Repair beats avoiding",
+        "bold": "Things go wrong between people; what matters is how quickly we come back. I go first, and I don't keep score.",
+        "honest": "I leave things longer than I should when there's been friction. Getting quicker at coming back would change a lot."
+      },
+      {
+        "hold": "Ordinary time, not big occasions",
+        "bold": "Closeness is built in ordinary time — the lift, the walk, the washing up together. The big occasions are the part I could skip.",
+        "honest": "I put a lot of weight on occasions and less on the everyday. The ordinary time is probably where it's actually made."
+      },
+      {
+        "hold": "Say the thing",
+        "bold": "I say the thing I'd otherwise leave unsaid — the appreciation and the difficulty both. Nobody in my life should have to guess where they stand with me.",
+        "honest": "I leave a lot unsaid, both the good and the awkward. I'd like the people close to me to have to guess less."
+      }
+    ],
+    "looking-back": [
+      {
+        "hold": "What actually happened",
+        "bold": "I look back at what I actually did, not at what I meant to do. The record is more useful than the intention, every time.",
+        "honest": "I remember my intentions better than my actions. Looking at what really happened is probably the more honest read."
+      },
+      {
+        "hold": "Point at what worked",
+        "bold": "I look back to find what worked, and I do more of that. Cataloguing what went wrong has never once helped me.",
+        "honest": "My instinct is to review the failures. Making myself point at what worked instead might be more use."
+      },
+      {
+        "hold": "Coming back is the whole thing",
+        "bold": "I've stopped counting runs of days. Coming back after a gap is the only skill that matters, and I'm good at it.",
+        "honest": "I fall off things and then treat that as the end of them. I'd like coming back to feel ordinary rather than like starting again."
+      }
+    ]
+  }
+}
