@@ -63,6 +63,8 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 - [x] @claude-local 08-06 **"What are you like, anyway?" inside the questionnaires set** — the universal-30 core (six axes incl. risk appetite), measurement-blind answering, room-of-100 confidence bands, honest exit. On-device, non-clinical, no front door: a fourth card in `/questionnaires/`. Bank + engine ported from `thrive-website` @30198ce.
 - [x] @claude-local 08-07 **API spend lock on `/api/chat` + `/api/compress-profile` — SHIPPED.** The Origin gate allowed a request with *no* Origin header, so bare curl walked in and spent Tom's Anthropic balance; browsers send Origin on every non-GET POST, so no-Origin now 403s. One shared gate (`lib/request-gate.js`), the `.vercel.app` preview rule pinned to project+team slug, and per-IP fixed-window rate limiting on the existing Upstash store (chat 60/10min, compress 20/10min, fails closed). Verified live on cowch.app.
 
+- [~] @claude-wheel 08-27 **Wheel-build flow — flagged prototype** — a person's ranked "What are you like, anyway?" run seeds a 13-spoke Reason-Ability wellness wheel they then own by choosing and editing the words in it. Choose-then-edit, never a blank canvas; spokes in redemption-latency order; verbatim harvest on-device. Unlinked page at `/questionnaires/build-your-wheel.html`; nothing existing changes.
+
 ## 🤔 Areas to think through   (open design — link the think-piece)
 
 - [ ] **How far the AI speaks AS Mandy** — the named, credentialed clinician vs. *in her approach*. Softened in the audit, not fully resolved — **Mandy's call**. → `docs/claims-audit.md`
