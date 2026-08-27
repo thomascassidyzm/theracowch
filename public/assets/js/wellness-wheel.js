@@ -435,7 +435,7 @@
     var done = plan.filter(function (p) { return harvest[p.spoke.id]; }).length;
     $('wheelMeta').textContent = done + ' of ' + plan.length + ' spokes in your own words · '
       + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-      + ' · kept on this device only';
+      + ' · kept on this device unless you share it';
 
     $('wheelList').innerHTML = plan.map(function (p, i) {
       var h = harvest[p.spoke.id];
