@@ -1,21 +1,27 @@
-/* Share your "What are you like, anyway?" results with Mandy.
+/* What happens to your results, on the two "What are you like, anyway?" screens.
 
-   The one place in this product where something a person did can leave their
-   device — and it only ever happens because they tapped a button that told them,
-   in plain words, exactly what was going and to whom. No beacon, nothing
-   default-on, nothing in the background. If this script never runs, nothing is
-   lost; the results stay where they always were.
+   Two different things live in this panel, and keeping them apart is the whole
+   point of the copy.
 
-   One script for both variants: it reads the completed result the engines have
-   already saved to localStorage, so neither engine needed forking. The
-   placeholder div on each page names its own storage key and variant.
+   The FIRST is not a send at all. Mandy is the companion inside the Cowch app,
+   and a person's results are already on this device — the same origin the app
+   runs on. So the app hands her the six scored results at conversation time
+   (public/assets/js/therapy-profile.js -> api/chat.js) and nothing has to be
+   shared, stored or uploaded for that to work. Saying so plainly matters:
+   before this, the panel invited people to "send their results to Mandy", which
+   with an in-app companion of the same name reads as though the thing they are
+   already talking to needs posting a copy.
 
-   What goes: the six scored axes exactly as they are shown on the page, plus
-   the name the person types. What never goes: their individual answers, any
-   note they left on the honest exit, and anything in the wellness wheel. The
-   server enforces that too (api/questionnaire-share.js builds its record from
-   named fields), but it is enforced here first because this is where the person
-   is being asked to trust it. */
+   The SECOND is a real send, to the people who build Cowch, and it is opt-in,
+   clearly separated, and described as what it is. That is the only route by
+   which anything from a questionnaire leaves a device.
+
+   What goes on that send: the six scored axes exactly as shown on the page,
+   plus the name typed. What never goes: individual answers, anything typed on
+   the honest exit, the wellness wheel. The server enforces it too
+   (api/questionnaire-share.js builds from named fields), but it is enforced
+   here first, because here is where the person is being asked to trust it. */
+
 (function () {
   'use strict';
 
@@ -36,29 +42,30 @@
 
     host.innerHTML = [
       '<div class="panel no-print">',
-        '<h2>Send this to Mandy?</h2>',
-        '<p>Mandy Kloppers built Cowch. If you came here from her, she can see how you got ',
-        'on with this &mdash; but only if you send it. Nothing has been sent so far, and ',
-        'nothing will be unless you tap the button.</p>',
+        '<h2>Send a copy to the people who build Cowch?</h2>',
+        '<p>Separate thing, entirely up to you, and nothing has gone anywhere so far. Cowch ',
+        'is made by Mandy Kloppers and a small team, and seeing real results helps them work ',
+        'out whether any of this is actually landing. Unlike the above, <b>this does leave ',
+        'your device.</b></p>',
         '<div class="callout">',
           '<b>What would go:</b> the six results above &mdash; the bands and the sentences on ',
-          'this page &mdash; and the name you type, so she knows whose they are.<br><br>',
+          'this page &mdash; and the name you type, so they know whose they are.<br><br>',
           '<b>What would not:</b> your individual answers, anything you typed, and anything ',
-          'in your wellness wheel. Those stay on this device.<br><br>',
-          'Mandy looks at these to see how people are getting on with Cowch. It is not a ',
-          'clinical assessment, and sending it is not booking an appointment or asking for ',
-          'a reply.',
+          'in your wellness wheel. Those stay here.<br><br>',
+          'This is not a clinical assessment, and sending it is not booking an appointment, ',
+          'asking for advice, or requesting a reply. Skipping it changes nothing about how ',
+          'the app works for you.',
         '</div>',
         '<div class="btn-row" data-share-step="start">',
-          '<button class="btn btn-primary" type="button" data-share="open">Send my results to Mandy</button>',
+          '<button class="btn btn-ghost" type="button" data-share="open">Send a copy</button>',
         '</div>',
         '<div data-share-step="form" hidden>',
-          '<label class="qshare-label" for="qshare-name">The name to show Mandy</label>',
-          '<input class="qshare-input" id="qshare-name" type="text" maxlength="80" autocomplete="name" placeholder="Whatever she&rsquo;d know you by">',
-          '<label class="qshare-label" for="qshare-email">Your email, if you&rsquo;d like her to be able to reach you &mdash; optional</label>',
+          '<label class="qshare-label" for="qshare-name">A name to put to these</label>',
+          '<input class="qshare-input" id="qshare-name" type="text" maxlength="80" autocomplete="name" placeholder="Whatever you&rsquo;d like to be known by">',
+          '<label class="qshare-label" for="qshare-email">Your email, if you&rsquo;d like them to be able to reach you &mdash; optional</label>',
           '<input class="qshare-input" id="qshare-email" type="email" maxlength="320" autocomplete="email" placeholder="Leave it blank if you&rsquo;d rather not">',
           '<div class="btn-row">',
-            '<button class="btn btn-primary" type="button" data-share="send">Send to Mandy</button>',
+            '<button class="btn btn-primary" type="button" data-share="send">Send the copy</button>',
             '<button class="btn btn-ghost" type="button" data-share="cancel">Not now</button>',
           '</div>',
         '</div>',
@@ -85,8 +92,8 @@
        second — but leave the door open, since a re-run is a new result. */
     try {
       var already = localStorage.getItem(sentKey);
-      if (already) status.textContent = 'You sent your results to Mandy on ' +
-        new Date(already).toLocaleDateString() + '. Sending again would add a second copy.';
+      if (already) status.textContent = 'You sent a copy on ' +
+        new Date(already).toLocaleDateString() + '. Sending again would add a second one.';
     } catch (e) {}
 
     function setStatus(msg, isError) {
@@ -124,7 +131,7 @@
       }
       var displayName = (host.querySelector('#qshare-name').value || '').trim();
       if (!displayName) {
-        setStatus('Please give Mandy a name to put to these.', true);
+        setStatus('Please add a name to put to these.', true);
         host.querySelector('#qshare-name').focus();
         return;
       }
@@ -170,7 +177,7 @@
         try { localStorage.setItem(sentKey, new Date().toISOString()); } catch (e) {}
         stepForm.hidden = true;
         stepStart.hidden = true;
-        setStatus('Sent ✓ — that is with Mandy. Your answers and anything you typed stayed here.');
+        setStatus('Sent ✓ — the copy is with the Cowch team. Your answers and anything you typed stayed here.');
         if (window.cowchTrack) window.cowchTrack('questionnaire_shared', { variant: payload.variant });
       }).catch(function (err) {
         btn.disabled = false;
