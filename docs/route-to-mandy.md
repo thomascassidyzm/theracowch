@@ -1,130 +1,117 @@
 # The route to Mandy — live
 
-*29 August 2026. What was built, what Mandy will see, what she can't see, and the three
-calls that are yours. Everything below is on `main` and deployed to cowch.app unless it
-says otherwise.*
+*29 August 2026. Rewritten after Tom's mid-run correction: Mandy is the AI companion inside
+cowch.app, not a human reading a page. Everything below is on `main` and deployed to
+cowch.app unless it says otherwise.*
 
 ---
 
 ## The shape of it, in one paragraph
 
-A person finishes "What are you like, anyway?" on their phone. At the bottom of their
-results there is now a panel that asks whether they'd like to send those results to
-Mandy. If they tap it, they're told in plain words what would go and what wouldn't, they
-type a name for her to put to it, and they tap send. That POST is the only route by which
-anything from a questionnaire has ever left a device. It lands in the same Upstash store
-the signed NDAs use, and Mandy opens one URL on her phone to read the lot as cards. If
-nobody taps the button, nothing goes anywhere — there is no beacon, nothing default-on,
-nothing in the background.
+Someone finishes "What are you like, anyway?" on their phone. Their results are already on
+that device — the same origin the app runs on. So when they next chat, the app hands Mandy
+the six scored results along with the message it was already sending, and she has a little
+background instead of starting cold. **Nothing is sent anywhere, nothing is stored, and
+there is no round trip.** Separately and entirely optionally, they can send a copy of those
+six results to the people who build Cowch, which is the only route by which anything from a
+questionnaire leaves a device. If they don't tap that, nothing goes.
 
-## What's live now
+## What the correction changed, and what it revealed
 
-**Five things landed, in this order.**
+I had built the report endpoint as an HTML page for a clinician on a phone. That was wrong,
+and reversing it turned out to matter more than a format swap, because it changes *where the
+data has to be*.
 
-**1. Thirty-nine pages of telemetry that was dead now works.** The scout's headline
-finding was that `exercise_engaged` and the four `imagine_guide_*` events had been
-written, guarded and never fired — the 32 exercise pages and 7 IMAGINE pages never loaded
-the analytics script, so the tracking function didn't exist there and every call
-evaporated. They load it now. No new events and no new properties: it finishes
-instrumentation we'd already paid for. This also closes the standing worklist item.
+If the consumer is the companion inside the app, then **the results never need to leave the
+device at all.** `api/chat.js` already receives an on-device `profile` object from
+`therapy-profile.js` on every message. That is the seam. Sending a result to a server so
+that the same device can fetch it back would be a round trip that buys nothing, needs a
+token in the client, costs a store write and read per conversation, and weakens the privacy
+posture for no gain. So the questionnaire result now rides along with the chat request that
+was already going.
 
-**2. An attribution hole nobody had spotted is closed.** The consent script that went in
-on 27 August captures the first-touch `?ref=` / `?utm_source=` label — but that block sat
-*below* the "already consented, bail out" early return. So a `?ref=mandy` arrival only
-ever got recorded for people who had **not** yet agreed. Everyone returning, and everyone
-who reached a questionnaire through the app, silently lost the label. Since that label is
-the only thing telling us a result came from Mandy's audience, it now runs before the
-early return.
+`api/questionnaire-report.js` still exists and now returns agent-shaped JSON as you asked.
+But be clear about what it is for: **it is not how a person's results reach Mandy.** It reads
+back the copies people have explicitly sent in — the cohort, for you and Mandy Kloppers to
+look at. The per-person path is on-device and needs no endpoint.
 
-**3. The "room of 100" wording was already fixed — I checked rather than redid it.** The
-uncommitted audit at the repo root flagged six places where the population framing was
-applied to all six axes, when Sensitivity and Risk appetite have no comparison
-population. All six were already fixed on `main` on 6 August, by the commit that made the
-framing conditional on each axis's own scale. I checked each one line by line, filed the
-audit under `docs/wording-audit-what-are-you-like.md` with a resolution table, and the
-report page inherits the same rule. **One thing in it is genuinely open and not fixed by
-that commit:** whether "Sensitivity", as this questionnaire reframes it, still earns the
-population norms it borrows from neuroticism. That's a question about the instrument, not
-the copy.
+## What's live
 
-**4. `api/questionnaire-share.js` — the receiving end.** The NDA endpoint's pattern on the
-same provisioned store. It refuses anything without an explicit `consented: true`, stamps
-the timestamp server-side so a device with a wrong clock can't steer the ordering, and
-goes through the existing Origin lock and per-IP rate limit. The record is assembled
-field by named field — never by spreading whatever the client posted — so the raw
-per-moment answers, the free-text notes from the honest exit, and the wellness wheel
-harvest have nowhere to land even if a client sends them.
+**One shared definition of what a band means.** `lib/questionnaire-context.js` turns scored
+bands into plain-language labels a companion can actually say — "somewhat higher than most
+people" — rather than numbers she would have to narrate. Both consumers use it, so a trait
+can never be described one way in conversation and another way in the JSON.
 
-**5. `api/questionnaire-report.js` — the page Mandy opens.** Same shared-secret shape as
-the NDA export, with the one difference that is the whole point: it returns an HTML page,
-not JSON. One card per person, newest first: the name they gave, when it arrived, which
-variant, how many moments they answered, the source label, and the six axes drawn as
-bars. Population axes read "roughly 58–79 of 100"; Sensitivity and Risk appetite read as
-a 0–10 dial marked "own scale, not a percentile". One honest line at the top says what it
-is — self-reported, an indication and not a measurement, not a clinical instrument. Raw
-JSON is still there behind `&format=json` for you.
+**The room-of-100 rule is enforced in code, and it matters more now.** Four axes have a real
+comparison population and get comparative labels. Sensitivity and risk appetite do not: they
+get self-referential ones, and the block handed to the model carries an explicit instruction
+never to describe them relative to other people. A model speaking from the labels is exactly
+where an invented crowd would have done damage.
 
-## What Mandy will see, and what she won't
+**The companion is told how to hold it.** This was the real design work. The base prompt
+already forbids trait labels and clinical-sounding summaries, so handing Mandy a personality
+profile without usage rules would cut straight across it and have her opening with "you're a
+high-openness person" — wrong register for a non-clinical product, and a claim the
+instrument cannot support. So the block says: background to listen with, not a script; don't
+open with it, don't recite it, don't use it to explain them to themselves; low confidence
+means the questionnaire genuinely doesn't know; and **if it contradicts what the person is
+saying right now, believe the person.** It goes in the *uncached* per-user system block, so
+the ~6k-token base prompt's cache is untouched and this costs no extra prefill.
 
-**She will see:** who sent it (the name they typed), when, which variant of the
-questionnaire, how many moments they answered, whether they came via her link, the six
-scored axes with confidence, and the one-line write-up for each axis — the same sentences
-they read on their own screen. And their email, if they chose to give one.
+**Nothing typed can travel.** The device reads named fields only, so `answers` (the
+per-moment record) and `abstentions` (which carry free text) are never picked up; the server
+rebuilds from named fields too. Belt and braces, deliberately.
 
-**She will not see:** anybody who didn't tap the button. Anything anyone typed. Their
-individual answers moment by moment. Their wellness wheel. Any behavioural record of what
-they did in Cowch afterwards — that doesn't exist anywhere in the system, on purpose, and
-the scout's Part 2 is the honest account of why no dashboard will ever produce it. A
-tester cohort is not a population, and Vercel's analytics is cookieless by design.
+**The copy on both results screens now says which Mandy.** This was the live problem the
+correction created: the panel invited people to "send your results to Mandy" while the thing
+they'd be talking to was *also* called Mandy. So the page's own panel now carries the truth —
+the app hands her these when you chat, nothing is sent for that to work, she's told to hold
+it lightly and to believe you over it — and the send is separated, retitled for who actually
+receives it, and explicit that skipping it changes nothing.
 
-## The one thing standing between here and Mandy having it
-
-**`QSHARE_EXPORT_TOKEN` is not set, and only you can set it.** It's a new Vercel env var —
-deliberately not the NDA token, so it's separately revocable — and until it exists the
-report endpoint answers **503**. That's the correct fail-closed behaviour, not a bug:
-no token, no door. Set it to any long random string, then the URL is
-`https://cowch.app/api/questionnaire-report?token=<that string>`.
-
-I have not sent Mandy anything, and the token is nowhere in the repo, in this document,
-or in my report. Handing her a live link with real people's results on it is your call.
+**And the two things from before the correction still stand:** 39 exercise and IMAGINE pages
+now load the analytics script, so `exercise_engaged` and the `imagine_guide_*` events fire
+at last; and the `?ref=` attribution hole is closed — that capture sat below the "already
+consented, bail out" early return, so the label was only ever recorded for people who hadn't
+yet agreed.
 
 ## Three calls that are yours — each answerable in a word
 
-**1. The payload.** I send the six scored axes and the sentences, and deliberately not
-the raw per-moment answers, not the free-text notes, and not the wheel harvest. That's
-the taste-safe default and it follows the scout's firm recommendation on the wheel. But
-Mandy may well say the raw answers are the clinically interesting part — a scored axis is
-a summary, the answers are the evidence. If she wants them, it's one field in two files.
-**Keep as is, or add the answers?**
+**1. The send-a-copy panel — does it still earn its place?** With the companion getting
+results on-device for free, the person no longer needs to send anything. What the send now
+buys is *you* — it is the only per-person signal you have about testers, which was half the
+original commission. I kept it and relabelled it honestly rather than deleting a shipped
+feature on my own authority. **Keep, or cut it?**
 
-**2. Identity.** A nameless card helps her with nothing, so a name is required and the
-person types whatever they'd want her to see; email is optional. You may want it
-anonymous instead, or the email required so she can actually reply. **Name required as
-built, anonymous, or email required too?**
+**2. The payload.** Six scored axes and the sentences; deliberately not the raw per-moment
+answers, not the free-text notes, not the wheel harvest. Now that the consumer is a model
+rather than a clinician, the argument for the raw answers is weaker — she would be
+interpreting evidence rather than reading a summary, which is exactly the diagnostic move
+the prompt forbids. My read: **keep it as is.** But it is one field in two files if you
+disagree.
 
-**3. Retention.** The NDA precedent sets no expiry at all — those records live forever. I
-did not silently inherit that: shared results carry a **12-month TTL**, long enough for
-her to look back over a year of her own referrals and short enough that this never
-quietly becomes a permanent database of people's personality results. Expired ids are
-pruned from the index on read. **12 months, or a different window?**
+**3. Retention.** The NDA precedent sets no expiry at all. I did not inherit that: sent
+copies carry a **12-month TTL**, and expired ids are pruned from the index on read.
+**12 months, or a different window?**
+
+## Needs you
+
+**`QSHARE_EXPORT_TOKEN` in Vercel** — a new env var, deliberately not the NDA one so it is
+separately revocable. Until you set it the report endpoint answers **503**, which is correct
+fail-closed behaviour and not a bug. Note this now gates only the cohort read; the
+per-person path to the companion does not touch it and works without any token. The token is
+in neither the repo, this document, nor my report.
 
 ## The honest gaps
 
-- **I could not test the live round trip end to end.** Verifying that a share actually
-  writes a record needs the report token, which only you can set, and posting a real
-  result would put test data in front of Mandy. Both endpoints were checked for the
-  behaviour that can be checked from outside: the report endpoint answers correctly with
-  no token, and the page's rendering was exercised offline against a real band shape,
-  including an axis with a missing dial value, with escaping verified. The first real
-  share will be the shakedown.
-- **No Upstash credentials on this machine** — same gap the scout reported. I read the
-  code; I did not read the store.
-- **The exercise and IMAGINE events are now wired, but no event has been observed
-  arriving.** That needs one look at the Vercel dashboard by someone logged in.
-
-## What was deliberately not touched
-
-The questionnaire's substance, its scoring, the wheel, the app's consent architecture,
-and the claims line. The share copy stays the non-clinical side of it: Mandy looks at
-these to see how people are getting on with Cowch, it is not a clinical assessment, and
-sending it is not booking an appointment or asking for a reply.
+- **I have not watched Mandy actually speak with this context in front of her.** The block
+  she receives was rendered and read end to end offline, and it is exercised on every chat
+  message, but whether the usage rules hold in practice — whether she stays off the labels
+  and lets it shape her listening instead — needs one real conversation by someone who has
+  done the questionnaire. That is the shakedown, and it is worth doing before this goes near
+  anyone new.
+- **No Upstash credentials on this machine.** I read the code; I have not read the store.
+- **The exercise and IMAGINE events are wired but none has been observed arriving.** That
+  needs one look at the Vercel dashboard by someone logged in.
+- **I sent Mandy nothing and used no real data.** The endpoints were probed only for the
+  behaviour that can be checked from outside.
