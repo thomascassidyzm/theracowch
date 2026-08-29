@@ -13,10 +13,13 @@
 // api/chat.js). Sending it to a server so the same device can fetch it back
 // would be a round trip that buys nothing and weakens the privacy posture.
 //
-// What this endpoint is for is the other direction: the results people have
-// explicitly chosen to send in, read back by the humans who build Cowch — and,
-// if it is ever wanted, by a companion talking about the cohort rather than
-// about the person in front of her.
+// What this endpoint is for is the other direction: the cohort view — the
+// results already sent in, read back by the humans who build Cowch, and if it
+// is ever wanted by a companion talking about the cohort rather than about the
+// person in front of her. The opt-in panel that used to write these records was
+// removed on 2026-08-29 (redundant once the on-device route existed, and a
+// heavier ask than it looked), so this reads a closed set that empties as the
+// 12-month TTLs expire.
 //
 // Guarded by a shared secret, same shape as api/nda-export.js: fail closed when
 // unconfigured, 401 on a wrong token, no default-open path. Deliberately its own

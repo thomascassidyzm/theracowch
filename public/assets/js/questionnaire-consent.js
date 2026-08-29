@@ -76,7 +76,7 @@
       '<p class="qconsent-lede">Before you start, a few things to know.</p>',
       '<div class="qconsent-statement">',
       '<p><strong>Cowch is a wellbeing-support app. It does not replace clinical therapy, medical care, diagnosis, medication, or emergency services.</strong></p>',
-      '<p>Your answers are kept on this device. Nothing is sent anywhere unless you choose to share your results.</p>',
+      '<p>Your answers are kept on this device and are not sent anywhere. Your results ride along with your chats with Mandy, straight from here.</p>',
       '<p>If you’re in crisis right now, please contact emergency services (UK 999 / US 911), NHS 111 option 2, Samaritans 116 123, or text SHOUT to 85258.</p>',
       '</div>',
       '<label class="qconsent-row"><input type="checkbox" data-qconsent="age">',

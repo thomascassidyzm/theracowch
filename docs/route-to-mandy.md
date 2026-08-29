@@ -12,9 +12,13 @@ Someone finishes "What are you like, anyway?" on their phone. Their results are 
 that device — the same origin the app runs on. So when they next chat, the app hands Mandy
 the six scored results along with the message it was already sending, and she has a little
 background instead of starting cold. **Nothing is sent anywhere, nothing is stored, and
-there is no round trip.** Separately and entirely optionally, they can send a copy of those
-six results to the people who build Cowch, which is the only route by which anything from a
-questionnaire leaves a device. If they don't tap that, nothing goes.
+there is no round trip.** That is now the only route: the opt-in "send a copy to the people
+who build Cowch" panel was removed on 2026-08-29, along with its endpoint — redundant once
+the on-device route existed, and a heavier ask than it looked. Nothing from a questionnaire
+leaves a device except as background on a chat the person is already sending.
+
+The cohort export (`api/questionnaire-report.js`, behind `QSHARE_EXPORT_TOKEN`) stays; it now
+reads a closed set of the copies sent while the panel was live.
 
 ## What the correction changed, and what it revealed
 
