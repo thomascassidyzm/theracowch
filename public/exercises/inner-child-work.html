@@ -392,6 +392,11 @@
             }
         })();
     </script>
+    <!-- Vercel Web Analytics (cookieless, no personal data) — must load before
+         the engagement script below, which calls window.cowchTrack. -->
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script src="/assets/js/analytics.js"></script>
     <script src="/assets/js/imagine-engagement.js" defer></script>
 </body>
 </html>
