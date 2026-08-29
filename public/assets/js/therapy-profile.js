@@ -227,6 +227,47 @@ async function compressProfile(recentMessages) {
 // Build Context for API
 // ============================================
 
+// The completed "What are you like, anyway?" result, if there is one, as the
+// six scored bands and nothing else.
+//
+// Mandy is the companion inside this app, so a person's results reach her by
+// being handed over at conversation time from the device they already live on —
+// not by being sent to a server and fetched back. Nothing is stored anywhere new
+// and nothing extra leaves the device: this rides along with the chat request
+// that was already going.
+//
+// Named fields ONLY. The saved blob also holds `answers` (the per-moment record)
+// and `abstentions` (which carry free text the person typed) — neither is read
+// here, so neither can travel. Both questionnaire variants save the same band
+// shape; the ranked one wins if somebody has done both, being the newer design.
+const QUESTIONNAIRE_KEYS = ['cowch-q-wayl-rank', 'cowch-q-wayl'];
+
+function getQuestionnaireResult() {
+  for (const key of QUESTIONNAIRE_KEYS) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.bands) || !parsed.bands.length) continue;
+      return {
+        variant: parsed.variant === 'rank' ? 'rank' : 'single',
+        completed: parsed.completed || '',
+        scenariosSeen: parsed.scenariosSeen,
+        bands: parsed.bands.map(b => {
+          const out = { k: b.k, name: b.name, scale: b.scale, focus: b.focus, sentence: b.sentence };
+          if (b.scale === 'absolute') {
+            out.dial = b.dial; out.spread = b.spread; out.position = b.position;
+          } else {
+            out.low = b.low; out.high = b.high;
+          }
+          return out;
+        })
+      };
+    } catch (e) { /* private mode, or a blob we don't recognise — just skip it */ }
+  }
+  return null;
+}
+
 function buildAPIContext() {
   const profile = getProfile();
   const history = getFullHistory();
@@ -248,7 +289,8 @@ function buildAPIContext() {
 
   return {
     profile: profileContext,
-    recentMessages: recentMessages
+    recentMessages: recentMessages,
+    questionnaire: getQuestionnaireResult()
   };
 }
 
@@ -297,6 +339,7 @@ window.TherapyProfile = {
   needsCompression,
   compressProfile,
   buildAPIContext,
+  getQuestionnaireResult,
   recordImagineEngagement,
   clearAllData,
   getEmptyProfile

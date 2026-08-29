@@ -677,6 +677,9 @@ async function handleSendMessage() {
             const context = window.TherapyProfile.buildAPIContext();
             apiBody.profile = context.profile;
             apiBody.recentMessages = context.recentMessages;
+            // Their "What are you like, anyway?" result, straight off this
+            // device — scored bands only, never anything they typed.
+            if (context.questionnaire) apiBody.questionnaire = context.questionnaire;
         } else {
             // Fallback to raw history
             apiBody.history = conversationHistory.slice(-3);

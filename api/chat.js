@@ -1,5 +1,6 @@
 import IMAGINE_FRAMEWORK_PROMPTS from '../lib/prompt-base.js';
 import { gate, LIMITS } from '../lib/request-gate.js';
+import { buildQuestionnaireContext } from '../lib/questionnaire-context.js';
 
 // The chat system-prompt base is BUNDLED via the import above (lib/prompt-base.js)
 // so it deploys reliably and is not served publicly. To change the prompt, edit
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
   if (!(await gate(req, res, LIMITS.chat))) return;
 
   try {
-    const { message, profile, recentMessages, history, currentPattern, sessionPhase } = req.body;
+    const { message, profile, recentMessages, history, currentPattern, sessionPhase, questionnaire } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -412,6 +413,41 @@ SAFETY & BOUNDARIES:
         }
       }
       userContext += `\n--- END CLIENT CONTEXT ---`;
+    }
+
+    // What they said about themselves in "What are you like, anyway?".
+    //
+    // This arrives from the device on each message, never from a store — the
+    // result lives in the person's own browser and is handed over at
+    // conversation time. Nothing they typed is in it: only the six scored axes,
+    // already turned into speakable labels by lib/questionnaire-context.js.
+    //
+    // The usage rules below are load-bearing, not decoration. The base prompt
+    // tells Mandy not to produce trait labels or clinical-sounding summaries;
+    // handing her a personality profile without saying how to hold it would cut
+    // straight across that and have her opening with "you're a high-openness
+    // person" — the wrong register for a non-clinical companion, and a claim the
+    // instrument cannot support. It is background she may listen WITH, not
+    // material to read back.
+    const qContext = buildQuestionnaireContext(questionnaire);
+    if (qContext) {
+      userContext += `\n\n--- WHAT THEY SAID ABOUT THEMSELVES ---`;
+      const seen = qContext.scenariosSeen ? `${qContext.scenariosSeen} moments answered, ` : '';
+      userContext += `\nThey completed Cowch's "What are you like, anyway?" questionnaire (${seen}overall confidence ${qContext.overallConfidence}).`;
+      qContext.traits.forEach(t => {
+        const framing = t.comparison === 'population'
+          ? t.lean
+          : `${t.lean} — this axis has no comparison population, so never describe it relative to other people`;
+        userContext += `\n- ${t.trait}: ${framing} (confidence: ${t.confidence}). Their own words for it: "${t.note}"`;
+      });
+      userContext += `\n\nHOW TO USE THIS — it is background, not a script:`;
+      userContext += `\n- ${qContext.caveat}`;
+      userContext += `\n- Do NOT open with it, recite it, or tell them what they are like. They have already read it.`;
+      userContext += `\n- Do NOT use it to label them or to explain them to themselves. It is not a diagnosis and low confidence means the questionnaire genuinely does not know.`;
+      userContext += `\n- DO let it shape how you listen: what to be curious about, which questions are worth asking, what might land badly.`;
+      userContext += `\n- Only refer to it directly if they raise it first, or if it is plainly relevant and you can do so lightly and tentatively.`;
+      userContext += `\n- If it contradicts what they are telling you right now, believe them, not the questionnaire.`;
+      userContext += `\n--- END ---`;
     }
 
     // Add current session context
