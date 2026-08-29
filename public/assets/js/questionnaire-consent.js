@@ -15,13 +15,15 @@
 
   var CONSENT_KEY = 'cowch-consent-v1';
 
-  var stored = null;
-  try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
-  if (stored === 'accepted') return;
-
   // First-touch acquisition label (?ref= / ?utm_source=), matching analytics.js.
-  // Recorded here too so a referral that lands straight on a questionnaire isn't
+  // Recorded here so a referral that lands straight on a questionnaire isn't
   // lost — it's a channel label, never anything personal.
+  //
+  // This runs BEFORE the consent early-return on purpose. It used to sit below
+  // it, which meant anyone who had already agreed — every returning visitor,
+  // and anyone who reached a questionnaire via the app — had their ?ref=mandy
+  // silently dropped. The label is what tells us a result came from Mandy's
+  // audience, so it must be captured regardless of consent state.
   try {
     var params = new URLSearchParams(window.location.search);
     var src = params.get('utm_source') || params.get('ref');
@@ -29,6 +31,10 @@
       localStorage.setItem('cowch-source', String(src).slice(0, 40));
     }
   } catch (e) {}
+
+  var stored = null;
+  try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+  if (stored === 'accepted') return;
 
   function build() {
     var style = document.createElement('style');
