@@ -240,9 +240,27 @@ async function compressProfile(recentMessages) {
 // and `abstentions` (which carry free text the person typed) — neither is read
 // here, so neither can travel. Both questionnaire variants save the same band
 // shape; the ranked one wins if somebody has done both, being the newer design.
+//
+// This is also the ONE enforcement point for the opt-out. The questionnaire
+// pages and app settings write `cowch-share-wayl-with-mandy` ('on' / 'off';
+// absent means on, it's an opt-out). When it says 'off' this returns null, and
+// everything downstream already handles null — chat-script.js guards with
+// `if (context.questionnaire)` and api/chat.js copes with it absent — so the
+// companion keeps working exactly as it does for anyone who never took the
+// questionnaire. Don't scatter this check anywhere else.
 const QUESTIONNAIRE_KEYS = ['cowch-q-wayl-rank', 'cowch-q-wayl'];
+const QUESTIONNAIRE_SHARE_KEY = 'cowch-share-wayl-with-mandy';
+
+function questionnaireSharingAllowed() {
+  try {
+    return localStorage.getItem(QUESTIONNAIRE_SHARE_KEY) !== 'off';
+  } catch (e) {
+    return true; // private mode: nothing stored, so the default (on) stands
+  }
+}
 
 function getQuestionnaireResult() {
+  if (!questionnaireSharingAllowed()) return null;
   for (const key of QUESTIONNAIRE_KEYS) {
     try {
       const raw = localStorage.getItem(key);

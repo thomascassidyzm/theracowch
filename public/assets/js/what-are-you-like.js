@@ -9,8 +9,13 @@
  * Load order: a plain <script> tag on
  * /questionnaires/what-are-you-like.html. No modules build in this repo.
  *
- * Everything stays on this device. The bank is fetched as static JSON; results
- * live in localStorage; nothing is ever uploaded.
+ * Where the data goes. The bank is fetched as static JSON; answers, abstention
+ * notes and results all live in localStorage on this device, and this engine
+ * uploads nothing. One thing does leave, elsewhere: once a run is FINISHED,
+ * assets/js/therapy-profile.js reads the six scored bands (named fields only —
+ * never `answers`, never `abstentions`) and rides them along with each chat
+ * message to Mandy. A person can switch that off; the key is
+ * `cowch-share-wayl-with-mandy` and the switch is assets/js/wayl-share-toggle.js.
  */
 (function () {
   'use strict';

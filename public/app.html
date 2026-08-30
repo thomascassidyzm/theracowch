@@ -2903,6 +2903,28 @@
             color: var(--coral);
         }
 
+        /* Share-with-Mandy switch (assets/js/wayl-share-toggle.js wires it) */
+        .settings-toggle-row {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-card);
+            border: var(--border-medium) solid var(--border-warm);
+            border-radius: var(--radius-medium);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            line-height: 1.45;
+            cursor: pointer;
+        }
+        .settings-toggle-row input {
+            margin-top: 2px;
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--coral);
+        }
+
         /* Theme picker */
         .settings-label {
             font-size: var(--font-size-sm);
@@ -5546,6 +5568,14 @@
                     </div>
 
                     <div class="settings-section">
+                        <p class="settings-label">What Mandy knows</p>
+                        <label class="settings-toggle-row">
+                            <input type="checkbox" data-wayl-share-toggle checked>
+                            <span>Share my &ldquo;What are you like, anyway?&rdquo; results with Mandy. Just the six results &mdash; never your answers, and never anything you typed.</span>
+                        </label>
+                    </div>
+
+                    <div class="settings-section">
                         <button class="settings-btn" id="settings-share-btn">
                             <span>💌</span>
                             Share Cowch with a friend
@@ -7603,6 +7633,7 @@
     <script src="/assets/js/share.js"></script>
     <script src="/assets/js/analytics.js"></script>
     <script src="/assets/js/therapy-profile.js"></script>
+    <script src="/assets/js/wayl-share-toggle.js?v=1"></script>
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=56"></script>
     <script src="/assets/js/app.js?v=91"></script>

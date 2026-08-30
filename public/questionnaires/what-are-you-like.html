@@ -84,6 +84,13 @@
             color: var(--body);
         }
         .callout b { color: var(--ink); }
+        .callout .share-toggle {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin: 12px 0 0; cursor: pointer; font-weight: 600;
+        }
+        .callout .share-toggle input {
+            margin-top: 3px; flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--coral);
+        }
 
         /* ---------- answering progress (deliberately quiet — no measurement leaks) ---------- */
         .journey {
@@ -343,7 +350,11 @@
             <p>And if none of the options is you &mdash; or the honest answer is &ldquo;it depends&rdquo; &mdash; every moment has a way to say exactly that. It&rsquo;s a real answer, not a cop-out.</p>
 
             <div class="callout">
-                This isn&rsquo;t a test and it isn&rsquo;t a diagnosis &mdash; it&rsquo;s a mirror, and a playful one. Everything you tap stays on this device. Bring anything that catches you to your chat with Mandy.
+                This isn&rsquo;t a test and it isn&rsquo;t a diagnosis &mdash; it&rsquo;s a mirror, and a playful one. Every answer you tap, and anything you type, stays on this device and goes nowhere else; only the six results at the end travel &mdash; they ride along with each message you send Mandy, so she knows a little about who she&rsquo;s talking to. Don&rsquo;t want that? Turn it off here and she&rsquo;ll never see them.
+                <label class="share-toggle">
+                    <input type="checkbox" id="waylShareToggle" data-wayl-share-toggle checked>
+                    <span>Share my six results with Mandy</span>
+                </label>
             </div>
 
             <div class="btn-row">
@@ -430,6 +441,7 @@
 </div>
 
 <script src="/assets/js/what-are-you-like.js?v=4"></script>
+<script src="/assets/js/wayl-share-toggle.js?v=1"></script>
 <script src="/assets/js/questionnaire-consent.js?v=1"></script>
 </body>
 </html>
