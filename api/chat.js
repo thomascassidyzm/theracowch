@@ -1,5 +1,5 @@
 import IMAGINE_FRAMEWORK_PROMPTS from '../lib/prompt-base.js';
-import { gate, LIMITS } from '../lib/request-gate.js';
+import { gate, LIMITS, tooBig } from '../lib/request-gate.js';
 import { buildQuestionnaireContext } from '../lib/questionnaire-context.js';
 
 // The chat system-prompt base is BUNDLED via the import above (lib/prompt-base.js)
@@ -29,6 +29,16 @@ export default async function handler(req, res) {
     // Cap input size so a single call can't balloon the Anthropic bill.
     if (typeof message === 'string' && message.length > 4000) {
       return res.status(413).json({ error: 'Message too long' });
+    }
+
+    // The gate already refused anything whose Content-Length was over
+    // LIMITS.chat.maxBodyBytes. This is the belt to that pair of braces: it
+    // measures what was actually parsed, so a missing or lying Content-Length
+    // buys nothing. Everything below `message` used to be entirely uncapped —
+    // profile, recentMessages, history and questionnaire all go into the
+    // Anthropic call, and all of them were free to be any size.
+    if (tooBig({ profile, recentMessages, history, questionnaire }, LIMITS.chat.maxBodyBytes)) {
+      return res.status(413).json({ error: 'Request too large' });
     }
 
     // Get IMAGINE framework prompts from URL (with caching)
