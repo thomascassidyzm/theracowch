@@ -87,10 +87,10 @@
         <h2>Where data lives</h2>
         <div class="flow">
             <div class="flow-row">
-                <div class="node local"><b>On the student's device</b><span>Journal entries, exercise inputs, chat history, preferences and progress &mdash; stored in their own browser. They stay on that device unless the student exports them.</span></div>
+                <div class="node local"><b>On the student's device</b><span>Journal entries, exercise inputs, chat history, preferences and progress &mdash; stored in their own browser. They stay on that device unless the student exports them, with one exception, shown next.</span></div>
             </div>
             <div class="flow-row">
-                <div class="node"><b>In transit, briefly → AI provider (Anthropic, US)</b><span>When a student messages Mandy, that message + recent context is sent over TLS purely to generate a reply. Not stored long-term by us; not used to train AI models (per provider contract).</span></div>
+                <div class="node"><b>In transit, briefly → AI provider (Anthropic, US)</b><span>When a student messages Mandy, that message + recent context is sent over TLS purely to generate a reply. &ldquo;Recent context&rdquo; includes the six scored results of the optional &ldquo;What are you like, anyway?&rdquo; questionnaire, if the student has finished it &mdash; scores only, never their individual answers or free text, and switchable off in Settings. Not stored long-term by us; not used to train AI models (per provider contract).</span></div>
                 <div class="node"><b>Hosting / CDN (Vercel)</b><span>Serves the app and passes requests through. Short-term operational logs only.</span></div>
             </div>
             <div class="flow-row">
@@ -112,7 +112,7 @@
         <h2>At a glance</h2>
         <table>
             <tr><th>Question</th><th>Answer</th></tr>
-            <tr><td>Does the institution process student data via Cowch?</td><td><strong>No.</strong> Students use it directly; content stays on their device.</td></tr>
+            <tr><td>Does the institution process student data via Cowch?</td><td><strong>No.</strong> Students use it directly; their content stays on their device, apart from what is sent to the AI provider to answer a message.</td></tr>
             <tr><td>Is a DPIA / data-sharing agreement needed to endorse it?</td><td>No data-processing relationship is created, so there is nothing to assess. We're glad to answer any questions in writing.</td></tr>
             <tr><td>Where do student messages go?</td><td>To the AI provider over TLS, only to generate a reply. Not stored long-term; not used for training.</td></tr>
             <tr><td>Are there accounts / logins?</td><td>No account required to use Cowch.</td></tr>

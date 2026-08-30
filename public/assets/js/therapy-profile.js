@@ -1,6 +1,8 @@
 // Cowch Therapy Profile - Compressed Context System
 // Stores therapeutic insights locally, sends compressed context to API
-// All data stays on-device for privacy
+// Raw history and questionnaire answers stay on-device; what leaves is the
+// compressed profile, the last few messages, and (unless switched off) the six
+// scored bands from "What are you like, anyway?" — see getQuestionnaireResult.
 
 const PROFILE_KEY = 'cowch_therapy_profile';
 const HISTORY_KEY = 'cowch_full_history';
