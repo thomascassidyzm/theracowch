@@ -59,8 +59,11 @@ loading the page.
 - Tailwind is referenced where used, but there is **no Tailwind build step** —
   don't rely on regenerating a compiled stylesheet.
 - Vercel (static hosting + serverless functions)
-- Clerk (auth), Supabase (database), Stripe (payments), Upstash Redis,
-  web-push (server-side deps in `package.json`)
+- `@upstash/redis` — the only datastore, used server-side by a handful of
+  `api/*.js` functions (NDA records, questionnaire reports, push
+  subscriptions). No Clerk, Supabase, or Stripe anywhere in this repo — there
+  is no auth provider, no separate database, and no payments integration.
+- `web-push` — server-side push notifications (`api/push/*`).
 
 ## The PWA cache — why a deployed change may not appear on a device
 
