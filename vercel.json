@@ -1,6 +1,10 @@
 {
   "redirects": [
-    { "source": "/chat.html", "destination": "/app.html#chat", "permanent": true }
+    {
+      "source": "/chat.html",
+      "destination": "/app.html#chat",
+      "permanent": true
+    }
   ],
   "headers": [
     {
@@ -18,5 +22,6 @@
       "path": "/api/push/send",
       "schedule": "*/15 * * * *"
     }
-  ]
+  ],
+  "ignoreCommand": "bash -c 'case \"$VERCEL_GIT_COMMIT_REF\" in main|dev|staging) exit 1;; *) exit 0;; esac'"
 }
