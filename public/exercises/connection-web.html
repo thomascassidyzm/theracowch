@@ -91,6 +91,62 @@
 
         .info-card strong { color: var(--coral); }
 
+        /* The web itself — the concentric-circle graph of the people you add */
+        .web-card {
+            background: var(--bg-card);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1rem 0.75rem 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #web-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            touch-action: manipulation;
+        }
+
+        #web-svg .node { cursor: pointer; }
+
+        .web-caption {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin-top: 0.35rem;
+            min-height: 2.4em;
+            padding: 0 0.25rem;
+        }
+
+        .web-caption .stat { color: var(--coral); font-weight: 900; }
+
+        .web-key {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.9rem;
+            margin-top: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .web-key span { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+        .web-key i {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .web-key i.supportive { background: var(--green); }
+        .web-key i.neutral { background: #8a7a6a; }
+        .web-key i.draining { background: var(--red); }
+
         /* Circle groups */
         .circle-group {
             background: var(--bg-card);
@@ -354,6 +410,18 @@
 
         <div class="saved-msg" id="saved-msg">Saved ✓</div>
 
+        <!-- The connection web: everyone you add appears here, on their ring -->
+        <div class="web-card">
+            <svg id="web-svg" viewBox="-70 -50 540 500" role="img"
+                 aria-label="Your connection web: the people you have added, placed on their inner, middle or outer circle around you."></svg>
+            <div class="web-caption" id="web-caption"></div>
+            <div class="web-key">
+                <span><i class="supportive"></i>Supportive</span>
+                <span><i class="neutral"></i>Neutral</span>
+                <span><i class="draining"></i>Draining</span>
+            </div>
+        </div>
+
         <!-- Circle 1: Inner -->
         <div class="circle-group">
             <div class="circle-header">
@@ -500,6 +568,7 @@
                 }).join('');
             });
 
+            renderWeb();
             updateInsights();
         }
 
@@ -511,6 +580,7 @@
 
         function removePerson(id) {
             connections = connections.filter(function(p) { return p.id !== id; });
+            if (selectedId === id) selectedId = null;
             save();
             renderLists();
         }
@@ -518,6 +588,7 @@
         function clearAll() {
             if (confirm('Clear all connections and start again?')) {
                 connections = [];
+                selectedId = null;
                 save();
                 renderLists();
             }
@@ -557,6 +628,136 @@
             }
 
             content.innerHTML = html;
+        }
+
+        // ---- The connection web -------------------------------------------------
+        // Everyone you add is drawn as a node on their ring, joined to YOU at the
+        // centre and coloured by the energy they bring. Plain inline SVG in a fixed
+        // viewBox so it scales to any phone width without a resize handler.
+        var WEB = {
+            cx: 200, cy: 200,
+            rings: {
+                inner:  { r: 58,  n: '1', label: 'Inner circle',  start: 0.6 },
+                middle: { r: 110, n: '2', label: 'Middle circle', start: 1.1 },
+                outer:  { r: 165, n: '3', label: 'Outer circle',  start: 1.6 }
+            },
+            colours: { supportive: '#7EA88B', neutral: '#8a7a6a', draining: '#D9363E' }
+        };
+        var selectedId = null;
+
+        function shortName(name) {
+            return name.length > 14 ? name.slice(0, 13) + '\u2026' : name;
+        }
+
+        function renderWeb() {
+            var svg = document.getElementById('web-svg');
+            if (!svg) return;
+            var cx = WEB.cx, cy = WEB.cy;
+            var parts = [];
+
+            // rings
+            ['outer', 'middle', 'inner'].forEach(function(key) {
+                var ring = WEB.rings[key];
+                parts.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + ring.r +
+                    '" fill="rgba(212,137,106,0.04)" stroke="#3a3533" stroke-width="2" pointer-events="none"/>');
+            });
+
+            // people, evenly spaced around their own ring
+            var groups = { inner: [], middle: [], outer: [] };
+            connections.forEach(function(person) {
+                if (groups[person.circle]) groups[person.circle].push(person);
+            });
+
+            var nodes = [];
+            Object.keys(groups).forEach(function(key) {
+                var ring = WEB.rings[key];
+                var people = groups[key];
+                var step = (Math.PI * 2) / (people.length || 1);
+                people.forEach(function(person, i) {
+                    var angle = -Math.PI / 2 + ring.start + i * step;
+                    var cos = Math.cos(angle), sin = Math.sin(angle);
+                    var x = cx + cos * ring.r;
+                    var y = cy + sin * ring.r;
+                    // The name sits beside the dot, on the side facing away from YOU,
+                    // anchored so a long name can never run back over its own dot.
+                    var anchor = cos > 0.35 ? 'start' : (cos < -0.35 ? 'end' : 'middle');
+                    var lx = x + (anchor === 'start' ? 13 : anchor === 'end' ? -13 : 0);
+                    var ly = anchor === 'middle' ? y + (sin < 0 ? -16 : 24) : y + 5;
+                    nodes.push({ person: person, x: x, y: y, lx: lx, ly: ly, anchor: anchor });
+                });
+            });
+
+            // spokes first, so nodes and text sit on top of them
+            nodes.forEach(function(node) {
+                parts.push('<line x1="' + cx + '" y1="' + cy + '" x2="' + node.x.toFixed(1) +
+                    '" y2="' + node.y.toFixed(1) + '" stroke="rgba(232,227,223,0.18)" stroke-width="1.5"/>');
+            });
+
+            // ring numbers, at 12 o'clock, on a plug of background so the ring reads through
+            ['inner', 'middle', 'outer'].forEach(function(key) {
+                var ring = WEB.rings[key];
+                parts.push('<circle cx="' + cx + '" cy="' + (cy - ring.r) + '" r="11" fill="#2a2320"/>');
+                parts.push('<text x="' + cx + '" y="' + (cy - ring.r) + '" text-anchor="middle" ' +
+                    'dominant-baseline="central" font-family="Gabarito, sans-serif" font-weight="900" ' +
+                    'font-size="15" fill="#8a7a6a">' + ring.n + '</text>');
+            });
+
+            // you, at the centre
+            parts.push('<circle cx="' + cx + '" cy="' + cy + '" r="27" fill="#D4896A" stroke="#1a1512" stroke-width="4"/>');
+            parts.push('<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" ' +
+                'font-family="Gabarito, sans-serif" font-weight="900" font-size="17" fill="#1a1512">YOU</text>');
+
+            // the people
+            nodes.forEach(function(node) {
+                var person = node.person;
+                var colour = WEB.colours[person.energy] || WEB.colours.neutral;
+                var isSelected = person.id === selectedId;
+                parts.push('<g class="node" data-id="' + person.id + '">');
+                parts.push('<circle cx="' + node.x.toFixed(1) + '" cy="' + node.y.toFixed(1) + '" r="22" fill="transparent"/>');
+                parts.push('<circle cx="' + node.x.toFixed(1) + '" cy="' + node.y.toFixed(1) + '" r="' +
+                    (isSelected ? 10 : 7) + '" fill="' + colour + '"' +
+                    (isSelected ? ' stroke="#F5F0E8" stroke-width="2.5"' : '') + '/>');
+                var label = shortName(person.name);
+                parts.push('<text x="' + node.lx.toFixed(1) + '" y="' + node.ly.toFixed(1) + '" text-anchor="' +
+                    node.anchor + '" font-family="Gabarito, sans-serif" font-weight="700" font-size="' +
+                    (label.length > 10 ? 14 : 16) + '" fill="' +
+                    (isSelected ? '#F5F0E8' : colour) + '">' + escapeHtml(label) + '</text>');
+                parts.push('</g>');
+            });
+
+            svg.innerHTML = parts.join('');
+
+            Array.prototype.forEach.call(svg.querySelectorAll('.node'), function(g) {
+                g.addEventListener('click', function() {
+                    var id = Number(g.getAttribute('data-id'));
+                    selectedId = (selectedId === id) ? null : id;
+                    renderWeb();
+                });
+            });
+
+            updateWebCaption();
+        }
+
+        function updateWebCaption() {
+            var caption = document.getElementById('web-caption');
+            if (!caption) return;
+
+            if (connections.length === 0) {
+                caption.innerHTML = 'No one on your web yet \u2014 add someone below and they\u2019ll appear on their circle.';
+                return;
+            }
+
+            var person = null;
+            connections.forEach(function(p) { if (p.id === selectedId) person = p; });
+
+            if (!person) {
+                caption.innerHTML = 'Tap anyone on the web to see who they are.';
+                return;
+            }
+
+            caption.innerHTML = '<span class="stat">' + escapeHtml(person.name) + '</span>' +
+                (person.relationship ? ' \u2014 ' + escapeHtml(person.relationship) : '') +
+                '<br>' + WEB.rings[person.circle].label + ' \u00b7 ' + person.energy;
         }
 
         // Form submit
