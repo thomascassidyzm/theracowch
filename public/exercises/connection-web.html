@@ -637,9 +637,11 @@
         var WEB = {
             cx: 200, cy: 200,
             rings: {
-                inner:  { r: 58,  n: '1', label: 'Inner circle',  start: 0.6 },
-                middle: { r: 110, n: '2', label: 'Middle circle', start: 1.1 },
-                outer:  { r: 165, n: '3', label: 'Outer circle',  start: 1.6 }
+                // `start` phases each ring roughly a third of a turn from the next, so
+                // that a web of two or three people fans out instead of clustering.
+                inner:  { r: 58,  n: '1', label: 'Inner circle',  start: 0.5 },
+                middle: { r: 110, n: '2', label: 'Middle circle', start: 2.6 },
+                outer:  { r: 165, n: '3', label: 'Outer circle',  start: 4.4 }
             },
             colours: { supportive: '#7EA88B', neutral: '#8a7a6a', draining: '#D9363E' }
         };
