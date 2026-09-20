@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "theracowch-vue-compiler.js",
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "repository": {
     "type": "git",
