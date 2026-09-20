@@ -84,10 +84,11 @@ against `CACHE_NAME`/`BUILD_DATE` in `public/sw.js`.
 
 ## Deployment
 
-Claude Code works on a `claude/*` branch and pushes it. The
-`.github/workflows/auto-merge-to-main.yml` workflow merges `claude/*` branches
-into `main`; Vercel auto-deploys `main` to production. The workflow is
-serialized (a `concurrency` group) and retries its push, so parallel sessions
+Agent sessions work on a `cs/*` branch (the command surface's own worktree
+naming — `cs/<job>-<slug>`; older CLI sessions may still cut `claude/*`) and
+push it. The `.github/workflows/auto-merge-to-main.yml` workflow merges both
+`cs/**` and `claude/**` branches into `main`; Vercel auto-deploys `main` to
+production. The workflow is serialized (a `concurrency` group) and retries its push, so parallel sessions
 don't race-drop each other — but a **genuine merge conflict fails the workflow
 loudly** and must be resolved by hand (the branch's changes won't reach `main`
 until then). After pushing, allow a minute or two for the merge + Vercel deploy.

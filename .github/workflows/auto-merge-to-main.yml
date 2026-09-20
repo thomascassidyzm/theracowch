@@ -1,14 +1,20 @@
-name: Auto-merge claude/ branches to main
+name: Auto-merge worker branches to main
 
 on:
   push:
     branches:
+      # cs/** is what every live worker branch is actually called: the command
+      # surface puts each worker in its own git worktree on cs/<job>-<slug>.
+      # claude/** is the older Claude Code CLI naming, kept so a session that
+      # still cuts one isn't silently stranded. Anything else (main, dev,
+      # staging, a human's branch) is deliberately not auto-merged.
+      - 'cs/**'
       - 'claude/**'
 
 permissions:
   contents: write
 
-# Serialize all auto-merges. Many claude/* sessions run at once; without this
+# Serialize all auto-merges. Many worker sessions run at once; without this
 # two runs could both check out main, merge, and race on `git push origin main`
 # — the loser is rejected (non-fast-forward) and its changes are silently
 # dropped. A single shared concurrency group forces these runs to queue instead
