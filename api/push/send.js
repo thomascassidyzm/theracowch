@@ -13,10 +13,11 @@
 //   VAPID_SUBJECT      — mailto: URL (push-services require this)
 //   KV_REST_API_URL    + KV_REST_API_TOKEN   (legacy Vercel KV stores), or
 //   UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN (new Upstash integration)
-// Optional:
-//   CRON_SECRET        — if set, requests must include
+//   CRON_SECRET        — REQUIRED. Requests must include
 //                        `Authorization: Bearer <CRON_SECRET>` (Vercel Cron
-//                        sends this automatically when configured)
+//                        sends this automatically once the env var exists).
+//                        If it is unset the endpoint refuses every request:
+//                        it must never be open to unauthenticated callers.
 
 import { Redis } from '@upstash/redis';
 import webpush from 'web-push';
@@ -83,13 +84,16 @@ function requireVapid() {
 }
 
 export default async function handler(req, res) {
+    // Fail closed: a missing CRON_SECRET must never leave this endpoint open.
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret) {
-        const auth = req.headers.authorization || '';
-        if (auth !== `Bearer ${cronSecret}`) {
-            res.status(401).json({ error: 'unauthorized' });
-            return;
-        }
+    if (!cronSecret) {
+        res.status(503).json({ error: 'Push cron not configured: CRON_SECRET missing.' });
+        return;
+    }
+    const auth = req.headers.authorization || '';
+    if (auth !== `Bearer ${cronSecret}`) {
+        res.status(401).json({ error: 'unauthorized' });
+        return;
     }
 
     if (!requireVapid()) {
