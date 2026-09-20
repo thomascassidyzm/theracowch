@@ -42,6 +42,16 @@ export default async function handler(req, res) {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
         const { fullName, organisation, email, agreed, signatureDataUrl, ndaVersion, ref } = body;
 
+        // Same class of hole as signatureDataUrl: every optional field below is
+        // stored via String(x).slice(), which bounds the STORED copy — but only
+        // because slice() is applied to the coercion. ndaVersion is the one that
+        // reaches the response as well, so refuse a non-string outright rather
+        // than describing an object back to the caller.
+        if (ndaVersion !== undefined && ndaVersion !== null && typeof ndaVersion !== 'string') {
+            res.status(400).json({ error: 'Invalid ndaVersion' });
+            return;
+        }
+
         if (!fullName || !String(fullName).trim()) {
             res.status(400).json({ error: 'Missing full name' });
             return;
@@ -54,11 +64,21 @@ export default async function handler(req, res) {
             res.status(400).json({ error: 'Agreement checkbox not confirmed' });
             return;
         }
-        if (!signatureDataUrl || !String(signatureDataUrl).startsWith('data:image/')) {
+        // TYPE BEFORE SHAPE. The checks below used to coerce with String(),
+        // but the ORIGINAL value is what gets stored — so an array whose first
+        // element carries the prefix coerces to a short, valid-looking string
+        // while the stored value is arbitrarily large. Cold-verify (2026-09-20)
+        // got 300,043 bytes through that way. A signature is a string or it is
+        // nothing; refuse anything else before it can be measured.
+        if (typeof signatureDataUrl !== 'string') {
             res.status(400).json({ error: 'Missing signature' });
             return;
         }
-        if (Buffer.byteLength(String(signatureDataUrl), 'utf8') > MAX_SIGNATURE_BYTES) {
+        if (!signatureDataUrl || !signatureDataUrl.startsWith('data:image/')) {
+            res.status(400).json({ error: 'Missing signature' });
+            return;
+        }
+        if (Buffer.byteLength(signatureDataUrl, 'utf8') > MAX_SIGNATURE_BYTES) {
             res.status(413).json({ error: 'Signature too large' });
             return;
         }

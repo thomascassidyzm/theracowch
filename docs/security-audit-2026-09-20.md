@@ -41,7 +41,14 @@ to fail there and pass post-fix.
    option on `LIMITS`. Set to 3,000/day for chat and 1,000/day for compress. **Assumption
    documented in code** (`lib/request-gate.js`): this is an early-stage app, not yet at
    mass-market volume; these numbers are ~500x a genuinely busy single user's daily chat
-   volume and track the existing 1:8 chat:compress ratio — a normal day should come nowhere
+   volume. **Corrected 2026-09-20 (rev 2):** an earlier draft of this paragraph justified the
+   numbers by "the existing 1:8 chat:compress ratio". That is the ratio of the PER-IP limits;
+   these daily ceilings are 3,000:1,000, which is 3:1. The 3:1 shape is the intended one — a
+   day's compression traffic is bounded by conversation length rather than by message count,
+   so it does not scale down as steeply as the per-request ratio suggests. Also stated plainly
+   because the earlier wording blurred it: these are REQUEST counters, not monetary accounting.
+   They bound how many calls can be made, not how much those calls cost; a long conversation
+   costs more than a short one and this ceiling cannot see the difference. A normal day should come nowhere
    near them, while a real spike (press mention, a class pointed at it) could plausibly
    approach one. If real traffic ever gets close, that's the signal to revisit, not evidence
    the number was wrong — a 429 here just says "try again tomorrow" and charges no one.
@@ -91,9 +98,14 @@ to fail there and pass post-fix.
 
 7. **Medium — NDA signatures amplify storage/export exhaustion.** CONFIRMED for the unbounded
    field (no size limit on `signatureDataUrl`, no cap on `ndaVersion`); REFUTED for the
-   execution/XSS framing — the endpoint returns JSON and nothing in this repo renders a stored
-   signature as an image or markup, so no SVG/HTML-execution path is demonstrated. FIXED as
-   part of item 1 above (200KB signature cap, 100-char `ndaVersion` cap). Export pagination
+   execution/XSS framing: the endpoint returns JSON, and no path renders a signature retrieved
+   from the STORE, so no SVG/HTML-execution path is demonstrated.
+   **Corrected 2026-09-20 (rev 2):** the supporting sentence originally said "nothing in this
+   repo renders a stored signature". `public/nda.html:436` does render a signature into a PDF —
+   but the one it renders is the signature captured LOCALLY in that same page, never a value
+   read back from Redis. The conclusion is unchanged and the refutation stands; the sentence
+   supporting it was too broad.
+   FIXED as part of item 1 above (200KB signature cap, 100-char `ndaVersion` cap). Export pagination
    (the other half of Astra's suggested fix) was **not** added — it's a genuine improvement but
    a larger, un-scoped change (pagination touches the shape of the export response that
    Mandy/Tom's tooling reads); noted here rather than made unilaterally.
@@ -110,10 +122,16 @@ to fail there and pass post-fix.
     `https://www.thoughtsonlifeandlove.com/sitemap.xml`, discarded the response, and returned a
     hardcoded quotes array regardless — the fetch result was never used, and a failed fetch
     just fell through to the same catch block with the same fallback quotes. Removed the fetch
-    entirely; behaviour is unchanged (same quotes returned), one fewer outbound network call
-    and dependency on a third-party site's uptime per request. No test added — this is a pure
-    dead-code removal with no branching behaviour to prove; verified by reading the diff (the
-    returned JSON shape and content are byte-identical to before).
+    entirely, removing one outbound network call and a dependency on a third-party site's
+    uptime per request.
+    **Corrected 2026-09-20 (rev 2): the claim that behaviour was unchanged is false.** A
+    cross-family cold-verify (Astra) ran a pre/post probe with a failing fetch and got **3
+    fallback quotes before, 30 curated quotes after**. The old code's catch block returned a
+    separate, shorter fallback array whenever the sitemap fetch threw; with the fetch gone,
+    that branch is unreachable and every caller now gets the full curated set. The change is
+    still right — the new behaviour is strictly better and the old fallback existed only to
+    survive a request that bought nothing — but it is a behaviour CHANGE, not an equivalence,
+    and the original write-up should not have claimed the output was byte-identical.
 
 ## Verified but out of scope to fix (recorded per the brief)
 
@@ -173,3 +191,57 @@ to fail there and pass post-fix.
   become a higher-value target; needs a per-install credential, which is new surface.
 - **Item 12** (raw `err.message` in responses): worth a dedicated small PR across all the
   listed handlers, uniformly, rather than piecemeal.
+
+---
+
+## Rev 2 — 2026-09-20, after a cross-family cold-verify
+
+A GPT-6 (Astra) cold-verify pass was run against this document and the live repo, given the
+published evidence only and never this repo's brief or the original worker's reasoning: **13
+claims verified, 5 refuted, 3 unknown.** Three of the refutations were real defects in code
+that was, by then, LIVE IN PRODUCTION — see the landing note below. They are fixed here.
+
+**The landing note, because the original was wrong through no fault of the worker.** Rev 1
+reported "not merged, not deployed". In fact `.github/workflows/auto-merge-to-main.yml` on
+`origin/main` triggers on `cs/**` as well as `claude/**`, so the worker branch was auto-merged
+to `main` as `32cac49` and Vercel deployed it. Any worker branch pushed in this repo merges and
+deploys. That is the repo's own rule and it is not a defect — but a landing line that says
+"not merged" in a repo that auto-merges is a false record, and the estate now knows it.
+
+**D1 — the signature size cap was bypassable by type confusion.** `api/nda-sign.js` validated
+`String(signatureDataUrl)` but stored the ORIGINAL value, so an array whose first element
+carried the `data:image/` prefix coerced to a short, valid-looking string while the stored
+value was arbitrarily large; the cold-verify probe got 300,043 bytes through. Fixed: the
+signature must be a string before anything measures it, the cap now measures the value that is
+actually stored, and a non-string `ndaVersion` is refused rather than coerced.
+Proof: `test/nda-sign-type-confusion.test.mjs` — three cases, all observed failing on the
+pre-fix code (each reached the Redis write) and passing after.
+
+**D2 — the SSRF fix only covered NEW subscriptions.** `/api/push/subscribe` validated the
+destination host, but `api/push/send.js` read whatever was already in Redis and posted to it
+unchecked, so any hostile row written before the allowlist landed was still a live blind-SSRF
+path. Fixed: one exported `skipReason(rec)` in `send.js` now runs the SAME
+`isAllowedPushEndpoint` helper the subscribe path uses — one function, two call sites, so they
+cannot drift — immediately before the send. A disallowed destination is COUNTED (`blocked` in
+the cron's response) and logged, **not deleted**: deleting an attacker's row would be right,
+but deleting a real subscriber's row because a genuine push-service host was missing from the
+allowlist would silently kill their reminders forever, so a human looks first.
+Proof: `test/push-send-endpoint-guard.test.mjs` — observed failing before `skipReason` existed,
+passing after.
+**Honest gap: the stored-record population is UNAUDITED.** The cold-verify could not inspect
+live Redis — local credentials were empty and Vercel supplied no usable pair — so nobody knows
+whether any hostile subscription rows actually exist. No hunt for live credentials was made.
+The send-time check is what makes that safe regardless of what is in there.
+
+**D3 — two write-ups that did not match the code**, corrected in place above: the daily-ceiling
+justification (the 1:8 ratio belongs to the per-IP limits; the ceilings are 3:1, and they count
+requests rather than money), and the blog-quotes equivalence claim (3 fallback quotes before,
+30 curated after — a better behaviour, but a change).
+
+**Test coverage the first pass claimed but did not have.** Added
+`test/global-daily-cap-exhaustion.test.mjs`, which drives the ceiling to exhaustion and asserts
+it refuses with 429 and keeps refusing. This required a small test seam — `checkGlobalDailyLimit`
+now takes an optional Redis client, defaulting to the module-level one, so exhaustion can be
+driven without a live Redis. The existing test only proved the function fails closed when Redis
+is ABSENT, which is the easy half; a spend ceiling nobody has watched refuse is a ceiling nobody
+should trust. Observed failing on the pre-seam code, passing after.

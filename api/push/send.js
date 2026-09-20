@@ -21,6 +21,7 @@
 
 import { Redis } from '@upstash/redis';
 import webpush from 'web-push';
+import { isAllowedPushEndpoint } from '../../lib/push-endpoint-allowlist.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -90,6 +91,24 @@ function requireVapid() {
     return true;
 }
 
+// ONE decision, exported so it is testable without Redis, and so the
+// subscribe-time and send-time checks can never drift apart: they call the same
+// allowlist. Subscribe-time validation alone was not enough — the dispatcher
+// reads rows that were written BEFORE that check existed, so a hostile
+// destination stored earlier would still be posted to. Checked here, at the
+// last moment before the send, the stored population is safe whatever is in it.
+//
+// Returns a reason string to skip, or null to deliver.
+export function skipReason(rec) {
+    if (!rec || !rec.subscription || !rec.prefs || !rec.subscription.endpoint) return 'malformed';
+    // A MISSING endpoint is malformed, not blocked: counting it as blocked would
+    // report an attack that is not there and hide a data problem that is.
+    if (!isAllowedPushEndpoint(rec.subscription.endpoint)) return 'endpoint-not-allowed';
+    if (!rec.prefs.enabled) return 'disabled';
+    if (rec.prefs.snoozeUntil && Date.now() < rec.prefs.snoozeUntil) return 'snoozed';
+    return null;
+}
+
 export default async function handler(req, res) {
     // Fail closed: a missing CRON_SECRET must never leave this endpoint open.
     const cronSecret = process.env.CRON_SECRET;
@@ -118,16 +137,26 @@ export default async function handler(req, res) {
         return;
     }
 
-    let sent = 0, errors = 0, expired = 0;
+    let sent = 0, errors = 0, expired = 0, blocked = 0;
 
     for (const id of ids) {
         let rec;
         try { rec = await redis.get('cowch:sub:' + id); } catch (_) { continue; }
-        if (!rec || !rec.subscription || !rec.prefs) continue;
+        const skip = skipReason(rec);
+        if (skip) {
+            // A disallowed destination is COUNTED, not deleted. Deleting an
+            // attacker's row would be right; deleting a real subscriber's row
+            // because a genuine push-service host is missing from the allowlist
+            // would silently kill their reminders forever. Counting surfaces it
+            // in the cron's own response so a human can look before anything is
+            // destroyed.
+            if (skip === 'endpoint-not-allowed') {
+                blocked++;
+                console.warn('push send blocked: endpoint not on the push-service allowlist for', id);
+            }
+            continue;
+        }
         const { subscription, prefs } = rec;
-
-        if (!prefs.enabled) continue;
-        if (prefs.snoozeUntil && Date.now() < prefs.snoozeUntil) continue;
 
         const tz = prefs.tz || 'UTC';
         let nowMins;
@@ -168,5 +197,5 @@ export default async function handler(req, res) {
         }
     }
 
-    res.json({ scanned: ids.length, sent, errors, expired });
+    res.json({ scanned: ids.length, sent, errors, expired, blocked });
 }
