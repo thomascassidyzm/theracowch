@@ -60,11 +60,18 @@ function nowMinutesInTz(date, tz) {
     return h * 60 + m;
 }
 
-function matchSlot(prefs, nowMins) {
+// Bounded HH:MM only — an unvalidated client-supplied `time` (e.g. the
+// number 1, or "9") reached `time.split(':')` here and threw, which aborted
+// the whole dispatch loop for every remaining subscription in Set iteration
+// order. A malformed slot is now just skipped, not fatal.
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export function matchSlot(prefs, nowMins) {
     const candidates = [];
     if (prefs.morning && prefs.morning.on && prefs.morning.time) candidates.push(['morning', prefs.morning.time]);
     if (prefs.evening && prefs.evening.on && prefs.evening.time) candidates.push(['evening', prefs.evening.time]);
     for (const [slot, time] of candidates) {
+        if (typeof time !== 'string' || !HHMM.test(time)) continue;
         const [h, m] = time.split(':').map(Number);
         const target = h * 60 + m;
         const diff = Math.abs(nowMins - target);

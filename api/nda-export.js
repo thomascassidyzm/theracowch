@@ -16,6 +16,12 @@ const redis = new Redis({
 });
 
 export default async function handler(req, res) {
+    // This URL carries a secret and personal data — never cached anywhere,
+    // including on the error paths below. Same header questionnaire-report.js
+    // already sets.
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+
     if (req.method !== 'GET') {
         res.setHeader('Allow', 'GET');
         res.status(405).end();

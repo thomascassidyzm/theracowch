@@ -15,16 +15,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Try to fetch quotes from Mandy's blog
-    const blogUrl = 'https://www.thoughtsonlifeandlove.com';
-    
-    // Use a web scraping approach to extract inspirational quotes
-    const response = await fetch(`${blogUrl}/sitemap.xml`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch blog content');
-    }
-    
     // Comprehensive collection of authentic therapeutic wisdom and mootivations
     const authenticQuotes = [
       // Core Therapeutic Wisdom

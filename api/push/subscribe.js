@@ -12,6 +12,8 @@
 
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+import { checkRateLimit } from '../../lib/request-gate.js';
+import { isAllowedPushEndpoint } from '../../lib/push-endpoint-allowlist.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -36,6 +38,28 @@ export default async function handler(req, res) {
 
         if (!subscription || !subscription.endpoint) {
             res.status(400).json({ error: 'Missing subscription.endpoint' });
+            return;
+        }
+
+        // Reject destinations that are not a real push service, before touching
+        // Redis at all. web-push posts the encrypted payload straight to this
+        // URL server-side; without this check a subscription is a stored,
+        // attacker-controlled outbound request.
+        if (!isAllowedPushEndpoint(subscription.endpoint)) {
+            res.status(400).json({ error: 'Unrecognised push endpoint' });
+            return;
+        }
+
+        // Anonymous, unauthenticated writes — cap how many one caller can create.
+        // Generous: a real user subscribes/updates prefs a handful of times, ever.
+        const rl = await checkRateLimit(req, { bucket: 'push-subscribe', limit: 20, windowSeconds: 600 });
+        if (!rl.ok) {
+            res.setHeader('Retry-After', String(rl.retryAfter));
+            res.status(rl.status).json(
+                rl.status === 429
+                    ? { error: 'Too many requests — give it a minute.' }
+                    : { error: 'Service temporarily unavailable' }
+            );
             return;
         }
 

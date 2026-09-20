@@ -2,7 +2,8 @@
 // Uses Claude to extract therapeutic insights from conversation
 // Called periodically to update the local therapy profile
 
-import { gate, LIMITS } from '../lib/request-gate.js';
+import { gate, LIMITS, tooBig } from '../lib/request-gate.js';
+import { checkTextField } from '../lib/text-field-guard.js';
 
 export default async function handler(req, res) {
   // Same gate as api/chat.js, same rationale: a public, account-less endpoint
@@ -16,9 +17,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Prompt required' });
     }
 
-    // Cap input size so a single call can't balloon the Anthropic bill.
-    if (typeof prompt === 'string' && prompt.length > 8000) {
-      return res.status(413).json({ error: 'Prompt too long' });
+    // Must be a plain string, and capped — same reasoning as api/chat.js: a
+    // non-string (e.g. a content-block array) is truthy and would otherwise
+    // be forwarded straight into the Anthropic call.
+    const promptError = checkTextField(prompt, 8000, 'Prompt');
+    if (promptError) {
+      return res.status(promptError.status).json({ error: promptError.error });
+    }
+
+    // Belt-and-braces serialised-size check, same as api/chat.js — the gate
+    // already checked Content-Length, this checks what was actually parsed.
+    if (tooBig(prompt, LIMITS.compress.maxBodyBytes)) {
+      return res.status(413).json({ error: 'Request too large' });
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {

@@ -13,6 +13,7 @@
 
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+import { checkRateLimit } from '../lib/request-gate.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -24,6 +25,11 @@ function clientIp(req) {
     if (fwd) return String(fwd).split(',')[0].trim();
     return req.socket && req.socket.remoteAddress || '';
 }
+
+// A real signature PNG data URL is a few KB; this is ~8x that, so no honest
+// client ever meets it, while one anonymous write can no longer carry an
+// arbitrary blob into Redis / the export payload.
+const MAX_SIGNATURE_BYTES = 200 * 1024;
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -52,12 +58,28 @@ export default async function handler(req, res) {
             res.status(400).json({ error: 'Missing signature' });
             return;
         }
+        if (Buffer.byteLength(String(signatureDataUrl), 'utf8') > MAX_SIGNATURE_BYTES) {
+            res.status(413).json({ error: 'Signature too large' });
+            return;
+        }
+
+        // Anonymous, unauthenticated writes — cap how many one caller can create.
+        const rl = await checkRateLimit(req, { bucket: 'nda-sign', limit: 10, windowSeconds: 600 });
+        if (!rl.ok) {
+            res.setHeader('Retry-After', String(rl.retryAfter));
+            res.status(rl.status).json(
+                rl.status === 429
+                    ? { error: 'Too many requests — give it a minute.' }
+                    : { error: 'Service temporarily unavailable' }
+            );
+            return;
+        }
 
         const id = crypto.randomUUID();
         const record = {
             id,
             ref: ref ? String(ref).slice(0, 200) : null,
-            ndaVersion: ndaVersion || 'unknown',
+            ndaVersion: ndaVersion ? String(ndaVersion).slice(0, 100) : 'unknown',
             fullName: String(fullName).slice(0, 200),
             organisation: organisation ? String(organisation).slice(0, 200) : '',
             email: String(email).slice(0, 320),

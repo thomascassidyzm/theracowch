@@ -1,6 +1,7 @@
 import IMAGINE_FRAMEWORK_PROMPTS from '../lib/prompt-base.js';
 import { gate, LIMITS, tooBig } from '../lib/request-gate.js';
 import { buildQuestionnaireContext } from '../lib/questionnaire-context.js';
+import { checkTextField } from '../lib/text-field-guard.js';
 
 // The chat system-prompt base is BUNDLED via the import above (lib/prompt-base.js)
 // so it deploys reliably and is not served publicly. To change the prompt, edit
@@ -26,18 +27,23 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Cap input size so a single call can't balloon the Anthropic bill.
-    if (typeof message === 'string' && message.length > 4000) {
-      return res.status(413).json({ error: 'Message too long' });
+    // Must be a plain string, and capped, before anything goes near the
+    // billed Anthropic call. An Anthropic-compatible array of content blocks
+    // is truthy, skips a `typeof === 'string'`-gated length check, and would
+    // otherwise be forwarded straight into `messages` — and only fail later
+    // at `message.toLowerCase()`, after the billed call already happened.
+    const messageError = checkTextField(message, 4000, 'Message');
+    if (messageError) {
+      return res.status(messageError.status).json({ error: messageError.error });
     }
 
     // The gate already refused anything whose Content-Length was over
     // LIMITS.chat.maxBodyBytes. This is the belt to that pair of braces: it
     // measures what was actually parsed, so a missing or lying Content-Length
-    // buys nothing. Everything below `message` used to be entirely uncapped —
-    // profile, recentMessages, history and questionnaire all go into the
-    // Anthropic call, and all of them were free to be any size.
-    if (tooBig({ profile, recentMessages, history, questionnaire }, LIMITS.chat.maxBodyBytes)) {
+    // buys nothing. `message`, profile, recentMessages, history and
+    // questionnaire all go into the Anthropic call, and all of them were free
+    // to be any size.
+    if (tooBig({ message, profile, recentMessages, history, questionnaire }, LIMITS.chat.maxBodyBytes)) {
       return res.status(413).json({ error: 'Request too large' });
     }
 
