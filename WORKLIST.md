@@ -78,6 +78,7 @@ item; if it needs detail, **link a doc** (`docs/marketing-strategy.md`, `docs/sh
 
 ## 🤔 Areas to think through   (open design — link the think-piece)
 
+- [ ] **What makes a WAYL elicitation deep** — under the daily-voice-is-the-user's-own-words ruling (Tom, 09-06), the asking is the product. Position: depth = the answer has to be composed, not retrieved; add the chooser's seat (the Gateway Question on the person's own tap) at each settled reveal, three beats, three sentences; not more questions. Live assessment untouched. → `docs/elicitation-depth.md`
 - [ ] **How far the AI speaks AS Mandy** — the named, credentialed clinician vs. *in her approach*. Softened in the audit, not fully resolved — **Mandy's call**. → `docs/claims-audit.md`
 - [ ] **What "validated" actually means** — pick the few signals that say it's working (someone came back; someone said it helped; a wellbeing team said yes) and ignore vanity metrics.
 - [ ] **The crisis answer** — the one paragraph a wellbeing team needs: Cowch routes to humans, does *not* detect / triage / own safety. Gates university trust.
