@@ -18,10 +18,25 @@ permissions:
 # two runs could both check out main, merge, and race on `git push origin main`
 # — the loser is rejected (non-fast-forward) and its changes are silently
 # dropped. A single shared concurrency group forces these runs to queue instead
-# of racing. cancel-in-progress is false so no queued merge is ever thrown away.
+# of racing.
+#
+# cancel-in-progress: false stops a RUNNING merge being killed. On its own that
+# is NOT enough: the default `queue: single` allows at most ONE run to sit
+# pending per group, and GitHub cancels that pending run and replaces it the
+# moment a third push arrives. With every cs/** and claude/** push sharing this
+# one group, three workers pushing within a couple of minutes meant the middle
+# one was silently cancelled — its branch never merged, the same silent-stranding
+# class this workflow exists to prevent, and invisible because a cancelled run
+# is not a failed run and nothing notifies anybody.
+#
+# `queue: max` raises the queue to 100 pending runs, so bursts of worker pushes
+# all wait their turn instead of evicting each other. (Only valid while
+# cancel-in-progress is false — the combination with true is a validation error.)
+# Docs: https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency
 concurrency:
   group: auto-merge-to-main
   cancel-in-progress: false
+  queue: max
 
 jobs:
   merge-to-main:
