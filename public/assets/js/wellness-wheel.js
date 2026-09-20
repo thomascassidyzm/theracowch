@@ -1,9 +1,10 @@
 /**
- * The wheel-build flow — PROTOTYPE, behind a flag.
+ * The wheel-build flow — the completion stage of "What are you like, anyway?".
  *
- * A person who has finished the ranked "What are you like, anyway?" gets a
- * thirteen-spoke wellness wheel built FOR them — and then owns it by choosing
- * and editing the words in it. Never a blank canvas: the assessment seeds it,
+ * A person who has finished WAYL comes straight here and gets a thirteen-spoke
+ * wellness wheel built FOR them — and then owns it by choosing the statements
+ * nearest to true for them, and editing the words in them, or writing their own
+ * from scratch. Never a blank canvas: the assessment seeds it,
  * redemption latency orders it, and they choose one of three genuinely
  * different ways to hold each spoke and then make it theirs.
  *
@@ -15,7 +16,8 @@
  *      ONES. A warrant harvested from a contested selection and played back
  *      with false confidence is the tool putting words in someone's mouth.
  *   3. THE HARVEST IS THE POINT. Every chosen-and-edited statement is kept
- *      verbatim, keyed to its spoke, on this device only.
+ *      verbatim, keyed to its spoke — on this device AND on the server, so it
+ *      survives the device.
  *
  * NO MODEL CALL, anywhere — not at runtime, not at build time. The three
  * candidates are selected deterministically from the pre-authored bank. See
@@ -26,8 +28,20 @@
  * stored record and nothing else. It never imports them, never writes their
  * keys, and cannot change what they do.
  *
+ * WHERE THE WORDS ARE KEPT (Tom's ruling, 2026-09-06). This stopped being a
+ * device-only prototype the day it became the completion stage of WAYL. The
+ * chosen-and-edited statements are still written to localStorage first — so the
+ * flow never stalls on a network — and are then POSTed to /api/wheel, keyed by
+ * a random id this device mints once. Verbatim at every hop: what the person
+ * typed is what is stored, never trimmed, tidied, capitalised or wrapped in
+ * encouragement. The daily line is meant to be their own words quoted back, and
+ * a quotation that has been improved is not a quotation.
+ *
+ * Nothing about the assessment itself travels: the raw WAYL answers stay in
+ * their own keys, on this device, exactly as they always did. What leaves is
+ * only what the person deliberately wrote here.
+ *
  * Plain browser JS, one <script> tag. No modules build in this repo.
- * Everything stays on this device: no endpoint, no account, no upload.
  */
 (function () {
   'use strict';
@@ -40,9 +54,23 @@
      key (…-progress) is deliberately NOT read: a run you are still inside and
      a run you have completed are different things. */
   var RANK_KEY = 'cowch-q-wayl-rank';
-  /* Our own harvest. Namespaced, on-device, nothing uploaded. */
+  /* …and the single-choice variant's finished record, same shape of `bands`.
+     Both are "What are you like, anyway?", so finishing either one earns the
+     same next step; the ranked run is preferred when a person has done both,
+     because it is the one with more evidence in it. */
+  var SINGLE_KEY = 'cowch-q-wayl';
+  /* Our own harvest — written here first, then sent to /api/wheel. */
   var WHEEL_KEY = 'cowch-wheel-build';
   var WHEEL_V = 1;
+  /* The id under which this person's words are kept on the server. Minted once,
+     on this device, and never derived from anything about them. */
+  var ID_KEY = 'cowch-wheel-id';
+  var API = '/api/wheel';
+  /* The same ceiling api/wheel.js enforces, checked HERE first so a spoke that
+     is too long is caught on the spoke it belongs to — a server refusal arrives
+     after the page has already moved on, which leaves a person reading a
+     complaint about a sentence they can no longer see. */
+  var MAX_TEXT_CHARS = 2000;
 
   /* ================= SAMPLE PROFILES =================
      A prototype affordance, and the page says so on screen. Tom has to be able
@@ -104,7 +132,11 @@
   var plan = [];           /* ordered [{spoke, register, torn, why}] */
   var harvest = {};        /* spokeId -> {hold, text, register, at} */
   var idx = 0;
-  var choice = null;       /* the stance index currently selected on screen */
+  var choice = null;       /* the stance index currently selected on screen, or 'own' */
+  var syncState = '';      /* '', 'saving', 'saved', 'failed' */
+  var syncPending = false; /* a save that has not reached the server yet */
+  var syncMsg = '';        /* the last thing we told them about keeping it */
+  var needsPush = false;   /* this device holds words the server has not got */
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -150,13 +182,124 @@
     return { source: source, label: label, conviction: conviction, focus: focus };
   }
 
-  function storedRun() {
+  function runAt(key) {
     var raw, d;
-    try { raw = localStorage.getItem(RANK_KEY); } catch (e) { return null; }
+    try { raw = localStorage.getItem(key); } catch (e) { return null; }
     if (!raw) return null;
     try { d = JSON.parse(raw); } catch (e) { return null; }
     if (!d || !Array.isArray(d.bands) || !d.bands.length) return null;
     return d;
+  }
+
+  /* Either finished variant will do — the ranked one first, because it is the
+     one with more evidence behind it. Only `bands` is read: the per-moment
+     answers and anything typed into the questionnaire itself are not touched
+     here and never leave the device. */
+  function storedRun() {
+    return runAt(RANK_KEY) || runAt(SINGLE_KEY);
+  }
+
+  /* ================= KEEPING IT, FOR REAL =================
+     localStorage is the draft; the server is the record. Written in that order
+     on purpose: the flow must never sit waiting on a network, and a person who
+     goes through a tunnel mid-wheel loses nothing.
+
+     The id is minted here, once. It is not derived from anything about the
+     person — no name, no email, no device fingerprint — and it is the only key
+     to their record, which is what lets there be no account. */
+  function deviceId() {
+    var id;
+    try { id = localStorage.getItem(ID_KEY); } catch (e) { return null; }
+    if (id) return id;
+    id = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : uuidish();
+    try { localStorage.setItem(ID_KEY, id); } catch (e) { return null; }
+    return id;
+  }
+
+  /* Older Safari has crypto.getRandomValues but not randomUUID. Same shape,
+     same randomness source; never Math.random, which would make ids guessable
+     and the id is the whole of the security here. */
+  function uuidish() {
+    var b = new Uint8Array(16);
+    window.crypto.getRandomValues(b);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    var h = [];
+    for (var i = 0; i < 16; i++) h.push((b[i] + 0x100).toString(16).slice(1));
+    return h.slice(0, 4).join('') + '-' + h.slice(4, 6).join('') + '-' + h.slice(6, 8).join('')
+      + '-' + h.slice(8, 10).join('') + '-' + h.slice(10, 16).join('');
+  }
+
+  function setSync(state, message) {
+    syncState = state;
+    syncMsg = message || '';
+    applySync();
+  }
+
+  /* The same line, wherever it is on screen — the build card renders itself
+     fresh on every spoke, so the status has to be re-applied rather than
+     written once into an element that is about to be replaced. */
+  function applySync() {
+    Array.prototype.forEach.call(document.querySelectorAll('.sync-note'), function (el) {
+      el.textContent = syncMsg;
+      el.classList.toggle('warn', syncState === 'failed');
+    });
+  }
+
+  /* One POST, the whole harvest, every time something changes. The record is
+     small (thirteen sentences at most) and last-write-wins is exactly right for
+     "these are my words as of now" — there is no merge to get wrong. */
+  function pushToServer() {
+    var id = deviceId();
+    if (!id) { setSync('failed', 'This browser will not let us keep anything — your words are only in this window.'); return; }
+    syncPending = true;
+    setSync('saving', 'Keeping your words…');
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: id,
+        order: plan.map(function (p) { return p.spoke.id; }),
+        entries: harvest,
+        profile: { source: profile ? profile.source : 'unknown', label: profile ? profile.label : '' }
+      })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; });
+    }).then(function (res) {
+      if (!res.ok) {
+        /* Say what the server said, not a cheerful substitute — if a spoke is
+           too long to store, the person needs to know that and to be the one
+           who shortens it. Nothing of theirs has been altered either way. */
+        syncPending = true;
+        setSync('failed', (res.j && res.j.error) || 'Couldn’t keep that just now — it’s safe on this device and we’ll try again.');
+        return;
+      }
+      syncPending = false;
+      setSync('saved', 'Kept, word for word.');
+    }).catch(function () {
+      syncPending = true;
+      setSync('failed', 'No connection just now — your words are safe on this device and we’ll try again.');
+    });
+  }
+
+  /* Coming back on a device that has the id but has lost (or never had) the
+     local copy — cleared storage, a reinstalled PWA — the record is fetched
+     back. It is only ever used to FILL a gap, never to overwrite words that are
+     already here. */
+  function pullFromServer() {
+    var id;
+    try { id = localStorage.getItem(ID_KEY); } catch (e) { return Promise.resolve(null); }
+    if (!id) return Promise.resolve(null);
+    return fetch(API + '?id=' + encodeURIComponent(id))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; });
+  }
+
+  function deleteOnServer() {
+    var id;
+    try { id = localStorage.getItem(ID_KEY); } catch (e) { return; }
+    if (!id) return;
+    fetch(API + '?id=' + encodeURIComponent(id), { method: 'DELETE' }).catch(function () {});
   }
 
   /* ================= BUILDING THE PLAN ================= */
@@ -258,9 +401,14 @@
   }
 
   /* ================= THE HARVEST =================
-     Their words, verbatim, keyed to the spoke. On this device, in this
-     browser, and nowhere else — no endpoint exists to send it to. */
+     Their words, verbatim, keyed to the spoke — written to this device first,
+     then to /api/wheel so they outlive the browser that typed them. */
   function saveHarvest() {
+    saveLocal();
+    pushToServer();
+  }
+
+  function saveLocal() {
     try {
       localStorage.setItem(WHEEL_KEY, JSON.stringify({
         v: WHEEL_V,
@@ -281,6 +429,37 @@
     return d;
   }
 
+  /* Words this device already has always win; the server copy only fills the
+     gaps. That ordering matters on the one case that is easy to get wrong — a
+     person who wrote three spokes on a plane and then opened the page again on
+     landing must not have the older server record land on top of them. */
+  function adoptRemote(remote) {
+    var local = loadHarvest();
+    if (!remote || !remote.entries || !Object.keys(remote.entries).length) {
+      needsPush = !!(local && local.entries && Object.keys(local.entries).length);
+      return;
+    }
+    var merged = (local && local.entries) || {};
+    var added = 0;
+    Object.keys(remote.entries).forEach(function (k) {
+      if (!merged[k]) { merged[k] = remote.entries[k]; added++; }
+    });
+    /* The server is behind if this device holds a spoke it does not. */
+    needsPush = Object.keys(merged).some(function (k) { return !remote.entries[k]; });
+    if (!local || added) {
+      try {
+        localStorage.setItem(WHEEL_KEY, JSON.stringify({
+          v: WHEEL_V,
+          updated: new Date().toISOString(),
+          profileSource: (local && local.profileSource) || (remote.profile && remote.profile.source) || 'unknown',
+          profileLabel: (local && local.profileLabel) || (remote.profile && remote.profile.label) || '',
+          order: (local && local.order) || remote.order || [],
+          entries: merged
+        }));
+      } catch (e) { /* private mode — the fetched copy is still in this session */ }
+    }
+  }
+
   /* ================= INTRO ================= */
   function renderIntro() {
     var run = storedRun();
@@ -292,9 +471,9 @@
         + '<div class="btn-row"><button class="btn btn-primary" type="button" data-use="stored">'
         + 'Build my wheel from my answers</button></div>';
     } else {
-      html += '<p class="found">No finished ranked run on this device yet. You can '
+      html += '<p class="found">No finished “What are you like, anyway?” on this device yet. You can '
         + '<a href="/questionnaires/what-are-you-like-rank.html">answer the thirty moments</a> first '
-        + '— or feel the flow now with one of the worked profiles below.</p>';
+        + '— the wheel is what comes next — or feel the flow now with one of the worked profiles below.</p>';
     }
     html += '<div class="sample-block"><p class="sample-lead"><b>Or use a worked profile.</b> '
       + 'These are made up, for feeling the shape of this before it is built properly. '
@@ -309,7 +488,7 @@
     if (prior && Object.keys(prior.entries).length) {
       html += '<p class="resume-note">You have ' + Object.keys(prior.entries).length
         + ' spoke' + (Object.keys(prior.entries).length === 1 ? '' : 's')
-        + ' already in your own words on this device. '
+        + ' already in your own words. '
         + '<button class="linkish" type="button" data-resume="1">Pick it back up</button>.</p>';
     }
     box.innerHTML = html;
@@ -326,6 +505,7 @@
       if (!harvest[plan[i].spoke.id]) { idx = i; break; }
       if (i === plan.length - 1) idx = plan.length;
     }
+    if (needsPush && Object.keys(harvest).length) { needsPush = false; pushToServer(); }
     if (idx >= plan.length) { renderWheel(); return; }
     show('build');
     renderSpoke();
@@ -338,7 +518,8 @@
     var cands = candidatesFor(sp, p.register);
     choice = null;
     if (existing) {
-      cands.forEach(function (c, i) { if (c.hold === existing.hold) choice = i; });
+      if (existing.own) choice = 'own';
+      else cands.forEach(function (c, i) { if (c.hold === existing.hold) choice = i; });
     }
 
     var dots = plan.map(function (q, i) {
@@ -359,16 +540,25 @@
       + '<p class="why">' + p.why + '</p>'
       + torn
       + '<p class="choose-lead">Three ways a person could honestly hold this. None of them is the right '
-      + 'one — pick whichever is nearest to true for you, and then change the words until it is yours.</p>'
+      + 'one — pick whichever is nearest to true for you, and then change the words until it is yours. '
+      + 'Or say it your own way from the start.</p>'
       + '<div class="cands">' + cands.map(function (c, i) {
         return '<button class="cand' + (choice === i ? ' picked' : '') + '" type="button" data-cand="' + i + '">'
           + '<span class="cand-hold">' + esc(c.hold) + '</span>'
           + '<span class="cand-text">' + esc(c.text) + '</span></button>';
-      }).join('') + '</div>'
+      }).join('')
+      /* The fourth door, and it is not a lesser one: a person whose way of
+         holding this isn't among the three should not have to start from
+         somebody else's sentence and delete it. Empty box, their words. */
+      + '<button class="cand cand-own' + (choice === 'own' ? ' picked' : '') + '" type="button" data-cand="own">'
+      + '<span class="cand-hold">In my own words</span>'
+      + '<span class="cand-text">None of those three. I’ll say it my way.</span></button>'
+      + '</div>'
       + '<div class="editor' + (choice === null ? ' hidden' : '') + '" id="editor">'
       + '<label class="edit-label" for="ownWords">Now make it yours. Change a word or rewrite the whole '
       + 'thing — what gets kept is exactly what you type.</label>'
-      + '<textarea id="ownWords" rows="4"></textarea>'
+      + '<textarea id="ownWords" rows="4" placeholder="Your words for this one."></textarea>'
+      + '<p class="sync-note" id="syncNote"></p>'
       + '</div>'
       + '</div>'
       + '<div class="btn-row">'
@@ -378,25 +568,39 @@
       + '<div class="nav-row">'
       + '<button class="nav-btn" type="button" data-back="1"' + (idx === 0 ? ' disabled' : '') + '>← Back</button>'
       + '<button class="nav-btn" type="button" data-skip="1">Leave this one blank →</button>'
+      + '</div>'
+      /* A FEW STATEMENTS IS A FINISHED WHEEL (Tom, 2026-09-06: "the user chooses
+         a few statements that reflect them best"). So the way out is on every
+         spoke, not only at the end of thirteen — nobody owes this page a full
+         set before their words count. */
+      + '<div class="nav-row">'
+      + '<button class="nav-btn" type="button" data-done="1">That’s enough — show me my wheel</button>'
       + '</div>';
 
     if (choice !== null) {
-      $('ownWords').value = existing ? existing.text : cands[choice].text;
+      $('ownWords').value = existing ? existing.text : (choice === 'own' ? '' : cands[choice].text);
     }
+    applySync();
   }
 
   function pick(i) {
     var p = plan[idx];
     var cands = candidatesFor(p.spoke, p.register);
+    var existing = harvest[p.spoke.id];
     choice = i;
-    Array.prototype.forEach.call(document.querySelectorAll('.cand'), function (b, j) {
-      b.classList.toggle('picked', j === i);
+    Array.prototype.forEach.call(document.querySelectorAll('.cand'), function (b) {
+      b.classList.toggle('picked', b.dataset.cand === String(i));
     });
     var ed = $('editor');
     ed.classList.remove('hidden');
     var ta = $('ownWords');
-    ta.value = cands[i].text;
+    /* Their own words win over a candidate every time: re-picking the stance
+       they already chose must not wipe the sentence they wrote under it. */
+    if (i === 'own') ta.value = (existing && existing.own) ? existing.text : '';
+    else if (existing && !existing.own && cands[i] && cands[i].hold === existing.hold) ta.value = existing.text;
+    else ta.value = cands[i].text;
     $('buildCard').querySelector('[data-keep]').disabled = false;
+    if (i === 'own') { try { ta.focus(); } catch (e) { /* a focus that fails changes nothing */ } }
     /* Plain page scroll, deliberately: the answering view of the ranked
        questionnaire is PINNED because nothing there is typed, and a pinned
        page plus a phone keyboard is a trap — the field goes under the keyboard
@@ -409,10 +613,24 @@
     if (choice === null) return;
     var p = plan[idx];
     var cands = candidatesFor(p.spoke, p.register);
-    var text = ($('ownWords').value || '').trim();
-    if (!text) text = cands[choice].text;
+    var raw = $('ownWords').value || '';
+    /* VERBATIM, and this is the line that means it: what is stored is what is
+       in the box. No trim, no capitalising, no full stop added. The only thing
+       .trim() is used for anywhere here is deciding whether a box is EMPTY. */
+    var isEmpty = !raw.trim();
+    if (raw.length > MAX_TEXT_CHARS) {
+      setSync('failed', 'That one is longer than we can keep (' + MAX_TEXT_CHARS + ' characters). Nothing has been changed — shorten it yourself and it will save.');
+      return;
+    }
+    if (choice === 'own') {
+      /* Nothing chosen and nothing typed is not a spoke — say so rather than
+         quietly putting one of our sentences in their mouth. */
+      if (isEmpty) { setSync('failed', 'Type a line in your own words, or pick one of the three above.'); return; }
+    }
+    var text = isEmpty ? cands[choice].text : raw;
     harvest[p.spoke.id] = {
-      hold: cands[choice].hold,
+      hold: choice === 'own' ? '' : cands[choice].hold,
+      own: choice === 'own',
       text: text,
       register: p.register,
       torn: !!p.torn,
@@ -433,10 +651,11 @@
   function renderWheel() {
     show('wheel');
     var done = plan.filter(function (p) { return harvest[p.spoke.id]; }).length;
-    $('wheelMeta').textContent = done + ' of ' + plan.length + ' spokes in your own words · '
+    $('wheelMeta').textContent = done + ' spoke' + (done === 1 ? '' : 's') + ' in your own words · '
       + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-      + ' · kept on this device unless you share it';
+      + ' · kept word for word';
 
+    applySync();
     $('wheelList').innerHTML = plan.map(function (p, i) {
       var h = harvest[p.spoke.id];
       return '<div class="wrow' + (h ? '' : ' blank') + '">'
@@ -459,8 +678,8 @@
       lines.push('   ' + (h ? h.text : '(left blank for now)'));
       lines.push('');
     });
-    lines.push('Built from a ranked "What are you like, anyway?" profile. A starting point, not a verdict.');
-    lines.push('Nothing here left the device it was written on.');
+    lines.push('Built from a "What are you like, anyway?" profile. A starting point, not a verdict.');
+    lines.push('These are my words, kept exactly as I typed them.');
     return lines.join('\n');
   }
 
@@ -493,7 +712,8 @@
       else start('sample:mixed', SAMPLES[2].label, SAMPLES[2].bands);
       return;
     }
-    if (t.dataset.cand !== undefined) { pick(+t.dataset.cand); return; }
+    if (t.dataset.cand !== undefined) { pick(t.dataset.cand === 'own' ? 'own' : +t.dataset.cand); return; }
+    if (t.dataset.done) { renderWheel(); return; }
     if (t.dataset.keep) { keep(); return; }
     if (t.dataset.skip) { advance(); return; }
     if (t.dataset.back) { if (idx > 0) { idx--; renderSpoke(); window.scrollTo({ top: 0 }); } return; }
@@ -510,22 +730,41 @@
       return;
     }
     if (t.dataset.restart) {
-      try { localStorage.removeItem(WHEEL_KEY); } catch (err) { /* nothing sensible left to do */ }
+      /* Clear means clear: the copy on this device AND the record on the
+         server. The id goes too, so what comes next is a new record rather than
+         a resurrection of the old one. */
+      deleteOnServer();
+      try { localStorage.removeItem(WHEEL_KEY); localStorage.removeItem(ID_KEY); } catch (err) { /* nothing sensible left to do */ }
       harvest = {}; idx = 0; show('intro'); renderIntro();
       return;
     }
     if (t.dataset.top) { show('build'); idx = 0; renderSpoke(); return; }
   });
 
-  /* ================= LOAD ================= */
+  /* ================= LOAD =================
+     Arriving with ?from=wayl means the person has just this second finished the
+     assessment and tapped through — so there is nothing to introduce and no
+     menu to offer. They land in the build itself, on their own spoke one. Any
+     other arrival still gets the intro. */
+  function arrivedFromWayl() {
+    return /[?&]from=(wayl|rank|single)/.test(window.location.search);
+  }
+
   Promise.all([
     fetch(SPOKES_URL).then(function (r) { return r.json(); }),
-    fetch(BANK_URL).then(function (r) { return r.json(); })
+    fetch(BANK_URL).then(function (r) { return r.json(); }),
+    pullFromServer()
   ]).then(function (res) {
     SPOKES = res[0].spokes || [];
     BANK = res[1].spokes || {};
-    renderIntro();
+    adoptRemote(res[2]);
     $('introLoading').classList.add('hidden');
+    var run = storedRun();
+    if (run && arrivedFromWayl()) {
+      start('assessment', run.meta || 'your answers', run.bands);
+      return;
+    }
+    renderIntro();
   }).catch(function () {
     $('introLoading').textContent = 'The wheel data didn’t load. A refresh usually sorts it.';
   });

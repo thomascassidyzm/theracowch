@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Build your wheel — prototype | Cowch</title>
+    <title>Build your wheel | Cowch</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="description" content="A prototype: your ranked answers build you a thirteen-spoke wellness wheel, and you own it by choosing and editing the words in it.">
+    <meta name="description" content="What comes after “What are you like, anyway?” — your answers build you a thirteen-spoke wellness wheel, and you own it by choosing the statements nearest to true and putting them in your own words.">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -13,9 +13,11 @@
            mirrored here rather than imported, exactly as the sibling
            questionnaires do. These pages are self-contained.
 
-           PROTOTYPE, behind a flag: nothing links to this page. It ships to
-           the live site because a prototype nobody can tap is not a prototype,
-           but nothing existing points at it and nothing existing changes.
+           THE COMPLETION STAGE of "What are you like, anyway?" (Tom, 2026-09-06:
+           "the build your wheel stage is what comes after WAYL is completed").
+           Both questionnaire variants hand off here when they finish, with
+           ?from=wayl, and the assessment result is read out of localStorage on
+           arrival — so nothing about the answers travels to get here.
 
            The layout deliberately does NOT copy the ranked questionnaire's
            pinned answering view. That view exists because nothing in it is
@@ -151,6 +153,17 @@
         }
         .cand-text { display: block; font-size: 0.95rem; line-height: 1.4; font-weight: 600; color: var(--ink); }
 
+        /* The fourth door reads as a door, not as a fourth statement: no
+           borrowed sentence in it, and set apart from the three above. */
+        .cand-own { background: var(--card); border-style: dashed; }
+        .cand-own .cand-text { font-weight: 500; color: var(--muted); }
+
+        .sync-note {
+            font-size: 0.82rem; font-weight: 700; color: var(--muted);
+            margin-top: 9px; min-height: 1.1em;
+        }
+        .sync-note.warn { color: var(--coral); }
+
         .editor { margin-top: 16px; }
         .edit-label { display: block; font-size: 0.88rem; font-weight: 700; color: var(--body); margin-bottom: 7px; }
         .editor textarea {
@@ -171,7 +184,10 @@
         }
         .wrow-name { flex: 1 1 auto; font-weight: 900; font-size: 1rem; }
         .wrow-edit { flex: 0 0 auto; font-size: 0.82rem; }
-        .wrow-words { font-size: 0.98rem; color: var(--body); line-height: 1.45; margin-top: 6px; padding-left: 31px; }
+        /* pre-wrap because these are THEIR words: a line break they typed is
+           part of what they wrote, and HTML's default whitespace collapsing
+           would quietly reflow it into one run-on line. */
+        .wrow-words { font-size: 0.98rem; color: var(--body); line-height: 1.45; margin-top: 6px; padding-left: 31px; white-space: pre-wrap; }
         .wrow-words.empty { color: var(--muted); font-style: italic; }
         .wrow.blank { opacity: 0.85; }
 
@@ -236,14 +252,15 @@
 
     <!-- intro -->
     <section id="intro">
-        <p class="flagline">Prototype · not linked from anywhere</p>
+        <p class="flagline">After “What are you like, anyway?”</p>
         <h1>Build your wheel</h1>
         <p class="lede">Thirteen spokes of an ordinary life, in an order your own answers set — and then, one at a time, in your own words.</p>
 
         <div class="panel">
             <p><b>You don't start with a blank page.</b> Your ranked answers build the wheel for you: which spoke you start on, what order the rest come in, and how boldly each one is put. All you do is choose which of three ways of holding it is nearest to true, and then change the words until they're yours.</p>
             <p>The order is not a ranking of you. It runs from the spokes where the next chance to choose well comes round soonest — the next meal, the next breath — to the ones that take months. Starting somewhere forgiving is the whole idea.</p>
-            <p><b>What gets kept is exactly what you type.</b> Your words, spoke by spoke, kept on this device. There&rsquo;s no account and no automatic upload &mdash; nothing goes anywhere unless you choose to share it.</p>
+            <p><b>What gets kept is exactly what you type.</b> Your words, spoke by spoke, word for word &mdash; never tidied, never rewritten, never wrapped in encouragement. Choose as many or as few as you like; a few lines that are true is a finished wheel.</p>
+            <p><b>Where they&rsquo;re kept.</b> On this device, and on Cowch&rsquo;s server, so they survive a cleared browser or a new phone and can be given back to you later, in your words. There&rsquo;s still no account and no name attached &mdash; just a random code this browser makes up. Your questionnaire answers themselves stay on this device, as they always have; the only thing that travels is what you deliberately write here. You can delete the lot, here and on the server, with one tap at the end.</p>
 
             <div class="callout">
                 This is a starting point, not a verdict. It maps what you'd choose, never what you're worth. Cowch is a wellbeing companion, built on a real therapist's approach — it isn't therapy, and it isn't a replacement for it.
@@ -252,7 +269,7 @@
             <p id="introLoading" class="found">Loading the thirteen&hellip;</p>
             <div id="introActions"></div>
         </div>
-        <p class="honesty">Nothing here leaves this device unless you choose to share it.</p>
+        <p class="honesty">Your words, kept as you wrote them, and yours to delete.</p>
     </section>
 
     <!-- one spoke at a time -->
@@ -274,16 +291,17 @@
         <div class="panel">
             <p><b>What this is for.</b> One spoke at a time, in the order above. Not all thirteen at once — you can't focus on everything at the same time, and the ones further round will still be there when you get to them.</p>
             <p>No streaks and nothing to keep up. If you come back to it in three weeks, that's just you coming back — it doesn't say anything about you and nothing here will count it.</p>
+            <p class="sync-note" id="wheelSync"></p>
             <div class="btn-row">
                 <button class="btn btn-primary" type="button" data-copy="1">Copy my wheel as text</button>
                 <button class="btn btn-ghost" type="button" data-top="1">Go through it again</button>
             </div>
             <p class="copy-note" id="copyNote"></p>
             <div class="btn-row">
-                <button class="btn btn-ghost" type="button" data-restart="1">Clear it and start over</button>
+                <button class="btn btn-ghost" type="button" data-restart="1">Delete my wheel &mdash; here and on the server</button>
             </div>
         </div>
-        <p class="honesty">A starting point, not a verdict — and it stays on this device unless you choose to share it.</p>
+        <p class="honesty">A starting point, not a verdict — in your own words, kept exactly as you wrote them.</p>
     </section>
 
 </div>

@@ -224,8 +224,15 @@ payload definition has to say explicitly whether that goes.
 
 `public/questionnaires/build-your-wheel.html` / `public/assets/js/wellness-wheel.js`
 keeps its harvest under `cowch-wheel-build`: the person's own words, verbatim, keyed to
-each of thirteen spokes. The code comment is unambiguous — "On this device, in this
-browser, and nowhere else — no endpoint exists to send it to."
+each of thirteen spokes.
+
+**UPDATED 2026-09-07 — the "nowhere else" half of this is out of date.** The wheel build is
+now the completion stage of WAYL, and the harvest is also POSTed to `/api/wheel` and kept
+server-side under a random per-browser id, so a person's own words survive a cleared browser
+or a new phone. Still no account, no name, no model call; still deletable in one tap, on the
+device and on the server. What has NOT changed is everything below — this is the most personal
+data in the app, and being stored is not the same as being fed to Mandy: nothing reads that
+record yet.
 
 **My read: this is the most personal data in the app and should not be in a first feed
 to Mandy.** A scored axis is a summary; the wheel harvest is a person's own sentences

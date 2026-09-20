@@ -116,8 +116,14 @@ context to API".
 
 **Checked and true, left alone:**
 
-- **The wheel build** (`build-your-wheel.html`, `wellness-wheel.js`, key `cowch-wheel-build`) —
-  "no endpoint, no account, no upload" holds. Nothing outside that file reads the key.
+- ~~**The wheel build**~~ — **NO LONGER TRUE, and the copy has been changed to match**
+  (2026-09-07). The wheel build is now the completion stage of "What are you like, anyway?",
+  and the words a person writes there are POSTed to `/api/wheel` and kept server-side under
+  a random per-browser id (Tom's ruling: the daily line is the user's own words, so they have
+  to outlive one browser). `build-your-wheel.html` now says so in plain words, on the intro
+  and at the end, with a delete-everywhere button; `privacy.html` §3 carries it too. The
+  *questionnaire's own* answers are unchanged: still device-only, still excluded from the
+  Mandy pipe.
 - **The Positive Data Log** in the self-doubt exercise (`cowch_positive_data_log`) — "It stays on
   this device, just for you" holds. Read by nothing that sends.
 - **Analytics** — `privacy.html` §7 is accurate; the analytics script sends only a channel label
