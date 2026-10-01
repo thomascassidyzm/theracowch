@@ -4,11 +4,13 @@
 // spec — no auth build-out for one internal use case).
 //
 // Provision: set NDA_EXPORT_TOKEN in Vercel env vars to any long random
-// string. Fetch records with:
+// string. Fetch records with the token in `Authorization: Bearer <token>`
+// (preferred — stays out of logs), or for old bookmarks as ?token=:
 //   GET /api/nda-export?token=<NDA_EXPORT_TOKEN>
 //   GET /api/nda-export?token=<NDA_EXPORT_TOKEN>&id=<uuid>   (single record)
 
 import { Redis } from '@upstash/redis';
+import { requireExportToken } from '../lib/export-token.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -28,15 +30,9 @@ export default async function handler(req, res) {
         return;
     }
 
-    const expected = process.env.NDA_EXPORT_TOKEN;
-    if (!expected) {
-        res.status(503).json({ error: 'Not configured: NDA_EXPORT_TOKEN missing.' });
-        return;
-    }
-    if (req.query.token !== expected) {
-        res.status(401).json({ error: 'Invalid or missing token' });
-        return;
-    }
+    if (!(await requireExportToken(req, res, {
+        bucket: 'nda-export', expected: process.env.NDA_EXPORT_TOKEN, envName: 'NDA_EXPORT_TOKEN'
+    }))) return;
 
     try {
         if (req.query.id) {
@@ -59,6 +55,6 @@ export default async function handler(req, res) {
         res.json({ count: records.length, records });
     } catch (err) {
         console.error('nda-export error:', err);
-        res.status(500).json({ error: 'nda-export failed', detail: String(err && err.message || err) });
+        res.status(500).json({ error: 'nda-export failed' });
     }
 }

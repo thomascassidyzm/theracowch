@@ -24,11 +24,14 @@
 // Guarded by a shared secret, same shape as api/nda-export.js: fail closed when
 // unconfigured, 401 on a wrong token, no default-open path. Deliberately its own
 // env var, not the NDA one — different data, separately revocable.
+//   GET /api/questionnaire-report  with  Authorization: Bearer <QSHARE_EXPORT_TOKEN>
+//   (?token=<...> still works for old bookmarks; the header keeps it out of logs)
 //   GET /api/questionnaire-report?token=<QSHARE_EXPORT_TOKEN>
 //   GET /api/questionnaire-report?token=<...>&id=<uuid>   (one record)
 //   GET /api/questionnaire-report?token=<...>&raw=1       (stored records, unshaped)
 
 import { Redis } from '@upstash/redis';
+import { requireExportToken } from '../lib/export-token.js';
 import { buildQuestionnaireContext, QUESTIONNAIRE_CAVEAT } from '../lib/questionnaire-context.js';
 
 const redis = new Redis({
@@ -52,27 +55,22 @@ function shaped(r) {
 }
 
 export default async function handler(req, res) {
+    // This URL carries a secret and personal data — never cached anywhere,
+    // including on the refusal paths below.
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+
     if (req.method !== 'GET') {
         res.setHeader('Allow', 'GET');
         res.status(405).end();
         return;
     }
 
-    const expected = process.env.QSHARE_EXPORT_TOKEN;
-    if (!expected) {
-        res.status(503).json({ error: 'Not configured: QSHARE_EXPORT_TOKEN missing.' });
-        return;
-    }
-    if (req.query.token !== expected) {
-        res.status(401).json({ error: 'Invalid or missing token' });
-        return;
-    }
+    if (!(await requireExportToken(req, res, {
+        bucket: 'qshare-export', expected: process.env.QSHARE_EXPORT_TOKEN, envName: 'QSHARE_EXPORT_TOKEN'
+    }))) return;
 
     try {
-        // This URL carries a secret and personal data — never cached anywhere.
-        res.setHeader('Cache-Control', 'no-store, max-age=0');
-        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-
         if (req.query.id) {
             const record = await redis.get('cowch:qshare:' + req.query.id);
             if (!record) {
@@ -109,6 +107,6 @@ export default async function handler(req, res) {
         });
     } catch (err) {
         console.error('questionnaire-report error:', err);
-        res.status(500).json({ error: 'questionnaire-report failed', detail: String(err && err.message || err) });
+        res.status(500).json({ error: 'questionnaire-report failed' });
     }
 }

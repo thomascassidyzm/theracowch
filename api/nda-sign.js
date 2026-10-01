@@ -122,6 +122,13 @@ export default async function handler(req, res) {
         });
     } catch (err) {
         console.error('nda-sign error:', err);
-        res.status(500).json({ error: 'nda-sign failed', detail: String(err && err.message || err) });
+        // A body that is not JSON is the caller's mistake, not ours. (Vercel's
+        // lazy req.body getter throws a 400-status error; a string body throws
+        // SyntaxError from JSON.parse.)
+        if (err instanceof SyntaxError || (err && err.statusCode === 400)) {
+            res.status(400).json({ error: 'Invalid JSON' });
+            return;
+        }
+        res.status(500).json({ error: 'nda-sign failed' });
     }
 }
