@@ -22,6 +22,14 @@ function switchTab(tabId) {
         panel.classList.toggle('active', panel.id === `tab-${tabId}`);
     });
 
+    // The pasture is a full-screen overlay belonging to Your Space; leaving the
+    // tab must close it, or a jump to chat (e.g. from the welcome guide right
+    // after onboarding's "Visit the pasture") lands under it.
+    if (tabId !== 'you') {
+        const pasture = document.getElementById('pasture-panel');
+        if (pasture) pasture.classList.remove('active');
+    }
+
     // Focus chat input when switching to chat
     if (tabId === 'chat') {
         setTimeout(() => { if (appChatInput) appChatInput.focus(); }, 100);
