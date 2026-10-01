@@ -139,30 +139,6 @@ function needsCompression() {
   return profile.messagesSinceCompression >= COMPRESS_AFTER_MESSAGES;
 }
 
-function buildCompressionPrompt(recentMessages, currentProfile) {
-  return `You are updating a therapy profile for a wellness app user. Analyze these recent messages and update the profile.
-
-CURRENT PROFILE:
-${JSON.stringify(currentProfile, null, 2)}
-
-RECENT MESSAGES (since last compression):
-${recentMessages.map(m => `${m.role}: ${m.content}`).join('\n\n')}
-
-Return ONLY valid JSON with these fields (keep values concise):
-{
-  "patterns": ["list", "of", "patterns"],
-  "patternStrength": {"pattern": strength_1_to_5},
-  "insights": ["max 5 key insights about this person"],
-  "activeThemes": ["what they're currently working on"],
-  "strengths": ["strengths you've noticed"],
-  "respondsTo": ["therapeutic approaches that work"],
-  "lastSessionSummary": "One sentence about this session",
-  "mood": "their current emotional state"
-}
-
-Focus on therapeutic relevance. Be concise. Max 200 words total.`;
-}
-
 async function compressProfile(recentMessages) {
   const profile = getProfile();
 
@@ -170,8 +146,14 @@ async function compressProfile(recentMessages) {
     const response = await fetch('/api/compress-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      // The server owns the prompt template (api/compress-profile.js); the
+      // device sends only the data it needs.
       body: JSON.stringify({
-        prompt: buildCompressionPrompt(recentMessages, profile)
+        profile,
+        messages: recentMessages
+          .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+          .slice(-16)
+          .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }))
       })
     });
 
