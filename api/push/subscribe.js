@@ -13,7 +13,8 @@
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
 import { checkRateLimit } from '../../lib/request-gate.js';
-import { isAllowedPushEndpoint } from '../../lib/push-endpoint-allowlist.js';
+import { tooBig } from '../../lib/request-gate.js';
+import { subscriptionProblem, cleanSubscription, cleanPrefs, MAX_SUBSCRIBE_BODY_BYTES } from '../../lib/push-subscription.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -31,48 +32,61 @@ export default async function handler(req, res) {
         return;
     }
 
+    // A real subscribe body is well under 1 KB; refuse anything big before
+    // parsing it, and whatever was parsed after.
+    const declared = Number(req.headers && req.headers['content-length']);
+    if (Number.isFinite(declared) && declared > MAX_SUBSCRIBE_BODY_BYTES) {
+        res.status(413).json({ error: 'Request too large' });
+        return;
+    }
+
+    let body;
     try {
-        const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+        body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    } catch (_) {
+        res.status(400).json({ error: 'Invalid JSON' });
+        return;
+    }
+    if (tooBig(body, MAX_SUBSCRIBE_BODY_BYTES)) {
+        res.status(413).json({ error: 'Request too large' });
+        return;
+    }
+
+    try {
         const subscription = body.subscription;
-        const prefs = body.prefs || {};
 
-        if (!subscription || !subscription.endpoint) {
-            res.status(400).json({ error: 'Missing subscription.endpoint' });
-            return;
-        }
-
-        // Reject destinations that are not a real push service, before touching
-        // Redis at all. web-push posts the encrypted payload straight to this
-        // URL server-side; without this check a subscription is a stored,
-        // attacker-controlled outbound request.
-        if (!isAllowedPushEndpoint(subscription.endpoint)) {
-            res.status(400).json({ error: 'Unrecognised push endpoint' });
+        // Endpoint on a real push service (a stored attacker URL would be a
+        // blind SSRF at send time) AND keys web-push can actually encrypt to
+        // (junk keys throw on every cron run, forever). Checked before Redis.
+        const problem = subscriptionProblem(subscription);
+        if (problem) {
+            res.status(400).json({ error: problem });
             return;
         }
 
         // Anonymous, unauthenticated writes — cap how many one caller can create.
         // Generous: a real user subscribes/updates prefs a handful of times, ever.
-        const rl = await checkRateLimit(req, { bucket: 'push-subscribe', limit: 20, windowSeconds: 600 });
-        if (!rl.ok) {
-            res.setHeader('Retry-After', String(rl.retryAfter));
-            res.status(rl.status).json(
-                rl.status === 429
-                    ? { error: 'Too many requests — give it a minute.' }
-                    : { error: 'Service temporarily unavailable' }
-            );
-            return;
+        // The daily cap stops one address filling cowch:subs a window at a time.
+        for (const limits of [
+            { bucket: 'push-subscribe', limit: 20, windowSeconds: 600 },
+            { bucket: 'push-subscribe-ipday', limit: 50, windowSeconds: 86400 }
+        ]) {
+            const rl = await checkRateLimit(req, limits);
+            if (!rl.ok) {
+                res.setHeader('Retry-After', String(rl.retryAfter));
+                res.status(rl.status).json(
+                    rl.status === 429
+                        ? { error: 'Too many requests — give it a minute.' }
+                        : { error: 'Service temporarily unavailable' }
+                );
+                return;
+            }
         }
 
         const id = endpointId(subscription.endpoint);
         const record = {
-            subscription,
-            prefs: {
-                enabled: !!prefs.enabled,
-                morning: prefs.morning || { on: false, time: '09:00' },
-                evening: prefs.evening || { on: false, time: '20:00' },
-                snoozeUntil: prefs.snoozeUntil || 0,
-                tz: prefs.tz || 'UTC'
-            },
+            subscription: cleanSubscription(subscription),
+            prefs: cleanPrefs(body.prefs),
             updatedAt: Date.now()
         };
 
@@ -82,6 +96,6 @@ export default async function handler(req, res) {
         res.json({ ok: true, id });
     } catch (err) {
         console.error('subscribe error:', err);
-        res.status(500).json({ error: 'subscribe failed', detail: String(err && err.message || err) });
+        res.status(500).json({ error: 'subscribe failed' });
     }
 }

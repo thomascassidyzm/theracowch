@@ -22,6 +22,7 @@
 import { Redis } from '@upstash/redis';
 import webpush from 'web-push';
 import { isAllowedPushEndpoint } from '../../lib/push-endpoint-allowlist.js';
+import { subscriptionProblem } from '../../lib/push-subscription.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -44,6 +45,13 @@ const NUDGES = {
 // Must match the cron interval in vercel.json. Pro tier */15 → 8 min window.
 // Hobby tier 0 * * * * → bump to ~30 min in vercel.json + raise this.
 const SLOT_TOLERANCE_MINUTES = 8;
+
+// Send loop bounds. The budget stays inside the shortest Vercel function
+// timeout (10s on Hobby) with room to answer; concurrency keeps one slow push
+// service from holding everybody else up.
+const SEND_CONCURRENCY = 20;
+const SEND_BUDGET_MS = 8000;
+const MAX_FAILURES = 5;
 
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -104,6 +112,8 @@ export function skipReason(rec) {
     // A MISSING endpoint is malformed, not blocked: counting it as blocked would
     // report an attack that is not there and hide a data problem that is.
     if (!isAllowedPushEndpoint(rec.subscription.endpoint)) return 'endpoint-not-allowed';
+    // Keys no browser would produce: web-push can never encrypt to them.
+    if (subscriptionProblem(rec.subscription)) return 'bad-keys';
     if (!rec.prefs.enabled) return 'disabled';
     if (rec.prefs.snoozeUntil && Date.now() < rec.prefs.snoozeUntil) return 'snoozed';
     return null;
@@ -133,15 +143,23 @@ export default async function handler(req, res) {
         ids = (await redis.smembers('cowch:subs')) || [];
     } catch (err) {
         console.error('Redis smembers failed:', err);
-        res.status(500).json({ error: 'Redis unavailable', detail: String(err && err.message || err) });
+        res.status(500).json({ error: 'Redis unavailable' });
         return;
     }
 
-    let sent = 0, errors = 0, expired = 0, blocked = 0;
+    let sent = 0, errors = 0, expired = 0, blocked = 0, pruned = 0, deferred = 0;
 
-    for (const id of ids) {
+    async function prune(id) {
+        try {
+            await redis.del('cowch:sub:' + id);
+            await redis.srem('cowch:subs', id);
+            await redis.del('cowch:subfail:' + id);
+        } catch (_) {}
+    }
+
+    async function processOne(id) {
         let rec;
-        try { rec = await redis.get('cowch:sub:' + id); } catch (_) { continue; }
+        try { rec = await redis.get('cowch:sub:' + id); } catch (_) { return; }
         const skip = skipReason(rec);
         if (skip) {
             // A disallowed destination is COUNTED, not deleted. Deleting an
@@ -154,21 +172,27 @@ export default async function handler(req, res) {
                 blocked++;
                 console.warn('push send blocked: endpoint not on the push-service allowlist for', id);
             }
-            continue;
+            // Rows no browser could have written (no record, keys web-push
+            // cannot encrypt to) are removed: they can never be delivered.
+            if (skip === 'malformed' || skip === 'bad-keys') {
+                await prune(id);
+                pruned++;
+            }
+            return;
         }
         const { subscription, prefs } = rec;
 
         const tz = prefs.tz || 'UTC';
         let nowMins;
-        try { nowMins = nowMinutesInTz(now, tz); } catch (_) { continue; }
+        try { nowMins = nowMinutesInTz(now, tz); } catch (_) { return; }
 
         const slot = matchSlot(prefs, nowMins);
-        if (!slot) continue;
+        if (!slot) return;
 
         const day = dayKeyInTz(now, tz);
         const sentKey = `cowch:sent:${id}:${slot}:${day}`;
         try {
-            if (await redis.get(sentKey)) continue; // already sent today
+            if (await redis.get(sentKey)) return; // already sent today
         } catch (_) { /* fall through */ }
 
         const nudge = pick(NUDGES[slot]);
@@ -181,21 +205,46 @@ export default async function handler(req, res) {
         try {
             await webpush.sendNotification(subscription, payload);
             await redis.set(sentKey, '1', { ex: 60 * 60 * 26 });
+            try { await redis.del('cowch:subfail:' + id); } catch (_) {}
             sent++;
         } catch (err) {
             errors++;
             const code = err && err.statusCode;
             if (code === 404 || code === 410) {
-                try {
-                    await redis.del('cowch:sub:' + id);
-                    await redis.srem('cowch:subs', id);
-                    expired++;
-                } catch (_) {}
+                await prune(id);
+                expired++;
             } else {
+                // Anything else is retried, but not forever: a row that has
+                // failed MAX_FAILURES sends in a row (a success resets the
+                // count) is removed rather than tried every 15 minutes.
                 console.error('push send failed for', id, code, err && err.message);
+                try {
+                    const fails = await redis.incr('cowch:subfail:' + id);
+                    if (fails === 1) await redis.expire('cowch:subfail:' + id, 60 * 60 * 24 * 14);
+                    if (fails >= MAX_FAILURES) { await prune(id); pruned++; }
+                } catch (_) {}
             }
         }
     }
 
-    res.json({ scanned: ids.length, sent, errors, expired, blocked });
+    // Parallel, bounded, and inside a time budget. The old loop was strictly
+    // sequential, so a large set (or a pile of junk rows) ran into the
+    // function timeout and the subscribers after it were never reached. The
+    // order is shuffled every run so whoever misses a budget-limited run is
+    // not the same person every time.
+    const queue = ids.slice();
+    for (let i = queue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [queue[i], queue[j]] = [queue[j], queue[i]];
+    }
+    const deadline = Date.now() + SEND_BUDGET_MS;
+    async function worker() {
+        while (queue.length) {
+            if (Date.now() > deadline) { deferred = queue.length; return; }
+            await processOne(queue.shift());
+        }
+    }
+    await Promise.all(Array.from({ length: Math.min(SEND_CONCURRENCY, queue.length) }, worker));
+
+    res.json({ scanned: ids.length, sent, errors, expired, blocked, pruned, deferred });
 }

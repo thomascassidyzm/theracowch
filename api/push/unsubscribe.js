@@ -3,6 +3,7 @@
 
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+import { checkRateLimit } from '../../lib/request-gate.js';
 
 const redis = new Redis({
     url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
@@ -20,11 +21,24 @@ export default async function handler(req, res) {
         return;
     }
 
+    let body;
     try {
-        const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+        body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    } catch (_) {
+        res.status(400).json({ error: 'Invalid JSON' });
+        return;
+    }
+
+    try {
         const endpoint = body.endpoint;
-        if (!endpoint) {
+        if (typeof endpoint !== 'string' || !endpoint || endpoint.length > 1024) {
             res.status(400).json({ error: 'Missing endpoint' });
+            return;
+        }
+        const rl = await checkRateLimit(req, { bucket: 'push-unsubscribe', limit: 20, windowSeconds: 600 });
+        if (!rl.ok) {
+            res.setHeader('Retry-After', String(rl.retryAfter));
+            res.status(rl.status).json({ error: rl.status === 429 ? 'Too many requests — give it a minute.' : 'Service temporarily unavailable' });
             return;
         }
         const id = endpointId(endpoint);
@@ -33,6 +47,6 @@ export default async function handler(req, res) {
         res.json({ ok: true });
     } catch (err) {
         console.error('unsubscribe error:', err);
-        res.status(500).json({ error: 'unsubscribe failed', detail: String(err && err.message || err) });
+        res.status(500).json({ error: 'unsubscribe failed' });
     }
 }
