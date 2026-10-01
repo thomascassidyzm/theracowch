@@ -2884,7 +2884,7 @@ async function syncPushSubscription() {
 
         const s = remindersLoad();
         const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
-        await fetch('/api/push/subscribe', {
+        const saved = await fetch('/api/push/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -2898,6 +2898,9 @@ async function syncPushSubscription() {
                 }
             })
         });
+        // Not registered server-side: say so rather than assume it worked.
+        // This runs again on every reminder reschedule, which is the retry.
+        if (!saved.ok) throw new Error(`push subscribe refused: ${saved.status}`);
     } catch (err) {
         // Browser/permission/network noise — swallowed on purpose; the
         // page-side setTimeout fallback in scheduleRemindersForToday() will

@@ -295,11 +295,53 @@
       .catch(function () { return null; });
   }
 
+  /* "Clear it and start over" must leave nothing behind. The id is forgotten
+     on this device at once, so a DELETE that fails (offline, server down) is
+     remembered under DELETE_KEY and retried on the next visit until the
+     server confirms it. Earlier service-worker builds also cached /api/
+     replies, so any cached copy of the wheel is purged from Cache Storage. */
+  var DELETE_KEY = 'cowch-wheel-delete-pending';
+  function pendingDeletes() {
+    try { return JSON.parse(localStorage.getItem(DELETE_KEY) || '[]') || []; } catch (e) { return []; }
+  }
+  function setPendingDeletes(ids) {
+    try {
+      if (ids.length) localStorage.setItem(DELETE_KEY, JSON.stringify(ids));
+      else localStorage.removeItem(DELETE_KEY);
+    } catch (e) { /* nothing sensible left to do */ }
+  }
+  function purgeCachedWheel() {
+    if (!window.caches || !caches.keys) return;
+    caches.keys().then(function (names) {
+      names.forEach(function (name) {
+        caches.open(name).then(function (cache) {
+          cache.keys().then(function (reqs) {
+            reqs.forEach(function (req) {
+              if (new URL(req.url).pathname.indexOf('/api/') === 0) cache.delete(req);
+            });
+          });
+        });
+      });
+    }).catch(function () {});
+  }
+  function flushPendingDeletes() {
+    pendingDeletes().forEach(function (id) {
+      fetch(API + '?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function (r) {
+        if (r.ok || r.status === 404) {
+          setPendingDeletes(pendingDeletes().filter(function (x) { return x !== id; }));
+        }
+      }).catch(function () { /* stays pending; retried next visit */ });
+    });
+  }
   function deleteOnServer() {
     var id;
     try { id = localStorage.getItem(ID_KEY); } catch (e) { return; }
+    purgeCachedWheel();
     if (!id) return;
-    fetch(API + '?id=' + encodeURIComponent(id), { method: 'DELETE' }).catch(function () {});
+    var ids = pendingDeletes();
+    if (ids.indexOf(id) === -1) ids.push(id);
+    setPendingDeletes(ids);
+    flushPendingDeletes();
   }
 
   /* ================= BUILDING THE PLAN ================= */
@@ -750,6 +792,7 @@
     return /[?&]from=(wayl|rank|single)/.test(window.location.search);
   }
 
+  flushPendingDeletes();
   Promise.all([
     fetch(SPOKES_URL).then(function (r) { return r.json(); }),
     fetch(BANK_URL).then(function (r) { return r.json(); }),

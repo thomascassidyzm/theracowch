@@ -1,7 +1,7 @@
-const CACHE_NAME = 'cowch-wellness-v238';
+const CACHE_NAME = 'cowch-wellness-v239';
 // Human-readable build date, surfaced in Settings via the GET_VERSION message
 // below so users can confirm at a glance which build they're running.
-const BUILD_DATE = '20 Sep 2026';
+const BUILD_DATE = '30 Sep 2026';
 const urlsToCache = [
   '/',
   '/app.html',
@@ -44,34 +44,13 @@ self.addEventListener('message', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
-  // Handle API calls with network-first strategy
-  if (event.request.url.includes('/api/')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Clone and cache successful API responses
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Return cached response if network fails
-          return caches.match(event.request).then(cachedResponse => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            // Return a fallback JSON response for chat API
-            return new Response(JSON.stringify({
-              response: "I'm currently offline, but I'm still here for you. Please check your connection and try again. 🐄",
-              offline: true
-            }), {
-              headers: { 'Content-Type': 'application/json' }
-            });
-          });
-        })
-    );
+  // API calls are never touched by the service worker: not cached (a GET of
+  // /api/wheel carries someone's own words, and a cache would keep serving
+  // them after "clear it and start over"), and never answered with a
+  // made-up success. A failed wheel save, NDA signature or push subscribe
+  // must reach the page as a failure so it can keep the data and retry; a
+  // failed chat call shows the crisis pointer (chat-script.js).
+  if (new URL(event.request.url).pathname.startsWith('/api/')) {
     return;
   }
 
@@ -128,6 +107,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   
+  // Old caches go entirely — earlier builds stored /api/ responses in them.
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
