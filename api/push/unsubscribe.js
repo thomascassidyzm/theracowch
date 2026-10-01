@@ -1,14 +1,11 @@
 // Removes a subscription. Called by the client when the user turns
 // reminders off entirely, or when the browser invalidates a subscription.
 
-import { Redis } from '@upstash/redis';
+import { createRedis } from '../../lib/redis.js';
 import crypto from 'crypto';
 import { checkRateLimit } from '../../lib/request-gate.js';
 
-const redis = new Redis({
-    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-});
+const redis = createRedis();
 
 function endpointId(endpoint) {
     return crypto.createHash('sha256').update(endpoint).digest('hex').slice(0, 32);

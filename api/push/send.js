@@ -19,15 +19,12 @@
 //                        If it is unset the endpoint refuses every request:
 //                        it must never be open to unauthenticated callers.
 
-import { Redis } from '@upstash/redis';
+import { createRedis } from '../../lib/redis.js';
 import webpush from 'web-push';
 import { isAllowedPushEndpoint } from '../../lib/push-endpoint-allowlist.js';
 import { subscriptionProblem } from '../../lib/push-subscription.js';
 
-const redis = new Redis({
-    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-});
+const redis = createRedis();
 
 const NUDGES = {
     morning: [

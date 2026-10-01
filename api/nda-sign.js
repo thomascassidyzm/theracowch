@@ -11,14 +11,11 @@
 //           agreedAt, signedAt (server), userAgent, ip }
 //   set:  cowch:nda:all — ids for the export endpoint to iterate
 
-import { Redis } from '@upstash/redis';
+import { createRedis } from '../lib/redis.js';
 import crypto from 'crypto';
 import { checkRateLimit } from '../lib/request-gate.js';
 
-const redis = new Redis({
-    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-});
+const redis = createRedis();
 
 function clientIp(req) {
     const fwd = req.headers['x-forwarded-for'];

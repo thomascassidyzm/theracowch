@@ -35,12 +35,10 @@
 //   GET    /api/wheel?id=<uuid>    the record, for restoring on this device
 //   DELETE /api/wheel?id=<uuid>    "clear it and start over", server side too
 
-import { Redis } from '@upstash/redis';
+import { createRedisIfConfigured } from '../lib/redis.js';
 import { isAllowedOrigin, checkRateLimit, tooBig } from '../lib/request-gate.js';
 
-const REDIS_URL   = process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
+const redis = createRedisIfConfigured();
 
 const TTL_SECONDS = 400 * 24 * 60 * 60;
 const MAX_BODY_BYTES = 64 * 1024;

@@ -30,14 +30,11 @@
 //   GET /api/questionnaire-report?token=<...>&id=<uuid>   (one record)
 //   GET /api/questionnaire-report?token=<...>&raw=1       (stored records, unshaped)
 
-import { Redis } from '@upstash/redis';
+import { createRedis } from '../lib/redis.js';
 import { requireExportToken } from '../lib/export-token.js';
 import { buildQuestionnaireContext, QUESTIONNAIRE_CAVEAT } from '../lib/questionnaire-context.js';
 
-const redis = new Redis({
-    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-});
+const redis = createRedis();
 
 // One stored share, as agent context. The scored bands go through the same
 // shared builder api/chat.js uses, so a trait can never be described one way

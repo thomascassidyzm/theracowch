@@ -10,16 +10,13 @@
 //   val:  { subscription, prefs, updatedAt }
 //   set:  cowch:subs — ids for the cron iterator
 
-import { Redis } from '@upstash/redis';
+import { createRedis } from '../../lib/redis.js';
 import crypto from 'crypto';
 import { checkRateLimit } from '../../lib/request-gate.js';
 import { tooBig } from '../../lib/request-gate.js';
 import { subscriptionProblem, cleanSubscription, cleanPrefs, MAX_SUBSCRIBE_BODY_BYTES } from '../../lib/push-subscription.js';
 
-const redis = new Redis({
-    url:   process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-});
+const redis = createRedis();
 
 function endpointId(endpoint) {
     return crypto.createHash('sha256').update(endpoint).digest('hex').slice(0, 32);
