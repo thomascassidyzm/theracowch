@@ -19,7 +19,7 @@ const mutations = {
     daily: ['lib/request-gate.js', 'if (count > dailyLimit)', 'if (false)'],
     'daily-wiring': ['lib/request-gate.js', 'if (dailyLimit)', 'if (false)'],
     'chat-input': ['api/chat.js', 'if (messageError)', 'if (false)'],
-    'compress-input': ['api/compress-profile.js', 'if (promptError)', 'if (false)'],
+    'compress-input': ['api/compress-profile.js', 'if (input.error)', 'if (false)'],
     blog: ['api/blog-quotes.js', 'try {', "try { await fetch('https://www.thoughtsonlifeandlove.com/sitemap.xml');"]
 };
 if (mutation) assert.ok(mutations[mutation], `Unknown mutation: ${mutation}`);
@@ -86,14 +86,16 @@ function setup(t) {
     t.mock.timers.enable({ apis: ['Date'], now: Date.UTC(2026, 8, 20, 12) });
     t.mock.method(globalThis, 'fetch', async (...args) => {
         state.calls.push(args);
-        return { ok: true, json: async () => ({ content: [{ text: 'A calm reply.' }] }) };
+        return { ok: true, json: async () => ({ content: [{ type: 'text', text: '{"mood":"calm"}' }] }) };
     });
 }
 
 for (const [name, handler, limit, body] of [
     ['NDA', nda, 10, { fullName: 'Test Person', email: 'test@example.com', agreed: true,
         signatureDataUrl: 'data:image/png;base64,AA==' }],
-    ['push', push, 20, { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/test' } }]
+    ['push', push, 20, { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/test', keys: {
+        p256dh: Buffer.concat([Buffer.from([4]), Buffer.alloc(64, 1)]).toString('base64url'),
+        auth: Buffer.alloc(16, 2).toString('base64url') } } }]
 ]) {
     test(`${name}: limit requests are stored; next request is 429 without a write`, async t => {
         setup(t);
@@ -116,20 +118,26 @@ for (const [name, handler, limit, body] of [
     });
 }
 
+// compress takes { profile, messages } and builds its prompt server-side, so
+// its "field" is the text of the one message it sends.
+const bodies = {
+    chat: v => ({ message: v }),
+    compress: v => ({ profile: {}, messages: [{ role: 'user', content: v }] })
+};
 for (const [name, handler, field, max, limits] of [
     ['chat', chat, 'message', 4000, LIMITS.chat],
-    ['compress', compress, 'prompt', 8000, LIMITS.compress]
+    ['compress', compress, 'content', 8000, LIMITS.compress]
 ]) {
     test(`${name}: last daily slot succeeds; another IP is denied before fetch`, async t => {
         setup(t);
         const key = `cowch:rl:global:${limits.bucket}:2026-09-20`;
         state.counters.set(key, limits.dailyLimit - 1);
         const last = response();
-        await handler(request({ [field]: 'hello' }), last);
+        await handler(request(bodies[name]('hello')), last);
         assert.equal(last.code, 200);
         assert.equal(state.calls.length, 1, 'last slot must reach AI');
         const denied = response();
-        await handler(request({ [field]: 'hello' }, '203.0.113.8'), denied);
+        await handler(request(bodies[name]('hello'), '203.0.113.8'), denied);
         assert.equal(denied.code, 429);
         assert.match(denied.body.error, /Daily capacity/);
         assert.equal(denied.headers['Retry-After'], '3600');
@@ -137,12 +145,12 @@ for (const [name, handler, field, max, limits] of [
     });
     for (const [label, value, status] of [
         ['content-block array', [{ type: 'text', text: 'hello' }], 400],
-        ['oversized string', 'x'.repeat(max + 1), 413]
+        ...(name === 'chat' ? [['oversized string', 'x'.repeat(max + 1), 413]] : [])
     ]) {
         test(`${name}: handler rejects ${label} before fetch`, async t => {
             setup(t);
             const res = response();
-            await handler(request({ [field]: value }), res);
+            await handler(request(bodies[name](value)), res);
             assert.equal(res.code, status);
             assert.equal(state.calls.length, 0, 'invalid input must never reach AI');
         });

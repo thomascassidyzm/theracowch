@@ -17,7 +17,12 @@ process.env.KV_REST_API_TOKEN = 'dummy';
 const { skipReason } = await import('../api/push/send.js');
 
 const prefs = { enabled: true, morning: { on: true, time: '09:00' }, evening: { on: false }, tz: 'UTC' };
-const rec = (endpoint) => ({ subscription: { endpoint, keys: { p256dh: 'x', auth: 'y' } }, prefs });
+// Keys shaped like a real browser's: a 65-byte uncompressed P-256 point and 16 auth bytes.
+const keys = {
+    p256dh: Buffer.concat([Buffer.from([4]), Buffer.alloc(64, 1)]).toString('base64url'),
+    auth: Buffer.alloc(16, 2).toString('base64url')
+};
+const rec = (endpoint) => ({ subscription: { endpoint, keys }, prefs });
 
 test('a stored endpoint on an attacker-chosen host is refused at send time', () => {
     assert.equal(skipReason(rec('https://attacker.example/collect')), 'endpoint-not-allowed');
@@ -46,4 +51,9 @@ test('malformed, disabled and snoozed records are skipped with their own reasons
         ...rec('https://web.push.apple.com/abc'),
         prefs: { ...prefs, snoozeUntil: Date.now() + 60000 }
     }), 'snoozed');
+});
+
+test('keys no browser could produce are skipped as bad-keys', () => {
+    const junk = { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/abc', keys: { p256dh: 'x', auth: 'y' } }, prefs };
+    assert.equal(skipReason(junk), 'bad-keys');
 });
