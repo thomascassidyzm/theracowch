@@ -43,6 +43,7 @@
 }
 .calf-stage:active { transform: scale(.94); }
 .calf-stage svg { width: 78px; height: 78px; display: block; }
+.calf-stage .calf-img { width: 82% !important; height: 82% !important; }
 .calf-stage.calf-bounce { animation: calfBounce .6s ease; }
 @keyframes calfBounce {
     0%,100% { transform: translateY(0) rotate(0); }
@@ -163,6 +164,7 @@
 
 .calf-stage-art { width: 200px; height: 200px; display: grid; place-items: center; }
 .calf-stage-art svg { width: 100%; height: 100%; }
+.calf-stage-art .calf-img { filter: drop-shadow(0 8px 10px rgba(60,46,40,.14)); }
 .calf-stage-art.pop-in { animation: calfStagePop .6s cubic-bezier(.34,1.56,.64,1); }
 @keyframes calfStagePop { 0% { transform: scale(.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .calf-stage-art.gentle-float { animation: calfFloat 4s ease-in-out infinite; }

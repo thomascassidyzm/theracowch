@@ -96,12 +96,14 @@
   // The calf is drawn from a rendered frame (a 3D plush portrait, one per
   // expression) when present, falling back to the inline SVG below if a frame
   // is missing. Drop PNG/WebP into /assets/calf/ named per CALF_FRAMES. The
-  // four expressions double as the growth stages (see STAGES).
+  // four expressions double as the growth stages (see STAGES). The frames are
+  // head-only cutouts on a transparent background (tools/calf-head-cutout.py),
+  // so the calf sits on whatever is behind it rather than in a beige square.
   var CALF_FRAMES = {
-    sleepy:  '/assets/calf/sleepy.webp',   // Newborn / resting
-    content: '/assets/calf/content.webp',  // Finding their feet / calm
-    happy:   '/assets/calf/happy.webp',    // Bright & playful
-    beam:    '/assets/calf/beam.webp'      // Thriving / joyful
+    sleepy:  '/assets/calf/sleepy-head.webp',   // Newborn / resting
+    content: '/assets/calf/content-head.webp',  // Finding their feet / calm
+    happy:   '/assets/calf/happy-head.webp',    // Bright & playful
+    beam:    '/assets/calf/beam-head.webp'      // Thriving / joyful
   };
 
   // Render the calf as an <img> of the rendered frame, with a graceful
