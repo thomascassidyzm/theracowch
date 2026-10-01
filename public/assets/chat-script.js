@@ -976,10 +976,19 @@ function escapeHtml(text) {
         .replace(/'/g, '&#39;');
 }
 
-// Only web links and same-site paths become links; javascript:, data: and
-// anything else stays as plain text.
+// Only https: links and links that resolve to this site become links;
+// http:, javascript:, data:, //host and /\host stay as plain text. Resolve with
+// the URL parser rather than pattern-matching, so the browser's own reading
+// of the href is the one we check.
 function isSafeHref(url) {
-    return /^https?:\/\//i.test(url) || (url.startsWith('/') && !url.startsWith('//'));
+    let resolved;
+    try {
+        resolved = new URL(url, location.origin);
+    } catch {
+        return false;
+    }
+    return resolved.origin === location.origin
+        || (resolved.protocol === 'https:' && /^https:/i.test(url.trim()));
 }
 
 function formatMessage(content) {

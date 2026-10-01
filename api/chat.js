@@ -1,5 +1,5 @@
 import IMAGINE_FRAMEWORK_PROMPTS from '../lib/prompt-base.js';
-import { gate, spendGlobal, LIMITS, tooBig } from '../lib/request-gate.js';
+import { gate, spendGlobal, LIMITS, tooBig, readJsonBody } from '../lib/request-gate.js';
 import { buildQuestionnaireContext } from '../lib/questionnaire-context.js';
 import { checkTextField, checkChatTurns, cleanProfile, cleanLabel } from '../lib/text-field-guard.js';
 
@@ -19,9 +19,11 @@ export default async function handler(req, res) {
   // until the gate says so. Everything it rejects is answered before any
   // upstream call — a rejected request costs nothing.
   if (!(await gate(req, res, LIMITS.chat))) return;
+  const parsed = readJsonBody(req, res);
+  if (!parsed.ok) return;
 
   try {
-    const { message, profile, recentMessages, history, currentPattern, sessionPhase, questionnaire } = req.body;
+    const { message, profile, recentMessages, history, currentPattern, sessionPhase, questionnaire } = parsed.body || {};
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });

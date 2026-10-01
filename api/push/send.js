@@ -51,6 +51,11 @@ const SLOT_TOLERANCE_MINUTES = 8;
 // service from holding everybody else up.
 const SEND_CONCURRENCY = 20;
 const SEND_BUDGET_MS = 8000;
+// The budget is a deadline, not a hint: at SEND_BUDGET_MS the handler answers
+// whatever is still in flight. Overridable only so a test can use a short one.
+function sendBudgetMs() {
+    return Number(process.env.PUSH_SEND_BUDGET_MS) || SEND_BUDGET_MS;
+}
 const MAX_FAILURES = 5;
 
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -148,6 +153,7 @@ export default async function handler(req, res) {
     }
 
     let sent = 0, errors = 0, expired = 0, blocked = 0, pruned = 0, deferred = 0;
+    const deadline = Date.now() + sendBudgetMs();
 
     async function prune(id) {
         try {
@@ -203,7 +209,10 @@ export default async function handler(req, res) {
         });
 
         try {
-            await webpush.sendNotification(subscription, payload);
+            // web-push's own request timeout, so a hung push service gives up
+            // by the deadline instead of holding the socket open past it.
+            const timeout = Math.max(1, deadline - Date.now());
+            await webpush.sendNotification(subscription, payload, { timeout });
             await redis.set(sentKey, '1', { ex: 60 * 60 * 26 });
             try { await redis.del('cowch:subfail:' + id); } catch (_) {}
             sent++;
@@ -237,14 +246,28 @@ export default async function handler(req, res) {
         const j = Math.floor(Math.random() * (i + 1));
         [queue[i], queue[j]] = [queue[j], queue[i]];
     }
-    const deadline = Date.now() + SEND_BUDGET_MS;
+    // Nothing new starts after the deadline, and the handler answers AT the
+    // deadline even if a send (or a Redis call around it) is still running:
+    // those are abandoned and counted, and the next cron run picks them up
+    // (the sent marker is only written after a send succeeds).
+    let inFlight = 0;
     async function worker() {
-        while (queue.length) {
-            if (Date.now() > deadline) { deferred = queue.length; return; }
-            await processOne(queue.shift());
+        while (queue.length && Date.now() < deadline) {
+            const id = queue.shift();
+            inFlight++;
+            try { await processOne(id); } finally { inFlight--; }
         }
     }
-    await Promise.all(Array.from({ length: Math.min(SEND_CONCURRENCY, queue.length) }, worker));
+    let timer;
+    const timedOut = new Promise(resolve => {
+        timer = setTimeout(() => resolve(true), Math.max(0, deadline - Date.now()));
+    });
+    const workers = Promise.all(Array.from({ length: Math.min(SEND_CONCURRENCY, queue.length) }, worker));
+    await Promise.race([workers, timedOut]);
+    clearTimeout(timer);
+    deferred = queue.length;
+    const abandoned = inFlight;
+    queue.length = 0; // stop any worker that is still running from taking more
 
-    res.json({ scanned: ids.length, sent, errors, expired, blocked, pruned, deferred });
+    res.json({ scanned: ids.length, sent, errors, expired, blocked, pruned, deferred, abandoned });
 }

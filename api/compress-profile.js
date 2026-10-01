@@ -2,7 +2,7 @@
 // Uses Claude to extract therapeutic insights from conversation
 // Called periodically to update the local therapy profile
 
-import { gate, spendGlobal, LIMITS, tooBig } from '../lib/request-gate.js';
+import { gate, spendGlobal, LIMITS, tooBig, readJsonBody } from '../lib/request-gate.js';
 
 // The prompt is built HERE, not on the device. The endpoint used to take a
 // free-form `prompt` string and forward it to Haiku verbatim, which made it a
@@ -63,9 +63,12 @@ export default async function handler(req, res) {
   // Same gate as api/chat.js, same rationale: a public, account-less endpoint
   // fronting a billed Anthropic key. One shared helper so the two can't drift.
   if (!(await gate(req, res, LIMITS.compress))) return;
+  const read = readJsonBody(req, res);
+  if (!read.ok) return;
+  const body = read.body;
 
   try {
-    const input = checkCompressionInput(req.body);
+    const input = checkCompressionInput(body);
     if (input.error) {
       return res.status(input.status).json({ error: input.error });
     }
@@ -73,7 +76,7 @@ export default async function handler(req, res) {
 
     // Belt-and-braces serialised-size check, same as api/chat.js — the gate
     // already checked Content-Length, this checks what was actually parsed.
-    if (tooBig(req.body, LIMITS.compress.maxBodyBytes)) {
+    if (tooBig(body, LIMITS.compress.maxBodyBytes)) {
       return res.status(413).json({ error: 'Request too large' });
     }
 

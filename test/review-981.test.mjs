@@ -6,7 +6,7 @@ import { registerHooks } from 'node:module';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-const state = { kv: new Map(), sets: new Map(), calls: [], pushes: [], pushFail: new Set() };
+const state = { kv: new Map(), sets: new Map(), calls: [], pushes: [], pushFail: new Set(), pushDelayMs: 0, pushOpts: [] };
 globalThis[Symbol.for('review-981-state')] = state;
 process.env.KV_REST_API_URL = 'https://example.invalid';
 process.env.KV_REST_API_TOKEN = 'test-only';
@@ -38,8 +38,12 @@ registerHooks({
             const s = () => globalThis[Symbol.for('review-981-state')];
             export default {
                 setVapidDetails() {},
-                async sendNotification(sub) {
+                async sendNotification(sub, payload, opts) {
                     s().pushes.push(sub.endpoint);
+                    s().pushOpts.push(opts);
+                    // A push service that never answers in time, and ignores the
+                    // timeout it was given: the worst case the deadline must cover.
+                    if (s().pushDelayMs) await new Promise(r => setTimeout(r, s().pushDelayMs).unref());
                     if (s().pushFail.has(sub.endpoint)) throw new Error('boom');
                 }
             };` };
@@ -72,7 +76,7 @@ function request(body, ip = '203.0.113.7', extra = {}) {
     return { method: 'POST', body, headers: { origin: 'https://theracowch.com', 'x-forwarded-for': ip, ...extra } };
 }
 function setup(t, reply = 'A calm reply. [[MOOD: okay]]') {
-    state.kv.clear(); state.sets.clear(); state.calls.length = 0; state.pushes.length = 0; state.pushFail.clear();
+    state.kv.clear(); state.sets.clear(); state.calls.length = 0; state.pushes.length = 0; state.pushFail.clear(); state.pushDelayMs = 0; state.pushOpts.length = 0;
     t.mock.timers.enable({ apis: ['Date'], now: Date.UTC(2026, 8, 20, 12) });
     t.mock.method(globalThis, 'fetch', async (...args) => {
         state.calls.push(args);
@@ -179,6 +183,23 @@ test('compress: a free-form prompt is refused, and only JSON comes back', async 
     assert.deepEqual(JSON.parse(res4.body.compressed), { patterns: ['x'] });
 });
 
+test('chat + compress: a malformed JSON body is a 400, not a 500, and costs nothing upstream', async t => {
+    setup(t);
+    // Vercel's req.body is a lazy getter that throws on malformed JSON.
+    const badJson = () => {
+        const req = request(undefined);
+        Object.defineProperty(req, 'body', { get() { const e = new Error('Invalid JSON'); e.statusCode = 400; throw e; } });
+        return req;
+    };
+    for (const handler of [chat, compress]) {
+        const res = response();
+        await handler(badJson(), res);
+        assert.equal(res.code, 400);
+        assert.deepEqual(res.body, { error: 'Invalid JSON' });
+    }
+    assert.equal(state.calls.length, 0, 'nothing reached Anthropic');
+});
+
 // ---- finding 5: push subscriptions are validated, junk cannot starve real ones --
 
 test('push subscribe: bad keys and oversized bodies are refused before anything is stored', async t => {
@@ -235,6 +256,28 @@ test('push send: junk rows are pruned, failing rows retire, and a real subscribe
     assert.ok(state.sets.get('cowch:subs').has('real'));
 });
 
+test('push send: the budget is a real deadline — slow sends are abandoned, the rest deferred', async t => {
+    setup(t);
+    process.env.PUSH_SEND_BUDGET_MS = '300';
+    t.after(() => { delete process.env.PUSH_SEND_BUDGET_MS; });
+    state.pushDelayMs = 3000;
+    const prefs = { enabled: true, morning: { on: true, time: '12:00' }, evening: { on: false, time: '20:00' }, tz: 'UTC' };
+    for (let i = 0; i < 45; i++) {
+        state.kv.set('cowch:sub:s' + i, { subscription: { endpoint: 'https://fcm.googleapis.com/s' + i, keys: KEYS }, prefs });
+        state.sets.set('cowch:subs', (state.sets.get('cowch:subs') || new Set()).add('s' + i));
+    }
+    const res = response();
+    const started = performance.now();
+    await send({ headers: { authorization: 'Bearer cron' } }, res);
+    const took = performance.now() - started;
+    assert.ok(took < 300 + 250, `answered in ${Math.round(took)} ms, budget 300 ms`);
+    assert.equal(res.body.sent, 0);
+    assert.equal(res.body.abandoned, 20, 'the in-flight sends are abandoned, not waited for');
+    assert.equal(res.body.deferred, 25, 'nothing new starts after the deadline');
+    assert.equal(state.pushes.length, 20);
+    assert.ok(state.pushOpts.every(o => o && o.timeout > 0 && o.timeout <= 300), 'web-push is given the remaining budget as its timeout');
+});
+
 // ---- findings 3 + 4: the service worker leaves /api/ alone ------------------
 
 test('service worker: /api/ requests are neither answered nor cached by the SW', () => {
@@ -257,12 +300,12 @@ test('service worker: /api/ requests are neither answered nor cached by the SW',
 
 // ---- finding 6: chat HTML is escaped, javascript: links are not links ---------
 
-test('chat formatMessage escapes HTML and only links http(s) and same-site paths', () => {
+test('chat formatMessage escapes HTML and only links https: and same-origin URLs', () => {
     const src = readFileSync(new URL('../public/assets/chat-script.js', import.meta.url), 'utf8');
     const start = src.indexOf('// Escape before any markdown is applied');
     const end = src.indexOf('// Build an exercise action card');
     assert.ok(start > 0 && end > start);
-    const ctx = { IMAGINE_EXERCISES: [] };
+    const ctx = { IMAGINE_EXERCISES: [], URL, location: { origin: 'https://cowch.app' } };
     vm.runInNewContext(src.slice(start, end) + '\nthis.formatMessage = formatMessage;', ctx);
     const f = ctx.formatMessage;
     const img = f('<img src=x onerror=alert(1)>');
@@ -276,6 +319,10 @@ test('chat formatMessage escapes HTML and only links http(s) and same-site paths
     assert.ok(!proto.includes('href'));
     assert.match(f('[Samaritans](https://www.samaritans.org)'), /<a href="https:\/\/www\.samaritans\.org"/);
     assert.match(f('[exercise](/exercises/body-scan.html)'), /<a href="\/exercises\/body-scan\.html"/);
+    for (const bad of ['http://example.com', '/\\evil.example', '\\\\evil.example', '//evil.example', 'javascript:alert(1)', 'JaVaScRiPt:alert(1)', 'data:text/html,x', 'http://cowch.app/x']) {
+        assert.ok(!f(`[x](${bad})`).includes('href'), `${bad} must stay plain text`);
+    }
+    assert.match(f('[home](https://cowch.app/app.html)'), /<a href="https:\/\/cowch\.app\/app\.html"/);
     assert.match(f('**bold** and *soft*'), /<strong>bold<\/strong> and <em>soft<\/em>/);
     assert.ok(!f('[x](https://a.example/"onmouseover="alert(1))').includes('" onmouseover'), 'quotes cannot break out of href');
 });
