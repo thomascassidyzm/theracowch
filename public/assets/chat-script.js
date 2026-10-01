@@ -717,6 +717,9 @@ async function handleSendMessage() {
         }
 
         const data = await response.json();
+        if (!data || typeof data.response !== 'string' || !data.response.trim()) {
+            throw new Error('API returned no reply');
+        }
 
         // Let the cow reflect the user's world: record the AI's read of their mood.
         if (data.mood && typeof window.recordCowchMood === 'function') {
@@ -756,12 +759,51 @@ async function handleSendMessage() {
         console.error('Error sending message:', error);
         removeTypingIndicator();
 
-        // Show error message
-        addMessage(
-            "I'm having trouble connecting right now. Please try again in a moment, or contact Mandy directly at thoughtsonlifeandlove.com.",
-            'mandy'
-        );
+        // Every refusal or failure (rate limit, daily cap, limiter down,
+        // upstream error, offline) ends in the same place: the crisis pointer.
+        // Someone may be writing in at their worst moment, and the limiter
+        // deliberately fails closed, so a dead end must never be all they see.
+        showChatFailure();
     }
+}
+
+// The fixed message shown whenever the chat can't reply. Built from DOM
+// nodes, not HTML strings, so it renders the same whatever else breaks.
+function showChatFailure() {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message mandy chat-failure';
+    messageDiv.setAttribute('role', 'alert');
+
+    const lead = document.createElement('p');
+    lead.textContent = "Cowch can't reply right now. Please try again in a moment.";
+    messageDiv.appendChild(lead);
+
+    const intro = document.createElement('p');
+    intro.textContent = 'If you need to talk to someone now (UK):';
+    messageDiv.appendChild(intro);
+
+    const list = document.createElement('ul');
+    list.className = 'crisis-pointer';
+    const lines = [
+        ['Samaritans: call ', '116 123', 'tel:116123', ' (free, 24 hours)'],
+        ['SHOUT: text SHOUT to ', '85258', 'sms:85258?body=SHOUT', ''],
+        ['In an emergency, call ', '999', 'tel:999', '']
+    ];
+    for (const [before, label, href, after] of lines) {
+        const li = document.createElement('li');
+        li.appendChild(document.createTextNode(before));
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = label;
+        li.appendChild(a);
+        if (after) li.appendChild(document.createTextNode(after));
+        list.appendChild(li);
+    }
+    messageDiv.appendChild(list);
+
+    chatMessages.appendChild(messageDiv);
+    scrollMessageToTop(messageDiv);
+    focusInput();
 }
 
 function generateQuickReplies(pattern, response) {
@@ -923,9 +965,26 @@ async function addMessageWithTypingEffect(content, sender, quickReplies = null) 
     focusInput();
 }
 
+// Escape before any markdown is applied: model replies and the user's own
+// typed text both reach innerHTML through formatMessage.
+function escapeHtml(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Only web links and same-site paths become links; javascript:, data: and
+// anything else stays as plain text.
+function isSafeHref(url) {
+    return /^https?:\/\//i.test(url) || (url.startsWith('/') && !url.startsWith('//'));
+}
+
 function formatMessage(content) {
-    // Enhanced markdown-like formatting
-    let formatted = content;
+    // Enhanced markdown-like formatting, applied to escaped text
+    let formatted = escapeHtml(content == null ? '' : content);
 
     // Process line by line to handle lists and headers
     const lines = formatted.split('\n');
@@ -979,7 +1038,8 @@ function formatMessage(content) {
     formatted = formatted.replace(/(?<![*_])_(?!_)([^_]+)_(?![*_])/g, '<em>$1</em>');
 
     // Markdown links [text](url)
-    formatted = formatted.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    formatted = formatted.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (match, text, url) =>
+        isSafeHref(url.replace(/&amp;/g, '&')) ? `<a href="${url}" rel="noopener noreferrer">${text}</a>` : text);
 
     // Auto-link exercise names to their exercise pages
     const exerciseLinks = [];
