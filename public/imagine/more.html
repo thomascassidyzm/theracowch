@@ -120,6 +120,15 @@
             });
             document.getElementById('jump').innerHTML = jump;
             document.getElementById('areas').innerHTML = html;
+            // Letter chips scroll in place without adding history entries, so
+            // Back always leaves this page rather than stepping through letters.
+            document.getElementById('jump').addEventListener('click', function (e) {
+                var a = e.target.closest && e.target.closest('a');
+                if (!a) return;
+                e.preventDefault();
+                var t = document.getElementById(a.getAttribute('href').slice(1));
+                if (t) { t.scrollIntoView(); history.replaceState(null, '', a.getAttribute('href')); }
+            });
             // The page is built after load, so honour a #letter link ourselves.
             if (location.hash) {
                 var t = document.getElementById(location.hash.slice(1));
@@ -131,5 +140,6 @@
     <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script src="/assets/js/analytics.js"></script>
+    <script src="/assets/js/back-nav.js?v=1"></script>
 </body>
 </html>

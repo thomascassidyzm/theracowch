@@ -17,7 +17,7 @@
   'use strict';
   var KEY = 'cowch-exercise-history-v1';
   var KEEP_DAYS = 90, MAX = 1000, RELOAD_GUARD_MS = 5 * 60 * 1000;
-  var DAY = 86400000;
+  var DAY = 86400000, RETURN_KEY = 'cowch-exhist-return';
 
   function load() {
     try { var a = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(a) ? a : []; }
@@ -103,6 +103,14 @@
     block.addEventListener('click', function () { days = 7; render(); panel.classList.add('active'); });
     var back = document.getElementById('exhist-panel-back');
     if (back) back.addEventListener('click', function () { panel.classList.remove('active'); });
+    // Tapping a row leaves for the exercise; its Back returns here, so reopen the list.
+    var list = document.getElementById('exhist-list');
+    if (list) list.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.exhist-row')) { try { sessionStorage.setItem(RETURN_KEY, '1'); } catch (_) {} }
+    });
+    var ret = null;
+    try { ret = sessionStorage.getItem(RETURN_KEY); sessionStorage.removeItem(RETURN_KEY); } catch (_) {}
+    if (ret && location.hash === '#you') { days = 7; render(); panel.classList.add('active'); }
     var more = document.getElementById('exhist-older');
     if (more) more.addEventListener('click', function () { days = 30; render(); });
     // Returning from an exercise (back button / bfcache) shows fresh data.
