@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>More exercises | Cowch.app</title>
+    <meta name="description" content="Every IMAGINE exercise beyond the main one for each letter, grouped by letter.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Gabarito', sans-serif;
+            background: #FBF6EF;
+            color: #2D2D2D;
+            line-height: 1.5;
+            padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+        }
+        .container { max-width: 640px; margin: 0 auto; }
+        .back {
+            display: inline-block;
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            color: #2D2D2D;
+            font-weight: 700;
+            text-decoration: none;
+            border: 2px solid #2D2D2D;
+            border-radius: 12px;
+            background: #fff;
+        }
+        h1 { font-size: 2.2rem; font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
+        .lede { font-size: 1.05rem; opacity: 0.85; margin-bottom: 20px; }
+
+        /* Jump strip: one tap to a letter's section */
+        .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+        .jump a {
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px;
+            font-weight: 900; font-size: 1.2rem;
+            text-decoration: none; color: #2D2D2D;
+            background: var(--c);
+        }
+
+        .area { margin-bottom: 32px; scroll-margin-top: 16px; }
+        .area-head {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px;
+        }
+        .area-letter {
+            flex: none;
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 14px;
+            background: var(--c);
+            font-size: 1.6rem; font-weight: 900; color: #2D2D2D;
+        }
+        .area-head h2 { font-size: 1.4rem; font-weight: 900; line-height: 1.2; }
+        .area-head a { display: block; font-size: 0.9rem; color: #2D2D2D; opacity: 0.75; }
+
+        .ex {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            min-height: 64px;
+            background: #fff;
+            border: 2px solid var(--c);
+            border-left-width: 8px;
+            border-radius: 14px;
+            color: #2D2D2D;
+            text-decoration: none;
+        }
+        .ex:active { transform: translateY(1px); }
+        .ex-text { flex: 1; }
+        .ex-text strong { display: block; font-size: 1.1rem; font-weight: 800; }
+        .ex-text span { display: block; font-size: 0.95rem; opacity: 0.8; }
+        .ex-arrow { font-size: 1.4rem; font-weight: 800; }
+        .note { font-size: 0.9rem; opacity: 0.7; margin-top: 8px; }
+    </style>
+    <script src="/assets/js/exercise-catalog.js"></script>
+</head>
+<body>
+    <div class="container">
+        <a href="/app.html#imagine" class="back">&larr; Back to IMAGINE</a>
+        <h1>More exercises</h1>
+        <p class="lede">Each IMAGINE letter has one main exercise. Everything else lives here, grouped by letter, so you can always find your way back to one you liked.</p>
+
+        <nav class="jump" id="jump" aria-label="Jump to a letter"></nav>
+        <div id="areas"></div>
+        <noscript><p class="note">This page needs JavaScript switched on to list the exercises.</p></noscript>
+    </div>
+
+    <script>
+        (function () {
+            var cat = window.CowchExercises;
+            if (!cat) return;
+            function esc(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+                });
+            }
+            var jump = '', html = '';
+            cat.AREAS.forEach(function (a) {
+                var rest = cat.others(a.key);
+                if (!rest.length) return;
+                var keep = cat.keeper(a.key);
+                jump += '<a href="#' + a.key + '" style="--c:' + a.color + '" aria-label="' + esc(a.name) + '">' + a.letter + '</a>';
+                html += '<section class="area" id="' + a.key + '" style="--c:' + a.color + '">' +
+                    '<div class="area-head"><div class="area-letter">' + a.letter + '</div><div>' +
+                        '<h2>' + esc(a.name) + '</h2>' +
+                        '<a href="/imagine/' + a.key + '.html">Main exercise: ' + esc(keep.title) + ' →</a>' +
+                    '</div></div>' +
+                    rest.map(function (e) {
+                        return '<a class="ex" href="' + cat.url(e.slug) + '">' +
+                            '<span class="ex-text"><strong>' + esc(e.title) + '</strong><span>' + esc(e.desc) + '</span></span>' +
+                            '<span class="ex-arrow" aria-hidden="true">→</span></a>';
+                    }).join('') +
+                '</section>';
+            });
+            document.getElementById('jump').innerHTML = jump;
+            document.getElementById('areas').innerHTML = html;
+            // The page is built after load, so honour a #letter link ourselves.
+            if (location.hash) {
+                var t = document.getElementById(location.hash.slice(1));
+                if (t) t.scrollIntoView();
+            }
+        })();
+    </script>
+    <!-- Vercel Web Analytics (cookieless, no personal data) -->
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script src="/assets/js/analytics.js"></script>
+</body>
+</html>

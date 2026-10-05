@@ -3442,7 +3442,16 @@ function setupImagineGuide() {
         textEl.innerHTML = `Lovely choice. ${blurb}Here are some ways to explore it — which would you like to try?`;
         optionsEl.innerHTML = '';
 
-        domain.exercises.forEach(ex => {
+        // One exercise per letter: show only this area's main ("keeper")
+        // exercise from exercise-catalog.js; the rest live in More exercises.
+        const areaKey = (DOMAIN_PAGES[domainKey] || '').replace(/^.*\/imagine\/|\.html$/g, '');
+        const cat = window.CowchExercises;
+        const keep = cat && cat.keeper(areaKey);
+        const shown = keep
+            ? [{ title: keep.title, description: keep.desc, url: cat.url(keep.slug) }]
+            : domain.exercises;
+
+        shown.forEach(ex => {
             const chip = document.createElement('button');
             chip.type = 'button';
             chip.className = 'imagine-guide-chip';
@@ -3456,19 +3465,18 @@ function setupImagineGuide() {
             optionsEl.appendChild(chip);
         });
 
-        // Open the area's full page for the user who wants more.
-        const pageUrl = DOMAIN_PAGES[domainKey];
-        if (pageUrl) {
-            const pageChip = document.createElement('button');
-            pageChip.type = 'button';
-            pageChip.className = 'imagine-guide-chip';
-            pageChip.innerHTML =
+        // Everything else in this area lives in More exercises.
+        if (cat) {
+            const moreChip = document.createElement('button');
+            moreChip.type = 'button';
+            moreChip.className = 'imagine-guide-chip';
+            moreChip.innerHTML =
                 `<span class="imagine-guide-chip-text">` +
-                    `<span class="imagine-guide-chip-title">Open the full ${domain.title} page</span>` +
-                    `<span class="imagine-guide-chip-desc">See everything in this area</span>` +
+                    `<span class="imagine-guide-chip-title">More exercises</span>` +
+                    `<span class="imagine-guide-chip-desc">The other ${domain.title} exercises, and every other letter's</span>` +
                 `</span>`;
-            pageChip.addEventListener('click', () => { window.location.href = pageUrl; });
-            optionsEl.appendChild(pageChip);
+            moreChip.addEventListener('click', () => { window.location.href = cat.MORE_URL + '#' + areaKey; });
+            optionsEl.appendChild(moreChip);
         }
 
         // Back to the area chooser.
@@ -3762,11 +3770,8 @@ function setupToolPanels() {
     document.getElementById('values-panel-back').addEventListener('click', () => closeToolPanel('values'));
     document.getElementById('exercises-panel-back').addEventListener('click', () => closeToolPanel('exercises'));
 
-    // Explore All Exercises button
-    document.getElementById('explore-exercises-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        openToolPanel('exercises');
-    });
+    // The IMAGINE tab's "More exercises" button is a plain link to
+    // /imagine/more.html (every exercise beyond each letter's main one).
 
     // Home page "See all exercises" button (removed from the home tab — guarded
     // in case it's reintroduced later)

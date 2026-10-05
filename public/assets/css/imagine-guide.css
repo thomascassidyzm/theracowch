@@ -200,3 +200,30 @@
 @media (prefers-reduced-motion: reduce) {
   .ig-guide, .ig-swap { animation: none; }
 }
+
+/* ---------- One exercise per letter (imagine-keeper.js) ---------- */
+/* Hide the page's exercise cards until the keeper script has run, so the
+   extra cards never flash before they're moved to "More exercises". */
+html.ik-pending a.exercise-card[href*="/exercises/"],
+html.ik-pending .exercise-card[onclick*="/exercises/"] { display: none !important; }
+
+.ik-more {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 32px;
+  padding: 18px 20px;
+  min-height: 64px;
+  background: #ffffff;
+  color: #2D2D2D;
+  text-decoration: none;
+  border: 3px solid var(--ik-accent, #C97B63);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 var(--ik-accent, #C97B63);
+  font-family: inherit;
+}
+.ik-more:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ik-accent, #C97B63); }
+.ik-more-text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.ik-more-text strong { font-size: 1.15rem; font-weight: 800; }
+.ik-more-text span { font-size: 0.95rem; line-height: 1.4; opacity: 0.8; }
+.ik-more-arrow { font-size: 1.6rem; font-weight: 800; }
