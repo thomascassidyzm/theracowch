@@ -2058,6 +2058,18 @@
         .space-block-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
         .space-block-chevron { font-size: 1.6rem; color: var(--text-muted); font-weight: 900; flex-shrink: 0; }
 
+        /* Your recent exercises */
+        .exhist-day { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); margin: var(--space-lg) 0 var(--space-sm); text-transform: none; }
+        .exhist-day:first-child { margin-top: 0; }
+        .exhist-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 14px; margin-bottom: 8px; border-radius: 14px; background: var(--bg-card, rgba(255,255,255,0.06)); border: 1px solid rgba(128,128,128,0.25); color: inherit; text-decoration: none; }
+        .exhist-letter { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #111; flex-shrink: 0; }
+        .exhist-title { flex: 1; font-weight: 700; }
+        .exhist-count { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; }
+        .exhist-chev { font-size: 1.6rem; color: var(--text-muted); font-weight: 900; }
+        .exhist-empty { color: var(--text-muted); line-height: 1.5; padding: var(--space-lg) 0; }
+        .exhist-older { display: block; margin: var(--space-lg) auto 0; background: none; border: none; color: inherit; text-decoration: underline; font: inherit; min-height: 44px; cursor: pointer; }
+        .exhist-older[hidden] { display: none; }
+
         /* Full-screen slide-in panels for Your Space (pasture, summary) — mirror
            the domain panel. */
         .pasture-panel, .summary-panel {
@@ -5469,6 +5481,17 @@
                         <span class="space-block-chevron">›</span>
                     </button>
 
+
+                    <!-- 3b. Your recent exercises — on-device history, one tap back in -->
+                    <button type="button" class="space-block" id="exhist-block" aria-label="Open your recent exercises">
+                        <span class="space-block-emoji">🕰️</span>
+                        <div class="space-block-text">
+                            <strong>Your recent exercises</strong>
+                            <span>Find your way back to ones you&rsquo;ve tried</span>
+                        </div>
+                        <span class="space-block-chevron">›</span>
+                    </button>
+
                     <!-- Patterns I'm noticing -->
                     <div class="patterns-card" id="patterns-card">
                         <div class="patterns-head">
@@ -5702,6 +5725,21 @@
                         <button type="button" class="summary-archive-link" id="summary-archive-open">🗂️ Past reflections <span class="archive-open-count" id="summary-archive-count"></span></button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Your recent exercises — on-device history -->
+        <div class="summary-panel" id="exhist-panel">
+            <header class="domain-panel-header">
+                <button class="domain-panel-back" id="exhist-panel-back">← Back</button>
+                <div class="domain-panel-title">
+                    <h2>Your recent exercises</h2>
+                    <span>Kept on this device only</span>
+                </div>
+            </header>
+            <div class="summary-panel-content">
+                <div id="exhist-list"></div>
+                <button type="button" class="exhist-older" id="exhist-older">Show older (last 30 days)</button>
             </div>
         </div>
 
@@ -7637,6 +7675,7 @@
     <script src="/assets/on-demand-prompts.js"></script>
     <script src="/assets/chat-script.js?v=56"></script>
     <script src="/assets/js/exercise-catalog.js"></script>
+    <script src="/assets/js/exercise-history.js?v=1"></script>
     <script src="/assets/js/app.js?v=92"></script>
     <script src="/assets/js/calf.js?v=2"></script>
 
