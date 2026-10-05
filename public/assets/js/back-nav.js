@@ -52,7 +52,10 @@
   }
 
   function init() {
-    var links = document.querySelectorAll('a.back, a.back-btn, a.back-button');
+    var links = [].filter.call(document.querySelectorAll('a[href]'), function (el) {
+      return el.matches('.back, .back-btn, .back-button, [data-back]') ||
+             /^(←\s*)?back\b/i.test(el.textContent.trim());   // unclassed existing Back links
+    });
     for (var i = 0; i < links.length; i++) wire(links[i]);
     if (!links.length && /^\/exercises\//.test(location.pathname)) {
       var a = document.createElement('a');
