@@ -5,13 +5,13 @@
    so Mandy knows a little about who she's talking to. Never the per-moment
    answers, never the abstention notes people type — those are not read at all.
 
-   This is the one control over that, and it is an OPT-OUT: unset means on,
-   because the companion is the point of the questionnaire. One key, one meaning:
+   This is the one control over that, and it is an OPT-IN (UK GDPR consent must
+   be an affirmative act): unset means off. One key, one meaning:
 
-     cowch-share-wayl-with-mandy : 'on' | 'off'   (absent === 'on')
+     cowch-share-wayl-with-mandy : 'on' | 'off'   (absent === 'off')
 
    Enforcement is NOT here. It is one place only — getQuestionnaireResult() in
-   assets/js/therapy-profile.js returns null when this says 'off', and everything
+   assets/js/therapy-profile.js returns null unless this says 'on', and everything
    downstream already handles null. Don't scatter the check.
 
    Wires every <input data-wayl-share-toggle> on the page. No build step. */
@@ -21,7 +21,7 @@
   var KEY = 'cowch-share-wayl-with-mandy';
 
   function isOn() {
-    try { return localStorage.getItem(KEY) !== 'off'; } catch (e) { return true; }
+    try { return localStorage.getItem(KEY) === 'on'; } catch (e) { return false; }
   }
 
   function set(on) {

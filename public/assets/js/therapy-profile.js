@@ -243,9 +243,9 @@ async function compressProfile(recentMessages) {
 // here, so neither can travel. Both questionnaire variants save the same band
 // shape; the ranked one wins if somebody has done both, being the newer design.
 //
-// This is also the ONE enforcement point for the opt-out. The questionnaire
+// This is also the ONE enforcement point for the opt-in. The questionnaire
 // pages and app settings write `cowch-share-wayl-with-mandy` ('on' / 'off';
-// absent means on, it's an opt-out). When it says 'off' this returns null, and
+// absent means off, it's an opt-in). Unless it says 'on' this returns null, and
 // everything downstream already handles null — chat-script.js guards with
 // `if (context.questionnaire)` and api/chat.js copes with it absent — so the
 // companion keeps working exactly as it does for anyone who never took the
@@ -255,9 +255,9 @@ const QUESTIONNAIRE_SHARE_KEY = 'cowch-share-wayl-with-mandy';
 
 function questionnaireSharingAllowed() {
   try {
-    return localStorage.getItem(QUESTIONNAIRE_SHARE_KEY) !== 'off';
+    return localStorage.getItem(QUESTIONNAIRE_SHARE_KEY) === 'on';
   } catch (e) {
-    return true; // private mode: nothing stored, so the default (on) stands
+    return false; // private mode: nothing stored, so the default (off) stands
   }
 }
 
