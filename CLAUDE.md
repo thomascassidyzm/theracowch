@@ -40,11 +40,10 @@ that ship are the files in the repo. Edit them directly.
   - `public/assets/css/`, `public/assets/*.js` — styles and helper scripts.
   - `public/index.html` redirects to `/app.html`. Other top-level pages:
     `about.html`, `privacy.html`, `terms.html`, `accessibility.html`,
-    `vision.html`, `offline.html`.
+    `offline.html`, `nda.html`, `for-universities.html`; `ls public/*.html` is the live list.
   - `public/sw.js` — the PWA service worker. `public/manifest.json` — PWA
     manifest.
-- **`api/` — Vercel serverless functions** (`chat.js`, `courses.js`,
-  `compress-profile.js`, `blog-quotes.js`, `api/push/*`). Node, deployed by
+- **`api/` — Vercel serverless functions** (`ls api/` for the live list: `chat.js`, `courses.js`, `compress-profile.js`, `blog-quotes.js`, `nda-*.js`, `questionnaire-report.js`, `wheel.js`, `api/push/*`). Node, deployed by
   Vercel as functions at `/api/...`.
 - The root `index.html` is **not** the served entry (Vercel serves `public/`).
   Don't edit it expecting a visible change.
@@ -68,7 +67,7 @@ loading the page.
 ## The PWA cache — why a deployed change may not appear on a device
 
 The app installs a service worker (`public/sw.js`) that caches under a
-**manually bumped** `CACHE_NAME` (e.g. `cowch-wellness-v120`). Two rules:
+**manually bumped** `CACHE_NAME` (e.g. `cowch-wellness-v244`; read the current value in the file). Two rules:
 
 1. **Bump `CACHE_NAME` (and `BUILD_DATE`) in `public/sw.js` whenever you change
    precached assets or want a clean cache.** Forgetting this is a common reason
@@ -92,3 +91,5 @@ production. The workflow is serialized (a `concurrency` group) and retries its p
 don't race-drop each other — but a **genuine merge conflict fails the workflow
 loudly** and must be resolved by hand (the branch's changes won't reach `main`
 until then). After pushing, allow a minute or two for the merge + Vercel deploy.
+
+**Anything that must NOT go live:** a push to `cs/**` or `claude/**` IS a production deploy. Use a non-`cs` branch name (e.g. `docs/…`, `preview/…`). The `staging` branch is bound to **staging.cowch.app** (Vercel builds only `main`, `dev` and `staging`); other branches get no git preview, so a preview of unmerged work needs a CLI deploy. Preview and staging share production's Upstash store: `lib/redis.js` prefixes every key with `<VERCEL_ENV>:` outside production, but the Anthropic key is shared, so a hit-test spends real money.
